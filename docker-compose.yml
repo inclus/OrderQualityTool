@@ -1,8 +1,8 @@
 orderqualitytool:
   restart: always
   build: ./
-  expose:
-    - "9000"
+  ports:
+    - "9000:9000"
   links:
     - postgres:postgres
   env_file: .env
