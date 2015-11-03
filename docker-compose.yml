@@ -12,6 +12,6 @@ postgres:
   restart: always
   image: postgres:latest
   volumes:
-    -/data/postgresql:/var/lib/postgresql
+    - /data/postgresql:/var/lib/postgresql
   ports:
     - "5432:5432"
