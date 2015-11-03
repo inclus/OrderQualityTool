@@ -1,0 +1,17 @@
+orderqualitytool:
+  restart: always
+  build: ./
+  expose:
+    - "9000"
+  links:
+    - postgres:postgres
+  env_file: .env
+  command: /usr/local/bin/gunicorn orderqualitytool.wsgi:application -w 2 -b :9000
+
+postgres:
+  restart: always
+  image: postgres:latest
+  volumes:
+    -/data/postgresql:/var/lib/postgresql
+  ports:
+    - "5432:5432"
