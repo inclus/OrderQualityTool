@@ -1,5 +1,7 @@
 import os
 
+import sys
+
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = '(d!y31^rnwjhux$nwv26*g#z-=_a&gwq0lc1b@3t!gv)dhn_bx'
 DEBUG = True
@@ -79,3 +81,15 @@ try:
     from local_settings import *
 except ImportError:
     pass
+
+if 'test' in sys.argv:
+    DATABASES = {
+        'default':
+        {'ENGINE': 'django.db.backends.sqlite3',
+         'NAME': 'test_sqlite.db'}
+    }
+    MEDIA_ROOT = 'media/test'
+    PASSWORD_HASHERS = ('django.contrib.auth.hashers.MD5PasswordHasher',
+                        'django.contrib.auth.hashers.SHA1PasswordHasher', )
+    MEDIA_URL = "/media/"
+    STATIC_URL = "/static/"
