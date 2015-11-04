@@ -1,5 +1,4 @@
 import os
-
 import sys
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -82,14 +81,14 @@ try:
 except ImportError:
     pass
 
-if 'test' in sys.argv:
+if ('test' in sys.argv) or ('jenkins' in sys.argv):
     DATABASES = {
         'default':
-        {'ENGINE': 'django.db.backends.sqlite3',
-         'NAME': 'test_sqlite.db'}
+            {'ENGINE': 'django.db.backends.sqlite3',
+             'NAME': 'test_sqlite.db'}
     }
     MEDIA_ROOT = 'media/test'
     PASSWORD_HASHERS = ('django.contrib.auth.hashers.MD5PasswordHasher',
-                        'django.contrib.auth.hashers.SHA1PasswordHasher', )
+                        'django.contrib.auth.hashers.SHA1PasswordHasher',)
     MEDIA_URL = "/media/"
     STATIC_URL = "/static/"
