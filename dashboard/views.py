@@ -1,4 +1,6 @@
-from django.shortcuts import render
+from braces.views import LoginRequiredMixin
+from django.views.generic import TemplateView
 
-def home(request):
-    return render(request, "home.html")
+
+class HomeView(LoginRequiredMixin, TemplateView):
+    template_name = "home.html"

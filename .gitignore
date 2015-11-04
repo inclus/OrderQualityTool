@@ -140,3 +140,4 @@ docs/_build/
 target/
 reports/
 *.sqlite3
+local_settings.py

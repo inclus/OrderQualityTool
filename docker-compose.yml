@@ -3,6 +3,8 @@ orderqualitytool:
   build: ./
   ports:
     - "9000:9000"
+  volumes:
+    - /data/assets:/usr/src/app/asset_files
   links:
     - postgres:postgres
   env_file: .env
