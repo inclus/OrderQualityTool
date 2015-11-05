@@ -5,3 +5,4 @@ django-braces==1.8.1
 django-password-reset==0.8.1
 django-bootstrap3==6.2.2
 django-flat-theme==1.1.1
+raven==5.8.1
