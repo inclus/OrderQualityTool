@@ -16,6 +16,7 @@ INSTALLED_APPS = (
     'bootstrap3',
     'dashboard',
     'qdbauth',
+    'password_reset'
 
 )
 
@@ -76,6 +77,12 @@ LOGIN_URL = '/login'
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_URL = '/logout'
 STATIC_ROOT = 'asset_files'
+
+EMAIL_HOST = os.environ.get('EMAIL_HOST', '')
+EMAIL_PORT = os.environ.get('EMAIL_PORT', '')
+EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', '')
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', '')
+
 try:
     from local_settings import *
 except ImportError:
