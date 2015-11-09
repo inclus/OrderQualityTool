@@ -6,3 +6,5 @@ django-password-reset==0.8.1
 django-bootstrap3==6.2.2
 django-flat-theme==1.1.1
 raven==5.8.1
+django-mptt==0.7.4
+django-admirarchy==0.2.0

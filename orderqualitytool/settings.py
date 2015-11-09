@@ -18,8 +18,10 @@ INSTALLED_APPS = (
     'dashboard',
     'qdbauth',
     'password_reset',
-    'raven.contrib.django.raven_compat'
-
+    'raven.contrib.django.raven_compat',
+    'mptt',
+    'locations',
+    'admirarchy'
 )
 
 MIDDLEWARE_CLASSES = (
@@ -85,7 +87,7 @@ EMAIL_PORT = os.environ.get('EMAIL_PORT', '')
 EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', '')
 EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', '')
 RAVEN_CONFIG = {
-    'dsn': os.environ.get('SENTRY_DSN', ''),
+    'dsn': os.environ.get('SENTRY_DSN', None),
 }
 try:
     from local_settings import *
