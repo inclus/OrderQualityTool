@@ -22,6 +22,7 @@ INSTALLED_APPS = (
     'mptt',
     'locations',
     'admirarchy',
+    'menu'
 )
 
 MIDDLEWARE_CLASSES = (

@@ -1,4 +1,5 @@
 {% load staticfiles %}
+{% load menu %}{% generate_menu %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -17,11 +18,11 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <a class="navbar-brand" href="#">Order Quality Tool</a>
+            <a class="navbar-brand" href="#">Order Quality</a>
         </div>
         <div id="navbar" class="navbar-collapse collapse">
             <ul class="nav navbar-nav">
-                <li class="active"><a href="/">Home</a></li>
+                {% with menu=menus.main %}{% include "bootstrap-navbar.html" %}{% endwith %}
             </ul>
 
             <ul class="pull-right nav navbar-nav">
@@ -34,6 +35,8 @@
         </div><!--/.nav-collapse -->
     </div>
 </nav>
+
+
 <div class="container">
     {% block content %}
     {% endblock content %}
