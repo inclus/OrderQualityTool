@@ -1,3 +1,6 @@
 from django.db import models
+from custom_user.models import AbstractEmailUser
+from locations.models import Location
 
-# Create your models here.
+class DashboardUser(AbstractEmailUser):
+    location = models.ForeignKey(Location, null=True, blank=True)

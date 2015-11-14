@@ -21,7 +21,7 @@ INSTALLED_APPS = (
     'raven.contrib.django.raven_compat',
     'mptt',
     'locations',
-    'admirarchy'
+    'admirarchy',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -89,6 +89,9 @@ EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', '')
 RAVEN_CONFIG = {
     'dsn': os.environ.get('SENTRY_DSN', None),
 }
+
+
+AUTH_USER_MODEL = 'dashboard.DashboardUser'
 try:
     from local_settings import *
 except ImportError:
