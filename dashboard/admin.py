@@ -6,7 +6,7 @@ from django.contrib.auth.models import Group
 from django.utils.translation import ugettext_lazy
 from django.utils.translation import ugettext_lazy as _
 
-from dashboard.models import DashboardUser
+from dashboard.models import DashboardUser, FacilityConsumptionRecord, DrugFormulation, FacilityCycleRecord
 from locations.models import Location
 
 
@@ -51,3 +51,6 @@ admin_site = QdbSite()
 admin_site.register(Group, GroupAdmin)
 admin_site.register(DashboardUser, EmailUserAdmin)
 admin_site.register(Location, MyModelAdmin)
+admin_site.register(FacilityConsumptionRecord)
+admin_site.register(DrugFormulation)
+admin_site.register(FacilityCycleRecord)
