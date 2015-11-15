@@ -142,3 +142,4 @@ reports/
 *.sqlite3
 local_settings.py
 asset_files/
+tmp

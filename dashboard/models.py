@@ -20,10 +20,16 @@ class FacilityCycleRecord(models.Model):
     facility = models.ForeignKey(Location)
     cycle = models.CharField(max_length=256)
 
+    def __unicode__(self):
+        return "%s %s" % (self.facility, self.cycle)
+
 
 class DrugFormulation(models.Model):
     name = models.CharField(max_length=256, null=False, blank=False)
     unit = models.CharField(max_length=256, null=False, blank=False)
+
+    def __unicode__(self):
+        return self.name
 
 
 class FacilityConsumptionRecord(models.Model):
@@ -42,6 +48,9 @@ class FacilityConsumptionRecord(models.Model):
     total_quantity_to_be_ordered = models.FloatField(null=True, blank=True)
     notes = models.CharField(max_length=256, null=True, blank=True)
 
+    def __unicode__(self):
+        return "%s %s" % (self.facility_cycle, self.drug_formulation)
+
 
 class WaosFile():
     def __init__(self, path):
@@ -54,11 +63,14 @@ class WaosFile():
 
     def get_data(self):
         record = self.get_facility_record()
-        for n in range(4, 14):
-            self.build_consumption_record(n, record)
+        if record:
+            for n in range(4, 14):
+                self.build_consumption_record(n, record)
 
-        for n in range(16, 24):
-            self.build_consumption_record(n, record)
+            for n in range(16, 24):
+                self.build_consumption_record(n, record)
+
+            return record
 
     def build_consumption_record(self, n, record):
         formulation_name = self.worksheet.cell_value(n, 1)
@@ -88,9 +100,11 @@ class WaosFile():
 
     def get_facility_record(self):
         facility_name = self.worksheet.cell_value(27, 1)
+        level = self.worksheet.cell_value(28, 1)
+        full_name = "%s %s" % (facility_name, level)
         cycle = self.worksheet.cell_value(30, 1)
         try:
-            location = Location.objects.get(name=facility_name)
+            location = Location.objects.get(name=full_name)
             record, exists = FacilityCycleRecord.objects.get_or_create(facility=location, cycle=cycle)
             return record
         except ObjectDoesNotExist:

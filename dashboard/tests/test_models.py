@@ -12,13 +12,13 @@ class WaosFileTestCase(TestCase):
         return file_path
 
     def test_can_get_record_from_file(self):
-        Location.objects.get_or_create(name="AIC Jinja", uid="AIC Jinja", level=1)
+        Location.objects.get_or_create(name="AIC Jinja Special Clinic", uid="AIC Jinja", level=1)
         record = WaosFile(self.get_fixture_path('b.xls')).get_facility_record()
         self.assertEqual(record.cycle, "Jul-Aug 2015")
-        self.assertEqual(record.facility.name, "AIC Jinja")
+        self.assertEqual(record.facility.name, "AIC Jinja Special Clinic")
 
     def test_can_build_consumption_records_from_file(self):
-        Location.objects.get_or_create(name="AIC Jinja", uid="AIC Jinja", level=1)
+        Location.objects.get_or_create(name="AIC Jinja Special Clinic", uid="AIC Jinja Special Clinic", level=1)
         WaosFile(self.get_fixture_path('b.xls')).get_data()
         self.assertEqual(FacilityConsumptionRecord.objects.count(), 18)
         self.assertEqual(FacilityConsumptionRecord.objects.get(id=1).opening_balance, 105)
