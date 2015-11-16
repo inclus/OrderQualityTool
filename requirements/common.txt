@@ -11,3 +11,6 @@ django-custom-user==0.5
 django-simple-menu==1.1.0
 xlrd==0.9.4
 arrow==0.7.0
+djangorestframework==3.3.1
+markdown=2.6.4
+django-filter=0.11.0

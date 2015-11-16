@@ -1,5 +1,6 @@
 import os
 
+import django_filters
 from braces.views import LoginRequiredMixin
 from django.conf import settings
 from django.contrib import messages
@@ -7,8 +8,11 @@ from django.core.files.base import ContentFile
 from django.core.files.storage import default_storage
 from django.db.models import Count
 from django.views.generic import TemplateView, FormView
+from rest_framework import filters
+from rest_framework.generics import ListAPIView
+from rest_framework.serializers import ModelSerializer
 
-from dashboard.models import WaosFile, FacilityCycleRecord
+from dashboard.models import WaosFile, FacilityCycleRecord, DrugFormulation, FacilityConsumptionRecord
 from forms import FileUploadForm
 from locations.models import Location
 
@@ -39,3 +43,49 @@ class DataImportView(LoginRequiredMixin, FormView):
             messages.add_message(self.request, messages.INFO, 'Successfully imported file for %s for cycle %s' % (record.facility, record.cycle))
         os.remove(tmp_file)
         return super(DataImportView, self).form_valid(form)
+
+
+class FacilityConsumptionRecordFilter(django_filters.FilterSet):
+    class Meta:
+        model = FacilityConsumptionRecord
+        fields = ['facility_cycle__facility']
+
+class LocationSerializer(ModelSerializer):
+    class Meta:
+        model = Location
+
+
+class FacilityCycleRecordSerializer(ModelSerializer):
+    facility = LocationSerializer()
+
+    class Meta:
+        model = FacilityCycleRecord
+
+
+class DrugFormulationSerializer(ModelSerializer):
+    class Meta:
+        model = DrugFormulation
+
+
+class FacilityConsumptionRecordSerializer(ModelSerializer):
+    facility_cycle = FacilityCycleRecordSerializer()
+
+    class Meta:
+        model = FacilityConsumptionRecord
+
+
+class CycleRecordsListView(ListAPIView):
+    queryset = FacilityCycleRecord.objects.all()
+    serializer_class = FacilityCycleRecordSerializer
+
+
+class DrugFormulationListView(ListAPIView):
+    queryset = DrugFormulation.objects.all()
+    serializer_class = DrugFormulationSerializer
+
+
+class ConsumptionRecordListView(ListAPIView):
+    queryset = FacilityConsumptionRecord.objects.all()
+    serializer_class = FacilityConsumptionRecordSerializer
+    filter_backends = (filters.DjangoFilterBackend,)
+    filter_class = FacilityConsumptionRecordFilter

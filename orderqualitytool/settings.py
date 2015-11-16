@@ -22,7 +22,8 @@ INSTALLED_APPS = (
     'mptt',
     'locations',
     'admirarchy',
-    'menu'
+    'menu',
+    'rest_framework'
 )
 
 MIDDLEWARE_CLASSES = (
@@ -90,7 +91,6 @@ EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', '')
 RAVEN_CONFIG = {
     'dsn': os.environ.get('SENTRY_DSN', None),
 }
-
 
 AUTH_USER_MODEL = 'dashboard.DashboardUser'
 try:
