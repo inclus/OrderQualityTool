@@ -15,11 +15,13 @@ class Migration(migrations.Migration):
             name='Location',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('name', models.CharField(unique=True, max_length=256)),
-                ('level', models.CharField(max_length=50)),
+                ('name', models.CharField(max_length=256)),
+                ('uid', models.CharField(unique=True, max_length=256)),
+                ('org_level', models.CharField(max_length=50)),
                 ('lft', models.PositiveIntegerField(editable=False, db_index=True)),
                 ('rght', models.PositiveIntegerField(editable=False, db_index=True)),
                 ('tree_id', models.PositiveIntegerField(editable=False, db_index=True)),
+                ('level', models.PositiveIntegerField(editable=False, db_index=True)),
                 ('parent', mptt.fields.TreeForeignKey(related_name='children', blank=True, to='locations.Location', null=True)),
             ],
             options={

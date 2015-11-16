@@ -5,6 +5,7 @@ from django.contrib.auth.admin import GroupAdmin, UserAdmin
 from django.contrib.auth.models import Group
 from django.utils.translation import ugettext_lazy
 from django.utils.translation import ugettext_lazy as _
+from mptt.admin import MPTTModelAdmin
 
 from dashboard.models import DashboardUser, FacilityConsumptionRecord, DrugFormulation, FacilityCycleRecord
 from locations.models import Location
@@ -67,7 +68,7 @@ class ConsumptionAdmin(ModelAdmin):
 admin_site = QdbSite()
 admin_site.register(Group, GroupAdmin)
 admin_site.register(DashboardUser, EmailUserAdmin)
-admin_site.register(Location, MyModelAdmin)
+admin_site.register(Location, MPTTModelAdmin)
 admin_site.register(FacilityConsumptionRecord, ConsumptionAdmin)
 admin_site.register(DrugFormulation)
 admin_site.register(FacilityCycleRecord)
