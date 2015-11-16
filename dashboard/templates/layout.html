@@ -1,5 +1,6 @@
 {% load staticfiles %}
 {% load menu %}{% generate_menu %}
+{% load bootstrap3 %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -9,6 +10,7 @@
     <link rel="stylesheet" href='{% static "css/app.css" %}'>
 </head>
 <body>
+
 <nav class="navbar navbar-inverse navbar-fixed-top">
     <div class="container">
         <div class="navbar-header">
@@ -27,9 +29,9 @@
 
             <ul class="pull-right nav navbar-nav">
                 {% if user.is_authenticated %}
-                        <li><a href="{% url 'logout' %}">Logout</a></li>
+                <li><a href="{% url 'logout' %}">Logout</a></li>
                 {% else %}
-                     <li><a href="{% url 'login' %}">Login</a></li>
+                <li><a href="{% url 'login' %}">Login</a></li>
                 {% endif %}
             </ul>
         </div><!--/.nav-collapse -->
@@ -38,6 +40,7 @@
 
 
 <div class="container">
+    {% bootstrap_messages %}
     {% block content %}
     {% endblock content %}
 </div>
