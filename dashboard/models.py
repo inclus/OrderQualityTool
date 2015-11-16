@@ -104,7 +104,7 @@ class WaosFile():
         full_name = "%s %s" % (facility_name, level)
         cycle = self.worksheet.cell_value(30, 1)
         try:
-            location = Location.objects.get(name=full_name)
+            location = Location.objects.get(name__icontains=full_name)
             record, exists = FacilityCycleRecord.objects.get_or_create(facility=location, cycle=cycle)
             return record
         except ObjectDoesNotExist:
