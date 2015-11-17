@@ -95,8 +95,6 @@ class WaosFile():
         value = self.worksheet.cell_value(n, i)
         if value:
             return value
-        else:
-            return 0
 
     def get_facility_record(self):
         facility_name = self.worksheet.cell_value(27, 1)

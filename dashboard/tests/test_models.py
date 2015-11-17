@@ -25,4 +25,4 @@ class WaosFileTestCase(TestCase):
         self.assertEqual(FacilityConsumptionRecord.objects.get(id=1).closing_balance, 381)
         self.assertEqual(FacilityConsumptionRecord.objects.get(id=1).months_of_stock_of_hand, 3.1)
         self.assertEqual(FacilityConsumptionRecord.objects.get(id=1).total_quantity_to_be_ordered, 131)
-        self.assertEqual(FacilityConsumptionRecord.objects.get(id=11).opening_balance, 0)
+        self.assertEqual(FacilityConsumptionRecord.objects.get(id=11).opening_balance, None)
