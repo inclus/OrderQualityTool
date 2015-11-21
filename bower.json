@@ -1,23 +1,25 @@
 {
-  "name": "orderqualitytool",
-  "homepage": "https://github.com/CHAIUganda/OrderQualityTool",
-  "description": "",
-  "main": "",
-  "moduleType": [],
-  "license": "MIT",
-  "private": true,
-  "ignore": [
-    "**/.*",
-    "node_modules",
-    "bower_components",
-    "vendor",
-    "test",
-    "tests"
-  ],
-  "dependencies": {
-    "angular": "1.4.7",
-    "bootstrap": "3.3.5",
-    "bootswatch": "3.3.5",
-    "jquery": "1.9"
-  }
+    "name": "orderqualitytool",
+    "homepage": "https://github.com/CHAIUganda/OrderQualityTool",
+    "description": "",
+    "main": "",
+    "moduleType": [],
+    "license": "MIT",
+    "private": true,
+    "ignore": [
+        "**/.*",
+        "node_modules",
+        "bower_components",
+        "vendor",
+        "test",
+        "tests"
+    ],
+    "dependencies": {
+        "angular": "1.4.7",
+        "bootstrap": "3.3.5",
+        "bootswatch": "3.3.5",
+        "jquery": "1.9",
+        "angular-ui-router": "~0.2.15",
+        "angular-chart.js": "~0.8.5"
+    }
 }

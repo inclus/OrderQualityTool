@@ -1,32 +1,7 @@
 {% extends "layout.html" %}
 
 {% block content %}
-<div class="container">
-    <div class="row">
-        <div class="col-md-5">
-        <h4>Key Metrics</h4>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-md-3">
-            <!-- <span class="metric">32 %</span> -->
-            <span class="detail">Web Based Rate</span>
-        </div>
-        <div class="col-m-3">
-            <table class="table table-bordered">
-                <tbody>{% for cycle in cycles %}
-                    <tr>
-                        <td>
-                            {{cycle.cycle}}
-                        </td>
-                        <td>
-                            {{cycle.count}}/ {{location_count}}
-                        </td>
-                    </tr>
-                    {% endfor %}</tbody>
-
-            </table>
-        </div>
-    </div>
+<div class="container" ng-app="dashboard">
+     <div ui-view></div>
 </div>
 {% endblock content %}
