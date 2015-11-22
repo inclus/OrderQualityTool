@@ -60,8 +60,7 @@ class ConsumptionAdmin(ModelAdmin):
                     'months_of_stock_of_hand',
                     'quantity_required_for_current_patients',
                     'estimated_number_of_new_patients',
-                    'estimated_number_of_new_pregnant_women',
-                    'total_quantity_to_be_ordered',
+                    'estimated_number_of_new_pregnant_women'
                     )
 
 

@@ -1,9 +1,12 @@
 from custom_user.models import AbstractEmailUser
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
+from openpyxl import load_workbook
 from xlrd import open_workbook
 
 from locations.models import Location
+
+CONSUMPTION = "CONSUMPTION"
 
 
 class DashboardUser(AbstractEmailUser):
@@ -45,6 +48,7 @@ class FacilityConsumptionRecord(models.Model):
     quantity_required_for_current_patients = models.FloatField(null=True, blank=True)
     estimated_number_of_new_patients = models.FloatField(null=True, blank=True)
     estimated_number_of_new_pregnant_women = models.FloatField(null=True, blank=True)
+    packs_ordered = models.FloatField(null=True, blank=True)
     total_quantity_to_be_ordered = models.FloatField(null=True, blank=True)
     notes = models.CharField(max_length=256, null=True, blank=True)
 
@@ -52,7 +56,7 @@ class FacilityConsumptionRecord(models.Model):
         return "%s %s" % (self.facility_cycle, self.drug_formulation)
 
 
-class WaosFile():
+class WaosStandardReport():
     def __init__(self, path):
         self.path = path
         self.worksheet = self.load_worksheet()
@@ -107,3 +111,49 @@ class WaosFile():
             return record
         except ObjectDoesNotExist:
             return None
+
+
+class GeneralReport():
+    def __init__(self, path, cycle):
+        self.path = path
+        self.cycle = cycle
+        self.workbook = self.get_workbook()
+
+    def get_workbook(self):
+        return load_workbook(self.path)
+
+    def get_facility_record(self, name):
+        try:
+            location = Location.objects.get(name__icontains=name)
+            record, exists = FacilityCycleRecord.objects.get_or_create(facility=location, cycle=self.cycle)
+            return record
+        except ObjectDoesNotExist:
+            return None
+
+    def parse_row(self, row):
+        facility_record = self.get_facility_record(row[0].value)
+        formulation_name = row[1].value
+        formulation, _ = DrugFormulation.objects.get_or_create(name=formulation_name)
+        consumption_record, _ = FacilityConsumptionRecord.objects.get_or_create(facility_cycle=facility_record, drug_formulation=formulation)
+        consumption_record.opening_balance = self.get_value(row, 3)
+        consumption_record.quantity_received = self.get_value(row, 4)
+        consumption_record.pmtct_consumption = self.get_value(row, 6)
+        consumption_record.art_consumption = self.get_value(row, 5)
+        consumption_record.loses_adjustments = self.get_value(row, 7)
+        consumption_record.closing_balance = self.get_value(row, 8)
+        consumption_record.months_of_stock_of_hand = self.get_value(row, 9)
+        consumption_record.quantity_required_for_current_patients = self.get_value(row, 10)
+        consumption_record.estimated_number_of_new_patients = self.get_value(row, 11)
+        consumption_record.estimated_number_of_new_pregnant_women = self.get_value(row, 12)
+        consumption_record.packs_ordered = self.get_value(row, 13)
+        consumption_record.save()
+
+    def get_value(self, row, i):
+        value = row[i].value
+        if value and value != "-":
+            return row[i].value
+
+    def get_data(self):
+        consumption_sheet = self.workbook.get_sheet_by_name(CONSUMPTION)
+        for row in consumption_sheet.iter_rows('A%s:W%s' % (consumption_sheet.min_row + 1, consumption_sheet.max_row)):
+            self.parse_row(row)

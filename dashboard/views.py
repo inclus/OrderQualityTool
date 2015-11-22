@@ -12,7 +12,7 @@ from rest_framework import filters
 from rest_framework.generics import ListAPIView
 from rest_framework.serializers import ModelSerializer
 
-from dashboard.models import WaosFile, FacilityCycleRecord, DrugFormulation, FacilityConsumptionRecord
+from dashboard.models import WaosStandardReport, FacilityCycleRecord, DrugFormulation, FacilityConsumptionRecord
 from forms import FileUploadForm
 from locations.models import Location
 
@@ -38,7 +38,7 @@ class DataImportView(LoginRequiredMixin, FormView):
         import_file = form.cleaned_data['import_file']
         path = default_storage.save('tmp/workspace.xlsx', ContentFile(import_file.read()))
         tmp_file = os.path.join(settings.MEDIA_ROOT, path)
-        record = WaosFile(tmp_file).get_data()
+        record = WaosStandardReport(tmp_file).get_data()
         if record:
             messages.add_message(self.request, messages.INFO, 'Successfully imported file for %s for cycle %s' % (record.facility, record.cycle))
         os.remove(tmp_file)
