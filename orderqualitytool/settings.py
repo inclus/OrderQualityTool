@@ -92,6 +92,9 @@ RAVEN_CONFIG = {
     'dsn': os.environ.get('SENTRY_DSN', None),
 }
 
+BROKER_URL = 'redis://redis:6379/0'
+CELERY_RESULT_BACKEND = 'redis://redis:6379/0'
+
 AUTH_USER_MODEL = 'dashboard.DashboardUser'
 try:
     from local_settings import *
