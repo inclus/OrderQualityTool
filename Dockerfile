@@ -23,8 +23,13 @@ RUN npm install -g bower
 
 RUN mkdir -p /usr/src/app
 WORKDIR /usr/src/app
-COPY . /usr/src/app
-RUN bower install --allow-root
-RUN pip install --no-cache-dir -r requirements.txt
-RUN python manage.py collectstatic --noinput
 
+COPY requirements.txt /usr/src/app/
+COPY requirements /usr/src/app/
+COPY requirements/*.txt /usr/src/app/requirements/
+
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY . /usr/src/app
+
+RUN bower install --allow-root

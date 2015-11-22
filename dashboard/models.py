@@ -51,6 +51,7 @@ class FacilityConsumptionRecord(models.Model):
     packs_ordered = models.FloatField(null=True, blank=True)
     total_quantity_to_be_ordered = models.FloatField(null=True, blank=True)
     notes = models.CharField(max_length=256, null=True, blank=True)
+    order_type = models.CharField(max_length=256, null=True, blank=True)
 
     def __unicode__(self):
         return "%s %s" % (self.facility_cycle, self.drug_formulation)
@@ -154,14 +155,16 @@ class GeneralReport():
                 consumption_record.estimated_number_of_new_patients = self.get_value(row, 12)
                 consumption_record.estimated_number_of_new_pregnant_women = self.get_value(row, 13)
                 consumption_record.packs_ordered = self.get_value(row, 14)
+                consumption_record.order_type = self.get_value(row, 21)
                 consumption_record.save()
             else:
                 print "%s facility has no record" % facility_name
 
     def get_value(self, row, i):
-        value = row[i].value
-        if value and value != "-":
-            return row[i].value
+        if i <= len(row):
+            value = row[i].value
+            if value and value != "-":
+                return row[i].value
 
     def get_data(self):
         consumption_sheet = self.workbook.get_sheet_by_name(CONSUMPTION)
