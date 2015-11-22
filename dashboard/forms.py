@@ -21,9 +21,15 @@ class CustomArrow(Arrow):
             return 'week', 'weeks', 1
         elif name in ['quarter', 'quarters']:
             return 'quarter', 'months', 3
-        elif name in ['months=2']:
-            return 'month', 'months', 2
+        elif cls._has_custom_frame(name):
+            frame, count = name.split("=")
+            return frame, '{0}s'.format(frame), int(count)
         raise AttributeError()
+
+    @classmethod
+    def _has_custom_frame(cls, name):
+        parts = name.split("=")
+        return len(parts) == 2 and parts[0] in cls._ATTRS
 
 
 def format_range(start, end):
@@ -31,7 +37,7 @@ def format_range(start, end):
 
 
 def generate_cycles(start, end):
-    return [format_range(s, e) for s, e in CustomArrow.span_range("months=2", start, end)]
+    return [format_range(s, e) for s, e in CustomArrow.span_range("month=2", start, end)]
 
 
 def generate_choices():
