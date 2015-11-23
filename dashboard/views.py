@@ -99,7 +99,6 @@ class FacilitiesReportingView(APIView):
     def get(self, request):
         data = dict((record['cycle'], record['count']) for record in FacilityCycleRecord.objects.values('cycle').annotate(count=Count('facility')))
         cycles = generate_cycles(now().replace(years=-2), now())
-        print data
         results = []
         for cycle in cycles:
             if cycle in data:

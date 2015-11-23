@@ -2,3 +2,4 @@
 django-jenkins
 coverage
 django-webtest
+mock

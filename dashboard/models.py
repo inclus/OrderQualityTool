@@ -1,3 +1,5 @@
+import logging
+
 from custom_user.models import AbstractEmailUser
 from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 from django.db import models
@@ -6,6 +8,7 @@ from xlrd import open_workbook
 
 from locations.models import Location
 
+logger = logging.getLogger(__name__)
 PATIENTS_ADULT = "PATIENTS (ADULT)"
 PATIENTS_PAED = "PATIENTS (PAED)"
 
@@ -154,7 +157,7 @@ class GeneralReport():
         except ObjectDoesNotExist:
             return None
         except MultipleObjectsReturned:
-            print "%s matched several places" % name
+            logger.debug("%s matched several places" % name)
             location = Location.objects.filter(name__icontains=name)[0]
             record, exists = FacilityCycleRecord.objects.get_or_create(facility=location, cycle=self.cycle)
             return record
@@ -164,7 +167,7 @@ class GeneralReport():
         if facility_name:
             facility_record = self.get_facility_record(facility_name)
             if facility_record:
-                print "consumption patient %s" % facility_record
+                logger.info("consumption patient %s" % facility_record)
                 formulation_name = row[2].value
                 formulation, _ = DrugFormulation.objects.get_or_create(name=formulation_name)
                 consumption_record, _ = FacilityConsumptionRecord.objects.get_or_create(facility_cycle=facility_record, drug_formulation=formulation)
@@ -182,14 +185,14 @@ class GeneralReport():
                 consumption_record.order_type = self.get_value(row, 21)
                 consumption_record.save()
             else:
-                print "%s not found" % facility_name
+                logger.debug("%s not found" % facility_name)
 
     def parse_adult_patient_row(self, row):
         facility_name = row[1].value
         if facility_name:
             facility_record = self.get_facility_record(facility_name)
             if facility_record:
-                print "adult patient %s" % facility_record
+                logger.info("adult patient %s" % facility_record)
                 formulation_name = row[2].value
                 formulation, _ = DrugFormulation.objects.get_or_create(name=formulation_name)
                 patient_record, _ = AdultPatientsRecord.objects.get_or_create(facility_cycle=facility_record, drug_formulation=formulation)
@@ -197,14 +200,14 @@ class GeneralReport():
                 patient_record.new = self.get_value(row, 5)
                 patient_record.save()
             else:
-                print "%s not found" % facility_name
+                logger.debug("%s not found" % facility_name)
 
     def parse_paed_patient_row(self, row):
         facility_name = row[1].value
         if facility_name:
             facility_record = self.get_facility_record(facility_name)
             if facility_record:
-                print "paed patient %s" % facility_record
+                logger.info("paed patient %s" % facility_record)
                 formulation_name = row[2].value
                 formulation, _ = DrugFormulation.objects.get_or_create(name=formulation_name)
                 patient_record, _ = PAEDPatientsRecord.objects.get_or_create(facility_cycle=facility_record, drug_formulation=formulation)
@@ -212,7 +215,7 @@ class GeneralReport():
                 patient_record.new = self.get_value(row, 5)
                 patient_record.save()
             else:
-                print "%s not found" % facility_name
+                logger.debug("%s not found" % facility_name)
 
     def get_value(self, row, i):
         if i <= len(row):
