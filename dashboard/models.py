@@ -1,3 +1,4 @@
+import gevent
 from custom_user.models import AbstractEmailUser
 from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 from django.db import models
@@ -5,6 +6,9 @@ from openpyxl import load_workbook
 from xlrd import open_workbook
 
 from locations.models import Location
+
+PATIENTS_ADULT = "PATIENTS (ADULT)"
+PATIENTS_PAED = "PATIENTS (PAED)"
 
 CONSUMPTION = "CONSUMPTION"
 
@@ -52,6 +56,26 @@ class FacilityConsumptionRecord(models.Model):
     total_quantity_to_be_ordered = models.FloatField(null=True, blank=True)
     notes = models.CharField(max_length=256, null=True, blank=True)
     order_type = models.CharField(max_length=256, null=True, blank=True)
+
+    def __unicode__(self):
+        return "%s %s" % (self.facility_cycle, self.drug_formulation)
+
+
+class AdultPatientsRecord(models.Model):
+    facility_cycle = models.ForeignKey(FacilityCycleRecord)
+    drug_formulation = models.ForeignKey(DrugFormulation)
+    existing = models.FloatField(null=True, blank=True)
+    new = models.FloatField(null=True, blank=True)
+
+    def __unicode__(self):
+        return "%s %s" % (self.facility_cycle, self.drug_formulation)
+
+
+class PAEDPatientsRecord(models.Model):
+    facility_cycle = models.ForeignKey(FacilityCycleRecord)
+    drug_formulation = models.ForeignKey(DrugFormulation)
+    existing = models.FloatField(null=True, blank=True)
+    new = models.FloatField(null=True, blank=True)
 
     def __unicode__(self):
         return "%s %s" % (self.facility_cycle, self.drug_formulation)
@@ -136,11 +160,12 @@ class GeneralReport():
             record, exists = FacilityCycleRecord.objects.get_or_create(facility=location, cycle=self.cycle)
             return record
 
-    def parse_row(self, row):
+    def parse_consumption_row(self, row):
         facility_name = row[1].value
         if facility_name:
             facility_record = self.get_facility_record(facility_name)
             if facility_record:
+                print "consumption patient %s" % facility_record
                 formulation_name = row[2].value
                 formulation, _ = DrugFormulation.objects.get_or_create(name=formulation_name)
                 consumption_record, _ = FacilityConsumptionRecord.objects.get_or_create(facility_cycle=facility_record, drug_formulation=formulation)
@@ -158,7 +183,37 @@ class GeneralReport():
                 consumption_record.order_type = self.get_value(row, 21)
                 consumption_record.save()
             else:
-                print "%s facility has no record" % facility_name
+                print "%s not found" % facility_name
+
+    def parse_adult_patient_row(self, row):
+        facility_name = row[1].value
+        if facility_name:
+            facility_record = self.get_facility_record(facility_name)
+            if facility_record:
+                print "adult patient %s" % facility_record
+                formulation_name = row[2].value
+                formulation, _ = DrugFormulation.objects.get_or_create(name=formulation_name)
+                patient_record, _ = AdultPatientsRecord.objects.get_or_create(facility_cycle=facility_record, drug_formulation=formulation)
+                patient_record.existing = self.get_value(row, 4)
+                patient_record.new = self.get_value(row, 5)
+                patient_record.save()
+            else:
+                print "%s not found" % facility_name
+
+    def parse_paed_patient_row(self, row):
+        facility_name = row[1].value
+        if facility_name:
+            facility_record = self.get_facility_record(facility_name)
+            if facility_record:
+                print "paed patient %s" % facility_record
+                formulation_name = row[2].value
+                formulation, _ = DrugFormulation.objects.get_or_create(name=formulation_name)
+                patient_record, _ = PAEDPatientsRecord.objects.get_or_create(facility_cycle=facility_record, drug_formulation=formulation)
+                patient_record.existing = self.get_value(row, 4)
+                patient_record.new = self.get_value(row, 5)
+                patient_record.save()
+            else:
+                print "%s not found" % facility_name
 
     def get_value(self, row, i):
         if i <= len(row):
@@ -167,6 +222,26 @@ class GeneralReport():
                 return row[i].value
 
     def get_data(self):
+        # self.consumption_records()
+        # self.adult_patients()
+        # self.paed_patients()
+        gevent.joinall([
+            gevent.spawn(self.adult_patients),
+            gevent.spawn(self.paed_patients),
+            gevent.spawn(self.consumption_records),
+        ])
+
+    def paed_patients(self):
+        paed_patients_sheet = self.workbook.get_sheet_by_name(PATIENTS_PAED)
+        for row in paed_patients_sheet.iter_rows('A%s:M%s' % (paed_patients_sheet.min_row + 1, paed_patients_sheet.max_row)):
+            self.parse_paed_patient_row(row)
+
+    def adult_patients(self):
+        adult_patients_sheet = self.workbook.get_sheet_by_name(PATIENTS_ADULT)
+        for row in adult_patients_sheet.iter_rows('A%s:M%s' % (adult_patients_sheet.min_row + 1, adult_patients_sheet.max_row)):
+            self.parse_adult_patient_row(row)
+
+    def consumption_records(self):
         consumption_sheet = self.workbook.get_sheet_by_name(CONSUMPTION)
         for row in consumption_sheet.iter_rows('A%s:X%s' % (consumption_sheet.min_row + 1, consumption_sheet.max_row)):
-            self.parse_row(row)
+            self.parse_consumption_row(row)

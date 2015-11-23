@@ -1,6 +1,6 @@
 var dashboard = angular.module('dashboard', ['ui.router', 'chart.js']);
 dashboard.config(function($stateProvider, $urlRouterProvider) {
-    $urlRouterProvider.otherwise('/');
+    $urlRouterProvider.otherwise('/reportingRate');
     $stateProvider
         .state('test', {
             url: '/:name',

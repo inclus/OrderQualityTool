@@ -7,7 +7,7 @@ from django.utils.translation import ugettext_lazy
 from django.utils.translation import ugettext_lazy as _
 from mptt.admin import MPTTModelAdmin
 
-from dashboard.models import DashboardUser, FacilityConsumptionRecord, DrugFormulation, FacilityCycleRecord
+from dashboard.models import DashboardUser, FacilityConsumptionRecord, DrugFormulation, FacilityCycleRecord, AdultPatientsRecord, PAEDPatientsRecord
 from locations.models import Location
 
 
@@ -64,10 +64,20 @@ class ConsumptionAdmin(ModelAdmin):
                     )
 
 
+class PatientAdmin(ModelAdmin):
+    list_display = ('facility_cycle',
+                    'drug_formulation',
+                    'existing',
+                    'new'
+                    )
+
+
 admin_site = QdbSite()
 admin_site.register(Group, GroupAdmin)
 admin_site.register(DashboardUser, EmailUserAdmin)
 admin_site.register(Location, MPTTModelAdmin)
+admin_site.register(AdultPatientsRecord, PatientAdmin)
+admin_site.register(PAEDPatientsRecord, PatientAdmin)
 admin_site.register(FacilityConsumptionRecord, ConsumptionAdmin)
 admin_site.register(DrugFormulation)
 admin_site.register(FacilityCycleRecord)
