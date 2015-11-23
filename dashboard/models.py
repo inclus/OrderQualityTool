@@ -1,4 +1,3 @@
-import gevent
 from custom_user.models import AbstractEmailUser
 from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 from django.db import models
@@ -222,14 +221,9 @@ class GeneralReport():
                 return row[i].value
 
     def get_data(self):
-        # self.consumption_records()
-        # self.adult_patients()
-        # self.paed_patients()
-        gevent.joinall([
-            gevent.spawn(self.adult_patients),
-            gevent.spawn(self.paed_patients),
-            gevent.spawn(self.consumption_records),
-        ])
+        self.adult_patients()
+        self.paed_patients()
+        self.consumption_records()
 
     def paed_patients(self):
         paed_patients_sheet = self.workbook.get_sheet_by_name(PATIENTS_PAED)
