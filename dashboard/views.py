@@ -1,6 +1,7 @@
 import os
 
 import django_filters
+from arrow import now
 from braces.views import LoginRequiredMixin
 from django.conf import settings
 from django.contrib import messages
@@ -10,11 +11,13 @@ from django.db.models import Count
 from django.views.generic import TemplateView, FormView
 from rest_framework import filters
 from rest_framework.generics import ListAPIView
+from rest_framework.response import Response
 from rest_framework.serializers import ModelSerializer
+from rest_framework.views import APIView
 
 from dashboard.models import FacilityCycleRecord, DrugFormulation, FacilityConsumptionRecord
 from dashboard.tasks import import_general_report
-from forms import FileUploadForm
+from forms import FileUploadForm, generate_cycles
 from locations.models import Location
 
 
@@ -90,3 +93,17 @@ class ConsumptionRecordListView(ListAPIView):
     serializer_class = FacilityConsumptionRecordSerializer
     filter_backends = (filters.DjangoFilterBackend,)
     filter_class = FacilityConsumptionRecordFilter
+
+
+class FacilitiesReportingView(APIView):
+    def get(self, request):
+        data = dict((record['cycle'], record['count']) for record in FacilityCycleRecord.objects.values('cycle').annotate(count=Count('facility')))
+        cycles = generate_cycles(now().replace(years=-2), now())
+        print data
+        results = []
+        for cycle in cycles:
+            if cycle in data:
+                results.append({"cycle": cycle, "count": data.get(cycle)})
+            else:
+                results.append({"cycle": cycle, "count": 0})
+        return Response({"values": results})

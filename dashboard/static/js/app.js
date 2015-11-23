@@ -2,19 +2,36 @@ var dashboard = angular.module('dashboard', ['ui.router', 'chart.js']);
 dashboard.config(function($stateProvider, $urlRouterProvider) {
     $urlRouterProvider.otherwise('/');
     $stateProvider
-        .state('home', {
-            url: '/',
-            templateUrl: '/static/views/home.html',
-            controller: function($scope) {
-                $scope.labels = ["January", "February", "March", "April", "May", "June", "July"];
-                $scope.series = ['Series A', 'Series B'];
-                $scope.data = [
-                    [65, 59, 80, 81, 56, 55, 40],
-                    [28, 48, 40, 19, 86, 27, 90]
-                ];
-                $scope.onClick = function(points, evt) {
-                    console.log(points, evt);
+        .state('test', {
+            url: '/:name',
+            templateUrl: '/static/views/main.html',
+            controller: function($scope, $stateParams) {
+                $scope.currentTest = $stateParams.name;
+                var templates = {
+                    "reportingRate": "/static/views/reporting_rate.html",
+                    "webVsPaper": "/static/views/web_vs_paper.html"
                 };
+                $scope.template = templates[$scope.currentTest];
+                $scope.tests = [{
+                    name: "reportingRate",
+                    description: "Reporting Rate",
+                    metric: "X%"
+                }, {
+                    name: "webVsPaper",
+                    description: "Web VS Paper Reporting",
+                    metric: "X%"
+                }];
             }
         });
+});
+
+dashboard.controller('ReportingRateController', function($scope, $http) {
+    $http.get('/api/test/reportingRate').then(function(response) {
+        var values = response.data.values;
+        $scope.labels = _.map(values, 'cycle');
+        var items = _.map(values, 'count');
+        $scope.series = ['Number of Facilities Reporting'];
+        $scope.data = [items];
+    });
+
 });

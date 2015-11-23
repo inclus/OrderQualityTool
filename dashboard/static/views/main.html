@@ -1,0 +1,19 @@
+<div class="row">
+    <div class="quality_test" ng-repeat="test in tests" ng-class="{'quality_test_active': test.name == currentTest}">
+        <a  ng-href="#/{{test.name}}">
+            <span class="quality_test__metric">{{test.metric}}</span>
+            <span class="quality_test__description">{{test.description}}</span>
+        </a>
+    </div>
+
+    <div class="quality_test last">
+        <a class="" href="#">
+            <span class="quality_test__metric glyphicon glyphicon-plus"></span>
+            <span class="quality_test__description">Click to show more tests</span>
+        </a>
+    </div>
+    <div class="test-area">
+        <div ng-include="template">
+        </div>
+    </div>
+</div>

@@ -1,0 +1,39 @@
+@import "../vendor/bootstrap/less/bootstrap.less";
+@import "../vendor/bootswatch/flatly/variables.less";
+@import "../vendor/bootswatch/flatly/bootswatch.less";
+body {
+  padding-top: 70px;
+  padding-bottom: 30px;
+}
+
+.quality_test {
+    &__metric {
+      display: block;
+      font-size: 3em;
+      color: @brand-success;
+      margin: 0 auto 0 auto;
+      .text-center();
+    }
+    &__description {
+      font-variant: small-caps;
+      margin: 0 auto 0 auto;
+      color: @brand-primary;
+      display: block;
+      .text-center();
+    }
+    .make-md-column(3);
+
+    &_active {
+        border-left: 1px solid @brand-success;
+        border-top: 1px solid @brand-success;
+        border-right: 1px solid @brand-success;
+        border-bottom: 1px solid white;
+    }
+}
+.test-area{
+    .make-md-column(12);
+    border-left: 1px solid @brand-success;
+    border-top: 1px solid @brand-success;
+    border-right: 1px solid @brand-success;
+    border-bottom: 1px solid @brand-success;
+}
