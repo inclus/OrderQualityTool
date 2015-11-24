@@ -15,7 +15,7 @@ from rest_framework.response import Response
 from rest_framework.serializers import ModelSerializer
 from rest_framework.views import APIView
 
-from dashboard.models import FacilityCycleRecord, DrugFormulation, FacilityConsumptionRecord
+from dashboard.models import FacilityCycleRecord, FacilityConsumptionRecord
 from dashboard.tasks import import_general_report
 from forms import FileUploadForm, generate_cycles
 from locations.models import Location
@@ -66,11 +66,6 @@ class FacilityCycleRecordSerializer(ModelSerializer):
         model = FacilityCycleRecord
 
 
-class DrugFormulationSerializer(ModelSerializer):
-    class Meta:
-        model = DrugFormulation
-
-
 class FacilityConsumptionRecordSerializer(ModelSerializer):
     facility_cycle = FacilityCycleRecordSerializer()
 
@@ -81,11 +76,6 @@ class FacilityConsumptionRecordSerializer(ModelSerializer):
 class CycleRecordsListView(ListAPIView):
     queryset = FacilityCycleRecord.objects.all()
     serializer_class = FacilityCycleRecordSerializer
-
-
-class DrugFormulationListView(ListAPIView):
-    queryset = DrugFormulation.objects.all()
-    serializer_class = DrugFormulationSerializer
 
 
 class ConsumptionRecordListView(ListAPIView):

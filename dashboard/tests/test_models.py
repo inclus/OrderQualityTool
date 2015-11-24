@@ -33,6 +33,12 @@ class GeneralReportTestCase(TestCase):
         file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'fixtures', name)
         return file_path
 
+    def test_import_is_efficient(self):
+        Location.objects.get_or_create(name="Bugaya HC III ( Buvuma )", uid="1234", level=1)
+        with self.assertNumQueries(7):
+            GeneralReport(self.get_fixture_path('new_format_small.xlsx'), "Jan- Feb 2000").consumption_records()
+        self.assertEqual(FacilityConsumptionRecord.objects.count(), 13)
+
     def test_can_build_consumption_records_from_file(self):
         Location.objects.get_or_create(name="Bugaya HC III ( Buvuma )", uid="1234", level=1)
         Location.objects.get_or_create(name="Gulu Regional Referal Hospital", uid="234", level=1)

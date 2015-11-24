@@ -1,4 +1,5 @@
 import logging
+from collections import defaultdict
 
 from custom_user.models import AbstractEmailUser
 from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
@@ -28,22 +29,15 @@ class DashboardUser(AbstractEmailUser):
 class FacilityCycleRecord(models.Model):
     facility = models.ForeignKey(Location)
     cycle = models.CharField(max_length=256)
+    reporting = models.CharField(max_length=60, blank=True, null=True)
+    order_type = models.CharField(max_length=60, blank=True, null=True)
 
     def __unicode__(self):
         return "%s %s" % (self.facility, self.cycle)
 
 
-class DrugFormulation(models.Model):
-    name = models.CharField(max_length=256, null=False, blank=False)
-    unit = models.CharField(max_length=256, null=False, blank=False)
-
-    def __unicode__(self):
-        return self.name
-
-
 class FacilityConsumptionRecord(models.Model):
     facility_cycle = models.ForeignKey(FacilityCycleRecord)
-    drug_formulation = models.ForeignKey(DrugFormulation)
     opening_balance = models.FloatField(null=True, blank=True)
     quantity_received = models.FloatField(null=True, blank=True)
     pmtct_consumption = models.FloatField(null=True, blank=True)
@@ -57,30 +51,30 @@ class FacilityConsumptionRecord(models.Model):
     packs_ordered = models.FloatField(null=True, blank=True)
     total_quantity_to_be_ordered = models.FloatField(null=True, blank=True)
     notes = models.CharField(max_length=256, null=True, blank=True)
-    order_type = models.CharField(max_length=256, null=True, blank=True)
+    formulation = models.CharField(max_length=256, null=True, blank=True)
 
     def __unicode__(self):
-        return "%s %s" % (self.facility_cycle, self.drug_formulation)
+        return "%s %s" % (self.facility_cycle, self.formulation)
 
 
 class AdultPatientsRecord(models.Model):
     facility_cycle = models.ForeignKey(FacilityCycleRecord)
-    drug_formulation = models.ForeignKey(DrugFormulation)
     existing = models.FloatField(null=True, blank=True)
     new = models.FloatField(null=True, blank=True)
+    formulation = models.CharField(max_length=256, null=True, blank=True)
 
     def __unicode__(self):
-        return "%s %s" % (self.facility_cycle, self.drug_formulation)
+        return "%s %s" % (self.facility_cycle, self.formulation)
 
 
 class PAEDPatientsRecord(models.Model):
     facility_cycle = models.ForeignKey(FacilityCycleRecord)
-    drug_formulation = models.ForeignKey(DrugFormulation)
     existing = models.FloatField(null=True, blank=True)
     new = models.FloatField(null=True, blank=True)
+    formulation = models.CharField(max_length=256, null=True, blank=True)
 
     def __unicode__(self):
-        return "%s %s" % (self.facility_cycle, self.drug_formulation)
+        return "%s %s" % (self.facility_cycle, self.formulation)
 
 
 class WaosStandardReport():
@@ -105,9 +99,7 @@ class WaosStandardReport():
 
     def build_consumption_record(self, n, record):
         formulation_name = self.worksheet.cell_value(n, 1)
-        unit = self.worksheet.cell_value(n, 2)
-        formulation, created = DrugFormulation.objects.get_or_create(name=formulation_name, unit=unit)
-        consumption_record, created = FacilityConsumptionRecord.objects.get_or_create(facility_cycle=record, drug_formulation=formulation)
+        consumption_record, created = FacilityConsumptionRecord.objects.get_or_create(facility_cycle=record, formulation=formulation_name)
         consumption_record.opening_balance = self.get_numerical_value(n, 3)
         consumption_record.quantity_received = self.get_numerical_value(n, 4)
         consumption_record.pmtct_consumption = self.get_numerical_value(n, 5)
@@ -162,61 +154,6 @@ class GeneralReport():
             record, exists = FacilityCycleRecord.objects.get_or_create(facility=location, cycle=self.cycle)
             return record
 
-    def parse_consumption_row(self, row):
-        facility_name = row[1].value
-        if facility_name:
-            facility_record = self.get_facility_record(facility_name)
-            if facility_record:
-                logger.info("consumption patient %s" % facility_record)
-                formulation_name = row[2].value
-                formulation, _ = DrugFormulation.objects.get_or_create(name=formulation_name)
-                consumption_record, _ = FacilityConsumptionRecord.objects.get_or_create(facility_cycle=facility_record, drug_formulation=formulation)
-                consumption_record.opening_balance = self.get_value(row, 4)
-                consumption_record.quantity_received = self.get_value(row, 5)
-                consumption_record.pmtct_consumption = self.get_value(row, 7)
-                consumption_record.art_consumption = self.get_value(row, 6)
-                consumption_record.loses_adjustments = self.get_value(row, 8)
-                consumption_record.closing_balance = self.get_value(row, 9)
-                consumption_record.months_of_stock_of_hand = self.get_value(row, 10)
-                consumption_record.quantity_required_for_current_patients = self.get_value(row, 11)
-                consumption_record.estimated_number_of_new_patients = self.get_value(row, 12)
-                consumption_record.estimated_number_of_new_pregnant_women = self.get_value(row, 13)
-                consumption_record.packs_ordered = self.get_value(row, 14)
-                consumption_record.order_type = self.get_value(row, 21)
-                consumption_record.save()
-            else:
-                logger.debug("%s not found" % facility_name)
-
-    def parse_adult_patient_row(self, row):
-        facility_name = row[1].value
-        if facility_name:
-            facility_record = self.get_facility_record(facility_name)
-            if facility_record:
-                logger.info("adult patient %s" % facility_record)
-                formulation_name = row[2].value
-                formulation, _ = DrugFormulation.objects.get_or_create(name=formulation_name)
-                patient_record, _ = AdultPatientsRecord.objects.get_or_create(facility_cycle=facility_record, drug_formulation=formulation)
-                patient_record.existing = self.get_value(row, 4)
-                patient_record.new = self.get_value(row, 5)
-                patient_record.save()
-            else:
-                logger.debug("%s not found" % facility_name)
-
-    def parse_paed_patient_row(self, row):
-        facility_name = row[1].value
-        if facility_name:
-            facility_record = self.get_facility_record(facility_name)
-            if facility_record:
-                logger.info("paed patient %s" % facility_record)
-                formulation_name = row[2].value
-                formulation, _ = DrugFormulation.objects.get_or_create(name=formulation_name)
-                patient_record, _ = PAEDPatientsRecord.objects.get_or_create(facility_cycle=facility_record, drug_formulation=formulation)
-                patient_record.existing = self.get_value(row, 4)
-                patient_record.new = self.get_value(row, 5)
-                patient_record.save()
-            else:
-                logger.debug("%s not found" % facility_name)
-
     def get_value(self, row, i):
         if i <= len(row):
             value = row[i].value
@@ -230,15 +167,77 @@ class GeneralReport():
 
     def paed_patients(self):
         paed_patients_sheet = self.workbook.get_sheet_by_name(PATIENTS_PAED)
+        records = defaultdict(list)
         for row in paed_patients_sheet.iter_rows('A%s:M%s' % (paed_patients_sheet.min_row + 1, paed_patients_sheet.max_row)):
-            self.parse_paed_patient_row(row)
+            facility_name = row[1].value
+            if facility_name:
+                patient_record = PAEDPatientsRecord()
+                patient_record.formulation = row[2].value
+                patient_record.existing = self.get_value(row, 4)
+                patient_record.new = self.get_value(row, 5)
+                records[facility_name].append(patient_record)
+            else:
+                logger.debug("%s not found" % facility_name)
+        for name, values in records.iteritems():
+            facility_record = self.get_facility_record(name)
+            patient_records = []
+            if facility_record:
+                PAEDPatientsRecord.objects.filter(facility_cycle=facility_record).delete()
+                for r in values:
+                    r.facility_cycle = facility_record
+                    patient_records.append(r)
+                PAEDPatientsRecord.objects.bulk_create(patient_records)
 
     def adult_patients(self):
         adult_patients_sheet = self.workbook.get_sheet_by_name(PATIENTS_ADULT)
+        records = defaultdict(list)
         for row in adult_patients_sheet.iter_rows('A%s:M%s' % (adult_patients_sheet.min_row + 1, adult_patients_sheet.max_row)):
-            self.parse_adult_patient_row(row)
+            facility_name = row[1].value
+            if facility_name:
+                patient_record = AdultPatientsRecord()
+                patient_record.formulation = row[2].value
+                patient_record.existing = self.get_value(row, 4)
+                patient_record.new = self.get_value(row, 5)
+                records[facility_name].append(patient_record)
+            else:
+                logger.debug("%s not found" % facility_name)
+        for name, values in records.iteritems():
+            facility_record = self.get_facility_record(name)
+            patient_records = []
+            if facility_record:
+                AdultPatientsRecord.objects.filter(facility_cycle=facility_record).delete()
+                for r in values:
+                    r.facility_cycle = facility_record
+                    patient_records.append(r)
+                AdultPatientsRecord.objects.bulk_create(patient_records)
 
     def consumption_records(self):
         consumption_sheet = self.workbook.get_sheet_by_name(CONSUMPTION)
+        records = defaultdict(list)
         for row in consumption_sheet.iter_rows('A%s:X%s' % (consumption_sheet.min_row + 1, consumption_sheet.max_row)):
-            self.parse_consumption_row(row)
+            facility_name = row[1].value
+            if facility_name:
+                consumption_record = FacilityConsumptionRecord()
+                consumption_record.formulation = row[2].value
+                consumption_record.opening_balance = self.get_value(row, 4)
+                consumption_record.quantity_received = self.get_value(row, 5)
+                consumption_record.pmtct_consumption = self.get_value(row, 7)
+                consumption_record.art_consumption = self.get_value(row, 6)
+                consumption_record.loses_adjustments = self.get_value(row, 8)
+                consumption_record.closing_balance = self.get_value(row, 9)
+                consumption_record.months_of_stock_of_hand = self.get_value(row, 10)
+                consumption_record.quantity_required_for_current_patients = self.get_value(row, 11)
+                consumption_record.estimated_number_of_new_patients = self.get_value(row, 12)
+                consumption_record.estimated_number_of_new_pregnant_women = self.get_value(row, 13)
+                consumption_record.packs_ordered = self.get_value(row, 14)
+                records[facility_name].append(consumption_record)
+
+        for name, values in records.iteritems():
+            facility_record = self.get_facility_record(name)
+            consumption_records = []
+            if facility_record:
+                FacilityConsumptionRecord.objects.filter(facility_cycle=facility_record).delete()
+                for r in values:
+                    r.facility_cycle = facility_record
+                    consumption_records.append(r)
+                FacilityConsumptionRecord.objects.bulk_create(consumption_records)
