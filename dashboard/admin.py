@@ -5,7 +5,6 @@ from django.contrib.auth.admin import GroupAdmin, UserAdmin
 from django.contrib.auth.models import Group
 from django.utils.translation import ugettext_lazy
 from django.utils.translation import ugettext_lazy as _
-from mptt.admin import MPTTModelAdmin
 
 from dashboard.models import DashboardUser, FacilityConsumptionRecord, FacilityCycleRecord, AdultPatientsRecord, PAEDPatientsRecord
 from locations.models import Location
@@ -19,11 +18,11 @@ class EmailUserAdmin(UserAdmin):
         (_('Important dates'), {'fields': ('last_login', 'date_joined')}),
     )
     add_fieldsets = ((
-                         None, {
-                             'classes': ('wide',),
-                             'fields': ('email', 'password1', 'password2', 'location')
-                         }
-                     ),
+        None, {
+            'classes': ('wide',),
+            'fields': ('email', 'password1', 'password2', 'location')
+        }
+    ),
     )
 
     form = EmailUserChangeForm
@@ -74,7 +73,7 @@ class PatientAdmin(ModelAdmin):
 admin_site = QdbSite()
 admin_site.register(Group, GroupAdmin)
 admin_site.register(DashboardUser, EmailUserAdmin)
-admin_site.register(Location, MPTTModelAdmin)
+admin_site.register(Location)
 admin_site.register(AdultPatientsRecord, PatientAdmin)
 admin_site.register(PAEDPatientsRecord, PatientAdmin)
 admin_site.register(FacilityConsumptionRecord, ConsumptionAdmin)
