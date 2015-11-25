@@ -5,7 +5,6 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = '(d!y31^rnwjhux$nwv26*g#z-=_a&gwq0lc1b@3t!gv)dhn_bx'
 DEBUG = True
 ALLOWED_HOSTS = []
-
 INSTALLED_APPS = (
     'flat',
     'django.contrib.admin',
@@ -15,16 +14,16 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'bootstrap3',
+    'locations',
     'dashboard',
     'qdbauth',
     'password_reset',
     'raven.contrib.django.raven_compat',
-    'mptt',
-    'locations',
     'admirarchy',
     'menu',
     'rest_framework'
 )
+
 
 MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware',

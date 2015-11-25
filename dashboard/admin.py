@@ -7,7 +7,7 @@ from django.utils.translation import ugettext_lazy
 from django.utils.translation import ugettext_lazy as _
 
 from dashboard.models import DashboardUser, FacilityConsumptionRecord, FacilityCycleRecord, AdultPatientsRecord, PAEDPatientsRecord
-from locations.models import Location
+from locations.models import Facility
 
 
 class EmailUserAdmin(UserAdmin):
@@ -18,11 +18,11 @@ class EmailUserAdmin(UserAdmin):
         (_('Important dates'), {'fields': ('last_login', 'date_joined')}),
     )
     add_fieldsets = ((
-        None, {
-            'classes': ('wide',),
-            'fields': ('email', 'password1', 'password2', 'location')
-        }
-    ),
+                         None, {
+                             'classes': ('wide',),
+                             'fields': ('email', 'password1', 'password2', 'location')
+                         }
+                     ),
     )
 
     form = EmailUserChangeForm
@@ -70,10 +70,18 @@ class PatientAdmin(ModelAdmin):
                     )
 
 
+class FacilityAdmin(ModelAdmin):
+    list_display = ('name',
+                    'warehouse',
+                    'ip',
+                    'district'
+                    )
+
+
 admin_site = QdbSite()
 admin_site.register(Group, GroupAdmin)
 admin_site.register(DashboardUser, EmailUserAdmin)
-admin_site.register(Location)
+admin_site.register(Facility, FacilityAdmin)
 admin_site.register(AdultPatientsRecord, PatientAdmin)
 admin_site.register(PAEDPatientsRecord, PatientAdmin)
 admin_site.register(FacilityConsumptionRecord, ConsumptionAdmin)

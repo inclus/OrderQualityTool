@@ -7,13 +7,13 @@ from django.db import models
 from openpyxl import load_workbook
 from xlrd import open_workbook
 
-from locations.models import Location
+from locations.models import Facility, District, IP, WareHouse
 
 logger = logging.getLogger(__name__)
 PATIENTS_ADULT = "PATIENTS (ADULT)"
 PATIENTS_PAED = "PATIENTS (PAED)"
-
 CONSUMPTION = "CONSUMPTION"
+LOCATION = "Facility Index"
 
 
 class DashboardUser(AbstractEmailUser):
@@ -23,14 +23,13 @@ class DashboardUser(AbstractEmailUser):
     def get_short_name(self):
         return self.email
 
-    location = models.ForeignKey(Location, null=True, blank=True)
-
 
 class FacilityCycleRecord(models.Model):
-    facility = models.ForeignKey(Location)
+    facility = models.ForeignKey(Facility)
     cycle = models.CharField(max_length=256)
-    reporting = models.CharField(max_length=60, blank=True, null=True)
-    order_type = models.CharField(max_length=60, blank=True, null=True)
+    reporting_status = models.BooleanField(default=False)
+    web_based = models.BooleanField(default=False)
+    multiple = models.BooleanField(default=False)
 
     def __unicode__(self):
         return "%s %s" % (self.facility, self.cycle)
@@ -125,7 +124,7 @@ class WaosStandardReport():
         full_name = "%s %s" % (facility_name, level)
         cycle = self.worksheet.cell_value(30, 1)
         try:
-            location = Location.objects.get(name__icontains=full_name)
+            location = Facility.objects.get(name__icontains=full_name)
             record, exists = FacilityCycleRecord.objects.get_or_create(facility=location, cycle=cycle)
             return record
         except ObjectDoesNotExist:
@@ -137,20 +136,23 @@ class GeneralReport():
         self.path = path
         self.cycle = cycle
         self.workbook = self.get_workbook()
+        self.districts = dict()
+        self.ips = dict()
+        self.warehouses = dict()
 
     def get_workbook(self):
         return load_workbook(self.path)
 
     def get_facility_record(self, name):
         try:
-            location = Location.objects.get(name__icontains=name)
+            location = Facility.objects.get(name__icontains=name)
             record, exists = FacilityCycleRecord.objects.get_or_create(facility=location, cycle=self.cycle)
             return record
         except ObjectDoesNotExist:
             return None
         except MultipleObjectsReturned:
             logger.debug("%s matched several places" % name)
-            location = Location.objects.filter(name__icontains=name)[0]
+            location = Facility.objects.filter(name__icontains=name)[0]
             record, exists = FacilityCycleRecord.objects.get_or_create(facility=location, cycle=self.cycle)
             return record
 
@@ -161,6 +163,7 @@ class GeneralReport():
                 return row[i].value
 
     def get_data(self):
+        self.locations()
         self.adult_patients()
         self.paed_patients()
         self.consumption_records()
@@ -211,6 +214,29 @@ class GeneralReport():
                     patient_records.append(r)
                 AdultPatientsRecord.objects.bulk_create(patient_records)
 
+    def locations(self):
+        location_sheet = self.workbook.get_sheet_by_name(LOCATION)
+        facilities = []
+        facility_data = []
+        for row in location_sheet.iter_rows('B%s:J%s' % (location_sheet.min_row + 3, location_sheet.max_row)):
+            facility = dict()
+            facility['name'] = row[0].value
+            facility['status'] = row[2].value
+            facility['IP'] = row[3].value
+            facility['Warehouse'] = row[4].value
+            facility['District'] = row[5].value
+            facility['Web/Paper'] = row[7].value
+            facility['Multiple'] = row[8].value
+            facility_data.append(facility)
+            facilities.append(self.build_facility(facility))
+        Facility.objects.bulk_create(facilities)
+        for f in facility_data:
+            record = self.get_facility_record(f['name'])
+            record.reporting_status = f['name'].strip() == 'Reporting'
+            record.web_based = f['Web/Paper'].strip() == 'Web'
+            record.multiple = f['Multiple'].strip() == 'Multiple orders'
+            record.save()
+
     def consumption_records(self):
         consumption_sheet = self.workbook.get_sheet_by_name(CONSUMPTION)
         records = defaultdict(list)
@@ -241,3 +267,24 @@ class GeneralReport():
                     r.facility_cycle = facility_record
                     consumption_records.append(r)
                 FacilityConsumptionRecord.objects.bulk_create(consumption_records)
+
+    def get_district(self, name):
+        if name not in self.districts:
+            district, _ = District.objects.get_or_create(name=name)
+            self.districts[name] = district
+        return self.districts[name]
+
+    def get_ip(self, name):
+        if name not in self.ips:
+            ip, _ = IP.objects.get_or_create(name=name)
+            self.ips[name] = ip
+        return self.ips[name]
+
+    def get_warehouse(self, name):
+        if name not in self.warehouses:
+            warehouse, _ = WareHouse.objects.get_or_create(name=name)
+            self.warehouses[name] = warehouse
+        return self.warehouses[name]
+
+    def build_facility(self, facility):
+        return Facility(name=facility['name'], warehouse=self.get_warehouse(facility['Warehouse']), ip=self.get_ip(facility['IP']), district=self.get_district(facility['District']))

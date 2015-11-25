@@ -7,7 +7,7 @@ from mock import patch, ANY
 from webtest import Upload
 
 from dashboard.models import FacilityCycleRecord
-from locations.models import Location
+from locations.models import Facility
 
 
 class HomeViewTestCase(WebTest):
@@ -40,7 +40,7 @@ class DataImportViewTestCase(WebTest):
 class FacilitiesReportingView(WebTest):
     def test_that_cycles_are_padded(self):
         cycle = 'Jan - Feb %s' % now().format("YYYY")
-        loc, _ = Location.objects.get_or_create(name="AIC Jinja Special Clinic", uid="AIC Jinja Special Clinic", level=1)
+        loc, _ = Facility.objects.get_or_create(name="AIC Jinja Special Clinic")
         FacilityCycleRecord.objects.create(facility=loc, cycle=cycle)
         url = "/api/test/reportingRate"
         json_response = self.app.get(url, user="testuser").content

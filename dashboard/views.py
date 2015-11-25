@@ -18,7 +18,7 @@ from rest_framework.views import APIView
 from dashboard.models import FacilityCycleRecord, FacilityConsumptionRecord
 from dashboard.tasks import import_general_report
 from forms import FileUploadForm, generate_cycles
-from locations.models import Location
+from locations.models import Facility
 
 
 class HomeView(LoginRequiredMixin, TemplateView):
@@ -26,10 +26,6 @@ class HomeView(LoginRequiredMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super(HomeView, self).get_context_data(**kwargs)
-        cycles = FacilityCycleRecord.objects.values('cycle').annotate(count=Count('facility'))
-        locations_at_level_5 = Location.objects.filter(level=5).count()
-        context['cycles'] = cycles
-        context['location_count'] = locations_at_level_5
         return context
 
 
@@ -54,13 +50,13 @@ class FacilityConsumptionRecordFilter(django_filters.FilterSet):
         fields = ['facility_cycle__facility']
 
 
-class LocationSerializer(ModelSerializer):
+class FacilitySerializer(ModelSerializer):
     class Meta:
-        model = Location
+        model = Facility
 
 
 class FacilityCycleRecordSerializer(ModelSerializer):
-    facility = LocationSerializer()
+    facility = FacilitySerializer()
 
     class Meta:
         model = FacilityCycleRecord

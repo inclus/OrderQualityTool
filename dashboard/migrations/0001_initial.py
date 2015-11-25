@@ -8,7 +8,7 @@ import django.utils.timezone
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('locations', '0001_initial'),
+        ('locations', '__first__'),
         ('auth', '0006_require_contenttypes_0002'),
     ]
 
@@ -25,7 +25,6 @@ class Migration(migrations.Migration):
                 ('is_active', models.BooleanField(default=True, help_text='Designates whether this user should be treated as active. Unselect this instead of deleting accounts.', verbose_name='active')),
                 ('date_joined', models.DateTimeField(default=django.utils.timezone.now, verbose_name='date joined')),
                 ('groups', models.ManyToManyField(related_query_name='user', related_name='user_set', to='auth.Group', blank=True, help_text='The groups this user belongs to. A user will get all permissions granted to each of their groups.', verbose_name='groups')),
-                ('location', models.ForeignKey(blank=True, to='locations.Location', null=True)),
                 ('user_permissions', models.ManyToManyField(related_query_name='user', related_name='user_set', to='auth.Permission', blank=True, help_text='Specific permissions for this user.', verbose_name='user permissions')),
             ],
             options={
@@ -35,11 +34,12 @@ class Migration(migrations.Migration):
             },
         ),
         migrations.CreateModel(
-            name='DrugFormulation',
+            name='AdultPatientsRecord',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('name', models.CharField(max_length=256)),
-                ('unit', models.CharField(max_length=256)),
+                ('existing', models.FloatField(null=True, blank=True)),
+                ('new', models.FloatField(null=True, blank=True)),
+                ('formulation', models.CharField(max_length=256, null=True, blank=True)),
             ],
         ),
         migrations.CreateModel(
@@ -56,9 +56,10 @@ class Migration(migrations.Migration):
                 ('quantity_required_for_current_patients', models.FloatField(null=True, blank=True)),
                 ('estimated_number_of_new_patients', models.FloatField(null=True, blank=True)),
                 ('estimated_number_of_new_pregnant_women', models.FloatField(null=True, blank=True)),
+                ('packs_ordered', models.FloatField(null=True, blank=True)),
                 ('total_quantity_to_be_ordered', models.FloatField(null=True, blank=True)),
                 ('notes', models.CharField(max_length=256, null=True, blank=True)),
-                ('drug_formulation', models.ForeignKey(to='dashboard.DrugFormulation')),
+                ('formulation', models.CharField(max_length=256, null=True, blank=True)),
             ],
         ),
         migrations.CreateModel(
@@ -66,11 +67,29 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('cycle', models.CharField(max_length=256)),
-                ('facility', models.ForeignKey(to='locations.Location')),
+                ('reporting_status', models.BooleanField(default=False)),
+                ('web_based', models.BooleanField(default=False)),
+                ('multiple', models.BooleanField(default=False)),
+                ('facility', models.ForeignKey(to='locations.Facility')),
+            ],
+        ),
+        migrations.CreateModel(
+            name='PAEDPatientsRecord',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('existing', models.FloatField(null=True, blank=True)),
+                ('new', models.FloatField(null=True, blank=True)),
+                ('formulation', models.CharField(max_length=256, null=True, blank=True)),
+                ('facility_cycle', models.ForeignKey(to='dashboard.FacilityCycleRecord')),
             ],
         ),
         migrations.AddField(
             model_name='facilityconsumptionrecord',
+            name='facility_cycle',
+            field=models.ForeignKey(to='dashboard.FacilityCycleRecord'),
+        ),
+        migrations.AddField(
+            model_name='adultpatientsrecord',
             name='facility_cycle',
             field=models.ForeignKey(to='dashboard.FacilityCycleRecord'),
         ),
