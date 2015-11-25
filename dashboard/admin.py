@@ -7,7 +7,7 @@ from django.utils.translation import ugettext_lazy
 from django.utils.translation import ugettext_lazy as _
 
 from dashboard.models import DashboardUser, FacilityConsumptionRecord, FacilityCycleRecord, AdultPatientsRecord, PAEDPatientsRecord
-from locations.models import Facility
+from locations.models import Facility, WareHouse, IP, District
 
 
 class EmailUserAdmin(UserAdmin):
@@ -82,6 +82,9 @@ admin_site = QdbSite()
 admin_site.register(Group, GroupAdmin)
 admin_site.register(DashboardUser, EmailUserAdmin)
 admin_site.register(Facility, FacilityAdmin)
+admin_site.register(IP)
+admin_site.register(WareHouse)
+admin_site.register(District)
 admin_site.register(AdultPatientsRecord, PatientAdmin)
 admin_site.register(PAEDPatientsRecord, PatientAdmin)
 admin_site.register(FacilityConsumptionRecord, ConsumptionAdmin)

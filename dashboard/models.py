@@ -219,16 +219,17 @@ class GeneralReport():
         facilities = []
         facility_data = []
         for row in location_sheet.iter_rows('B%s:J%s' % (location_sheet.min_row + 3, location_sheet.max_row)):
-            facility = dict()
-            facility['name'] = row[0].value
-            facility['status'] = row[2].value
-            facility['IP'] = row[3].value
-            facility['Warehouse'] = row[4].value
-            facility['District'] = row[5].value
-            facility['Web/Paper'] = row[7].value
-            facility['Multiple'] = row[8].value
-            facility_data.append(facility)
-            facilities.append(self.build_facility(facility))
+            if row[0].value:
+                facility = dict()
+                facility['name'] = row[0].value
+                facility['status'] = row[2].value
+                facility['IP'] = row[3].value
+                facility['Warehouse'] = row[4].value
+                facility['District'] = row[5].value
+                facility['Web/Paper'] = row[7].value
+                facility['Multiple'] = row[8].value
+                facility_data.append(facility)
+                facilities.append(self.build_facility(facility))
         Facility.objects.bulk_create(facilities)
         for f in facility_data:
             record = self.get_facility_record(f['name'])
