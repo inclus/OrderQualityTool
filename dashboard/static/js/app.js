@@ -78,8 +78,10 @@ dashboard.controller('ReportingRateController', function($scope, $http) {
             scaleOverride: true,
             scaleSteps: 10,
             scaleStepWidth: 10,
-            scaleStartValue: 0
+            scaleStartValue: 0,
+            scaleLineColor: "#42BE73"
         };
+        $scope.colors = ["#42BE73"];
     });
 });
 
@@ -95,8 +97,11 @@ dashboard.controller('WebBasedRateController', function($scope, $http) {
             scaleOverride: true,
             scaleSteps: 10,
             scaleStepWidth: 10,
-            scaleStartValue: 0
+            scaleStartValue: 0,
+            scaleLineColor: "#42BE73",
+            strokeColor: "#42BE73",
         };
+        $scope.colors = ["#42BE73"];
     });
 });
 
