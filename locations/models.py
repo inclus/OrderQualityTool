@@ -26,7 +26,10 @@ class Facility(models.Model):
     name = models.CharField(max_length=256, unique=True)
     warehouse = models.ForeignKey(WareHouse, null=True, blank=True)
     ip = models.ForeignKey(IP, null=True, blank=True)
-    district = models.ForeignKey(District, null=True, blank=True)
+    district = models.ForeignKey(District, null=True, blank=True, related_name="facilities")
 
     def __unicode__(self):
         return self.name
+
+    class Meta:
+        verbose_name_plural = "facilities"

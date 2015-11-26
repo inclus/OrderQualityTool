@@ -25,7 +25,7 @@ class DashboardUser(AbstractEmailUser):
 
 
 class FacilityCycleRecord(models.Model):
-    facility = models.ForeignKey(Facility)
+    facility = models.ForeignKey(Facility, related_name="records")
     cycle = models.CharField(max_length=256)
     reporting_status = models.BooleanField(default=False)
     web_based = models.BooleanField(default=False)
@@ -229,11 +229,11 @@ class GeneralReport():
                 facility['Web/Paper'] = row[7].value
                 facility['Multiple'] = row[8].value
                 facility_data.append(facility)
-                facilities.append(self.build_facility(facility))
-        Facility.objects.bulk_create(facilities)
+                self.build_facility(facility)
+
         for f in facility_data:
             record = self.get_facility_record(f['name'])
-            record.reporting_status = f['name'].strip() == 'Reporting'
+            record.reporting_status = f['status'].strip() == 'Reporting'
             record.web_based = f['Web/Paper'].strip() == 'Web'
             record.multiple = f['Multiple'].strip() == 'Multiple orders'
             record.save()
@@ -288,4 +288,5 @@ class GeneralReport():
         return self.warehouses[name]
 
     def build_facility(self, facility):
-        return Facility(name=facility['name'], warehouse=self.get_warehouse(facility['Warehouse']), ip=self.get_ip(facility['IP']), district=self.get_district(facility['District']))
+        facility, _ = Facility.objects.get_or_create(name=facility['name'], warehouse=self.get_warehouse(facility['Warehouse']), ip=self.get_ip(facility['IP']), district=self.get_district(facility['District']))
+        return facility

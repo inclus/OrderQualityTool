@@ -1,6 +1,5 @@
 @import "../vendor/bootstrap/less/bootstrap.less";
-@import "../vendor/bootswatch/flatly/variables.less";
-@import "../vendor/bootswatch/flatly/bootswatch.less";
+
 body {
   padding-top: 70px;
   padding-bottom: 30px;
@@ -9,8 +8,8 @@ body {
 .quality_test {
     &__metric {
       display: block;
-      font-size: 3em;
-      color: @brand-success;
+      font-size: 2em;
+      color: @brand-primary;
       margin: 0 auto 0 auto;
       .text-center();
     }
@@ -21,19 +20,44 @@ body {
       display: block;
       .text-center();
     }
-    .make-md-column(3);
+    .make-md-column(2);
 
     &_active {
-        border-left: 1px solid @brand-success;
-        border-top: 1px solid @brand-success;
-        border-right: 1px solid @brand-success;
+        border-left: 1px solid @brand-primary;
+        border-top: 1px solid @brand-primary;
+        border-right: 1px solid @brand-primary;
         border-bottom: 1px solid white;
+    }
+    a:hover {
+        color: @brand-primary;
+        text-decoration: none;
+      span{
+        text-decoration: none;
+        color: @brand-primary;
+      }
+      
     }
 }
 .test-area{
     .make-md-column(12);
-    border-left: 1px solid @brand-success;
-    border-top: 1px solid @brand-success;
-    border-right: 1px solid @brand-success;
-    border-bottom: 1px solid @brand-success;
+    border-left: 1px solid @brand-primary;
+    border-top: 1px solid @brand-primary;
+    border-right: 1px solid @brand-primary;
+    border-bottom: 1px solid @brand-primary;
+}
+
+.test-area {
+  .make-md-column(12);
+}
+
+.page_graph{
+  .make-sm-column(6);
+  .make-sm-column-offset(3);
+  .make-md-column(8);
+  .make-md-column-offset(2);
+  .make-lg-column(10);
+  .make-lg-column-offset(1);
+}
+.ranking_lists {
+  margin-top: 20px;
 }

@@ -2,12 +2,13 @@ import os
 from json import loads
 
 from arrow import now
+from django.core.urlresolvers import reverse
 from django_webtest import WebTest
 from mock import patch, ANY
 from webtest import Upload
 
 from dashboard.models import FacilityCycleRecord
-from locations.models import Facility
+from locations.models import Facility, District
 
 
 class HomeViewTestCase(WebTest):
@@ -41,8 +42,44 @@ class FacilitiesReportingView(WebTest):
     def test_that_cycles_are_padded(self):
         cycle = 'Jan - Feb %s' % now().format("YYYY")
         loc, _ = Facility.objects.get_or_create(name="AIC Jinja Special Clinic")
-        FacilityCycleRecord.objects.create(facility=loc, cycle=cycle)
+        loc2, _ = Facility.objects.get_or_create(name="AIC Special Clinic")
+        FacilityCycleRecord.objects.create(facility=loc, cycle=cycle, reporting_status=True)
+        FacilityCycleRecord.objects.create(facility=loc2, cycle=cycle, reporting_status=False)
         url = "/api/test/reportingRate"
         json_response = self.app.get(url, user="testuser").content
         data = loads(json_response)['values']
-        self.assertIn({"count": 1, "cycle": cycle}, data)
+        self.assertIn({"rate": 50, "cycle": cycle}, data)
+
+
+class BestDistrictReportingView(WebTest):
+    def test_best_performing_districts(self):
+        cycle = 'Jan - Feb %s' % now().format("YYYY")
+        dis, _ = District.objects.get_or_create(name="dis1")
+        dis2, _ = District.objects.get_or_create(name="dis2")
+        loc, _ = Facility.objects.get_or_create(name="AIC Jinja Special Clinic", district=dis)
+        loc2, _ = Facility.objects.get_or_create(name="AIC Special Clinic", district=dis2)
+        loc3, _ = Facility.objects.get_or_create(name="AIC Specialic", district=dis2)
+        FacilityCycleRecord.objects.create(facility=loc, cycle=cycle, reporting_status=True)
+        FacilityCycleRecord.objects.create(facility=loc2, cycle=cycle, reporting_status=True)
+        FacilityCycleRecord.objects.create(facility=loc3, cycle=cycle, reporting_status=False)
+        url = reverse("reporting_rate_best")
+        json_response = self.app.get(url, user="testuser").content
+        data = loads(json_response)['values']
+        self.assertEquals('dis1', data[0]['name'])
+        self.assertEquals(100, data[0]['rate'])
+
+    def test_worst_performing_districts(self):
+        cycle = 'Jan - Feb %s' % now().format("YYYY")
+        dis, _ = District.objects.get_or_create(name="dis1")
+        dis2, _ = District.objects.get_or_create(name="dis2")
+        loc, _ = Facility.objects.get_or_create(name="AIC Jinja Special Clinic", district=dis)
+        loc2, _ = Facility.objects.get_or_create(name="AIC Special Clinic", district=dis2)
+        loc3, _ = Facility.objects.get_or_create(name="AIC Specialic", district=dis2)
+        FacilityCycleRecord.objects.create(facility=loc, cycle=cycle, reporting_status=True)
+        FacilityCycleRecord.objects.create(facility=loc2, cycle=cycle, reporting_status=True)
+        FacilityCycleRecord.objects.create(facility=loc3, cycle=cycle, reporting_status=False)
+        url = reverse("reporting_rate_worst")
+        json_response = self.app.get(url, user="testuser").content
+        data = loads(json_response)['values']
+        self.assertEquals('dis2', data[0]['name'])
+        self.assertEquals(50, data[0]['rate'])

@@ -1,6 +1,14 @@
 <div ng-controller="ReportingRateController">
-    <canvas id="line" class="chart chart-line" chart-data="data"
-      chart-labels="labels" chart-legend="true" chart-series="series"
-      chart-click="onClick" >
-    </canvas>
+
+    <div class="page_graph">
+        <canvas id="line"
+        class="chart chart-line"
+        chart-data="data"
+        chart-labels="labels"
+        chart-legend="true"
+        chart-series="series"
+        chart-options="options"
+        chart-click="onClick" >
+        </canvas>
+    </div>
 </div>

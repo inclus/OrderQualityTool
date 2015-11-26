@@ -78,6 +78,15 @@ class FacilityAdmin(ModelAdmin):
                     )
 
 
+class FacilityCycleRecordAdmin(ModelAdmin):
+    list_display = ('facility',
+                    'reporting_status',
+                    'web_based',
+                    'multiple',
+                    'cycle'
+                    )
+
+
 admin_site = QdbSite()
 admin_site.register(Group, GroupAdmin)
 admin_site.register(DashboardUser, EmailUserAdmin)
@@ -88,4 +97,4 @@ admin_site.register(District)
 admin_site.register(AdultPatientsRecord, PatientAdmin)
 admin_site.register(PAEDPatientsRecord, PatientAdmin)
 admin_site.register(FacilityConsumptionRecord, ConsumptionAdmin)
-admin_site.register(FacilityCycleRecord)
+admin_site.register(FacilityCycleRecord, FacilityCycleRecordAdmin)
