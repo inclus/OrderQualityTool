@@ -1,3 +1,4 @@
+import math
 import os
 
 from arrow import Arrow, now
@@ -38,6 +39,19 @@ def format_range(start, end):
 
 def generate_cycles(start, end):
     return [format_range(s, e) for s, e in CustomArrow.span_range("month=2", start, end)]
+
+
+def format_range_numbered(start, end):
+    cycle_number = int(math.ceil((float(start.format('MM')) / 12) * 6))
+    year = start.format('YY')
+    name = "%s - %s %s" % (start.format('MMM'), end.format('MMM'), start.format('YYYY'))
+    return {"name": name, "number": cycle_number, "year": year}
+
+
+def generate_cycles_numbered(start, end):
+    values = [format_range_numbered(s, e) for s, e in CustomArrow.span_range("month=2", start, end)]
+    values.reverse()
+    return values
 
 
 def generate_choices():

@@ -11,5 +11,8 @@ urlpatterns = [
     url(r'^api/test/webBased$', views.WebBasedReportingView.as_view(), name='web_based'),
     url(r'^api/test/reportingRate/bestDistricts$', views.BestPerformingDistrictsView.as_view(), name='reporting_rate_best'),
     url(r'^api/test/reportingRate/worstDistricts$', views.WorstPerformingDistrictsView.as_view(), name='reporting_rate_worst'),
-    url(r'^api/cycles$', views.CyclesView.as_view(), name='cycles')
+    url(r'^api/cycles$', views.CyclesView.as_view(), name='cycles'),
+    url(r'^api/test/metrics', views.ReportMetrics.as_view(), name='metrics'),
+    url(r'^api/test/webVsPaper/bestDistricts$', views.BestPerformingWebDistrictsView.as_view(), name='web_based_best'),
+    url(r'^api/test/webVsPaper/worstDistricts$', views.WorstPerformingWebDistrictsView.as_view(), name='web_based_worst'),
 ]
