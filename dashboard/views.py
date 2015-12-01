@@ -16,10 +16,10 @@ from rest_framework.response import Response
 from rest_framework.serializers import ModelSerializer
 from rest_framework.views import APIView
 
+from dashboard.helpers import generate_cycles
 from dashboard.models import FacilityCycleRecord, FacilityConsumptionRecord
 from dashboard.tasks import import_general_report
 from forms import FileUploadForm
-from dashboard.helpers import generate_cycles
 from locations.models import Facility, District
 
 
@@ -172,7 +172,9 @@ class CyclesView(APIView):
         records = [cycle['cycle'] for cycle in FacilityCycleRecord.objects.values('cycle').distinct()]
         most_recent_cycle, = sorted(records, sort_cycle, reverse=True)[:1]
         month = to_date(most_recent_cycle)
-        return Response({"values": generate_cycles(now().replace(years=-2), month), "most_recent_cycle": most_recent_cycle})
+        cycles = generate_cycles(now().replace(years=-2), month)
+        cycles.reverse()
+        return Response({"values": cycles, "most_recent_cycle": most_recent_cycle})
 
 
 class ReportMetrics(APIView):

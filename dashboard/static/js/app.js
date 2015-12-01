@@ -13,16 +13,15 @@ dashboard.config(function($stateProvider, $urlRouterProvider) {
 
                 $http.get('/api/cycles').then(function(response) {
                     $scope.cycles = response.data.values;
-                    $scope.most_recent_cycle = response.data.most_recent_cycle;
-                    $scope.selectedCycle = response.data.most_recent_cycle.name;
-                    $scope.endCycle = $scope.most_recent_cycle;
                     $scope.startCycle = $scope.cycles[6 - 1];
+                    $scope.endCycle = $scope.selectedCycle = response.data.most_recent_cycle;
+                    console.log('cycle', $scope.endCycle, $scope.selectedCycle);
                 });
 
                 $scope.$watch('startCycle', function(start) {
                     if (start) {
                         var pos = _.findIndex($scope.cycles, function(item) {
-                            return item.name == start.name;
+                            return item == start;
                         });
                         $scope.endCycles = $scope.cycles.slice(0, pos + 1);
                     }
@@ -120,7 +119,7 @@ dashboard.controller('ReportingRateController', function($scope, $http) {
     };
     $scope.$watch('startCycle', function(start) {
         if (start) {
-            update($scope.startCycle.name, $scope.endCycle.name);
+            update($scope.startCycle, $scope.endCycle);
         }
 
     }, true);

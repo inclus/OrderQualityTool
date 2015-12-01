@@ -5,14 +5,14 @@
     </div>
     <div class="col-md-2">
             <select name="cycle" class="form-control" ng-model="startCycle" 
-                ng-options="displayCycle(cycle) for cycle in cycles track by cycle.name">
+                ng-options="cycle for cycle in cycles">
             </select>
         </div>
         <div class="col-md-1">
             <h5 class="text-center"> -- </h5>
         </div>
         <div class="col-md-2">
-            <select name="cycle" class="form-control" ng-model="endCycle" ng-options="displayCycle(cycle) for cycle in endCycles track by cycle.name">
+            <select name="cycle" class="form-control" ng-model="endCycle" ng-options="cycle for cycle in endCycles">
             </select>
         </div>
 </div>
