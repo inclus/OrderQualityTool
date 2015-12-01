@@ -1,40 +1,45 @@
 <div class="row range_filter">
     <div class="col-md-12">
         <label for="">Cycle Range</label>
-
     </div>
     <div class="col-md-2">
-            <select name="cycle" class="form-control" ng-model="startCycle" 
-                ng-options="cycle for cycle in cycles">
-            </select>
-        </div>
-        <div class="col-md-1">
-            <h5 class="text-center"> -- </h5>
-        </div>
-        <div class="col-md-2">
-            <select name="cycle" class="form-control" ng-model="endCycle" ng-options="cycle for cycle in endCycles">
-            </select>
-        </div>
-</div>
-<div class="row">
-    <div class="quality_test" ng-repeat="test in tests" ng-class="{'quality_test_active': test.name == currentTest}">
-        <a ng-href="#/{{test.name}}">
-            <span class="quality_test__metric">{{test.metric}}</span>
-            <span class="quality_test__description">{{test.description}}</span>
-        </a>
+        <select name="cycle" class="form-control" ng-model="startCycle"
+            ng-options="cycle for cycle in cycles">
+        </select>
     </div>
-    <div class="quality_test last pull-right">
-        <a class="" href="#" ng-click="open()">
-            <span class="quality_test__metric glyphicon glyphicon-plus"></span>
-            <span class="quality_test__description">Click to show more tests</span>
-        </a>
+    <div class="col-md-1">
+        <h5 class="text-center"> -- </h5>
+    </div>
+    <div class="col-md-2">
+        <select name="cycle" class="form-control" ng-model="endCycle" ng-options="cycle for cycle in endCycles">
+        </select>
     </div>
 </div>
 <div class="row">
+    <div class="col-md-12">
+        <div class="quality_test" ng-repeat="test in tests" ng-class="{'quality_test_active': test.name == currentTest}">
+            <a ng-href="#/{{test.name}}">
+                <span class="quality_test__metric">{{test.metric}}</span>
+                <span class="quality_test__description">{{test.description}}</span>
+            </a>
+        </div>
+        <div class="quality_test last pull-right">
+            <a class="" href="#" ng-click="open()">
+                <span class="quality_test__metric glyphicon glyphicon-plus"></span>
+                <span class="quality_test__description">Click to show more tests</span>
+            </a>
+        </div>
+    </div>
+    
+</div>
+<div class="row">
+<div class="col-md-12">
     <div class="test-area">
         <div ng-include="template">
         </div>
     </div>
+</div>
+    
 </div>
 <div class="row ranking_lists">
     <div class="col-md-6">
@@ -44,10 +49,10 @@
             </div>
         </div>
         <table class="table table-bordered">
-        <tr>
-            <th>District</th>
-            <th>Report Rate</th>
-        </tr>
+            <tr>
+                <th>District</th>
+                <th>Report Rate</th>
+            </tr>
             <tr ng-repeat="district in worstDistricts">
                 <td>{{district.name}}</td>
                 <td>{{district.rate | number : 1}} %</td>
@@ -61,10 +66,10 @@
             </div>
         </div>
         <table class="table table-bordered">
-        <tr>
-            <th>District</th>
-            <th>Report Rate</th>
-        </tr>
+            <tr>
+                <th>District</th>
+                <th>Report Rate</th>
+            </tr>
             <tr ng-repeat="district in bestDistricts">
                 <td>{{district.name}}</td>
                 <td>{{district.rate | number : 1}} %</td>

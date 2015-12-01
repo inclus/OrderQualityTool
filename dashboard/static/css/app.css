@@ -6773,6 +6773,14 @@ body {
   min-height: 1px;
   padding-left: 15px;
   padding-right: 15px;
+  padding-top: 15px;
+  padding-bottom: 15px;
+}
+@media (min-width: 992px) {
+  .quality_test {
+    float: left;
+    width: 25%;
+  }
 }
 .quality_test__metric {
   display: block;
@@ -6787,12 +6795,6 @@ body {
   color: #2C3E50;
   display: block;
   text-align: center;
-}
-@media (min-width: 992px) {
-  .quality_test {
-    float: left;
-    width: 25%;
-  }
 }
 .quality_test_active {
   border-left: 1px solid #2C3E50;
