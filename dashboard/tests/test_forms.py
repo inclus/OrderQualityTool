@@ -4,7 +4,8 @@ from unittest import TestCase
 import arrow
 from django.core.files.uploadedfile import SimpleUploadedFile
 
-from dashboard.forms import FileUploadForm, generate_cycles
+from dashboard.forms import FileUploadForm
+from dashboard.helpers import generate_cycles
 
 
 class FileUploadFormTestCase(TestCase):
