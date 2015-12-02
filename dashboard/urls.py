@@ -9,10 +9,10 @@ urlpatterns = [
     url(r'^api/consumptionRecords$', views.ConsumptionRecordListView.as_view(), name='list_consumption_record'),
     url(r'^api/test/reportingRate$', views.FacilitiesReportingView.as_view(), name='reporting_rate'),
     url(r'^api/test/webBased$', views.WebBasedReportingView.as_view(), name='web_based'),
-    url(r'^api/test/reportingRate/bestDistricts$', views.BestPerformingDistrictsView.as_view(), name='reporting_rate_best'),
-    url(r'^api/test/reportingRate/worstDistricts$', views.WorstPerformingDistrictsView.as_view(), name='reporting_rate_worst'),
-     url(r'^api/test/reportingRate/best/csv$', views.BestPerformingDistrictsCSVView.as_view(), name='reporting_rate_best_csv'),
-    url(r'^api/test/reportingRate/worst/csv$', views.WorstPerformingDistrictsCSVView.as_view(), name='reporting_rate_worst_csv'),
+    url(r'^api/test/ranking/best', views.BestPerformingDistrictsView.as_view(), name='reporting_rate_best'),
+    url(r'^api/test/ranking/worst', views.WorstPerformingDistrictsView.as_view(), name='reporting_rate_worst'),
+    url(r'^api/test/ranking/best/csv$', views.BestPerformingDistrictsCSVView.as_view(), name='reporting_rate_best_csv'),
+    url(r'^api/test/ranking/worst/csv$', views.WorstPerformingDistrictsCSVView.as_view(), name='reporting_rate_worst_csv'),
     url(r'^api/cycles$', views.CyclesView.as_view(), name='cycles'),
     url(r'^api/test/metrics', views.ReportMetrics.as_view(), name='metrics')
 ]

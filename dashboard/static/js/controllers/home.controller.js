@@ -17,7 +17,6 @@ angular.module('dashboard').controller('HomeController', ['$scope', '$stateParam
             $scope.cycles = response.data.values;
             $scope.startCycle = $scope.cycles[6 - 1];
             $scope.endCycle = $scope.selectedCycle = response.data.most_recent_cycle;
-            console.log('cycle', $scope.endCycle, $scope.selectedCycle);
         });
 
         $scope.$watch('startCycle', function(start) {
@@ -42,8 +41,7 @@ angular.module('dashboard').controller('HomeController', ['$scope', '$stateParam
                 level: $scope.bestPerforming,
                 cycle: $scope.selectedCycle
             });
-            var url = "/api/test/reportingRate/best/csv?" + query;
-            console.log(url);
+            var url = "/api/test/ranking/best/csv?" + query;
             downloadURL(url, 'best.csv');
         }
 
@@ -52,12 +50,12 @@ angular.module('dashboard').controller('HomeController', ['$scope', '$stateParam
                 level: $scope.worstPerforming,
                 cycle: $scope.selectedCycle
             });
-            var url = "/api/test/reportingRate/worst/csv?" + query;
+            var url = "/api/test/ranking/worst/csv?" + query;
             downloadURL(url, 'worst.csv');
         }
 
         var updateWorstList = function() {
-            $http.get('/api/test/reportingRate/worstDistricts', {
+            $http.get('/api/test/ranking/worst', {
                 params: {
                     level: $scope.worstPerforming,
                     cycle: $scope.selectedCycle
@@ -68,7 +66,7 @@ angular.module('dashboard').controller('HomeController', ['$scope', '$stateParam
         };
 
         var updateBestList = function() {
-            $http.get('/api/test/reportingRate/bestDistricts', {
+            $http.get('/api/test/ranking/best', {
                 params: {
                     level: $scope.bestPerforming,
                     cycle: $scope.selectedCycle
