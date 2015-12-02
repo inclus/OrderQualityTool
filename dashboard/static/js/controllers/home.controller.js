@@ -1,5 +1,5 @@
-angular.module('dashboard').controller('HomeController', ['$scope', '$stateParams', '$uibModal', '$http', '$httpParamSerializer',
-    function($scope, $stateParams, $uibModal, $http, $httpParamSerializer) {
+angular.module('dashboard').controller('HomeController', ['$scope', '$stateParams', '$http', '$httpParamSerializer',
+    function($scope, $stateParams, $http, $httpParamSerializer) {
 
         $scope.displayCycle = function(cycle) {
             return "CYCLE " + cycle.number + " '" + cycle.year;
@@ -121,22 +121,5 @@ angular.module('dashboard').controller('HomeController', ['$scope', '$stateParam
                 metric: web + "%"
             }];
         });
-
-        $scope.open = function() {
-
-            var testSelectModal = $uibModal.open({
-                templateUrl: '/static/views/choose_tests.html',
-                controller: 'TestSelectionController',
-                resolve: {
-                    tests: function() {
-                        return $scope.tests;
-                    }
-                }
-            });
-
-            testSelectModal.result.then(function(selectedItem) {
-                $scope.selected = selectedItem;
-            }, function() {});
-        };
     }
 ])

@@ -19,7 +19,7 @@
     <div class="col-md-12">
         <div class="quality_test" ng-repeat="test in tests" ng-class="{'quality_test_active': test.name == currentTest}">
             <a ng-href="#/{{test.name}}">
-                <span class="quality_test__metric">{{test.metric}}</span>
+                <span class="quality_test__metric">{{test.metric }}</span>
                 <span class="quality_test__description">{{test.description}}</span>
             </a>
         </div>

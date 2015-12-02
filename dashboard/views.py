@@ -214,6 +214,6 @@ class ReportMetrics(APIView):
         data = dict((record['cycle'], {'count': record['count'], 'reporting': record['reporting']}) for record in FacilityCycleRecord.objects.filter(cycle=most_recent_cycle).values('cycle').annotate(count=Count('pk'), reporting=Count(Case(When(reporting_status=True, then=1)))))
         item = web.get(most_recent_cycle)
         report_item = data.get(most_recent_cycle)
-        web_rate = "{0:.2f}".format((float(item['reporting']) / float(item['count'])) * 100)
-        report_rate = "{0:.2f}".format((float(report_item['reporting']) / float(report_item['count'])) * 100)
+        web_rate = "{0:.1f}".format((float(item['reporting']) / float(item['count'])) * 100)
+        report_rate = "{0:.1f}".format((float(report_item['reporting']) / float(report_item['count'])) * 100)
         return Response({"webBased": web_rate, "reporting": report_rate})
