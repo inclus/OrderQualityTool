@@ -24,8 +24,8 @@ class District(models.Model):
 
 class Facility(models.Model):
     name = models.CharField(max_length=256, unique=True)
-    warehouse = models.ForeignKey(WareHouse, null=True, blank=True)
-    ip = models.ForeignKey(IP, null=True, blank=True)
+    warehouse = models.ForeignKey(WareHouse, null=True, blank=True, related_name="facilities")
+    ip = models.ForeignKey(IP, null=True, blank=True, related_name="facilities")
     district = models.ForeignKey(District, null=True, blank=True, related_name="facilities")
 
     def __unicode__(self):

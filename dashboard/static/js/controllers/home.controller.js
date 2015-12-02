@@ -4,7 +4,15 @@ angular.module('dashboard').controller('HomeController', ['$scope', '$stateParam
         $scope.displayCycle = function(cycle) {
             return "CYCLE " + cycle.number + " '" + cycle.year;
         };
+        $scope.bestPerforming = 'District';
+        $scope.selectBest = function(name) {
+            $scope.bestPerforming = name;
+        };
 
+        $scope.worstPerforming = 'District';
+        $scope.selectWorst = function(name) {
+            $scope.worstPerforming = name;
+        };
         $http.get('/api/cycles').then(function(response) {
             $scope.cycles = response.data.values;
             $scope.startCycle = $scope.cycles[6 - 1];
@@ -22,17 +30,10 @@ angular.module('dashboard').controller('HomeController', ['$scope', '$stateParam
 
         }, true);
 
-        $scope.updateLists = function() {
-            var test = $stateParams.name;
-            $http.get('/api/test/' + test + '/bestDistricts', {
+        var updateWorstList = function() {
+            $http.get('/api/test/reportingRate/worstDistricts', {
                 params: {
-                    cycle: $scope.selectedCycle
-                }
-            }).then(function(response) {
-                $scope.bestDistricts = response.data.values;
-            });
-            $http.get('/api/test/' + test + '/worstDistricts', {
-                params: {
+                    level: $scope.worstPerforming,
                     cycle: $scope.selectedCycle
                 }
             }).then(function(response) {
@@ -40,10 +41,31 @@ angular.module('dashboard').controller('HomeController', ['$scope', '$stateParam
             });
         };
 
+        var updateBestList = function() {
+            $http.get('/api/test/reportingRate/bestDistricts', {
+                params: {
+                    level: $scope.bestPerforming,
+                    cycle: $scope.selectedCycle
+                }
+            }).then(function(response) {
+                $scope.bestDistricts = response.data.values;
+            });
+        };
+
         $scope.$watch('selectedCycle', function(cycle) {
             if (cycle) {
-                $scope.updateLists();
+                updateWorstList();
+                updateBestList();
             }
+        });
+
+        $scope.$watch('bestPerforming', function() {
+            updateBestList();
+        });
+
+
+        $scope.$watch('worstPerforming', function() {
+            updateWorstList();
         });
 
         $scope.currentTest = $stateParams.name;

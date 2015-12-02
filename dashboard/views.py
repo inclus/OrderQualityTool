@@ -20,7 +20,7 @@ from dashboard.helpers import generate_cycles
 from dashboard.models import FacilityCycleRecord, FacilityConsumptionRecord
 from dashboard.tasks import import_general_report
 from forms import FileUploadForm
-from locations.models import Facility, District
+from locations.models import Facility, District, IP, WareHouse
 
 
 class HomeView(LoginRequiredMixin, TemplateView):
@@ -136,10 +136,13 @@ class BestPerformingDistrictsView(APIView):
 
     def get(self, request):
         filters = {}
+        levels = {'district': District, 'ip': IP, 'warehouse': WareHouse}
         cycle = request.GET.get('cycle', None)
+        level = request.GET.get('level', 'district').lower()
+        current_model = levels.get(level, District)
         if cycle:
             filters['facilities__records__cycle'] = cycle
-        data = District.objects.filter(**filters).values('name', 'facilities__records__cycle').annotate(count=Count('facilities__records__pk'), reporting=Count(Case(When(facilities__records__reporting_status=True, then=1))))
+        data = current_model.objects.filter(**filters).values('name', 'facilities__records__cycle').annotate(count=Count('facilities__records__pk'), reporting=Count(Case(When(facilities__records__reporting_status=True, then=1))))
         for item in data:
             if item['reporting'] == 0:
                 item['rate'] = 0

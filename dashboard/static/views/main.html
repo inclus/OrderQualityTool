@@ -11,7 +11,7 @@
         <h5 class="text-center"> -- </h5>
     </div>
     <div class="col-md-2">
-         <select name="cycle" class="form-control" ng-model="endCycle" ng-options="cycle for cycle in endCycles">
+        <select name="cycle" class="form-control" ng-model="endCycle" ng-options="cycle for cycle in endCycles">
         </select>
     </div>
 </div>
@@ -42,15 +42,28 @@
     
 </div>
 <div class="row ranking_lists">
+    <div class="col-md-12">
+        <h3>Ranking</h3>
+    </div>
     <div class="col-md-6">
         <div class="panel panel-default">
             <div class="panel-heading">
-                <h3 class="panel-title">Worst Performing Districts</h3>
+                <h3 class="panel-title">Worst Performing
+                <div class="pull-right dropdown">
+                    <a class="dropdown-toggle " data-toggle="dropdown"> {{worstPerforming}}s <b class="caret"></b></a>
+                    <ul class="dropdown-menu">
+                        <li><a ng-click="selectWorst('District')">Districts</a></li>
+                        <li><a ng-click="selectWorst('Warehouse')">Warehouses</a></li>
+                        <li><a ng-click="selectWorst('IP')">IP</a></li>
+                    </ul>
+                </div>
+                
+                </h3>
             </div>
         </div>
         <table class="table table-bordered">
             <tr>
-                <th>District</th>
+                <th>{{worstPerforming}}</th>
                 <th>Report Rate</th>
             </tr>
             <tr ng-repeat="district in worstDistricts">
@@ -62,12 +75,20 @@
     <div class="col-md-6">
         <div class="panel panel-default">
             <div class="panel-heading">
-                <h3 class="panel-title">Best Performing Districts</h3>
+                <h3 class="panel-title">Best Performing
+                <div class="pull-right dropdown">
+                    <a class="dropdown-toggle " data-toggle="dropdown"> {{bestPerforming}}s <b class="caret"></b></a>
+                    <ul class="dropdown-menu">
+                        <li><a ng-click="selectBest('District')">Districts</a></li>
+                        <li><a ng-click="selectBest('Warehouse')">Warehouses</a></li>
+                        <li><a ng-click="selectBest('IP')">IP</a></li>
+                    </ul>
+                </div></h3>
             </div>
         </div>
         <table class="table table-bordered">
             <tr>
-                <th>District</th>
+                <th> {{bestPerforming}} </th>
                 <th>Report Rate</th>
             </tr>
             <tr ng-repeat="district in bestDistricts">
