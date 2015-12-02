@@ -9,8 +9,9 @@ var lessSrc = 'dashboard/static/css/app.less';
 var lessDest = 'dashboard/static/css';
 
 gulp.task("server", bg("python", "manage.py", "runserver", "0.0.0.0:8000"));
+gulp.task("worker", bg("celery", "-A", "orderqualitytool.celery", "worker", "--loglevel=INFO"));
 
-gulp.task('default', ['server'], function() {
+gulp.task('default', ['server', 'worker'], function() {
     return gulp.src(lessSrc)
         .pipe(watchLess(lessSrc, function() {
             gulp.start('less');
