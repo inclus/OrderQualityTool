@@ -23,6 +23,9 @@ class DashboardUser(AbstractEmailUser):
     def get_short_name(self):
         return self.email
 
+    class Meta:
+        app_label = 'dashboard'
+
 
 class FacilityCycleRecord(models.Model):
     facility = models.ForeignKey(Facility, related_name="records")
