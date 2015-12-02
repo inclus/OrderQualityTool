@@ -6,7 +6,6 @@ SECRET_KEY = '(d!y31^rnwjhux$nwv26*g#z-=_a&gwq0lc1b@3t!gv)dhn_bx'
 DEBUG = True
 ALLOWED_HOSTS = []
 INSTALLED_APPS = (
-    'flat',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -21,7 +20,9 @@ INSTALLED_APPS = (
     'raven.contrib.django.raven_compat',
     'admirarchy',
     'menu',
-    'rest_framework'
+    'rest_framework',
+    'django.contrib.sites',
+    'custom_user'
 )
 
 

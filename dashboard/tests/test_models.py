@@ -47,8 +47,6 @@ class GeneralReportTestCase(FixtureFileReportTestCase):
         self.assertEqual(FacilityConsumptionRecord.objects.count(), 13)
 
     def test_can_build_consumption_records_from_file(self):
-        Facility.objects.get_or_create(name="Bugaya HC III ( Buvuma )")
-        Facility.objects.get_or_create(name="Gulu Regional Referal Hospital")
         GeneralReport(self.get_fixture_path('new_format.xlsx'), "Jan- Feb 2000").get_data()
         self.assertEqual(FacilityConsumptionRecord.objects.count(), 41)
         self.assertEqual(FacilityConsumptionRecord.objects.get(id=1).opening_balance, 20)
@@ -56,3 +54,5 @@ class GeneralReportTestCase(FixtureFileReportTestCase):
         self.assertEqual(FacilityConsumptionRecord.objects.get(id=1).months_of_stock_of_hand, 18)
         self.assertEqual(FacilityConsumptionRecord.objects.get(id=1).packs_ordered, -14)
         self.assertEqual(FacilityConsumptionRecord.objects.get(id=2).opening_balance, 35)
+        GeneralReport(self.get_fixture_path('new_format_changed.xlsx'), "Jan- Feb 2012").get_data()
+        self.assertEqual(FacilityConsumptionRecord.objects.count(), 82)

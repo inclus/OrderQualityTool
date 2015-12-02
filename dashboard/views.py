@@ -1,4 +1,4 @@
-import math
+import csv
 import os
 
 import arrow
@@ -10,6 +10,7 @@ from django.contrib import messages
 from django.core.files.base import ContentFile
 from django.core.files.storage import default_storage
 from django.db.models import Count, Case, When
+from django.http import HttpResponse
 from django.views.generic import TemplateView, FormView
 from rest_framework import filters
 from rest_framework.generics import ListAPIView
@@ -17,10 +18,11 @@ from rest_framework.response import Response
 from rest_framework.serializers import ModelSerializer
 from rest_framework.views import APIView
 
+from dashboard.helpers import generate_cycles
 from dashboard.models import FacilityCycleRecord, FacilityConsumptionRecord
 from dashboard.tasks import import_general_report
-from forms import FileUploadForm, generate_cycles, generate_cycles_numbered
-from locations.models import Facility, District
+from forms import FileUploadForm
+from locations.models import Facility, District, IP, WareHouse
 
 
 class HomeView(LoginRequiredMixin, TemplateView):
@@ -135,21 +137,48 @@ class BestPerformingDistrictsView(APIView):
     reverse = True
 
     def get(self, request):
+        results = self.get_data(request)
+        return Response({"values": results})
+
+    def get_data(self, request):
         filters = {}
+        levels = {'district': District, 'ip': IP, 'warehouse': WareHouse}
         cycle = request.GET.get('cycle', None)
+        level = request.GET.get('level', 'district').lower()
+        current_model = levels.get(level, District)
         if cycle:
             filters['facilities__records__cycle'] = cycle
-        data = District.objects.filter(**filters).values('name', 'facilities__records__cycle').annotate(count=Count('facilities__records__pk'), reporting=Count(Case(When(facilities__records__reporting_status=True, then=1))))
+        data = current_model.objects.filter(**filters).values('name', 'facilities__records__cycle').annotate(count=Count('facilities__records__pk'), reporting=Count(Case(When(facilities__records__reporting_status=True, then=1))))
         for item in data:
             if item['reporting'] == 0:
                 item['rate'] = 0
             else:
                 item['rate'] = (float(item['reporting']) / float(item['count'])) * 100
         results = sorted(data, key=lambda x: (x['rate'], x['count']), reverse=self.reverse)[:10]
-        return Response({"values": results})
+        return results
 
 
 class WorstPerformingDistrictsView(BestPerformingDistrictsView):
+    reverse = False
+
+
+class BestPerformingDistrictsCSVView(BestPerformingDistrictsView):
+    file_name = 'best'
+
+    def get(self, request):
+        response = HttpResponse(content_type='text/csv')
+        level = request.GET.get('level', 'district').lower()
+        response['Content-Disposition'] = 'attachment; filename="%s-%s.csv"' % (self.file_name, level)
+        writer = csv.writer(response)
+        writer.writerow([level, 'reporting rate'])
+        results = self.get_data(request)
+        for n in results:
+            writer.writerow([n['name'], n['rate']])
+        return response
+
+
+class WorstPerformingDistrictsCSVView(BestPerformingDistrictsCSVView):
+    file_name = 'worst'
     reverse = False
 
 
@@ -172,8 +201,9 @@ class CyclesView(APIView):
         records = [cycle['cycle'] for cycle in FacilityCycleRecord.objects.values('cycle').distinct()]
         most_recent_cycle, = sorted(records, sort_cycle, reverse=True)[:1]
         month = to_date(most_recent_cycle)
-        cycle_number = int(math.ceil((float(month.format('MM')) / 12) * 6))
-        return Response({"values": generate_cycles_numbered(now().replace(years=-2), month), "most_recent_cycle": {"name": most_recent_cycle, "number": cycle_number, "year": month.format('YY')}})
+        cycles = generate_cycles(now().replace(years=-2), month)
+        cycles.reverse()
+        return Response({"values": cycles, "most_recent_cycle": most_recent_cycle})
 
 
 class ReportMetrics(APIView):
@@ -184,28 +214,6 @@ class ReportMetrics(APIView):
         data = dict((record['cycle'], {'count': record['count'], 'reporting': record['reporting']}) for record in FacilityCycleRecord.objects.filter(cycle=most_recent_cycle).values('cycle').annotate(count=Count('pk'), reporting=Count(Case(When(reporting_status=True, then=1)))))
         item = web.get(most_recent_cycle)
         report_item = data.get(most_recent_cycle)
-        web_rate = "{0:.2f}".format((float(item['reporting']) / float(item['count'])) * 100)
-        report_rate = "{0:.2f}".format((float(report_item['reporting']) / float(report_item['count'])) * 100)
+        web_rate = "{0:.1f}".format((float(item['reporting']) / float(item['count'])) * 100)
+        report_rate = "{0:.1f}".format((float(report_item['reporting']) / float(report_item['count'])) * 100)
         return Response({"webBased": web_rate, "reporting": report_rate})
-
-
-class BestPerformingWebDistrictsView(APIView):
-    reverse = True
-
-    def get(self, request):
-        filters = {}
-        cycle = request.GET.get('cycle', None)
-        if cycle:
-            filters['facilities__records__cycle'] = cycle
-        data = District.objects.filter(**filters).values('name', 'facilities__records__cycle').annotate(count=Count('facilities__records__pk'), reporting=Count(Case(When(facilities__records__web_based=True, then=1))))
-        for item in data:
-            if item['reporting'] == 0:
-                item['rate'] = 0
-            else:
-                item['rate'] = (float(item['reporting']) / float(item['count'])) * 100
-        results = sorted(data, key=lambda x: (x['rate'], x['count']), reverse=self.reverse)[:10]
-        return Response({"values": results})
-
-
-class WorstPerformingWebDistrictsView(BestPerformingWebDistrictsView):
-    reverse = False

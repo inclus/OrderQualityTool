@@ -23,6 +23,9 @@ class DashboardUser(AbstractEmailUser):
     def get_short_name(self):
         return self.email
 
+    class Meta:
+        app_label = 'dashboard'
+
 
 class FacilityCycleRecord(models.Model):
     facility = models.ForeignKey(Facility, related_name="records")
@@ -288,5 +291,13 @@ class GeneralReport():
         return self.warehouses[name]
 
     def build_facility(self, facility):
-        facility, _ = Facility.objects.get_or_create(name=facility['name'], warehouse=self.get_warehouse(facility['Warehouse']), ip=self.get_ip(facility['IP']), district=self.get_district(facility['District']))
+        warehouse = self.get_warehouse(facility['Warehouse'])
+        ip = self.get_ip(facility['IP'])
+        district = self.get_district(facility['District'])
+        facility_name = facility['name']
+        facility, _ = Facility.objects.get_or_create(name=facility_name)
+        facility.warehouse = warehouse
+        facility.ip = ip
+        facility.district = district
+        facility.save()
         return facility
