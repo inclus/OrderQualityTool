@@ -11,7 +11,7 @@
         <h5 class="text-center"> -- </h5>
     </div>
     <div class="col-md-2">
-        <select name="cycle" class="form-control" ng-model="endCycle" ng-options="cycle for cycle in endCycles">
+         <select name="cycle" class="form-control" ng-model="endCycle" ng-options="cycle for cycle in endCycles">
         </select>
     </div>
 </div>
@@ -23,8 +23,8 @@
                 <span class="quality_test__description">{{test.description}}</span>
             </a>
         </div>
-        <div class="quality_test last pull-right">
-            <a class="" href="#" ng-click="open()">
+        <div class="quality_test quality_test_add pull-right" ng-class="{'quality_test_active': currentTest == 'addTests'}">
+            <a class="" href="#/addTests">
                 <span class="quality_test__metric glyphicon glyphicon-plus"></span>
                 <span class="quality_test__description">Click to show more tests</span>
             </a>
@@ -33,12 +33,12 @@
     
 </div>
 <div class="row">
-<div class="col-md-12">
-    <div class="test-area">
-        <div ng-include="template">
+    <div class="col-md-12">
+        <div class="test-area">
+            <div ng-include="template">
+            </div>
         </div>
     </div>
-</div>
     
 </div>
 <div class="row ranking_lists">

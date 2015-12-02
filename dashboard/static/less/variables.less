@@ -6,7 +6,8 @@
 //== Colors
 //
 //## Gray and brand colors for use across Bootstrap.
-
+@chai-green:             #27ae60;
+@chai-word-green:        #27ae60;
 @gray-base:              #000;
 @gray-darker:            lighten(@gray-base, 13.5%); // #222
 @gray-dark:              #7b8a8b;   // #333
@@ -31,7 +32,7 @@
 @text-color:            @gray-dark;
 
 //** Global textual link color.
-@link-color:            @brand-primary;
+@link-color:            @chai-green;
 //** Link hover color set via `darken()` function.
 @link-hover-color:      darken(@link-color, 15%);
 //** Link hover decoration.
@@ -391,7 +392,7 @@
 //=== Inverted navbar
 // Reset inverted navbar basics
 @navbar-inverse-color:                      lighten(@gray-light, 15%);
-@navbar-inverse-bg:                         #43BE73;
+@navbar-inverse-bg:                         @chai-green;
 @navbar-inverse-border:                     darken(@navbar-inverse-bg, 10%);
 
 // Inverted navbar links

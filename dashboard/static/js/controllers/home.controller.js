@@ -49,7 +49,9 @@ angular.module('dashboard').controller('HomeController', ['$scope', '$stateParam
         $scope.currentTest = $stateParams.name;
         var templates = {
             "reportingRate": "/static/views/reporting_rate.html",
-            "webVsPaper": "/static/views/web_vs_paper.html"
+            "webVsPaper": "/static/views/web_vs_paper.html",
+            "guidlineAdherenceRate": "/static/views/guidlineAdherenceRate.html",
+            "addTests": "/static/views/addTests.html",
         };
 
         $scope.template = templates[$scope.currentTest];
@@ -64,6 +66,10 @@ angular.module('dashboard').controller('HomeController', ['$scope', '$stateParam
             }, {
                 name: "webVsPaper",
                 description: "Web VS Paper Reporting",
+                metric: web + "%"
+            }, {
+                name: "guidlineAdherenceRate",
+                description: "GuideLine Adherence Rate",
                 metric: web + "%"
             }];
         });
