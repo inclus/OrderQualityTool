@@ -1,5 +1,5 @@
-angular.module('dashboard').controller('HomeController', ['$scope', '$stateParams', '$uibModal', '$http',
-    function($scope, $stateParams, $uibModal, $http) {
+angular.module('dashboard').controller('HomeController', ['$scope', '$stateParams', '$uibModal', '$http', '$httpParamSerializer',
+    function($scope, $stateParams, $uibModal, $http, $httpParamSerializer) {
 
         $scope.displayCycle = function(cycle) {
             return "CYCLE " + cycle.number + " '" + cycle.year;
@@ -29,6 +29,32 @@ angular.module('dashboard').controller('HomeController', ['$scope', '$stateParam
             }
 
         }, true);
+
+        function downloadURL(url, name) {
+            var link = document.createElement("a");
+            link.download = name;
+            link.href = url;
+            link.click();
+        }
+
+        $scope.downloadBest = function() {
+            var query = $httpParamSerializer({
+                level: $scope.bestPerforming,
+                cycle: $scope.selectedCycle
+            });
+            var url = "/api/test/reportingRate/best/csv?" + query;
+            console.log(url);
+            downloadURL(url, 'best.csv');
+        }
+
+        $scope.downloadWorst = function() {
+            var query = $httpParamSerializer({
+                level: $scope.worstPerforming,
+                cycle: $scope.selectedCycle
+            });
+            var url = "/api/test/reportingRate/worst/csv?" + query;
+            downloadURL(url, 'worst.csv');
+        }
 
         var updateWorstList = function() {
             $http.get('/api/test/reportingRate/worstDistricts', {

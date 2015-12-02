@@ -1,3 +1,4 @@
+import csv
 import os
 
 import arrow
@@ -9,6 +10,7 @@ from django.contrib import messages
 from django.core.files.base import ContentFile
 from django.core.files.storage import default_storage
 from django.db.models import Count, Case, When
+from django.http import HttpResponse
 from django.views.generic import TemplateView, FormView
 from rest_framework import filters
 from rest_framework.generics import ListAPIView
@@ -135,6 +137,10 @@ class BestPerformingDistrictsView(APIView):
     reverse = True
 
     def get(self, request):
+        results = self.get_data(request)
+        return Response({"values": results})
+
+    def get_data(self, request):
         filters = {}
         levels = {'district': District, 'ip': IP, 'warehouse': WareHouse}
         cycle = request.GET.get('cycle', None)
@@ -149,10 +155,30 @@ class BestPerformingDistrictsView(APIView):
             else:
                 item['rate'] = (float(item['reporting']) / float(item['count'])) * 100
         results = sorted(data, key=lambda x: (x['rate'], x['count']), reverse=self.reverse)[:10]
-        return Response({"values": results})
+        return results
 
 
 class WorstPerformingDistrictsView(BestPerformingDistrictsView):
+    reverse = False
+
+
+class BestPerformingDistrictsCSVView(BestPerformingDistrictsView):
+    file_name = 'best'
+
+    def get(self, request):
+        response = HttpResponse(content_type='text/csv')
+        level = request.GET.get('level', 'district').lower()
+        response['Content-Disposition'] = 'attachment; filename="%s-%s.csv"' % (self.file_name, level)
+        writer = csv.writer(response)
+        writer.writerow([level, 'reporting rate'])
+        results = self.get_data(request)
+        for n in results:
+            writer.writerow([n['name'], n['rate']])
+        return response
+
+
+class WorstPerformingDistrictsCSVView(BestPerformingDistrictsCSVView):
+    file_name = 'worst'
     reverse = False
 
 
@@ -191,25 +217,3 @@ class ReportMetrics(APIView):
         web_rate = "{0:.2f}".format((float(item['reporting']) / float(item['count'])) * 100)
         report_rate = "{0:.2f}".format((float(report_item['reporting']) / float(report_item['count'])) * 100)
         return Response({"webBased": web_rate, "reporting": report_rate})
-
-
-class BestPerformingWebDistrictsView(APIView):
-    reverse = True
-
-    def get(self, request):
-        filters = {}
-        cycle = request.GET.get('cycle', None)
-        if cycle:
-            filters['facilities__records__cycle'] = cycle
-        data = District.objects.filter(**filters).values('name', 'facilities__records__cycle').annotate(count=Count('facilities__records__pk'), reporting=Count(Case(When(facilities__records__web_based=True, then=1))))
-        for item in data:
-            if item['reporting'] == 0:
-                item['rate'] = 0
-            else:
-                item['rate'] = (float(item['reporting']) / float(item['count'])) * 100
-        results = sorted(data, key=lambda x: (x['rate'], x['count']), reverse=self.reverse)[:10]
-        return Response({"values": results})
-
-
-class WorstPerformingWebDistrictsView(BestPerformingWebDistrictsView):
-    reverse = False

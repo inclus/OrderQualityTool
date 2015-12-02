@@ -6890,3 +6890,14 @@ select.form-control {
   border-radius: 0;
   -webkit-appearance: none;
 }
+.ranking-dropdown {
+  display: inline-block;
+}
+a.label-qdb {
+  border: 1px solid #27ae60;
+  color: #27ae60;
+  border-radius: 5px;
+}
+a.label-qdb:hover {
+  color: #1e8449;
+}
