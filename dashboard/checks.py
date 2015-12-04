@@ -2,8 +2,8 @@ import operator
 
 from django.db.models import Q, Count
 
-from dashboard.helpers import CONSUMPTION, ADULT, PAED, ORDER_FORM_FREE_OF_GAPS
-from dashboard.models import FacilityConsumptionRecord, AdultPatientsRecord, PAEDPatientsRecord, FacilityCycleRecord, CycleTestScore
+from dashboard.helpers import CONSUMPTION, ADULT, PAED, ORDER_FORM_FREE_OF_GAPS, ORDER_FORM_FREE_OF_NEGATIVE_NUMBERS
+from dashboard.models import FacilityConsumptionRecord, AdultPatientsRecord, PAEDPatientsRecord, FacilityCycleRecord, CycleTestScore, CycleFormulationTestScore
 
 
 def run_order_form_free_of_gaps_test(cycle):
@@ -60,3 +60,20 @@ def calculate_rate(accumulator, item):
     accumulator[3] += 1
 
     return accumulator
+
+
+def run_order_form_free_of_negative_numbers_test(cycle):
+    values = FacilityConsumptionRecord.objects.filter(facility_cycle__cycle=cycle).order_by().values('formulation').distinct()
+    for formulation in values:
+        name = formulation["formulation"]
+        filter_list = [Q(opening_balance__lt=0), Q(quantity_received__lt=0), Q(pmtct_consumption__lt=0), Q(art_consumption__lt=0), Q(estimated_number_of_new_pregnant_women__lt=0), Q(total_quantity_to_be_ordered__lt=0)]
+        total_count = FacilityCycleRecord.objects.filter(cycle=cycle).count()
+        not_reporting = FacilityCycleRecord.objects.filter(cycle=cycle, reporting_status=False).count()
+        valid = FacilityConsumptionRecord.objects.filter(facility_cycle__cycle=cycle, formulation=name).exclude(reduce(operator.or_, filter_list)).count()
+        score, _ = CycleFormulationTestScore.objects.get_or_create(cycle=cycle, test=ORDER_FORM_FREE_OF_NEGATIVE_NUMBERS, formulation=name)
+        yes_rate = float(valid * 100) / float(total_count)
+        not_reporting_rate = float(not_reporting * 100) / float(total_count)
+        score.yes = yes_rate
+        score.no = 100 - yes_rate - not_reporting_rate
+        score.not_reporting = not_reporting_rate
+        score.save()

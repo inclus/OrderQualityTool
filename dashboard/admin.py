@@ -6,7 +6,7 @@ from django.contrib.auth.models import Group
 from django.utils.translation import ugettext_lazy
 from django.utils.translation import ugettext_lazy as _
 
-from dashboard.models import DashboardUser, FacilityConsumptionRecord, FacilityCycleRecord, AdultPatientsRecord, PAEDPatientsRecord, CycleTestScore
+from dashboard.models import DashboardUser, FacilityConsumptionRecord, FacilityCycleRecord, AdultPatientsRecord, PAEDPatientsRecord, CycleTestScore, CycleFormulationTestScore
 from dashboard.tasks import calculate_scores_for_checks_in_cycle
 from locations.models import Facility, WareHouse, IP, District
 
@@ -107,6 +107,7 @@ admin_site.register(IP)
 admin_site.register(WareHouse)
 admin_site.register(District)
 admin_site.register(CycleTestScore)
+admin_site.register(CycleFormulationTestScore)
 admin_site.register(AdultPatientsRecord, PatientAdmin)
 admin_site.register(PAEDPatientsRecord, PatientAdmin)
 admin_site.register(FacilityConsumptionRecord, ConsumptionAdmin)

@@ -1,13 +1,17 @@
 <div ng-controller="MainChecksController">
     <div class="col-md-3">
-        <h5>Select Test to Display</h5>
-        <select ng-model="selectedTest" id="" class="form-control">
-            <option value="orderFormFreeOfGaps">Order Form Is Free of Gaps</option>
+        <h5>SELECT TEST</h5>
+        <select ng-model="selectedTest" class="form-control" ng-options="test.desc for test in tests track by test.url">
+        </select>
+
+        <h5 ng-show="selectedTest.hasRegimen">SELECT REGIMEN</h5>
+        <select  ng-show="selectedTest.hasRegimen" ng-model="selectedRegimen" class="form-control" ng-options="regimen.name for regimen in regimens track by regimen.name">
         </select>
     </div>
     <div class="col-md-9">
         <div class="page_graph">
-            <h3 class="text-center">Order Form Is Free of Gaps</h3>
+            <h3 class="text-center">{{selectedTest.desc}}</h3>
+            <h5 class="text-center" ng-show="selectedTest.hasRegimen">{{selectedRegimen.name}}</h5>
             <angular-chart options="options"></angular-chart>
         </div>
     </div>

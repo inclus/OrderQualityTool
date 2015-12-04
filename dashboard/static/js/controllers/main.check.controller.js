@@ -1,16 +1,38 @@
 angular.module('dashboard').controller('MainChecksController', ['$scope', '$http',
     function($scope, $http) {
-        $scope.selectedTest = 'orderFormFreeOfGaps';
+        $scope.tests = [{
+            "url": "orderFormFreeOfGaps",
+            "desc": "Order Form Is Free of Gaps",
+            "hasRegimen": false
+        }, {
+            "url": "orderFormFreeOfNegativeNumbers",
+            "desc": "Order Form Is Free of Negative Numbers",
+            "hasRegimen": true
+        }];
+        $http.get('/api/regimens').then(function(response) {
+            $scope.regimens = _.map(response.data.values, function(item) {
+                return {
+                    name: item.formulation
+                };
+            });
+            $scope.selectedRegimen = $scope.regimens[0];
+        });
+        $scope.selectedTest = $scope.tests[0];
         var update = function(start, end) {
-            var test = $scope.selectedTest;
+            console.log('updating', start, end);
+            var test = $scope.selectedTest.url;
+            var regimen = undefined;
+            if ($scope.selectedRegimen) {
+                regimen = $scope.selectedRegimen.name;
+            }
             $http.get('/api/test/' + test, {
                 params: {
                     start: start,
                     end: end,
+                    regimen: regimen
                 }
             }).then(function(response) {
                 var values = response.data.values;
-                console.log(values);
                 $scope.options = {
                     data: values,
                     dimensions: {
@@ -60,6 +82,13 @@ angular.module('dashboard').controller('MainChecksController', ['$scope', '$http
 
         $scope.$watch('selectedTest', function(test) {
             if (test) {
+                update($scope.startCycle, $scope.endCycle);
+            }
+
+        }, true);
+
+        $scope.$watch('selectedRegimen', function(regimen) {
+            if (regimen) {
                 update($scope.startCycle, $scope.endCycle);
             }
 

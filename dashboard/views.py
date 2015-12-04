@@ -18,8 +18,8 @@ from rest_framework.response import Response
 from rest_framework.serializers import ModelSerializer
 from rest_framework.views import APIView
 
-from dashboard.helpers import generate_cycles, ORDER_FORM_FREE_OF_GAPS
-from dashboard.models import FacilityCycleRecord, FacilityConsumptionRecord, CycleTestScore
+from dashboard.helpers import generate_cycles, ORDER_FORM_FREE_OF_GAPS, ORDER_FORM_FREE_OF_NEGATIVE_NUMBERS
+from dashboard.models import FacilityCycleRecord, FacilityConsumptionRecord, CycleTestScore, CycleFormulationTestScore
 from dashboard.tasks import import_general_report
 from forms import FileUploadForm
 from locations.models import Facility, District, IP, WareHouse
@@ -221,7 +221,6 @@ class ReportMetrics(APIView):
 
 class OrderFormFreeOfGapsView(APIView):
     def get(self, request):
-
         start = request.GET.get('start', None)
         end = request.GET.get('end', None)
         filters = {}
@@ -233,6 +232,37 @@ class OrderFormFreeOfGapsView(APIView):
             cycles = cycles_included
             filters['cycle__in'] = cycles_included
         scores = CycleTestScore.objects.filter(test=ORDER_FORM_FREE_OF_GAPS, **filters)
+        data = dict((k.cycle, k) for k in scores)
+        results = []
+        for cycle in cycles:
+            if cycle in data:
+                item = data.get(cycle)
+                results.append({"cycle": cycle, "yes": item.yes, "no": item.no, "not_reporting": item.not_reporting})
+            else:
+                results.append({"cycle": cycle, "rate": 0, "yes": 0, "no": 0, "not_reporting": 0})
+        return Response({'values': results})
+
+
+class RegimensListView(APIView):
+    def get(self, request):
+        values = FacilityConsumptionRecord.objects.order_by().values('formulation').distinct()
+        return Response({'values': values})
+
+
+class OrderFormFreeOfNegativeNumbersView(APIView):
+    def get(self, request):
+        start = request.GET.get('start', None)
+        end = request.GET.get('end', None)
+        formulation = request.GET.get('regimen', None)
+        filters = {'formulation': formulation}
+        cycles = generate_cycles(now().replace(years=-2), now())
+        if start and end:
+            start_index = cycles.index(start)
+            end_index = cycles.index(end)
+            cycles_included = cycles[start_index: end_index + 1]
+            cycles = cycles_included
+            filters['cycle__in'] = cycles_included
+        scores = CycleFormulationTestScore.objects.filter(test=ORDER_FORM_FREE_OF_NEGATIVE_NUMBERS, **filters)
         data = dict((k.cycle, k) for k in scores)
         results = []
         for cycle in cycles:
