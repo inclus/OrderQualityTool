@@ -9,6 +9,7 @@ urlpatterns = [
     url(r'^api/consumptionRecords$', views.ConsumptionRecordListView.as_view(), name='list_consumption_record'),
     url(r'^api/test/reportingRate$', views.FacilitiesReportingView.as_view(), name='reporting_rate'),
     url(r'^api/test/webBased$', views.WebBasedReportingView.as_view(), name='web_based'),
+    url(r'^api/test/orderFormFreeOfGaps', views.OrderFormFreeOfGapsView.as_view(), name='order_form_free_of_gaps'),
     url(r'^api/test/ranking/best', views.BestPerformingDistrictsView.as_view(), name='reporting_rate_best'),
     url(r'^api/test/ranking/worst', views.WorstPerformingDistrictsView.as_view(), name='reporting_rate_worst'),
     url(r'^api/test/ranking/best/csv$', views.BestPerformingDistrictsCSVView.as_view(), name='reporting_rate_best_csv'),

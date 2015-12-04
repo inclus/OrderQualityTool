@@ -18,8 +18,8 @@ from rest_framework.response import Response
 from rest_framework.serializers import ModelSerializer
 from rest_framework.views import APIView
 
-from dashboard.helpers import generate_cycles
-from dashboard.models import FacilityCycleRecord, FacilityConsumptionRecord
+from dashboard.helpers import generate_cycles, ORDER_FORM_FREE_OF_GAPS
+from dashboard.models import FacilityCycleRecord, FacilityConsumptionRecord, CycleTestScore
 from dashboard.tasks import import_general_report
 from forms import FileUploadForm
 from locations.models import Facility, District, IP, WareHouse
@@ -217,3 +217,15 @@ class ReportMetrics(APIView):
         web_rate = "{0:.1f}".format((float(item['reporting']) / float(item['count'])) * 100)
         report_rate = "{0:.1f}".format((float(report_item['reporting']) / float(report_item['count'])) * 100)
         return Response({"webBased": web_rate, "reporting": report_rate})
+
+
+class CycleTestScoreSerializer(ModelSerializer):
+    class Meta:
+        model = CycleTestScore
+
+
+class OrderFormFreeOfGapsView(APIView):
+    def get(self, request):
+        scores = CycleTestScore.objects.filter(test=ORDER_FORM_FREE_OF_GAPS)
+        serializer = CycleTestScoreSerializer(scores, many=True)
+        return Response({'values': serializer.data})

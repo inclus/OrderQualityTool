@@ -2,7 +2,8 @@ import os
 
 from django.test import TestCase
 
-from dashboard.models import WaosStandardReport, FacilityConsumptionRecord, GeneralReport, FacilityCycleRecord
+from dashboard.reports import WaosStandardReport, GeneralReport
+from dashboard.models import FacilityConsumptionRecord, FacilityCycleRecord
 from locations.models import Facility
 
 

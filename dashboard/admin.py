@@ -6,7 +6,8 @@ from django.contrib.auth.models import Group
 from django.utils.translation import ugettext_lazy
 from django.utils.translation import ugettext_lazy as _
 
-from dashboard.models import DashboardUser, FacilityConsumptionRecord, FacilityCycleRecord, AdultPatientsRecord, PAEDPatientsRecord
+from dashboard.models import DashboardUser, FacilityConsumptionRecord, FacilityCycleRecord, AdultPatientsRecord, PAEDPatientsRecord, CycleTestScore
+from dashboard.tasks import calculate_scores_for_checks_in_cycle
 from locations.models import Facility, WareHouse, IP, District
 
 
@@ -78,6 +79,16 @@ class FacilityAdmin(ModelAdmin):
                     )
 
 
+def run_tests(model_admin, request, queryset):
+    data = queryset.order_by().values('cycle').distinct()
+    print data
+    for value in data:
+        calculate_scores_for_checks_in_cycle.delay(value['cycle'])
+
+
+run_tests.short_description = "Run quality tests for these cycles"
+
+
 class FacilityCycleRecordAdmin(ModelAdmin):
     list_display = ('facility',
                     'reporting_status',
@@ -85,6 +96,7 @@ class FacilityCycleRecordAdmin(ModelAdmin):
                     'multiple',
                     'cycle'
                     )
+    actions = [run_tests]
 
 
 admin_site = QdbSite()
@@ -94,6 +106,7 @@ admin_site.register(Facility, FacilityAdmin)
 admin_site.register(IP)
 admin_site.register(WareHouse)
 admin_site.register(District)
+admin_site.register(CycleTestScore)
 admin_site.register(AdultPatientsRecord, PatientAdmin)
 admin_site.register(PAEDPatientsRecord, PatientAdmin)
 admin_site.register(FacilityConsumptionRecord, ConsumptionAdmin)

@@ -33,3 +33,22 @@ def generate_cycles(start, end):
 
 def generate_choices():
     return [(s, s) for s in generate_cycles(now().replace(years=-2), now())]
+
+
+ORDER_FORM_FREE_OF_GAPS = "OrderFormFreeOfGaps"
+QUANTITY_TO_BE_ORDERED = 'total_quantity_to_be_ordered'
+OF_NEW_PREGNANT_WOMEN = 'estimated_number_of_new_pregnant_women'
+NUMBER_OF_NEW_PATIENTS = 'estimated_number_of_new_patients'
+FOR_CURRENT_PATIENTS = 'quantity_required_for_current_patients'
+MONTHS_OF_STOCK_OF_HAND = 'months_of_stock_of_hand'
+CLOSING_BALANCE = 'closing_balance'
+LOSES_ADJUSTMENTS = 'loses_adjustments'
+ART_CONSUMPTION = 'art_consumption'
+PMTCT_CONSUMPTION = 'pmtct_consumption'
+QUANTITY_RECEIVED = 'quantity_received'
+OPENING_BALANCE = 'opening_balance'
+ADULT = 'adult'
+CONSUMPTION = 'consumption'
+PAED = 'paed'
+PATIENTS_ADULT = "PATIENTS (ADULT)"
+PATIENTS_PAED = "PATIENTS (PAED)"
