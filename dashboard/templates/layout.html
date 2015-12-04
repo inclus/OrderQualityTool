@@ -8,6 +8,7 @@
     <title>{% block title %}Order Quality Tool{% endblock title %}</title>
     <link rel="stylesheet" href='{% static "css/app.css" %}'>
     <link rel="stylesheet" href='{% static "vendor/angular-chart.js/dist/angular-chart.css" %}'>
+    <link rel="stylesheet" href='{% static "vendor/c3/c3.css"%}' />
 </head>
 <body>
 
@@ -53,10 +54,14 @@
 <script type="text/javascript" src='{% static "vendor/angular-chart.js/dist/angular-chart.js"%}'></script>
 <script type="text/javascript" src='{% static "vendor/lodash/lodash.min.js"%}'></script>
 <script type="text/javascript" src='{% static "vendor/checklist-model/checklist-model.js"%}'></script>
+<script type="text/javascript" src='{% static "vendor/d3/d3.js"%}'></script>
+<script type="text/javascript" src='{% static "vendor/c3/c3.js"%}'></script>
+<script type="text/javascript" src='{% static "vendor/angular-chart/angular-chart.js"%}'></script>
 <script type="text/javascript" src='{% static "js/app.js" %}'></script>
 <script type="text/javascript" src='{% static "js/services/report.service.js" %}'></script>
 <script type="text/javascript" src='{% static "js/controllers/home.controller.js" %}'></script>
 <script type="text/javascript" src='{% static "js/controllers/report.rate.controller.js" %}'></script>
 <script type="text/javascript" src='{% static "js/controllers/web.based.rate.controller.js" %}'></script>
+<script type="text/javascript" src='{% static "js/controllers/main.check.controller.js" %}'></script>
 </body>
 </html>

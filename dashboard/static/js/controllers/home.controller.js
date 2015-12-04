@@ -116,7 +116,7 @@ angular.module('dashboard').controller('HomeController', ['$scope', '$stateParam
             }, {
                 name: "guidlineAdherenceRate",
                 description: "GuideLine Adherence Rate",
-                metric: web + "%"
+                metric: 0 + "%"
             }];
         });
     }
