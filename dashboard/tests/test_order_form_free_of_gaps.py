@@ -3,7 +3,7 @@ import json
 from django.core.urlresolvers import reverse
 from django_webtest import WebTest
 
-from dashboard.checks import run_order_form_free_of_gaps_test
+from dashboard.checks.order_form_free_of_gaps import OrderFormFreeOfGaps
 from dashboard.models import FacilityCycleRecord, FacilityConsumptionRecord, AdultPatientsRecord, PAEDPatientsRecord
 from locations.models import Facility
 
@@ -53,7 +53,7 @@ class OrderFormFreeOfGapsViewTestCase(WebTest):
             record, _ = FacilityCycleRecord.objects.get_or_create(cycle=cycle, facility=facility)
 
         url = "%s" % (reverse(self.url_name))
-        run_order_form_free_of_gaps_test(cycle)
+        OrderFormFreeOfGaps().run(cycle)
         response = self.app.get(url, user="testuser")
         json_content = json.loads(response.content)
         self.assertEqual(cycle, json_content['values'][0]['cycle'])

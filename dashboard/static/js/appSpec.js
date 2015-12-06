@@ -20,7 +20,7 @@ describe('ReportingRateController', function() {
 
     it('should fetch values when startCycle changes', function() {
         var controller = createController();
-        httpBackend.expect('GET', '/api/test/reportingRate?start=Jan+Feb+2013')
+        httpBackend.expect('GET', '/api/test/submittedOrder?start=Jan+Feb+2013')
             .respond({
                 "values": []
             });

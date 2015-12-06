@@ -1,7 +1,7 @@
 angular.module('dashboard').controller('ReportingRateController', ['$scope', '$http',
     function($scope, $http) {
         var update = function(start, end) {
-            $http.get('/api/test/reportingRate', {
+            $http.get('/api/test/submittedOrder', {
                 params: {
                     start: start,
                     end: end,

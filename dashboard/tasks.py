@@ -2,14 +2,15 @@ import os
 
 from celery import shared_task
 
-from dashboard.checks import run_order_form_free_of_gaps_test, run_order_form_free_of_negative_numbers_test
+from dashboard.checks.order_form_free_of_gaps import OrderFormFreeOfGaps
+from dashboard.checks.order_free_of_negative_numbers import OrderFormFreeOfNegativeNumbers
 from dashboard.reports import GeneralReport
 
 
 @shared_task
 def calculate_scores_for_checks_in_cycle(cycle):
-    run_order_form_free_of_gaps_test(cycle)
-    run_order_form_free_of_negative_numbers_test(cycle)
+    OrderFormFreeOfGaps().run(cycle)
+    OrderFormFreeOfNegativeNumbers().run(cycle)
 
 
 @shared_task
