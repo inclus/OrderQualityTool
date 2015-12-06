@@ -2,7 +2,7 @@ angular.module('dashboard').controller('WebBasedRateController', ['$scope', '$ht
     function($scope, $http) {
 
         var update = function(start, end) {
-            $http.get('/api/test/webBased', {
+            $http.get('/api/test/orderType', {
                 params: {
                     start: start,
                     end: end,
@@ -26,14 +26,14 @@ angular.module('dashboard').controller('WebBasedRateController', ['$scope', '$ht
         };
         $scope.$watch('startCycle', function(start) {
             if (start) {
-                update($scope.startCycle.name, $scope.endCycle.name);
+                update($scope.startCycle, $scope.endCycle);
             }
 
         }, true);
 
         $scope.$watch('endCycle', function(end) {
             if (end) {
-                update($scope.startCycle.name, $scope.endCycle.name);
+                update($scope.startCycle, $scope.endCycle);
             }
 
         }, true);
