@@ -1,5 +1,3 @@
-import json
-
 from django.core.urlresolvers import reverse
 from django_webtest import WebTest
 
@@ -16,12 +14,12 @@ class OrderFormFreeOfGapsViewTestCase(WebTest):
         response = self.app.get(url, user="testuser")
         self.assertEqual(200, response.status_code)
 
-    def _dont_test_logic(self):
+    def test_logic(self):
         names = ["FA1", "FA2", "FA3"]
         names_without_data = ["FA4", "FA5"]
-        consumption_regimens = ["CREG-%s" % n for n in range(1, 24)]
-        adult_regimens = ["AREG-%s" % n for n in range(1, 8)]
-        paed_regimens = ["PREG-%s" % n for n in range(1, 6)]
+        consumption_regimens = ["CREG-%s" % n for n in range(1, 26)]
+        adult_regimens = ["AREG-%s" % n for n in range(1, 23)]
+        paed_regimens = ["PREG-%s" % n for n in range(1, 9)]
         cycle = "Jan - Feb 2013"
         consumption_data = {}
         consumption_data['opening_balance'] = 3
@@ -52,11 +50,9 @@ class OrderFormFreeOfGapsViewTestCase(WebTest):
             facility, _ = Facility.objects.get_or_create(name=name)
             record, _ = FacilityCycleRecord.objects.get_or_create(cycle=cycle, facility=facility)
 
-        url = "%s" % (reverse(self.url_name))
-        OrderFormFreeOfGaps().run(cycle)
-        response = self.app.get(url, user="testuser")
-        json_content = json.loads(response.content)
-        self.assertEqual(cycle, json_content['values'][0]['cycle'])
-        self.assertEqual(60.0, json_content['values'][0]['yes'])
-        self.assertEqual(0.0, json_content['values'][0]['no'])
-        self.assertEqual(40.0, json_content['values'][0]['not_reporting'])
+        score = OrderFormFreeOfGaps().run(cycle)
+        print score
+        self.assertEqual(cycle, score.cycle)
+        self.assertEqual(60.0, score.yes)
+        self.assertEqual(0.0, score.no)
+        self.assertEqual(40.0, score.not_reporting)

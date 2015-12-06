@@ -4,7 +4,7 @@ from django.db.models import Q
 
 from dashboard.checks.common import Check
 from dashboard.helpers import ADULT, PAED, ORDER_FORM_FREE_OF_GAPS
-from dashboard.models import FacilityConsumptionRecord, AdultPatientsRecord, PAEDPatientsRecord, FacilityCycleRecord, CONSUMPTION, CycleTestScore
+from dashboard.models import FacilityCycleRecord, CONSUMPTION, FacilityConsumptionRecord, AdultPatientsRecord, PAEDPatientsRecord, CycleTestScore
 
 
 def calculate_rate(accumulator, item):
@@ -31,31 +31,28 @@ def calculate_rate(accumulator, item):
 
 class OrderFormFreeOfGaps(Check):
     def run(self, cycle):
-        filter_list = [Q(opening_balance=None), Q(quantity_received=None), Q(pmtct_consumption=None), Q(art_consumption=None), Q(loses_adjustments=None), Q(closing_balance=None), Q(months_of_stock_of_hand=None), Q(quantity_required_for_current_patients=None), Q(estimated_number_of_new_patients=None), Q(estimated_number_of_new_pregnant_women=None), Q(total_quantity_to_be_ordered=None)]
-        data = FacilityConsumptionRecord.objects.filter(facility_cycle__cycle=cycle).exclude(reduce(operator.or_, filter_list)).values('facility_cycle__facility__name').annotate(count=Count('pk'))
-        adult_data = AdultPatientsRecord.objects.filter(facility_cycle__cycle=cycle).exclude(Q(new=None) | Q(existing=None)).values('facility_cycle__facility__name').annotate(count=Count('pk'))
-        paed_data = PAEDPatientsRecord.objects.filter(facility_cycle__cycle=cycle).exclude(Q(new=None) | Q(existing=None)).values('facility_cycle__facility__name').annotate(count=Count('pk'))
-        data_as_dict = dict((value['facility_cycle__facility__name'], value["count"]) for value in data)
-        adult_data_as_dict = dict((value['facility_cycle__facility__name'], value["count"]) for value in adult_data)
-        paed_data_as_dict = dict((value['facility_cycle__facility__name'], value["count"]) for value in paed_data)
-        combined_data = list()
-        for record in FacilityCycleRecord.objects.filter(cycle=cycle):
-            name = record.facility.name
-            item = {}
-            if name in data_as_dict:
-                item[CONSUMPTION] = data_as_dict[name]
+        filter_list = [Q(opening_balance=None), Q(quantity_received=None), Q(art_consumption=None), Q(loses_adjustments=None), Q(estimated_number_of_new_patients=None)]
+        yes = 0
+        no = 0
+        not_reporting = 0
+        number_of_facilities = FacilityCycleRecord.objects.count()
+        for facilityCycleRecord in FacilityCycleRecord.objects.filter(cycle=cycle):
+            number_of_records_for_facility = FacilityConsumptionRecord.objects.filter(facility_cycle=facilityCycleRecord).count()
+            if number_of_records_for_facility == 0:
+                not_reporting += 1
+            else:
+                number_facility_consumption_records = FacilityConsumptionRecord.objects.filter(facility_cycle=facilityCycleRecord).exclude(reduce(operator.or_, filter_list)).count()
+                number_of_adult_records = AdultPatientsRecord.objects.filter(facility_cycle__cycle=cycle).exclude(Q(new=None) | Q(existing=None)).count()
+                number_of_paed_records = PAEDPatientsRecord.objects.filter(facility_cycle__cycle=cycle).exclude(Q(new=None) | Q(existing=None)).count()
 
-            if name in adult_data_as_dict:
-                item[ADULT] = adult_data_as_dict[name]
+                if number_facility_consumption_records >= 25 and number_of_adult_records >= 22 and number_of_paed_records >= 7:
+                    yes += 1
+                else:
+                    no += 1
 
-            if name in paed_data_as_dict:
-                item[PAED] = paed_data_as_dict[name]
-            combined_data.append(item)
-
-        yes, no, not_reporting, count = reduce(calculate_rate, combined_data, [0, 0, 0, 0])
-        yes_rate = float(yes) * 100 / float(count)
-        not_rate = float(no) * 100 / float(count)
-        not_reporting_rate = float(not_reporting) * 100 / float(count)
+        yes_rate = float(yes) * 100 / float(number_of_facilities)
+        not_rate = float(no) * 100 / float(number_of_facilities)
+        not_reporting_rate = float(not_reporting) * 100 / float(number_of_facilities)
         score, _ = CycleTestScore.objects.get_or_create(cycle=cycle, test=ORDER_FORM_FREE_OF_GAPS)
         score.yes = yes_rate
         score.no = not_rate
