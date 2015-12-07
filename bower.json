@@ -26,6 +26,7 @@
     "checklist-model": "~0.8.0",
     "angular-ui-router-tabs": "~1.7.0",
     "angular-mocks": "~1.4.8",
-    "angular-chart": "~0.3.2"
+    "angular-chart": "~0.3.2",
+    "ng-table": "~0.8.3"
   }
 }

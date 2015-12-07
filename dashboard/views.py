@@ -137,7 +137,7 @@ class FacilitiesMultipleReportingView(APIView):
         records = [cycle['cycle'] for cycle in FacilityCycleRecord.objects.values('cycle').distinct()]
         most_recent_cycle, = sorted(records, sort_cycle, reverse=True)[:1]
         cycle = request.GET.get('cycle', most_recent_cycle)
-        records = FacilityCycleRecord.objects.filter(cycle=cycle).values('multiple', 'facility__name')
+        records = FacilityCycleRecord.objects.filter(cycle=cycle, multiple=True).values('multiple', 'facility__name')
         return Response({"values": records})
 
 

@@ -1,21 +1,40 @@
-angular.module('dashboard').controller('MainChecksController', ['$scope', '$http',
-    function($scope, $http) {
+angular.module('dashboard').controller('MainChecksController', ['$scope', '$http', 'NgTableParams',
+    function($scope, $http, NgTableParams) {
         $scope.tests = [{
             "url": "orderFormFreeOfGaps",
-            "desc": "Order Form Is Free of Gaps",
-            "hasRegimen": false
+            "desc": "NO BLANKS: If the facility reported, is the whole order form free of blanks?",
+            "hasRegimen": false,
+            "hasChart": true,
+            "testNumber": 3,
+            "template": "/static/views/chart.html"
+        }, {
+            "url": "facilitiesMultiple",
+            "desc": "DUPLICATE ORDERS: Facilities that submitted more than one order over the cycle",
+            "hasRegimen": false,
+            "hasChart": false,
+            "testNumber": 4,
+            "template": "/static/views/table.html"
         }, {
             "url": "orderFormFreeOfNegativeNumbers",
-            "desc": "Order Form Is Free of Negative Numbers",
-            "hasRegimen": true
+            "desc": "NO NEGATIVES: Is the order free of negative numbers?",
+            "hasRegimen": true,
+            "hasChart": true,
+            "testNumber": 5,
+            "template": "/static/views/chart.html"
         }, {
             "url": "differentOrdersOverTime",
-            "desc": "Did the facility submit different orders over time",
-            "hasRegimen": true
+            "desc": "NON-REPEATING ORDERS: Does the facility avoid repeating the same orders in consecutive cycles?",
+            "hasRegimen": true,
+            "hasChart": true,
+            "testNumber": 7,
+            "template": "/static/views/chart.html"
         }, {
             "url": "closingBalance",
-            "desc": "Does Closing balance of one cycle = Opening balance from following one?",
-            "hasRegimen": true
+            "desc": "Does Opening  balance of the cycle = Closing balance from the previous one?",
+            "hasRegimen": true,
+            "hasChart": true,
+            "testNumber": 8,
+            "template": "/static/views/chart.html"
         }];
         $http.get('/api/regimens').then(function(response) {
             $scope.regimens = _.map(response.data.values, function(item) {
@@ -28,51 +47,72 @@ angular.module('dashboard').controller('MainChecksController', ['$scope', '$http
         $scope.selectedTest = $scope.tests[0];
         var update = function(start, end) {
             console.log('updating', start, end);
-            var test = $scope.selectedTest.url;
-            var regimen = undefined;
-            if ($scope.selectedRegimen) {
-                regimen = $scope.selectedRegimen.name;
-            }
-            $http.get('/api/test/' + test, {
-                params: {
-                    start: start,
-                    end: end,
-                    regimen: regimen
+            if ($scope.selectedTest.hasChart) {
+                var test = $scope.selectedTest.url;
+                var regimen = undefined;
+                if ($scope.selectedRegimen) {
+                    regimen = $scope.selectedRegimen.name;
                 }
-            }).then(function(response) {
-                var values = response.data.values;
-                $scope.options = {
-                    data: values,
-                    dimensions: {
-                        cycle: {
-                            axis: 'x',
-                            type: 'line'
-                        },
-                        no: {
-                            axis: 'y',
-                            type: 'line',
-                            name: 'No',
-                            dataType: 'numeric',
-                            displayFormat: d3.format(".1f")
-                        },
-                        yes: {
-                            axis: 'y',
-                            type: 'line',
-                            name: 'Yes',
-                            dataType: 'numeric',
-                            displayFormat: d3.format(".1f")
-                        },
-                        not_reporting: {
-                            axis: 'y',
-                            type: 'line',
-                            name: 'Not Reporting',
-                            dataType: 'numeric',
-                            displayFormat: d3.format(".1f")
-                        }
+                $http.get('/api/test/' + test, {
+                    params: {
+                        start: start,
+                        end: end,
+                        regimen: regimen
                     }
-                };
-                $scope.colors = ["#42BE73"];
-            });
+                }).then(function(response) {
+                    var values = response.data.values;
+                    $scope.options = {
+                        data: values,
+                        dimensions: {
+                            cycle: {
+                                axis: 'x',
+                                type: 'line'
+                            },
+                            no: {
+                                axis: 'y',
+                                type: 'line',
+                                name: 'No',
+                                dataType: 'numeric',
+                                displayFormat: d3.format(".1f")
+                            },
+                            yes: {
+                                axis: 'y',
+                                type: 'line',
+                                name: 'Yes',
+                                dataType: 'numeric',
+                                displayFormat: d3.format(".1f")
+                            },
+                            not_reporting: {
+                                axis: 'y',
+                                type: 'line',
+                                name: 'Not Reporting',
+                                dataType: 'numeric',
+                                displayFormat: d3.format(".1f")
+                            }
+                        }
+                    };
+                    $scope.colors = ["#42BE73"];
+                });
+            } else {
+                var test = $scope.selectedTest.url;
+
+                $http.get('/api/test/' + test, {
+                    params: {
+                        start: start,
+                        end: end
+                    }
+                }).then(function(response) {
+                    var values = response.data.values;
+                    $scope.tableParams = new NgTableParams({
+                        page: 1, // show first page
+                        count: 10 // count per page
+                    }, {
+                        filterDelay: 0,
+                        data: values
+                    });
+                });
+            }
+
         };
         $scope.$watch('startCycle', function(start) {
             if (start && $scope.selectedTest) {

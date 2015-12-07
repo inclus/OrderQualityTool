@@ -25,6 +25,7 @@ module.exports = function(config) {
             "dashboard/static/vendor/lodash/lodash.min.js",
             "dashboard/static/vendor/checklist-model/checklist-model.js",
             "dashboard/static/vendor/angular-chart/angular-chart.js",
+            "dashboard/vendor/ng-table/dist/ng-table.js",
             "dashboard/static/js/**/*.js"
         ],
 
