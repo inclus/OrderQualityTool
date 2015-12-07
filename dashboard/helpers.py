@@ -1,3 +1,4 @@
+import arrow
 from arrow import Arrow, now
 
 
@@ -37,8 +38,15 @@ def generate_choices():
 
 ORDER_FORM_FREE_OF_GAPS = "OrderFormFreeOfGaps"
 ORDER_FORM_FREE_OF_NEGATIVE_NUMBERS = "orderFormFreeOfNegativeNumbers"
+DIFFERENT_ORDERS_OVER_TIME = "differentOrdersOverTime"
+
 ADULT = 'adult'
 CONSUMPTION = 'consumption'
 PAED = 'paed'
 PATIENTS_ADULT = "PATIENTS (ADULT)"
 PATIENTS_PAED = "PATIENTS (PAED)"
+
+
+def to_date(text):
+    month = text.split('-')[1].strip()
+    return arrow.get(month, 'MMM YYYY')

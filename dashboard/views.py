@@ -1,7 +1,6 @@
 import csv
 import os
 
-import arrow
 import django_filters
 from arrow import now
 from braces.views import LoginRequiredMixin
@@ -18,7 +17,7 @@ from rest_framework.response import Response
 from rest_framework.serializers import ModelSerializer
 from rest_framework.views import APIView
 
-from dashboard.helpers import generate_cycles, ORDER_FORM_FREE_OF_GAPS, ORDER_FORM_FREE_OF_NEGATIVE_NUMBERS
+from dashboard.helpers import generate_cycles, ORDER_FORM_FREE_OF_GAPS, ORDER_FORM_FREE_OF_NEGATIVE_NUMBERS, DIFFERENT_ORDERS_OVER_TIME, to_date
 from dashboard.models import FacilityCycleRecord, FacilityConsumptionRecord, CycleTestScore, CycleFormulationTestScore
 from dashboard.tasks import import_general_report
 from forms import FileUploadForm
@@ -191,11 +190,6 @@ class WorstPerformingDistrictsCSVView(BestPerformingDistrictsCSVView):
     reverse = False
 
 
-def to_date(text):
-    month = text.split('-')[1].strip()
-    return arrow.get(month, 'MMM YYYY')
-
-
 def sort_cycle(item1, item2):
     if to_date(item1) < to_date(item2):
         return -1
@@ -259,6 +253,8 @@ class RegimensListView(APIView):
 
 
 class OrderFormFreeOfNegativeNumbersView(APIView):
+    test = ORDER_FORM_FREE_OF_NEGATIVE_NUMBERS
+
     def get(self, request):
         start = request.GET.get('start', None)
         end = request.GET.get('end', None)
@@ -271,7 +267,7 @@ class OrderFormFreeOfNegativeNumbersView(APIView):
             cycles_included = cycles[start_index: end_index + 1]
             cycles = cycles_included
             filters['cycle__in'] = cycles_included
-        scores = CycleFormulationTestScore.objects.filter(test=ORDER_FORM_FREE_OF_NEGATIVE_NUMBERS, **filters)
+        scores = CycleFormulationTestScore.objects.filter(test=self.test, **filters)
         data = dict((k.cycle, k) for k in scores)
         results = []
         for cycle in cycles:
@@ -281,3 +277,7 @@ class OrderFormFreeOfNegativeNumbersView(APIView):
             else:
                 results.append({"cycle": cycle, "rate": 0, "yes": 0, "no": 0, "not_reporting": 0})
         return Response({'values': results})
+
+
+class DifferentOrdersOverTimeView(OrderFormFreeOfNegativeNumbersView):
+    test = DIFFERENT_ORDERS_OVER_TIME
