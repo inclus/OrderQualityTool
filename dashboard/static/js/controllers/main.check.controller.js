@@ -1,5 +1,5 @@
-angular.module('dashboard').controller('MainChecksController', ['$scope', '$http', 'NgTableParams',
-    function($scope, $http, NgTableParams) {
+angular.module('dashboard').controller('MainChecksController', ['$scope', '$http',
+    function($scope, $http) {
         $scope.tests = [{
             "url": "orderFormFreeOfGaps",
             "desc": "NO BLANKS: If the facility reported, is the whole order form free of blanks?",
@@ -36,82 +36,88 @@ angular.module('dashboard').controller('MainChecksController', ['$scope', '$http
             "testNumber": 8,
             "template": "/static/views/chart.html"
         }];
-        $http.get('/api/regimens').then(function(response) {
-            $scope.regimens = _.map(response.data.values, function(item) {
-                return {
-                    name: item.formulation
-                };
-            });
-            $scope.selectedRegimen = $scope.regimens[0];
-        });
+        $scope.regimens = [{
+            name: "TDF/3TC/EFV (Adult)",
+            value: "TDF/3TC/EFV"
+        }, {
+            name: "ABC/3TC (Paed)",
+            value: "ABC/3TC"
+        }, {
+            name: "EFV200 (Paed)",
+            value: "(EFV) 200mg"
+        }];
+        $scope.selectedRegimen = $scope.regimens[0];
+
         $scope.selectedTest = $scope.tests[0];
+
+    }
+]);
+angular.module('dashboard').controller('MultipleOrdersController', ['$scope', '$http', 'NgTableParams',
+    function($scope, $http, NgTableParams) {
+        $http.get('/api/test/facilitiesMultiple').then(function(response) {
+            var values = response.data.values;
+            $scope.tableParams = new NgTableParams({
+                page: 1,
+                count: 10
+            }, {
+                filterDelay: 0,
+                data: values
+            });
+        });
+    }
+]);
+angular.module('dashboard').controller('LineChartController', ['$scope', '$http',
+    function($scope, $http) {
         var update = function(start, end) {
             console.log('updating', start, end);
-            if ($scope.selectedTest.hasChart) {
-                var test = $scope.selectedTest.url;
-                var regimen = undefined;
-                if ($scope.selectedRegimen) {
-                    regimen = $scope.selectedRegimen.name;
-                }
-                $http.get('/api/test/' + test, {
-                    params: {
-                        start: start,
-                        end: end,
-                        regimen: regimen
-                    }
-                }).then(function(response) {
-                    var values = response.data.values;
-                    $scope.options = {
-                        data: values,
-                        dimensions: {
-                            cycle: {
-                                axis: 'x',
-                                type: 'line'
-                            },
-                            no: {
-                                axis: 'y',
-                                type: 'line',
-                                name: 'No',
-                                dataType: 'numeric',
-                                displayFormat: d3.format(".1f")
-                            },
-                            yes: {
-                                axis: 'y',
-                                type: 'line',
-                                name: 'Yes',
-                                dataType: 'numeric',
-                                displayFormat: d3.format(".1f")
-                            },
-                            not_reporting: {
-                                axis: 'y',
-                                type: 'line',
-                                name: 'Not Reporting',
-                                dataType: 'numeric',
-                                displayFormat: d3.format(".1f")
-                            }
-                        }
-                    };
-                    $scope.colors = ["#42BE73"];
-                });
-            } else {
-                var test = $scope.selectedTest.url;
 
-                $http.get('/api/test/' + test, {
-                    params: {
-                        start: start,
-                        end: end
-                    }
-                }).then(function(response) {
-                    var values = response.data.values;
-                    $scope.tableParams = new NgTableParams({
-                        page: 1, // show first page
-                        count: 10 // count per page
-                    }, {
-                        filterDelay: 0,
-                        data: values
-                    });
-                });
+            var test = $scope.selectedTest.url;
+            var regimen = undefined;
+            if ($scope.selectedRegimen) {
+                regimen = $scope.selectedRegimen.value;
             }
+            $http.get('/api/test/' + test, {
+                params: {
+                    start: start,
+                    end: end,
+                    regimen: regimen
+                }
+            }).then(function(response) {
+                var values = response.data.values;
+                $scope.options = {};
+                $scope.options = {
+                    data: values,
+                    dimensions: {
+                        cycle: {
+                            axis: 'x',
+                            type: 'line'
+                        },
+                        no: {
+                            axis: 'y',
+                            type: 'line',
+                            name: 'No',
+                            dataType: 'numeric',
+                            displayFormat: d3.format(".1f")
+                        },
+                        yes: {
+                            axis: 'y',
+                            type: 'line',
+                            name: 'Yes',
+                            dataType: 'numeric',
+                            displayFormat: d3.format(".1f")
+                        },
+                        not_reporting: {
+                            axis: 'y',
+                            type: 'line',
+                            name: 'Not Reporting',
+                            dataType: 'numeric',
+                            displayFormat: d3.format(".1f")
+                        }
+                    }
+                };
+                $scope.colors = ["#42BE73"];
+            });
+
 
         };
         $scope.$watch('startCycle', function(start) {

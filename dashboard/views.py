@@ -259,7 +259,7 @@ class OrderFormFreeOfNegativeNumbersView(APIView):
         start = request.GET.get('start', None)
         end = request.GET.get('end', None)
         formulation = request.GET.get('regimen', None)
-        filters = {'formulation': formulation}
+        filters = {'formulation__icontains': formulation}
         cycles = generate_cycles(now().replace(years=-2), now())
         if start and end:
             start_index = cycles.index(start)

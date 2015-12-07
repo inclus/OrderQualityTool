@@ -4,7 +4,7 @@
         <select ng-model="selectedTest" class="form-control" ng-options="test.desc for test in tests track by test.url">
         </select>
 
-        <h5 ng-show="selectedTest.hasRegimen">SELECT REGIMEN</h5>
+        <h5 ng-show="selectedTest.hasRegimen">Choose FORMULATION</h5>
         <select  ng-show="selectedTest.hasRegimen" ng-model="selectedRegimen" class="form-control" ng-options="regimen.name for regimen in regimens track by regimen.name">
         </select>
     </div>
