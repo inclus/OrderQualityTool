@@ -6,7 +6,7 @@ from django.contrib.auth.models import Group
 from django.utils.translation import ugettext_lazy
 from django.utils.translation import ugettext_lazy as _
 
-from dashboard.models import DashboardUser, FacilityConsumptionRecord, FacilityCycleRecord, AdultPatientsRecord, PAEDPatientsRecord, CycleTestScore, CycleFormulationTestScore
+from dashboard.models import DashboardUser, FacilityConsumptionRecord, FacilityCycleRecord, AdultPatientsRecord, PAEDPatientsRecord, CycleTestScore, CycleFormulationTestScore, FacilityCycleRecordScore
 from dashboard.tasks import calculate_scores_for_checks_in_cycle
 from locations.models import Facility, WareHouse, IP, District
 
@@ -49,18 +49,20 @@ class MyModelAdmin(HierarchicalModelAdmin):
 
 
 class ConsumptionAdmin(ModelAdmin):
-    list_display = ('facility_cycle',
-                    'opening_balance',
-                    'quantity_received',
-                    'pmtct_consumption',
-                    'art_consumption',
-                    'loses_adjustments',
-                    'closing_balance',
-                    'months_of_stock_of_hand',
-                    'quantity_required_for_current_patients',
-                    'estimated_number_of_new_patients',
-                    'estimated_number_of_new_pregnant_women'
-                    )
+    list_display = (
+        'facility_cycle',
+        'formulation',
+        'opening_balance',
+        'quantity_received',
+        'pmtct_consumption',
+        'art_consumption',
+        'loses_adjustments',
+        'closing_balance',
+        'months_of_stock_of_hand',
+        'quantity_required_for_current_patients',
+        'estimated_number_of_new_patients',
+        'estimated_number_of_new_pregnant_women'
+    )
 
 
 class PatientAdmin(ModelAdmin):
@@ -107,6 +109,7 @@ admin_site.register(IP)
 admin_site.register(WareHouse)
 admin_site.register(District)
 admin_site.register(CycleTestScore)
+admin_site.register(FacilityCycleRecordScore)
 admin_site.register(CycleFormulationTestScore)
 admin_site.register(AdultPatientsRecord, PatientAdmin)
 admin_site.register(PAEDPatientsRecord, PatientAdmin)

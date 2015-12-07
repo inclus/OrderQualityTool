@@ -91,9 +91,10 @@ class GeneralReport():
 
     def get_value(self, row, i):
         if i <= len(row):
-            value = row[i].value
-            if value and value != "-":
-                return row[i].value
+            real_value = row[i].value
+            value = real_value
+            if value != "-" and value != '':
+                return real_value
 
     def get_data(self):
         self.locations()

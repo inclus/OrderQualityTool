@@ -1,5 +1,7 @@
 import operator
 
+from django.db.models import Q
+
 from dashboard.checks.common import Check
 from dashboard.helpers import ORDER_FORM_FREE_OF_NEGATIVE_NUMBERS
 from dashboard.models import FacilityConsumptionRecord, FacilityCycleRecord, CycleFormulationTestScore

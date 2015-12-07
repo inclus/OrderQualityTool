@@ -58,6 +58,15 @@ class FacilityCycleRecord(models.Model):
         return "%s %s" % (self.facility, self.cycle)
 
 
+class FacilityCycleRecordScore(models.Model):
+    facility_cycle = models.ForeignKey(FacilityCycleRecord)
+    test = models.CharField(max_length=256)
+    score = models.CharField(choices=(("YES", "YES"), ("NO", "NO"), ("NOT_REPORTING", "NOT_REPORTING")), db_index=True, max_length=20)
+
+    def __unicode__(self):
+        return "%s %s %s" % (self.facility_cycle, self.test, self.score)
+
+
 class FacilityConsumptionRecord(models.Model):
     facility_cycle = models.ForeignKey(FacilityCycleRecord)
     opening_balance = models.FloatField(null=True, blank=True)
