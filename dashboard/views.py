@@ -17,7 +17,7 @@ from rest_framework.response import Response
 from rest_framework.serializers import ModelSerializer
 from rest_framework.views import APIView
 
-from dashboard.helpers import generate_cycles, ORDER_FORM_FREE_OF_GAPS, ORDER_FORM_FREE_OF_NEGATIVE_NUMBERS, DIFFERENT_ORDERS_OVER_TIME, to_date
+from dashboard.helpers import generate_cycles, ORDER_FORM_FREE_OF_GAPS, ORDER_FORM_FREE_OF_NEGATIVE_NUMBERS, DIFFERENT_ORDERS_OVER_TIME, to_date, CLOSING_BALANCE_MATCHES_OPENING_BALANCE
 from dashboard.models import FacilityCycleRecord, FacilityConsumptionRecord, CycleTestScore, CycleFormulationTestScore
 from dashboard.tasks import import_general_report
 from forms import FileUploadForm
@@ -281,3 +281,7 @@ class OrderFormFreeOfNegativeNumbersView(APIView):
 
 class DifferentOrdersOverTimeView(OrderFormFreeOfNegativeNumbersView):
     test = DIFFERENT_ORDERS_OVER_TIME
+
+
+class ClosingBalanceView(DifferentOrdersOverTimeView):
+    test = CLOSING_BALANCE_MATCHES_OPENING_BALANCE

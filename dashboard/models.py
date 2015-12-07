@@ -41,7 +41,7 @@ class CycleFormulationTestScore(models.Model):
     formulation = models.CharField(max_length=256, null=True, blank=True)
 
     class Meta:
-        unique_together = ("cycle", "formulation")
+        unique_together = ("cycle", "formulation", "test")
 
     def __unicode__(self):
         return "%s %s YES:%s NO:%s NOT_REPORTING:%s FORMULATION:%s" % (self.cycle, self.test, self.yes, self.no, self.not_reporting, self.formulation)

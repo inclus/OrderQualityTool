@@ -35,4 +35,4 @@ celery:
   volumes_from:
     - orderqualitytool
   env_file: .env
-  command: celery -A orderqualitytool.celery worker
+  command: celery -A orderqualitytool.celery worker --concurrency=6

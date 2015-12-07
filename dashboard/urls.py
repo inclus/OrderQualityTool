@@ -11,6 +11,7 @@ urlpatterns = [
     url(r'^api/test/orderType', views.WebBasedReportingView.as_view(), name='order_type'),
     url(r'^api/test/facilitiesMultiple', views.FacilitiesMultipleReportingView.as_view(), name='facilities_multiple'),
     url(r'^api/test/orderFormFreeOfGaps', views.OrderFormFreeOfGapsView.as_view(), name='order_form_free_of_gaps'),
+    url(r'^api/test/closingBalance', views.ClosingBalanceView.as_view(), name='closing_balance_matches_opening_balance'),
     url(r'^api/test/orderFormFreeOfNegativeNumbers', views.OrderFormFreeOfNegativeNumbersView.as_view(), name='order_form_free_of_negative_numbers'),
     url(r'^api/test/differentOrdersOverTime', views.DifferentOrdersOverTimeView.as_view(), name='different_orders_over_time'),
     url(r'^api/test/ranking/best', views.BestPerformingDistrictsView.as_view(), name='ranking_best'),

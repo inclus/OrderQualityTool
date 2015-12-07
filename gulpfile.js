@@ -9,7 +9,7 @@ var lessSrc = 'dashboard/static/css/app.less';
 var lessDest = 'dashboard/static/css';
 
 gulp.task("server", bg("python", "manage.py", "runserver", "0.0.0.0:8000"));
-gulp.task("worker", bg("celery", "-A", "orderqualitytool.celery", "worker", "--loglevel=INFO"));
+gulp.task("worker", bg("celery", "-A", "orderqualitytool.celery", "worker", "--loglevel=INFO", "--concurrency=6"));
 
 gulp.task('default', ['server', 'worker'], function() {
     return gulp.src(lessSrc)

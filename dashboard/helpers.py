@@ -39,6 +39,7 @@ def generate_choices():
 ORDER_FORM_FREE_OF_GAPS = "OrderFormFreeOfGaps"
 ORDER_FORM_FREE_OF_NEGATIVE_NUMBERS = "orderFormFreeOfNegativeNumbers"
 DIFFERENT_ORDERS_OVER_TIME = "differentOrdersOverTime"
+CLOSING_BALANCE_MATCHES_OPENING_BALANCE = "closingBalanceMatchesOpeningBalance"
 
 ADULT = 'adult'
 CONSUMPTION = 'consumption'

@@ -8,6 +8,14 @@ angular.module('dashboard').controller('MainChecksController', ['$scope', '$http
             "url": "orderFormFreeOfNegativeNumbers",
             "desc": "Order Form Is Free of Negative Numbers",
             "hasRegimen": true
+        }, {
+            "url": "differentOrdersOverTime",
+            "desc": "Did the facility submit different orders over time",
+            "hasRegimen": true
+        }, {
+            "url": "closingBalance",
+            "desc": "Does Closing balance of one cycle = Opening balance from following one?",
+            "hasRegimen": true
         }];
         $http.get('/api/regimens').then(function(response) {
             $scope.regimens = _.map(response.data.values, function(item) {
