@@ -133,6 +133,15 @@ class WebBasedReportingView(APIView):
         return Response({"values": results})
 
 
+class FacilitiesMultipleReportingView(APIView):
+    def get(self, request):
+        records = [cycle['cycle'] for cycle in FacilityCycleRecord.objects.values('cycle').distinct()]
+        most_recent_cycle, = sorted(records, sort_cycle, reverse=True)[:1]
+        cycle = request.GET.get('cycle', most_recent_cycle)
+        records = FacilityCycleRecord.objects.filter(cycle=cycle).values('multiple', 'facility__name')
+        return Response({"values": records})
+
+
 class BestPerformingDistrictsView(APIView):
     reverse = True
 
