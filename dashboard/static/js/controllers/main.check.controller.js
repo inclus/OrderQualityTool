@@ -56,6 +56,13 @@ angular.module('dashboard').controller('MainChecksController', ['$scope', '$http
             "hasChart": true,
             "testNumber": 9,
             "template": "/static/views/chart.html"
+        }, {
+            "url": "stablePatientVolumes",
+            "desc": "STABLE PATIENT VOLUMES: Are total patient numbers stable from one cycle to the next?",
+            "hasRegimen": true,
+            "hasChart": true,
+            "testNumber": 9,
+            "template": "/static/views/chart.html"
         }];
         $scope.regimens = [{
             name: "TDF/3TC/EFV (Adult)",
