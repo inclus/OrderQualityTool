@@ -42,6 +42,13 @@ angular.module('dashboard').controller('MainChecksController', ['$scope', '$http
             "hasChart": true,
             "testNumber": 8,
             "template": "/static/views/chart.html"
+        }, {
+            "url": "stableConsumption",
+            "desc": "STABLE CONSUMPTION: Is total consumption stable from one cycle to the next (i.e. less than 50% growth or decline from one cycle to the next)?",
+            "hasRegimen": true,
+            "hasChart": true,
+            "testNumber": 9,
+            "template": "/static/views/chart.html"
         }];
         $scope.regimens = [{
             name: "TDF/3TC/EFV (Adult)",

@@ -15,7 +15,7 @@ class DifferentOrdersOverTimeTestCase(TestCase):
     def test_check(self):
         names = ["FA1", "FA2", "FA3"]
         names_without_data = ["FA4", "FA5"]
-        consumption_regimens = ["CREG-%s" % n for n in range(1, 26)]
+        consumption_regimens = ["Efavirenz (TDF/3TC/EFV)", "Lamivudine (ABC/3TC) 60mg/30mg [Pack 60]", "(EFV) 200mg [Pack 90]"]
         cycles = ["Jan - Feb 2013", "Mar - Apr 2013"]
         consumption_data = {}
         consumption_data['opening_balance'] = 3
