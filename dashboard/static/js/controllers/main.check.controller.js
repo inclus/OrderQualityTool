@@ -54,14 +54,42 @@ angular.module('dashboard').controller('MainChecksController', ['$scope', '$http
             "desc": "WAREHOUSE FULFILMENT: Does volume ordered = volume delivered in following cycle?",
             "hasRegimen": true,
             "hasChart": true,
-            "testNumber": 9,
+            "testNumber": 10,
             "template": "/static/views/chart.html"
         }, {
             "url": "stablePatientVolumes",
             "desc": "STABLE PATIENT VOLUMES: Are total patient numbers stable from one cycle to the next?",
             "hasRegimen": true,
             "hasChart": true,
-            "testNumber": 9,
+            "testNumber": 11,
+            "template": "/static/views/chart.html"
+        }, {
+            "url": "nnrtiCurrentAdults",
+            "desc": "NRTI vs NNRTI/PI VOLUMES (CURRENT ADULTS): Do total current Adult NRTI patient volumes tally with total NNRTI & PI patient volumes?",
+            "hasRegimen": false,
+            "hasChart": true,
+            "testNumber": 15,
+            "template": "/static/views/chart.html"
+        }, {
+            "url": "nnrtiCurrentPaed",
+            "desc": "NRTI vs NNRTI/PI VOLUMES (CURRENT PAED): Do total current Paed NRTI patient volumes tally with total NNRTI & PI patient volumes?",
+            "hasRegimen": false,
+            "hasChart": true,
+            "testNumber": 16,
+            "template": "/static/views/chart.html"
+        }, {
+            "url": "nnrtiNewAdults",
+            "desc": "NRTI vs NNRTI/PI VOLUMES (ESTIMATED NEW ADULTS): Do total Estimated New Adult NRTI patient volumes tally with total NNRTI & PI patient volumes?",
+            "hasRegimen": false,
+            "hasChart": true,
+            "testNumber": 17,
+            "template": "/static/views/chart.html"
+        }, {
+            "url": "nnrtiNewPaed",
+            "desc": "NRTI vs NNRTI/PI VOLUMES (ESTIMATED NEW PAED): Do total Estimated New Paed NRTI patient volumes tally with total NNRTI & PI patient volumes?",
+            "hasRegimen": false,
+            "hasChart": true,
+            "testNumber": 18,
             "template": "/static/views/chart.html"
         }];
         $scope.regimens = [{

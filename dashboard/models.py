@@ -22,11 +22,14 @@ class DashboardUser(AbstractEmailUser):
 
 
 class CycleTestScore(models.Model):
-    cycle = models.CharField(max_length=256, unique=True)
+    cycle = models.CharField(max_length=256)
     test = models.CharField(max_length=256)
     yes = models.FloatField(null=True)
     no = models.FloatField(null=True)
     not_reporting = models.FloatField(null=True)
+
+    class Meta:
+        unique_together = ("cycle", "test")
 
     def __unicode__(self):
         return "%s %s YES:%s NO:%s NOT_REPORTING:%s" % (self.cycle, self.test, self.yes, self.no, self.not_reporting)

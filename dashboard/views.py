@@ -17,7 +17,7 @@ from rest_framework.response import Response
 from rest_framework.serializers import ModelSerializer
 from rest_framework.views import APIView
 
-from dashboard.helpers import generate_cycles, ORDER_FORM_FREE_OF_GAPS, ORDER_FORM_FREE_OF_NEGATIVE_NUMBERS, DIFFERENT_ORDERS_OVER_TIME, to_date, CLOSING_BALANCE_MATCHES_OPENING_BALANCE, CONSUMPTION_AND_PATIENTS, STABLE_CONSUMPTION, WAREHOUSE_FULFILMENT, STABLE_PATIENT_VOLUMES, GUIDELINE_ADHERENCE
+from dashboard.helpers import generate_cycles, ORDER_FORM_FREE_OF_GAPS, ORDER_FORM_FREE_OF_NEGATIVE_NUMBERS, DIFFERENT_ORDERS_OVER_TIME, to_date, CLOSING_BALANCE_MATCHES_OPENING_BALANCE, CONSUMPTION_AND_PATIENTS, STABLE_CONSUMPTION, WAREHOUSE_FULFILMENT, STABLE_PATIENT_VOLUMES, GUIDELINE_ADHERENCE, NNRTI_CURRENT_ADULTS, NNRTI_CURRENT_PAED, NNRTI_NEW_ADULTS, NNRTI_NEW_PAED
 from dashboard.models import FacilityCycleRecord, FacilityConsumptionRecord, CycleTestScore, CycleFormulationTestScore
 from dashboard.tasks import import_general_report
 from forms import FileUploadForm
@@ -223,6 +223,8 @@ class ReportMetrics(APIView):
 
 
 class OrderFormFreeOfGapsView(APIView):
+    test = ORDER_FORM_FREE_OF_GAPS
+
     def get(self, request):
         start = request.GET.get('start', None)
         end = request.GET.get('end', None)
@@ -234,7 +236,7 @@ class OrderFormFreeOfGapsView(APIView):
             cycles_included = cycles[start_index: end_index + 1]
             cycles = cycles_included
             filters['cycle__in'] = cycles_included
-        scores = CycleTestScore.objects.filter(test=ORDER_FORM_FREE_OF_GAPS, **filters)
+        scores = CycleTestScore.objects.filter(test=self.test, **filters)
         data = dict((k.cycle, k) for k in scores)
         results = []
         for cycle in cycles:
@@ -305,3 +307,19 @@ class StablePatientVolumesView(DifferentOrdersOverTimeView):
 
 class GuideLineAdherenceView(DifferentOrdersOverTimeView):
     test = GUIDELINE_ADHERENCE
+
+
+class NNRTICurrentAdultsView(OrderFormFreeOfGapsView):
+    test = NNRTI_CURRENT_ADULTS
+
+
+class NNRTICurrentPaedView(OrderFormFreeOfGapsView):
+    test = NNRTI_CURRENT_PAED
+
+
+class NNRTINewAdultsView(OrderFormFreeOfGapsView):
+    test = NNRTI_NEW_ADULTS
+
+
+class NNRTINewPaedView(OrderFormFreeOfGapsView):
+    test = NNRTI_NEW_PAED

@@ -1,6 +1,14 @@
 import arrow
 from arrow import Arrow, now
 
+NNRTI_NEW_PAED = "nnrtiNewPaed"
+
+NNRTI_NEW_ADULTS = "nnrtiNewAdults"
+
+NNRTI_CURRENT_PAED = "nnrtiCurrentPaed"
+
+NNRTI_CURRENT_ADULTS = "nnrtiCurrentAdults"
+
 
 class CustomArrow(Arrow):
     @classmethod

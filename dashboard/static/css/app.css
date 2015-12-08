@@ -1071,7 +1071,7 @@ html {
   -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
 }
 body {
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: "Open Sans", sans-serif;
   font-size: 14px;
   line-height: 1.42857143;
   color: #7b8a8b;
@@ -6007,7 +6007,7 @@ button.close {
   position: absolute;
   z-index: 1070;
   display: block;
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: "Open Sans", sans-serif;
   font-style: normal;
   font-weight: normal;
   letter-spacing: normal;
@@ -6125,7 +6125,7 @@ button.close {
   display: none;
   max-width: 276px;
   padding: 1px;
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: "Open Sans", sans-serif;
   font-style: normal;
   font-weight: normal;
   letter-spacing: normal;
@@ -6784,16 +6784,17 @@ body {
 }
 .quality_test__metric {
   display: block;
-  font-size: 2em;
-  color: #27ae60;
+  font-size: 30px;
+  color: #585858;
   margin: 0 auto 0 auto;
   text-align: center;
   height: 40px;
 }
 .quality_test__description {
-  font-variant: small-caps;
+  font-size: 12px;
+  letter-spacing: 1.5px;
   margin: 0 auto 0 auto;
-  color: #27ae60;
+  color: #585858;
   display: block;
   text-align: center;
 }
@@ -6803,7 +6804,11 @@ body {
   border-right: 1px solid #27ae60;
   border-bottom: 1px solid white;
   margin-bottom: -1px;
+  color: #27ae60;
   z-index: 900;
+}
+.quality_test_active a span {
+  color: #27ae60;
 }
 .quality_test a:hover {
   color: #1e8449;

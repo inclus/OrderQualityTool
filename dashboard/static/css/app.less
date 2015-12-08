@@ -12,16 +12,18 @@ body {
     padding-bottom: 15px;
     &__metric {
       display: block;
-      font-size: 2em;
-      color: @chai-word-green;
+      font-size: 30px;
+      color: #585858;
       margin: 0 auto 0 auto;
       .text-center();
       height: 40px;
     }
+
     &__description {
-      font-variant: small-caps;
+      font-size: 12px;
+      letter-spacing: 1.5px;
       margin: 0 auto 0 auto;
-      color: @chai-word-green;
+      color: #585858;
       display: block;
       .text-center();
     }
@@ -32,7 +34,13 @@ body {
         border-right: 1px solid @chai-word-green;
         border-bottom: 1px solid white;
         margin-bottom: -1px;
+        color: @chai-word-green;
         z-index: 900;
+        a {
+          span {
+            color: @chai-word-green;
+          }
+        }
     }
     a:hover {
         color: darken(@chai-word-green, 10%);

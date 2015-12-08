@@ -6,6 +6,7 @@ from dashboard.checks.closing_balance import ClosingBalance
 from dashboard.checks.consumption_and_patients import ConsumptionAndPatients
 from dashboard.checks.different_orders_over_time import DifferentOrdersOverTime
 from dashboard.checks.guideline_adherence import GuideLineAdherence
+from dashboard.checks.nnrti_checks import NNRTI
 from dashboard.checks.order_form_free_of_gaps import OrderFormFreeOfGaps
 from dashboard.checks.order_free_of_negative_numbers import OrderFormFreeOfNegativeNumbers
 from dashboard.checks.stable_consumption import StableConsumption
@@ -30,6 +31,7 @@ def calculate_scores_for_checks_in_cycle(cycle):
     process_test.delay(WarehouseFulfilment, cycle)
     process_test.delay(StablePatientVolumes, cycle)
     process_test.delay(GuideLineAdherence, cycle)
+    process_test.delay(NNRTI, cycle)
 
 
 @shared_task
