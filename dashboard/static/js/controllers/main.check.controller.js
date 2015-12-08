@@ -143,7 +143,6 @@ angular.module('dashboard').controller('LineChartController', ['$scope', '$http'
                         }
                     }
                 };
-                $scope.colors = ["#42BE73"];
             });
 
 

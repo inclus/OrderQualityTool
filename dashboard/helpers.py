@@ -44,6 +44,7 @@ CONSUMPTION_AND_PATIENTS = "consumptionAndPatients"
 STABLE_CONSUMPTION = "stableConsumption"
 WAREHOUSE_FULFILMENT = "warehouseFulfilment"
 STABLE_PATIENT_VOLUMES = "stablePatientVolumes"
+GUIDELINE_ADHERENCE = "guidelineAdherence"
 
 ADULT = 'adult'
 CONSUMPTION = 'consumption'

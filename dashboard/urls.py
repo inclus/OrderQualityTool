@@ -18,6 +18,7 @@ urlpatterns = [
     url(r'^api/test/stableConsumption', views.StableConsumptionView.as_view(), name='stable_consumption'),
     url(r'^api/test/stablePatientVolumes', views.StablePatientVolumesView.as_view(), name='stable_patient_volumes'),
     url(r'^api/test/warehouseFulfilment', views.WarehouseFulfilmentView.as_view(), name='warehouse_fulfilment'),
+    url(r'^api/test/guidelineAdherence', views.GuideLineAdherenceView.as_view(), name='guideline_adherence'),
     url(r'^api/test/ranking/best', views.BestPerformingDistrictsView.as_view(), name='ranking_best'),
     url(r'^api/test/ranking/worst', views.WorstPerformingDistrictsView.as_view(), name='ranking_worst'),
     url(r'^api/test/ranking/best/csv$', views.BestPerformingDistrictsCSVView.as_view(), name='ranking_best_csv'),
