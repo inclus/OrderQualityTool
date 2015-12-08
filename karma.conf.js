@@ -15,6 +15,8 @@ module.exports = function(config) {
         // list of files / patterns to load in the browser
         files: [
             "dashboard/static/vendor/angular/angular.js",
+            "dashboard/static/vendor/d3/d3.js",
+            "dashboard/static/vendor/c3/c3.js",
             "dashboard/static/vendor/angular-mocks/angular-mocks.js",
             "dashboard/static/vendor/angular-ui-router/release/angular-ui-router.min.js",
             "dashboard/static/vendor/angular-bootstrap/ui-bootstrap-tpls.min.js",

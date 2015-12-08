@@ -9,19 +9,29 @@ angular.module('dashboard').controller('WebBasedRateController', ['$scope', '$ht
                 }
             }).then(function(response) {
                 var values = response.data.values;
-                $scope.labels = _.map(values, 'cycle');
-                var items = _.map(values, 'rate');
-                $scope.series = ['Web Based Reporting Rate'];
-                $scope.data = [items];
                 $scope.options = {
-                    scaleOverride: true,
-                    scaleSteps: 10,
-                    scaleStepWidth: 10,
-                    scaleStartValue: 0,
-                    scaleLineColor: "#42BE73",
-                    strokeColor: "#42BE73",
+                    data: values,
+                    dimensions: {
+                        cycle: {
+                            axis: 'x',
+                            type: 'line'
+                        },
+                        web: {
+                            axis: 'y',
+                            type: 'line',
+                            name: 'Web',
+                            dataType: 'numeric',
+                            displayFormat: d3.format(".1f")
+                        },
+                        paper: {
+                            axis: 'y',
+                            type: 'line',
+                            name: 'Paper',
+                            dataType: 'numeric',
+                            displayFormat: d3.format(".1f")
+                        }
+                    }
                 };
-                $scope.colors = ["#42BE73"];
             });
         };
         $scope.$watch('startCycle', function(start) {

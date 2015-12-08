@@ -1,5 +1,5 @@
-angular.module('dashboard').controller('HomeController', ['$scope', '$stateParams', '$http', '$httpParamSerializer',
-    function($scope, $stateParams, $http, $httpParamSerializer) {
+angular.module('dashboard').controller('HomeController', ['$scope', '$stateParams', '$http', '$httpParamSerializer', 'NgTableParams',
+    function($scope, $stateParams, $http, $httpParamSerializer, NgTableParams) {
 
         $scope.displayCycle = function(cycle) {
             return "CYCLE " + cycle.number + " '" + cycle.year;
@@ -61,7 +61,14 @@ angular.module('dashboard').controller('HomeController', ['$scope', '$stateParam
                     cycle: $scope.selectedCycle
                 }
             }).then(function(response) {
-                $scope.worstDistricts = response.data.values;
+                $scope.worstTableParams = new NgTableParams({
+                    page: 1,
+                    count: 10
+                }, {
+                    filterDelay: 0,
+                    counts: [],
+                    data: response.data.values
+                });
             });
         };
 
@@ -72,7 +79,14 @@ angular.module('dashboard').controller('HomeController', ['$scope', '$stateParam
                     cycle: $scope.selectedCycle
                 }
             }).then(function(response) {
-                $scope.bestDistricts = response.data.values;
+                $scope.bestTableParams = new NgTableParams({
+                    page: 1,
+                    count: 10
+                }, {
+                    filterDelay: 0,
+                    counts: [],
+                    data: response.data.values
+                });
             });
         };
 
@@ -104,7 +118,8 @@ angular.module('dashboard').controller('HomeController', ['$scope', '$stateParam
 
         $http.get('/api/test/metrics').then(function(response) {
             var web = response.data.webBased;
-            var reporting = response.data.webBased;
+            var reporting = response.data.reporting;
+            var adherence = response.data.adherence;
             $scope.tests = [{
                 name: "reportingRate",
                 description: "Reporting Rate",
@@ -116,7 +131,7 @@ angular.module('dashboard').controller('HomeController', ['$scope', '$stateParam
             }, {
                 name: "guidlineAdherenceRate",
                 description: "GuideLine Adherence Rate",
-                metric: 0 + "%"
+                metric: adherence + "%"
             }];
         });
     }

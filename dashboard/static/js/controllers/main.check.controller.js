@@ -117,6 +117,7 @@ angular.module('dashboard').controller('MultipleOrdersController', ['$scope', '$
                 count: 10
             }, {
                 filterDelay: 0,
+                counts: [],
                 data: values
             });
         });

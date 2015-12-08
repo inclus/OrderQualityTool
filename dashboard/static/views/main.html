@@ -65,12 +65,12 @@
                 </h3>
             </div>
         </div>
-        <table class="table table-bordered">
+        <table class="table table-bordered" ng-table="worstTableParams">
             <tr>
                 <th>{{worstPerforming}}</th>
                 <th>Report Rate</th>
             </tr>
-            <tr ng-repeat="district in worstDistricts">
+            <tr ng-repeat="district in $data">
                 <td>{{district.name}}</td>
                 <td>{{district.rate | number : 1}} %</td>
             </tr>
@@ -94,12 +94,12 @@
                 </h3>
             </div>
         </div>
-        <table class="table table-bordered">
+        <table class="table table-bordered" ng-table="bestTableParams">
             <tr>
                 <th> {{bestPerforming}} </th>
                 <th>Report Rate</th>
             </tr>
-            <tr ng-repeat="district in bestDistricts">
+            <tr ng-repeat="district in $data">
                 <td>{{district.name}}</td>
                 <td>{{district.rate | number : 1}} %</td>
             </tr>

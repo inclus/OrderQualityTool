@@ -48,7 +48,7 @@ class FacilitiesReportingView(WebTest):
         url = "/api/test/submittedOrder"
         json_response = self.app.get(url, user="testuser").content
         data = loads(json_response)['values']
-        self.assertIn({"rate": 50, "cycle": cycle}, data)
+        self.assertIn({"reporting": 50, "cycle": cycle, "not_reporting": 50}, data)
 
 
 class BestDistrictReportingView(WebTest):

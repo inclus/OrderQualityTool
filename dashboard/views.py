@@ -8,7 +8,7 @@ from django.conf import settings
 from django.contrib import messages
 from django.core.files.base import ContentFile
 from django.core.files.storage import default_storage
-from django.db.models import Count, Case, When
+from django.db.models import Count, Case, When, Avg
 from django.http import HttpResponse
 from django.views.generic import TemplateView, FormView
 from rest_framework import filters
@@ -102,9 +102,9 @@ class FacilitiesReportingView(APIView):
             if cycle in data:
                 item = data.get(cycle)
                 rate = (float(item['reporting']) / float(item['count'])) * 100
-                results.append({"cycle": cycle, "rate": rate})
+                results.append({"cycle": cycle, "reporting": rate, "not_reporting": 100 - rate})
             else:
-                results.append({"cycle": cycle, "rate": 0})
+                results.append({"cycle": cycle, "reporting": 0, "not_reporting": 100})
         return Response({"values": results})
 
 
@@ -126,9 +126,9 @@ class WebBasedReportingView(APIView):
             if cycle in data:
                 item = data.get(cycle)
                 rate = (float(item['reporting']) / float(item['count'])) * 100
-                results.append({"cycle": cycle, "rate": rate})
+                results.append({"cycle": cycle, "web": rate, "paper": 100 - rate})
             else:
-                results.append({"cycle": cycle, "rate": 0})
+                results.append({"cycle": cycle, "web": 0, "paper": 100})
         return Response({"values": results})
 
 
@@ -162,7 +162,7 @@ class BestPerformingDistrictsView(APIView):
                 item['rate'] = 0
             else:
                 item['rate'] = (float(item['reporting']) / float(item['count'])) * 100
-        results = sorted(data, key=lambda x: (x['rate'], x['count']), reverse=self.reverse)[:10]
+        results = sorted(data, key=lambda x: (x['rate'], x['count']), reverse=self.reverse)
         return results
 
 
@@ -219,7 +219,9 @@ class ReportMetrics(APIView):
         report_item = data.get(most_recent_cycle)
         web_rate = "{0:.1f}".format((float(item['reporting']) / float(item['count'])) * 100)
         report_rate = "{0:.1f}".format((float(report_item['reporting']) / float(report_item['count'])) * 100)
-        return Response({"webBased": web_rate, "reporting": report_rate})
+        adherence = "{0:.1f}".format(CycleFormulationTestScore.objects.filter(test=GUIDELINE_ADHERENCE, cycle=cycle['cycle']).aggregate(adherence=Avg('yes')).get("adherence", 0))
+        print(adherence)
+        return Response({"webBased": web_rate, "reporting": report_rate, "adherence": adherence})
 
 
 class OrderFormFreeOfGapsView(APIView):
