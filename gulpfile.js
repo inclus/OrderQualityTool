@@ -10,6 +10,7 @@ var lessDest = 'dashboard/static/css';
 
 gulp.task("server", bg("python", "manage.py", "runserver", "0.0.0.0:8000"));
 gulp.task("worker", bg("celery", "-A", "orderqualitytool.celery", "worker", "--loglevel=INFO", "--concurrency=6"));
+gulp.task("djangotest", bg("python", "manage.py", "test"));
 
 gulp.task('default', ['server', 'worker'], function() {
     return gulp.src(lessSrc)
@@ -30,7 +31,7 @@ gulp.task('less', function() {
         .pipe(gulp.dest(lessDest));
 });
 
-gulp.task('test', function(done) {
+gulp.task('test', ['djangotest'], function(done) {
     new Server({
         configFile: __dirname + '/karma.conf.js',
         singleRun: true
