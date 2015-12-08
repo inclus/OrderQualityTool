@@ -42,6 +42,7 @@ DIFFERENT_ORDERS_OVER_TIME = "differentOrdersOverTime"
 CLOSING_BALANCE_MATCHES_OPENING_BALANCE = "closingBalanceMatchesOpeningBalance"
 CONSUMPTION_AND_PATIENTS = "consumptionAndPatients"
 STABLE_CONSUMPTION = "stableConsumption"
+WAREHOUSE_FULFILMENT = "warehouseFulfilment"
 
 ADULT = 'adult'
 CONSUMPTION = 'consumption'

@@ -49,6 +49,13 @@ angular.module('dashboard').controller('MainChecksController', ['$scope', '$http
             "hasChart": true,
             "testNumber": 9,
             "template": "/static/views/chart.html"
+        }, {
+            "url": "warehouseFulfilment",
+            "desc": "WAREHOUSE FULFILMENT: Does volume ordered = volume delivered in following cycle?",
+            "hasRegimen": true,
+            "hasChart": true,
+            "testNumber": 9,
+            "template": "/static/views/chart.html"
         }];
         $scope.regimens = [{
             name: "TDF/3TC/EFV (Adult)",
