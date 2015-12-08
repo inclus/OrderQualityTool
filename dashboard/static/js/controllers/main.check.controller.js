@@ -22,6 +22,13 @@ angular.module('dashboard').controller('MainChecksController', ['$scope', '$http
             "testNumber": 5,
             "template": "/static/views/chart.html"
         }, {
+            "url": "consumptionAndPatients",
+            "desc": "CONSUMPTION AND PATIENTS: Do consumption volumes tally with corresponding patient regimen volumes (i.e. they are within 30% of each other)?",
+            "hasRegimen": true,
+            "hasChart": true,
+            "testNumber": 6,
+            "template": "/static/views/chart.html"
+        }, {
             "url": "differentOrdersOverTime",
             "desc": "NON-REPEATING ORDERS: Does the facility avoid repeating the same orders in consecutive cycles?",
             "hasRegimen": true,

@@ -3,6 +3,7 @@ import os
 from celery import shared_task
 
 from dashboard.checks.closing_balance import ClosingBalance
+from dashboard.checks.consumption_and_patients import ConsumptionAndPatients
 from dashboard.checks.different_orders_over_time import DifferentOrdersOverTime
 from dashboard.checks.order_form_free_of_gaps import OrderFormFreeOfGaps
 from dashboard.checks.order_free_of_negative_numbers import OrderFormFreeOfNegativeNumbers
@@ -20,6 +21,7 @@ def calculate_scores_for_checks_in_cycle(cycle):
     process_test.delay(OrderFormFreeOfNegativeNumbers, cycle)
     process_test.delay(DifferentOrdersOverTime, cycle)
     process_test.delay(ClosingBalance, cycle)
+    process_test.delay(ConsumptionAndPatients, cycle)
 
 
 @shared_task

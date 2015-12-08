@@ -1,2 +1,3 @@
 class Check(object):
-    pass
+    def run(self, cycle):
+        raise NotImplementedError()
