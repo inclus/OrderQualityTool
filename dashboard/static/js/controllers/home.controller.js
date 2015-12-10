@@ -1,5 +1,5 @@
-angular.module('dashboard').controller('HomeController', ['$scope', '$stateParams', 'ReportService', '$httpParamSerializer', 'NgTableParams',
-    function($scope, $stateParams, ReportService, $httpParamSerializer, NgTableParams) {
+angular.module('dashboard').controller('HomeController', ['$scope', 'ReportService', '$httpParamSerializer', 'NgTableParams',
+    function($scope, ReportService, $httpParamSerializer, NgTableParams) {
 
         $scope.displayCycle = function(cycle) {
             return "CYCLE " + cycle.number + " '" + cycle.year;
@@ -96,33 +96,10 @@ angular.module('dashboard').controller('HomeController', ['$scope', '$stateParam
             updateWorstList();
         });
 
-        $scope.currentTest = $stateParams.name;
-        var templates = {
-            "reportingRate": "/static/views/reporting_rate.html",
-            "webVsPaper": "/static/views/web_vs_paper.html",
-            "guidlineAdherenceRate": "/static/views/guidlineAdherenceRate.html",
-            "addTests": "/static/views/addTests.html",
-        };
-
-        $scope.template = templates[$scope.currentTest];
-
         ReportService.getMetrics().then(function(data) {
-            var web = data.webBased;
-            var reporting = data.reporting;
-            var adherence = data.adherence;
-            $scope.tests = [{
-                name: "reportingRate",
-                description: "Reporting Rate",
-                metric: reporting + "%"
-            }, {
-                name: "webVsPaper",
-                description: "Web VS Paper Reporting",
-                metric: web + "%"
-            }, {
-                name: "guidlineAdherenceRate",
-                description: "GuideLine Adherence Rate",
-                metric: adherence + "%"
-            }];
+            $scope.webRate = data.webBased;
+            $scope.reportingRate = data.reporting;
+            $scope.adherenceRate = data.adherence;
         });
     }
 ])

@@ -3,10 +3,22 @@ dashboard.config(['$stateProvider', '$urlRouterProvider',
     function($stateProvider, $urlRouterProvider) {
         $urlRouterProvider.otherwise('/reportingRate');
         $stateProvider
-            .state('test', {
-                url: '/:name',
+            .state('home', {
+                url: '',
                 templateUrl: '/static/views/main.html',
                 controller: 'HomeController'
+            }).state('home.reportingRate', {
+                url: '/reportingRate',
+                templateUrl: '/static/views/reporting_rate.html'
+            }).state('home.webVsPaper', {
+                url: '/webVsPaper',
+                templateUrl: '/static/views/web_vs_paper.html'
+            }).state('home.guidlineAdherenceRate', {
+                url: '/guidlineAdherenceRate',
+                templateUrl: '/static/views/guidlineAdherenceRate.html'
+            }).state('home.addTests', {
+                url: '/addTests',
+                templateUrl: '/static/views/addTests.html'
             });
     }
 ]);
