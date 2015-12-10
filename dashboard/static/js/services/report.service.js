@@ -21,7 +21,7 @@ angular.module('dashboard').service('ReportService', ['$http',
         };
 
         var getWorstRankings = function(level, selectedCycle) {
-            return $http.get('/api/test/ranking/best', {
+            return $http.get('/api/test/ranking/worst', {
                 params: {
                     level: level,
                     cycle: selectedCycle
