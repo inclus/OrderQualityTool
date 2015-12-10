@@ -45,6 +45,8 @@ h1, h2 , h3 , h4 ,h5 , h6{
             color: @chai-word-green;
           }
         }
+
+        @media (max-width: @screen-md) { border: none }
     }
     a:hover {
         color: darken(@chai-word-green, 10%);
@@ -65,6 +67,7 @@ h1, h2 , h3 , h4 ,h5 , h6{
     border-top: 1px solid @chai-green;
     border-right: 1px solid @chai-green;
     border-bottom: 1px solid @chai-green;
+    @media (max-width: @screen-md) { border: none }
 }
 
 .test-area {
@@ -104,4 +107,19 @@ a.label-qdb{
   &:hover {
     color: darken(@chai-word-green, 10%);
   }
+}
+
+.select-drop{
+  background:#FFF url("/static/images/car.png") no-repeat 98% 50%;
+}
+
+.cycle-select {
+  .make-sm-column(4);
+  .make-md-column(3);
+  .select-drop;
+}
+
+.spacer {
+  .make-md-column(0.5);
+  @media (max-width: @screen-md) { display: none }
 }

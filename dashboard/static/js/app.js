@@ -2,6 +2,7 @@ var dashboard = angular.module('dashboard', ['ui.router', 'chart.js', 'ui.bootst
 dashboard.config(['$stateProvider', '$urlRouterProvider',
     function($stateProvider, $urlRouterProvider) {
         $urlRouterProvider.otherwise('/reportingRate');
+        $urlRouterProvider.when('', '/reportingRate');
         $stateProvider
             .state('home', {
                 url: '',

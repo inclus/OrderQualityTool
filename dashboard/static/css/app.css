@@ -6818,6 +6818,11 @@ h6 {
 .quality_test_active a span {
   color: #27ae60;
 }
+@media (max-width: 992px) {
+  .quality_test_active {
+    border: none;
+  }
+}
 .quality_test a:hover {
   color: #1e8449;
   text-decoration: none;
@@ -6840,6 +6845,11 @@ h6 {
   .test-area {
     float: left;
     width: 100%;
+  }
+}
+@media (max-width: 992px) {
+  .test-area {
+    border: none;
   }
 }
 .test-area {
@@ -6913,4 +6923,43 @@ a.label-qdb {
 }
 a.label-qdb:hover {
   color: #1e8449;
+}
+.select-drop {
+  background: #FFF url("/static/images/car.png") no-repeat 98% 50%;
+}
+.cycle-select {
+  position: relative;
+  min-height: 1px;
+  padding-left: 15px;
+  padding-right: 15px;
+  background: #FFF url("/static/images/car.png") no-repeat 98% 50%;
+}
+@media (min-width: 768px) {
+  .cycle-select {
+    float: left;
+    width: 33.33333333%;
+  }
+}
+@media (min-width: 992px) {
+  .cycle-select {
+    float: left;
+    width: 25%;
+  }
+}
+.spacer {
+  position: relative;
+  min-height: 1px;
+  padding-left: 15px;
+  padding-right: 15px;
+}
+@media (min-width: 992px) {
+  .spacer {
+    float: left;
+    width: 4.16666667%;
+  }
+}
+@media (max-width: 992px) {
+  .spacer {
+    display: none;
+  }
 }

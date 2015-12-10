@@ -1,6 +1,5 @@
 angular.module('dashboard').controller('HomeController', ['$scope', 'ReportService', '$httpParamSerializer', 'NgTableParams',
     function($scope, ReportService, $httpParamSerializer, NgTableParams) {
-
         $scope.displayCycle = function(cycle) {
             return "CYCLE " + cycle.number + " '" + cycle.year;
         };
