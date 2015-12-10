@@ -1,15 +1,13 @@
-angular.module('dashboard').controller('GuidelineAdherenceController', ['$scope', '$http',
-    function($scope, $http) {
+angular.module('dashboard').controller('GuidelineAdherenceController', ['$scope', 'ReportService',
+    function($scope, ReportService) {
         $scope.guidelineType = 'Adult 1L';
         var update = function(start, end) {
-            $http.get('/api/test/guidelineAdherence', {
-                params: {
-                    start: start,
-                    end: end,
-                    regimen: $scope.guidelineType
-                }
-            }).then(function(response) {
-                var values = response.data.values;
+            ReportService.getDataForTest('guidelineAdherence', {
+                start: start,
+                end: end,
+                regimen: $scope.guidelineType
+            }).then(function(data) {
+                var values = data.values;
                 $scope.options = {
                     data: values,
                     dimensions: {

@@ -1,5 +1,5 @@
-angular.module('dashboard').controller('MainChecksController', ['$scope', '$http',
-    function($scope, $http) {
+angular.module('dashboard').controller('MainChecksController', ['$scope',
+    function($scope) {
         $scope.tests = [{
             "url": "orderFormFreeOfGaps",
             "desc": "NO BLANKS: If the facility reported, is the whole order form free of blanks?",
@@ -108,10 +108,10 @@ angular.module('dashboard').controller('MainChecksController', ['$scope', '$http
 
     }
 ]);
-angular.module('dashboard').controller('MultipleOrdersController', ['$scope', '$http', 'NgTableParams',
-    function($scope, $http, NgTableParams) {
-        $http.get('/api/test/facilitiesMultiple').then(function(response) {
-            var values = response.data.values;
+angular.module('dashboard').controller('MultipleOrdersController', ['$scope', 'ReportService', 'NgTableParams',
+    function($scope, ReportService, NgTableParams) {
+        ReportService.getDataForTest('facilitiesMultiple').then(function(data) {
+            var values = data.values;
             $scope.tableParams = new NgTableParams({
                 page: 1,
                 count: 10
@@ -121,26 +121,23 @@ angular.module('dashboard').controller('MultipleOrdersController', ['$scope', '$
                 data: values
             });
         });
+
     }
 ]);
-angular.module('dashboard').controller('LineChartController', ['$scope', '$http',
-    function($scope, $http) {
+angular.module('dashboard').controller('LineChartController', ['$scope', 'ReportService',
+    function($scope, ReportService) {
         var update = function(start, end) {
-            console.log('updating', start, end);
-
             var test = $scope.selectedTest.url;
             var regimen = undefined;
             if ($scope.selectedRegimen) {
                 regimen = $scope.selectedRegimen.value;
             }
-            $http.get('/api/test/' + test, {
-                params: {
-                    start: start,
-                    end: end,
-                    regimen: regimen
-                }
-            }).then(function(response) {
-                var values = response.data.values;
+            ReportService.getDataForTest(test, {
+                start: start,
+                end: end,
+                regimen: regimen
+            }).then(function(data) {
+                var values = data.values;
                 $scope.options = {};
                 $scope.options = {
                     data: values,

@@ -1,13 +1,11 @@
-angular.module('dashboard').controller('ReportingRateController', ['$scope', '$http',
-    function($scope, $http) {
+angular.module('dashboard').controller('ReportingRateController', ['$scope', 'ReportService',
+    function($scope, ReportService) {
         var update = function(start, end) {
-            $http.get('/api/test/submittedOrder', {
-                params: {
-                    start: start,
-                    end: end,
-                }
-            }).then(function(response) {
-                var values = response.data.values;
+            ReportService.getDataForTest('submittedOrder', {
+                start: start,
+                end: end
+            }).then(function(data) {
+                var values = data.values;
                 $scope.options = {
                     data: values,
                     dimensions: {

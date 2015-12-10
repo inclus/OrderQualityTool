@@ -29,11 +29,18 @@ angular.module('dashboard').service('ReportService', ['$http',
             }).then(handleResponse);
         };
 
+        var getDataForTest = function(test, params) {
+            return $http.get('/api/test/' + test, {
+                params: params
+            }).then(handleResponse);
+        };
+
         return {
             "getCycles": getCycles,
             "getMetrics": getMetrics,
             "getBestRankings": getBestRankings,
-            "getWorstRankings": getWorstRankings
+            "getWorstRankings": getWorstRankings,
+            "getDataForTest": getDataForTest
         };
     }
 ])
