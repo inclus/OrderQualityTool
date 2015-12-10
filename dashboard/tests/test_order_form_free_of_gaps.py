@@ -51,7 +51,6 @@ class OrderFormFreeOfGapsViewTestCase(WebTest):
             record, _ = FacilityCycleRecord.objects.get_or_create(cycle=cycle, facility=facility)
 
         score = OrderFormFreeOfGaps().run(cycle)
-        print score
         self.assertEqual(cycle, score.cycle)
         self.assertEqual(60.0, score.yes)
         self.assertEqual(0.0, score.no)

@@ -1,10 +1,12 @@
-from dashboard.checks.common import Check
+from dashboard.checks.common import CycleFormulationCheck
 from dashboard.checks.different_orders_over_time import get_next_cycle
 from dashboard.helpers import CLOSING_BALANCE_MATCHES_OPENING_BALANCE
-from dashboard.models import FacilityConsumptionRecord, FacilityCycleRecord, CycleFormulationTestScore
+from dashboard.models import FacilityConsumptionRecord, FacilityCycleRecord
 
 
-class ClosingBalance(Check):
+class ClosingBalance(CycleFormulationCheck):
+    test = CLOSING_BALANCE_MATCHES_OPENING_BALANCE
+
     def run(self, cycle):
         next_cycle = get_next_cycle(cycle)
         formulations = [
@@ -30,11 +32,4 @@ class ClosingBalance(Check):
                         no += 1
                     else:
                         yes += 1
-            score, _ = CycleFormulationTestScore.objects.get_or_create(cycle=cycle, test=CLOSING_BALANCE_MATCHES_OPENING_BALANCE, formulation=name)
-            yes_rate = float(yes * 100) / float(total_count)
-            no_rate = float(no * 100) / float(total_count)
-            not_reporting_rate = float(not_reporting * 100) / float(total_count)
-            score.yes = yes_rate
-            score.no = no_rate
-            score.not_reporting = not_reporting_rate
-            score.save()
+            self.build_cycle_formulation_score(cycle, name, yes, no, not_reporting, total_count)

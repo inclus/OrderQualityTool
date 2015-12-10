@@ -2,9 +2,9 @@ import operator
 
 from django.db.models import Q, F, Sum
 
-from dashboard.checks.common import Check
+from dashboard.checks.common import CycleFormulationCheck
 from dashboard.helpers import GUIDELINE_ADHERENCE
-from dashboard.models import FacilityCycleRecord, CycleFormulationTestScore, FacilityConsumptionRecord
+from dashboard.models import FacilityCycleRecord, FacilityConsumptionRecord
 
 FIELDS = "fields"
 
@@ -27,7 +27,9 @@ NEW = 'new'
 EXISTING = 'existing'
 
 
-class GuideLineAdherence(Check):
+class GuideLineAdherence(CycleFormulationCheck):
+    test = GUIDELINE_ADHERENCE
+
     def run(self, cycle):
         formulations = [
             {NAME: "Adult 1L", DF2: ["(AZT/3TC) 300mg/150mg [Pack 60]", "(AZT/3TC/NVP) 300mg/150mg/200mg [Pack 60]"], DF1: ["TDF/3TC"], RATIO: 80.0, FIELDS: ["estimated_number_of_new_patients", "estimated_number_of_new_pregnant_women"]},
@@ -64,10 +66,4 @@ class GuideLineAdherence(Check):
 
                 except TypeError as e:
                     no += 1
-            score, _ = CycleFormulationTestScore.objects.get_or_create(cycle=cycle, test=GUIDELINE_ADHERENCE, formulation=name)
-            yes_rate = float(yes * 100) / float(total_count)
-            not_reporting_rate = float(not_reporting * 100) / float(total_count)
-            score.yes = yes_rate
-            score.no = float(no * 100) / float(total_count)
-            score.not_reporting = not_reporting_rate
-            score.save()
+            self.build_cycle_formulation_score(cycle, name, yes, no, not_reporting, total_count)

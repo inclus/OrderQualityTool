@@ -115,7 +115,7 @@ class GeneralReport():
                 records[facility_name].append(patient_record)
             else:
                 logger.debug("%s not found" % facility_name)
-        for name, values in records.iteritems():
+        for name, values in records.items():
             facility_record = self.get_facility_record(name)
             patient_records = []
             if facility_record:
@@ -138,7 +138,7 @@ class GeneralReport():
                 records[facility_name].append(patient_record)
             else:
                 logger.debug("%s not found" % facility_name)
-        for name, values in records.iteritems():
+        for name, values in records.items():
             facility_record = self.get_facility_record(name)
             patient_records = []
             if facility_record:
@@ -193,7 +193,7 @@ class GeneralReport():
                 consumption_record.packs_ordered = self.get_value(row, 14)
                 records[facility_name].append(consumption_record)
 
-        for name, values in records.iteritems():
+        for name, values in records.items():
             facility_record = self.get_facility_record(name)
             consumption_records = []
             if facility_record:

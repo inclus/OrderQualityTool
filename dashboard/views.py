@@ -20,7 +20,7 @@ from rest_framework.views import APIView
 from dashboard.helpers import generate_cycles, ORDER_FORM_FREE_OF_GAPS, ORDER_FORM_FREE_OF_NEGATIVE_NUMBERS, DIFFERENT_ORDERS_OVER_TIME, to_date, CLOSING_BALANCE_MATCHES_OPENING_BALANCE, CONSUMPTION_AND_PATIENTS, STABLE_CONSUMPTION, WAREHOUSE_FULFILMENT, STABLE_PATIENT_VOLUMES, GUIDELINE_ADHERENCE, NNRTI_CURRENT_ADULTS, NNRTI_CURRENT_PAED, NNRTI_NEW_ADULTS, NNRTI_NEW_PAED
 from dashboard.models import FacilityCycleRecord, FacilityConsumptionRecord, CycleTestScore, CycleFormulationTestScore
 from dashboard.tasks import import_general_report
-from forms import FileUploadForm
+from dashboard.forms import FileUploadForm
 from locations.models import Facility, District, IP, WareHouse
 
 
@@ -219,8 +219,7 @@ class ReportMetrics(APIView):
         report_item = data.get(most_recent_cycle)
         web_rate = "{0:.1f}".format((float(item['reporting']) / float(item['count'])) * 100)
         report_rate = "{0:.1f}".format((float(report_item['reporting']) / float(report_item['count'])) * 100)
-        adherence = "{0:.1f}".format(CycleFormulationTestScore.objects.filter(test=GUIDELINE_ADHERENCE, cycle=cycle['cycle']).aggregate(adherence=Avg('yes')).get("adherence", 0))
-        print(adherence)
+        adherence = CycleFormulationTestScore.objects.filter(test=GUIDELINE_ADHERENCE, cycle=cycle['cycle']).aggregate(adherence=Avg('yes')).get("adherence", 0)
         return Response({"webBased": web_rate, "reporting": report_rate, "adherence": adherence})
 
 

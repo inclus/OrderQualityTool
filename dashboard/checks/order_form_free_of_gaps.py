@@ -1,3 +1,4 @@
+import functools
 import operator
 
 from django.db.models import Q
@@ -33,7 +34,7 @@ class OrderFormFreeOfGaps(Check):
         if number_of_records_for_facility == 0:
             not_reporting += 1
         else:
-            number_facility_consumption_records = FacilityConsumptionRecord.objects.filter(facility_cycle=facilityCycleRecord).exclude(reduce(operator.or_, filter_list)).count()
+            number_facility_consumption_records = FacilityConsumptionRecord.objects.filter(facility_cycle=facilityCycleRecord).exclude(functools.reduce(operator.or_, filter_list)).count()
             number_of_adult_records = AdultPatientsRecord.objects.filter(facility_cycle=facilityCycleRecord).exclude(Q(new__isnull=True) | Q(existing__isnull=True)).count()
             number_of_paed_records = PAEDPatientsRecord.objects.filter(facility_cycle=facilityCycleRecord).exclude(Q(new__isnull=True) | Q(existing__isnull=True)).count()
             if number_facility_consumption_records >= 24 and number_of_adult_records >= 22 and number_of_paed_records >= 7:

@@ -83,7 +83,6 @@ class FacilityAdmin(ModelAdmin):
 
 def run_tests(model_admin, request, queryset):
     data = queryset.order_by().values('cycle').distinct()
-    print data
     for value in data:
         calculate_scores_for_checks_in_cycle.delay(value['cycle'])
 

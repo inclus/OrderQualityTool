@@ -2,8 +2,8 @@ import os
 
 from django.test import TestCase
 
-from dashboard.reports import WaosStandardReport, GeneralReport
 from dashboard.models import FacilityConsumptionRecord, FacilityCycleRecord
+from dashboard.reports import WaosStandardReport, GeneralReport
 from locations.models import Facility
 
 
@@ -50,10 +50,12 @@ class GeneralReportTestCase(FixtureFileReportTestCase):
     def test_can_build_consumption_records_from_file(self):
         GeneralReport(self.get_fixture_path('new_format.xlsx'), "Jan- Feb 2000").get_data()
         self.assertEqual(FacilityConsumptionRecord.objects.count(), 41)
-        self.assertEqual(FacilityConsumptionRecord.objects.get(id=1).opening_balance, 20)
-        self.assertEqual(FacilityConsumptionRecord.objects.get(id=1).closing_balance, 18)
-        self.assertEqual(FacilityConsumptionRecord.objects.get(id=1).months_of_stock_of_hand, 18)
-        self.assertEqual(FacilityConsumptionRecord.objects.get(id=1).packs_ordered, -14)
-        self.assertEqual(FacilityConsumptionRecord.objects.get(id=2).opening_balance, 35)
+        first_record = FacilityConsumptionRecord.objects.get(formulation="Cotrimoxazole 120mg [Pack 1000]",facility_cycle__facility__name = "Bugaya HC III ( Buvuma )")
+        second_record = FacilityConsumptionRecord.objects.get(formulation="Cotrimoxazole 960mg[Pack 1000]",facility_cycle__facility__name = "Bugaya HC III ( Buvuma )")
+        self.assertEqual(first_record.opening_balance, 20)
+        self.assertEqual(first_record.closing_balance, 18)
+        self.assertEqual(first_record.months_of_stock_of_hand, 18)
+        self.assertEqual(first_record.packs_ordered, -14)
+        self.assertEqual(second_record.opening_balance, 35)
         GeneralReport(self.get_fixture_path('new_format_changed.xlsx'), "Jan- Feb 2012").get_data()
         self.assertEqual(FacilityConsumptionRecord.objects.count(), 82)

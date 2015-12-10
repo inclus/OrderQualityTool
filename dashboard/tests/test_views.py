@@ -46,7 +46,7 @@ class FacilitiesReportingView(WebTest):
         FacilityCycleRecord.objects.create(facility=loc, cycle=cycle, reporting_status=True)
         FacilityCycleRecord.objects.create(facility=loc2, cycle=cycle, reporting_status=False)
         url = "/api/test/submittedOrder"
-        json_response = self.app.get(url, user="testuser").content
+        json_response = self.app.get(url, user="testuser").content.decode('utf8')
         data = loads(json_response)['values']
         self.assertIn({"reporting": 50, "cycle": cycle, "not_reporting": 50}, data)
 
@@ -63,7 +63,7 @@ class BestDistrictReportingView(WebTest):
         FacilityCycleRecord.objects.create(facility=loc2, cycle=cycle, reporting_status=True)
         FacilityCycleRecord.objects.create(facility=loc3, cycle=cycle, reporting_status=False)
         url = reverse("ranking_best")
-        json_response = self.app.get(url, user="testuser").content
+        json_response = self.app.get(url, user="testuser").content.decode('utf8')
         data = loads(json_response)['values']
         self.assertEquals('dis1', data[0]['name'])
         self.assertEquals(100, data[0]['rate'])
@@ -79,7 +79,7 @@ class BestDistrictReportingView(WebTest):
         FacilityCycleRecord.objects.create(facility=loc2, cycle=cycle, reporting_status=True)
         FacilityCycleRecord.objects.create(facility=loc3, cycle=cycle, reporting_status=False)
         url = reverse("ranking_worst")
-        json_response = self.app.get(url, user="testuser").content
+        json_response = self.app.get(url, user="testuser").content.decode('utf8')
         data = loads(json_response)['values']
         self.assertEquals('dis2', data[0]['name'])
         self.assertEquals(50, data[0]['rate'])

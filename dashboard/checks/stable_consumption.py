@@ -1,9 +1,9 @@
 from django.db.models import Sum, F
 
-from dashboard.checks.common import Check
+from dashboard.checks.common import CycleFormulationCheck
 from dashboard.checks.different_orders_over_time import get_next_cycle
 from dashboard.helpers import STABLE_CONSUMPTION
-from dashboard.models import FacilityCycleRecord, FacilityConsumptionRecord, CycleFormulationTestScore
+from dashboard.models import FacilityCycleRecord, FacilityConsumptionRecord
 
 SUM = 'sum'
 
@@ -16,7 +16,9 @@ PMTCT_CONSUMPTION = 'pmtct_consumption'
 ART_CONSUMPTION = 'art_consumption'
 
 
-class StableConsumption(Check):
+class StableConsumption(CycleFormulationCheck):
+    test = STABLE_CONSUMPTION
+
     def run(self, cycle):
         next_cycle = get_next_cycle(cycle)
         formulations = [
@@ -47,12 +49,4 @@ class StableConsumption(Check):
                         no += 1
                 except TypeError as e:
                     no += 1
-
-            score, _ = CycleFormulationTestScore.objects.get_or_create(cycle=cycle, test=STABLE_CONSUMPTION, formulation=formulation[CONSUMPTION_QUERY])
-            yes_rate = float(yes * 100) / float(total_count)
-            no_rate = float(no * 100) / float(total_count)
-            not_reporting_rate = float(not_reporting * 100) / float(total_count)
-            score.yes = yes_rate
-            score.no = no_rate
-            score.not_reporting = not_reporting_rate
-            score.save()
+            self.build_cycle_formulation_score(cycle, formulation[CONSUMPTION_QUERY], yes, no, not_reporting, total_count)

@@ -3,3 +3,5 @@ django-jenkins
 coverage
 django-webtest
 mock
+django-nose
+nose-timer

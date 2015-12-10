@@ -1,6 +1,6 @@
-from dashboard.checks.common import Check
+from dashboard.checks.common import CycleFormulationCheck
 from dashboard.helpers import to_date, format_range, DIFFERENT_ORDERS_OVER_TIME
-from dashboard.models import FacilityCycleRecord, FacilityConsumptionRecord, CycleFormulationTestScore
+from dashboard.models import FacilityCycleRecord, FacilityConsumptionRecord
 
 
 def get_next_cycle(cycle):
@@ -11,7 +11,9 @@ def get_next_cycle(cycle):
     return next_cycle
 
 
-class DifferentOrdersOverTime(Check):
+class DifferentOrdersOverTime(CycleFormulationCheck):
+    test = DIFFERENT_ORDERS_OVER_TIME
+
     def run(self, cycle):
         next_cycle = get_next_cycle(cycle)
         formulations = [
@@ -31,17 +33,10 @@ class DifferentOrdersOverTime(Check):
                 if len(current_values) == 0 or len(new_values) == 0 or not facility_record.reporting_status:
                     not_reporting += 1
                 else:
-                    combined_list = current_values[0].values() + new_values[0].values()
+                    combined_list = list(current_values[0].values()) + list(new_values[0].values())
                     diff = list(set(new_values[0].values()) - set(current_values[0].values()))
                     if len(diff) > 1 or None in combined_list:
                         no += 1
                     else:
                         yes += 1
-            score, _ = CycleFormulationTestScore.objects.get_or_create(cycle=cycle, test=DIFFERENT_ORDERS_OVER_TIME, formulation=name)
-            yes_rate = float(yes * 100) / float(total_count)
-            no_rate = float(no * 100) / float(total_count)
-            not_reporting_rate = float(not_reporting * 100) / float(total_count)
-            score.yes = yes_rate
-            score.no = no_rate
-            score.not_reporting = not_reporting_rate
-            score.save()
+            self.build_cycle_formulation_score(cycle, name, yes, no, not_reporting, total_count)
