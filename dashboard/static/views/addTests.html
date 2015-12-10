@@ -1,4 +1,6 @@
 <div ng-controller="MainChecksController">
+<h4 class="text-center">{{selectedTest.desc}}</h4>
+    <h5 class="text-center" ng-show="selectedTest.hasRegimen">{{selectedRegimen.name}}</h5>
     <div class="col-md-3">
         <h5>SELECT TEST</h5>
         <select
