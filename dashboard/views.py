@@ -219,7 +219,7 @@ class ReportMetrics(APIView):
         report_item = data.get(most_recent_cycle)
         web_rate = "{0:.1f}".format((float(item['reporting']) / float(item['count'])) * 100)
         report_rate = "{0:.1f}".format((float(report_item['reporting']) / float(report_item['count'])) * 100)
-        adherence = CycleFormulationTestScore.objects.filter(test=GUIDELINE_ADHERENCE, cycle=cycle['cycle']).aggregate(adherence=Avg('yes')).get("adherence", 0)
+        adherence = "{0:.1f}".format(CycleFormulationTestScore.objects.filter(test=GUIDELINE_ADHERENCE, cycle=cycle['cycle']).aggregate(adherence=Avg('yes')).get("adherence", 0))
         return Response({"webBased": web_rate, "reporting": report_rate, "adherence": adherence})
 
 
