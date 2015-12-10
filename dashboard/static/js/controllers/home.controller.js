@@ -1,5 +1,5 @@
-angular.module('dashboard').controller('HomeController', ['$scope', '$stateParams', '$http', '$httpParamSerializer', 'NgTableParams',
-    function($scope, $stateParams, $http, $httpParamSerializer, NgTableParams) {
+angular.module('dashboard').controller('HomeController', ['$scope', '$stateParams', 'ReportService', '$httpParamSerializer', 'NgTableParams',
+    function($scope, $stateParams, ReportService, $httpParamSerializer, NgTableParams) {
 
         $scope.displayCycle = function(cycle) {
             return "CYCLE " + cycle.number + " '" + cycle.year;
@@ -13,10 +13,10 @@ angular.module('dashboard').controller('HomeController', ['$scope', '$stateParam
         $scope.selectWorst = function(name) {
             $scope.worstPerforming = name;
         };
-        $http.get('/api/cycles').then(function(response) {
-            $scope.cycles = response.data.values;
+        ReportService.getCycles().then(function(data) {
+            $scope.cycles = data.values;
             $scope.startCycle = $scope.cycles[6 - 1];
-            $scope.endCycle = $scope.selectedCycle = response.data.most_recent_cycle;
+            $scope.endCycle = $scope.selectedCycle = data.most_recent_cycle;
         });
 
         $scope.$watch('startCycle', function(start) {
@@ -55,37 +55,27 @@ angular.module('dashboard').controller('HomeController', ['$scope', '$stateParam
         }
 
         var updateWorstList = function() {
-            $http.get('/api/test/ranking/worst', {
-                params: {
-                    level: $scope.worstPerforming,
-                    cycle: $scope.selectedCycle
-                }
-            }).then(function(response) {
+            ReportService.getWorstRankings($scope.worstPerforming, $scope.selectedCycle).then(function(data) {
                 $scope.worstTableParams = new NgTableParams({
                     page: 1,
                     count: 10
                 }, {
                     filterDelay: 0,
                     counts: [],
-                    data: response.data.values
+                    data: data.values
                 });
             });
         };
 
         var updateBestList = function() {
-            $http.get('/api/test/ranking/best', {
-                params: {
-                    level: $scope.bestPerforming,
-                    cycle: $scope.selectedCycle
-                }
-            }).then(function(response) {
+            ReportService.getBestRankings($scope.bestPerforming, $scope.selectedCycle).then(function(data) {
                 $scope.bestTableParams = new NgTableParams({
                     page: 1,
                     count: 10
                 }, {
                     filterDelay: 0,
                     counts: [],
-                    data: response.data.values
+                    data: data.values
                 });
             });
         };
@@ -116,10 +106,10 @@ angular.module('dashboard').controller('HomeController', ['$scope', '$stateParam
 
         $scope.template = templates[$scope.currentTest];
 
-        $http.get('/api/test/metrics').then(function(response) {
-            var web = response.data.webBased;
-            var reporting = response.data.reporting;
-            var adherence = response.data.adherence;
+        ReportService.getMetrics().then(function(data) {
+            var web = data.webBased;
+            var reporting = data.reporting;
+            var adherence = data.adherence;
             $scope.tests = [{
                 name: "reportingRate",
                 description: "Reporting Rate",
