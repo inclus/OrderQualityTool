@@ -53,14 +53,21 @@ STABLE_CONSUMPTION = "stableConsumption"
 WAREHOUSE_FULFILMENT = "warehouseFulfilment"
 STABLE_PATIENT_VOLUMES = "stablePatientVolumes"
 GUIDELINE_ADHERENCE = "guidelineAdherence"
-
+REPORTING = "REPORTING"
+WEB_BASED = "WEB_BASED"
 ADULT = 'adult'
 CONSUMPTION = 'consumption'
 PAED = 'paed'
 PATIENTS_ADULT = "PATIENTS (ADULT)"
 PATIENTS_PAED = "PATIENTS (PAED)"
+MULTIPLE_ORDERS = "MULTIPLE_ORDERS"
 
 
 def to_date(text):
     month = text.split('-')[1].strip()
     return arrow.get(month, 'MMM YYYY')
+
+
+YES = "YES"
+NO = "NO"
+NOT_REPORTING = "NOT_REPORTING"

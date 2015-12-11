@@ -1,14 +1,25 @@
-from dashboard.models import CycleFormulationTestScore
+from dashboard.models import CycleFormulationTestScore, FacilityCycleRecordScore
 
 
 class Check(object):
+    test = ''
+
     def run(self, cycle):
         raise NotImplementedError()
 
+    def record_result_for_facility(self, record, result, formulation_name=None, test=None):
+        if test:
+            f_test = test
+        else:
+            f_test = self.test
+        score_record, _ = FacilityCycleRecordScore.objects.get_or_create(facility_cycle=record, test=f_test)
+        score_record.score = result
+        if formulation_name:
+            score_record.formulation = formulation_name
+        score_record.save()
+
 
 class CycleFormulationCheck(Check):
-    test = ''
-
     def run(self, cycle):
         raise NotImplementedError()
 

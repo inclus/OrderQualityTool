@@ -1,6 +1,6 @@
 from dashboard.checks.common import CycleFormulationCheck
 from dashboard.checks.different_orders_over_time import get_next_cycle
-from dashboard.helpers import CLOSING_BALANCE_MATCHES_OPENING_BALANCE
+from dashboard.helpers import CLOSING_BALANCE_MATCHES_OPENING_BALANCE, NOT_REPORTING, YES, NO
 from dashboard.models import FacilityConsumptionRecord, FacilityCycleRecord
 
 
@@ -23,6 +23,7 @@ class ClosingBalance(CycleFormulationCheck):
             for facility_record in FacilityCycleRecord.objects.filter(cycle=cycle):
                 current_values = FacilityConsumptionRecord.objects.filter(facility_cycle=facility_record, formulation__icontains=name).order_by().values('closing_balance')
                 new_values = FacilityConsumptionRecord.objects.filter(facility_cycle__facility=facility_record.facility, facility_cycle__cycle=next_cycle, formulation__icontains=name).order_by().values('opening_balance')
+                result = NOT_REPORTING
                 if len(current_values) == 0 or len(new_values) == 0 or not facility_record.reporting_status:
                     not_reporting += 1
                 else:
@@ -30,6 +31,9 @@ class ClosingBalance(CycleFormulationCheck):
                     diff = list(set(new_values[0].values()) - set(current_values[0].values()))
                     if len(diff) > 1 or None in combined_list:
                         no += 1
+                        result = NO
                     else:
                         yes += 1
+                        result = YES
+                self.record_result_for_facility(facility_record, result, name)
             self.build_cycle_formulation_score(cycle, name, yes, no, not_reporting, total_count)

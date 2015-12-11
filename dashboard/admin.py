@@ -97,7 +97,19 @@ class FacilityCycleRecordAdmin(ModelAdmin):
                     'multiple',
                     'cycle'
                     )
+    list_filter = ('reporting_status', 'multiple', 'cycle')
     actions = [run_tests]
+
+
+class ScoreAdmin(ModelAdmin):
+    list_display = ('facility', 'cycle', 'score', 'test', 'formulation')
+    list_filter = ('test', 'score', 'formulation')
+
+    def cycle(self, obj):
+        return obj.facility_cycle.cycle
+
+    def facility(self, obj):
+        return obj.facility_cycle.facility
 
 
 admin_site = QdbSite()
@@ -108,7 +120,7 @@ admin_site.register(IP)
 admin_site.register(WareHouse)
 admin_site.register(District)
 admin_site.register(CycleTestScore)
-admin_site.register(FacilityCycleRecordScore)
+admin_site.register(FacilityCycleRecordScore, ScoreAdmin)
 admin_site.register(CycleFormulationTestScore)
 admin_site.register(AdultPatientsRecord, PatientAdmin)
 admin_site.register(PAEDPatientsRecord, PatientAdmin)

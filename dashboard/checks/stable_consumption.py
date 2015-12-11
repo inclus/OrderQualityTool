@@ -2,7 +2,7 @@ from django.db.models import Sum, F
 
 from dashboard.checks.common import CycleFormulationCheck
 from dashboard.checks.different_orders_over_time import get_next_cycle
-from dashboard.helpers import STABLE_CONSUMPTION
+from dashboard.helpers import STABLE_CONSUMPTION, NOT_REPORTING, NO, YES
 from dashboard.models import FacilityCycleRecord, FacilityConsumptionRecord
 
 SUM = 'sum'
@@ -41,12 +41,18 @@ class StableConsumption(CycleFormulationCheck):
                     number_of_consumption_records_next_cycle = next_cycle_qs.count()
                     next_cycle_consumption = next_cycle_qs.aggregate(sum=Sum(F(ART_CONSUMPTION) + F(PMTCT_CONSUMPTION))).get(SUM, 0)
                     current_cycle_consumption = current_cycle_qs.aggregate(sum=Sum(F(ART_CONSUMPTION) + F(PMTCT_CONSUMPTION))).get(SUM, 0)
+                    result = NOT_REPORTING
                     if number_of_consumption_records == 0 or number_of_consumption_records_next_cycle == 0:
                         not_reporting += 1
                     elif 0.5 < (next_cycle_consumption / current_cycle_consumption) < 1.5:
                         yes += 1
+                        result = YES
                     else:
                         no += 1
+                        result = NO
                 except TypeError as e:
                     no += 1
+                    result = NO
+                finally:
+                    self.record_result_for_facility(record, result, formulation[CONSUMPTION_QUERY])
             self.build_cycle_formulation_score(cycle, formulation[CONSUMPTION_QUERY], yes, no, not_reporting, total_count)

@@ -2,7 +2,7 @@ from django.db.models import Sum
 
 from dashboard.checks.common import CycleFormulationCheck
 from dashboard.checks.different_orders_over_time import get_next_cycle
-from dashboard.helpers import WAREHOUSE_FULFILMENT
+from dashboard.helpers import WAREHOUSE_FULFILMENT, NOT_REPORTING, YES, NO
 from dashboard.models import FacilityCycleRecord, FacilityConsumptionRecord
 
 QUANTITY_RECEIVED = "quantity_received"
@@ -38,13 +38,19 @@ class WarehouseFulfilment(CycleFormulationCheck):
                     number_of_consumption_records_next_cycle = next_cycle_qs.count()
                     amount_received = next_cycle_qs.aggregate(sum=Sum(QUANTITY_RECEIVED)).get(SUM, 0)
                     amount_ordered = current_cycle_qs.aggregate(sum=Sum(PACKS_ORDERED)).get(SUM, 0)
+                    result = NOT_REPORTING
                     if number_of_consumption_records == 0 or number_of_consumption_records_next_cycle == 0:
                         not_reporting += 1
                     elif amount_ordered == amount_received:
                         yes += 1
+                        result = YES
                     else:
                         no += 1
+                        result = NO
                 except TypeError as e:
                     no += 1
+                    result = NO
+                finally:
+                    self.record_result_for_facility(record, result)
 
             self.build_cycle_formulation_score(cycle, formulation[CONSUMPTION_QUERY], yes, no, not_reporting, total_count)

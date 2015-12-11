@@ -18,7 +18,7 @@ from rest_framework.serializers import ModelSerializer
 from rest_framework.views import APIView
 
 from dashboard.forms import FileUploadForm
-from dashboard.helpers import generate_cycles, ORDER_FORM_FREE_OF_GAPS, ORDER_FORM_FREE_OF_NEGATIVE_NUMBERS, DIFFERENT_ORDERS_OVER_TIME, to_date, CLOSING_BALANCE_MATCHES_OPENING_BALANCE, CONSUMPTION_AND_PATIENTS, STABLE_CONSUMPTION, WAREHOUSE_FULFILMENT, STABLE_PATIENT_VOLUMES, GUIDELINE_ADHERENCE, NNRTI_CURRENT_ADULTS, NNRTI_CURRENT_PAED, NNRTI_NEW_ADULTS, NNRTI_NEW_PAED
+from dashboard.helpers import generate_cycles, ORDER_FORM_FREE_OF_GAPS, ORDER_FORM_FREE_OF_NEGATIVE_NUMBERS, DIFFERENT_ORDERS_OVER_TIME, to_date, CLOSING_BALANCE_MATCHES_OPENING_BALANCE, CONSUMPTION_AND_PATIENTS, STABLE_CONSUMPTION, WAREHOUSE_FULFILMENT, STABLE_PATIENT_VOLUMES, GUIDELINE_ADHERENCE, NNRTI_CURRENT_ADULTS, NNRTI_CURRENT_PAED, NNRTI_NEW_ADULTS, NNRTI_NEW_PAED, YES
 from dashboard.models import FacilityCycleRecord, FacilityConsumptionRecord, CycleTestScore, CycleFormulationTestScore
 from dashboard.tasks import import_general_report
 from locations.models import Facility, District, IP, WareHouse
@@ -150,18 +150,25 @@ class BestPerformingDistrictsView(APIView):
 
     def get_data(self, request):
         filters = {}
-        levels = {'district': District, 'ip': IP, 'warehouse': WareHouse}
+        levels = {'district': District, 'ip': IP, 'warehouse': WareHouse, 'facility': Facility}
         cycle = request.GET.get('cycle', None)
         level = request.GET.get('level', 'district').lower()
         current_model = levels.get(level, District)
         if cycle:
             filters['facilities__records__cycle'] = cycle
-        data = current_model.objects.filter(**filters).values('name', 'facilities__records__cycle').annotate(count=Count('facilities__records__pk'), reporting=Count(Case(When(facilities__records__reporting_status=True, then=1))))
+            if level == 'facility':
+                filters = {}
+                filters['records__cycle'] = cycle
+
+        if level == 'facility':
+            data = current_model.objects.filter(**filters).values('name', 'records__cycle').annotate(count=Count('records__scores__pk'), yes=Count(Case(When(records__scores__score=YES, then=1))))
+        else:
+            data = current_model.objects.filter(**filters).values('name', 'facilities__records__cycle').annotate(count=Count('facilities__records__scores__pk'), yes=Count(Case(When(facilities__records__scores__score=YES, then=1))))
         for item in data:
-            if item['reporting'] == 0:
+            if item['yes'] == 0:
                 item['rate'] = 0
             else:
-                item['rate'] = (float(item['reporting']) / float(item['count'])) * 100
+                item['rate'] = (float(item['yes']) / float(item['count'])) * 100
         results = sorted(data, key=lambda x: (x['rate'], x['count']), reverse=self.reverse)
         return results
 

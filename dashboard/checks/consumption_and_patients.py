@@ -1,7 +1,7 @@
 from django.db.models import Sum, F
 
 from dashboard.checks.common import CycleFormulationCheck
-from dashboard.helpers import CONSUMPTION_AND_PATIENTS
+from dashboard.helpers import CONSUMPTION_AND_PATIENTS, YES, NO, NOT_REPORTING
 from dashboard.models import AdultPatientsRecord, PAEDPatientsRecord, FacilityCycleRecord, FacilityConsumptionRecord
 
 NAME = "name"
@@ -48,12 +48,16 @@ class ConsumptionAndPatients(CycleFormulationCheck):
                     art_consumption = consumption_qs.aggregate(sum=Sum(ART_CONSUMPTION)).get(SUM, 0)
                     total = patient_sum + art_consumption
                     adjusted_consumption_sum = art_consumption / formulation[RATIO]
+                    result = NOT_REPORTING
                     if number_of_consumption_records == 0 or number_of_patient_records == 0:
                         not_reporting += 1
                     elif total == 0 or (0.7 * patient_sum) < adjusted_consumption_sum < (1.429 * patient_sum):
                         yes += 1
+                        result = YES
                     else:
                         no += 1
+                        result = NO
+                    self.record_result_for_facility(record, result, formulation[PATIENT_QUERY])
                 except TypeError as e:
                     no += 1
             self.build_cycle_formulation_score(cycle, formulation[CONSUMPTION_QUERY], yes, no, not_reporting, total_count)

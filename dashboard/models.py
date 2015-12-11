@@ -3,6 +3,7 @@ import logging
 from custom_user.models import AbstractEmailUser
 from django.db import models
 
+from dashboard.helpers import NOT_REPORTING, YES, NO
 from locations.models import Facility
 
 logger = logging.getLogger(__name__)
@@ -57,14 +58,21 @@ class FacilityCycleRecord(models.Model):
     web_based = models.BooleanField(default=False)
     multiple = models.BooleanField(default=False)
 
+    class Meta:
+        unique_together = ("cycle", "facility")
+
     def __unicode__(self):
         return "%s %s" % (self.facility, self.cycle)
 
 
 class FacilityCycleRecordScore(models.Model):
-    facility_cycle = models.ForeignKey(FacilityCycleRecord)
+    facility_cycle = models.ForeignKey(FacilityCycleRecord, related_name="scores")
     test = models.CharField(max_length=256)
-    score = models.CharField(choices=(("YES", "YES"), ("NO", "NO"), ("NOT_REPORTING", "NOT_REPORTING")), db_index=True, max_length=20)
+    formulation = models.CharField(max_length=256, null=True)
+    score = models.CharField(choices=((YES, YES), (NO, NO), (NOT_REPORTING, NOT_REPORTING)), db_index=True, max_length=20)
+
+    class Meta:
+        unique_together = ("facility_cycle", "formulation", "test")
 
     def __unicode__(self):
         return "%s %s %s" % (self.facility_cycle, self.test, self.score)

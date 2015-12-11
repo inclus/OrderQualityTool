@@ -3,7 +3,7 @@ import operator
 from django.db.models import Q, F, Sum
 
 from dashboard.checks.common import Check
-from dashboard.helpers import NNRTI_CURRENT_ADULTS, NNRTI_CURRENT_PAED, NNRTI_NEW_ADULTS, NNRTI_NEW_PAED
+from dashboard.helpers import NNRTI_CURRENT_ADULTS, NNRTI_CURRENT_PAED, NNRTI_NEW_ADULTS, NNRTI_NEW_PAED, NOT_REPORTING, YES, NO
 from dashboard.models import FacilityCycleRecord, CycleTestScore, FacilityConsumptionRecord
 
 TEST = "test"
@@ -95,15 +95,21 @@ class NNRTI(Check):
                     sum_df1 = df1_qs.aggregate(sum=Sum(df1_sum_fields)).get("sum", 0)
                     sum_df2 = df2_qs.aggregate(sum=Sum(df1_sum_fields)).get("sum", 0)
                     total = sum_df1 + sum_df2
+                    result = NOT_REPORTING
                     if df1_count == 0 or df2_count == 0:
                         not_reporting += 1
                     elif total == 0 or 0.7 < ((sum_df1 / ratio) / sum_df2) < 1.429:
                         yes += 1
+                        result = YES
                     else:
                         no += 1
+                        result = NO
 
                 except TypeError as e:
                     no += 1
+                    result = NO
+                finally:
+                    self.record_result_for_facility(record, result, test=test)
             score, _ = CycleTestScore.objects.get_or_create(cycle=cycle, test=test)
             yes_rate = float(yes * 100) / float(total_count)
             not_reporting_rate = float(not_reporting * 100) / float(total_count)

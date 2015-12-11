@@ -3,7 +3,7 @@ import operator
 from django.db.models import Q, F, Sum
 
 from dashboard.checks.common import CycleFormulationCheck
-from dashboard.helpers import GUIDELINE_ADHERENCE
+from dashboard.helpers import GUIDELINE_ADHERENCE, NOT_REPORTING, YES, NO
 from dashboard.models import FacilityCycleRecord, FacilityConsumptionRecord
 
 FIELDS = "fields"
@@ -57,13 +57,19 @@ class GuideLineAdherence(CycleFormulationCheck):
                     sum_df1 = df1_qs.aggregate(sum=Sum(df1_sum_fields)).get("sum", 0)
                     sum_df2 = df2_qs.aggregate(sum=Sum(df1_sum_fields)).get("sum", 0)
                     total = sum_df1 + sum_df2
+                    result = NOT_REPORTING
                     if df1_count == 0 or df2_count == 0:
                         not_reporting += 1
                     elif total == 0 or sum_df1 < (ratio * total):
                         yes += 1
+                        result = YES
                     else:
                         no += 1
+                        result = NO
 
                 except TypeError as e:
                     no += 1
+                    result = NO
+                finally:
+                    self.record_result_for_facility(record, result, name)
             self.build_cycle_formulation_score(cycle, name, yes, no, not_reporting, total_count)

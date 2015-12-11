@@ -12,6 +12,7 @@ from dashboard.checks.order_free_of_negative_numbers import OrderFormFreeOfNegat
 from dashboard.checks.stable_consumption import StableConsumption
 from dashboard.checks.stable_patient_volumes import StablePatientVolumes
 from dashboard.checks.warehouse_fulfilement import WarehouseFulfilment
+from dashboard.checks.web_based_reporting import WebBasedReportingCheck, ReportingCheck, MultipleOrdersCheck
 from dashboard.reports import GeneralReport
 
 
@@ -22,6 +23,9 @@ def process_test(check_class, cycle):
 
 @shared_task
 def calculate_scores_for_checks_in_cycle(cycle):
+    process_test.delay(WebBasedReportingCheck, cycle)
+    process_test.delay(ReportingCheck, cycle)
+    process_test.delay(MultipleOrdersCheck, cycle)
     process_test.delay(OrderFormFreeOfGaps, cycle)
     process_test.delay(OrderFormFreeOfNegativeNumbers, cycle)
     process_test.delay(DifferentOrdersOverTime, cycle)
@@ -32,6 +36,7 @@ def calculate_scores_for_checks_in_cycle(cycle):
     process_test.delay(StablePatientVolumes, cycle)
     process_test.delay(GuideLineAdherence, cycle)
     process_test.delay(NNRTI, cycle)
+
 
 
 @shared_task
