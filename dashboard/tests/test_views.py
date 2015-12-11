@@ -8,7 +8,7 @@ from django_webtest import WebTest
 from mock import patch, ANY
 from webtest import Upload
 
-from dashboard.checks.web_based_reporting import ReportingCheck
+from dashboard.checks.web_based_reporting import ReportingCheck, WebBasedReportingCheck, MultipleOrdersCheck
 from dashboard.models import FacilityCycleRecord, FacilityCycleRecordScore
 from locations.models import Facility, District
 
@@ -90,7 +90,7 @@ class BestDistrictReportingView(WebTest):
         self.assertEquals(50, data[0]['rate'])
 
 
-class WebBasedReportingCheckTestCase(TestCase):
+class ReportingCheckTestCase(TestCase):
     def test_logic(self):
         cycle = 'Jan - Feb %s' % now().format("YYYY")
         dis, _ = District.objects.get_or_create(name="dis1")
@@ -102,5 +102,37 @@ class WebBasedReportingCheckTestCase(TestCase):
         FacilityCycleRecord.objects.create(facility=loc2, cycle=cycle, reporting_status=True)
         FacilityCycleRecord.objects.create(facility=loc3, cycle=cycle, reporting_status=False)
         ReportingCheck().run(cycle)
+        self.assertEqual(3, FacilityCycleRecordScore.objects.count())
+        self.assertEqual(2, FacilityCycleRecordScore.objects.filter(score="YES").count())
+
+
+class WebBasedReportingCheckTestCase(TestCase):
+    def test_logic(self):
+        cycle = 'Jan - Feb %s' % now().format("YYYY")
+        dis, _ = District.objects.get_or_create(name="dis1")
+        dis2, _ = District.objects.get_or_create(name="dis2")
+        loc, _ = Facility.objects.get_or_create(name="AIC Jinja Special Clinic", district=dis)
+        loc2, _ = Facility.objects.get_or_create(name="AIC Special Clinic", district=dis2)
+        loc3, _ = Facility.objects.get_or_create(name="AIC Specialic", district=dis2)
+        FacilityCycleRecord.objects.create(facility=loc, cycle=cycle, web_based=True)
+        FacilityCycleRecord.objects.create(facility=loc2, cycle=cycle, web_based=True)
+        FacilityCycleRecord.objects.create(facility=loc3, cycle=cycle, web_based=False)
+        WebBasedReportingCheck().run(cycle)
+        self.assertEqual(3, FacilityCycleRecordScore.objects.count())
+        self.assertEqual(2, FacilityCycleRecordScore.objects.filter(score="YES").count())
+
+
+class MultipleReportingCheckTestCase(TestCase):
+    def test_logic(self):
+        cycle = 'Jan - Feb %s' % now().format("YYYY")
+        dis, _ = District.objects.get_or_create(name="dis1")
+        dis2, _ = District.objects.get_or_create(name="dis2")
+        loc, _ = Facility.objects.get_or_create(name="AIC Jinja Special Clinic", district=dis)
+        loc2, _ = Facility.objects.get_or_create(name="AIC Special Clinic", district=dis2)
+        loc3, _ = Facility.objects.get_or_create(name="AIC Specialic", district=dis2)
+        FacilityCycleRecord.objects.create(facility=loc, cycle=cycle, multiple=True)
+        FacilityCycleRecord.objects.create(facility=loc2, cycle=cycle, multiple=True)
+        FacilityCycleRecord.objects.create(facility=loc3, cycle=cycle, multiple=False)
+        MultipleOrdersCheck().run(cycle)
         self.assertEqual(3, FacilityCycleRecordScore.objects.count())
         self.assertEqual(2, FacilityCycleRecordScore.objects.filter(score="YES").count())
