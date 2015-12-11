@@ -3,11 +3,13 @@ from json import loads
 
 from arrow import now
 from django.core.urlresolvers import reverse
+from django.test import TestCase
 from django_webtest import WebTest
 from mock import patch, ANY
 from webtest import Upload
 
-from dashboard.models import FacilityCycleRecord
+from dashboard.checks.web_based_reporting import ReportingCheck
+from dashboard.models import FacilityCycleRecord, FacilityCycleRecordScore
 from locations.models import Facility, District
 
 
@@ -62,9 +64,11 @@ class BestDistrictReportingView(WebTest):
         FacilityCycleRecord.objects.create(facility=loc, cycle=cycle, reporting_status=True)
         FacilityCycleRecord.objects.create(facility=loc2, cycle=cycle, reporting_status=True)
         FacilityCycleRecord.objects.create(facility=loc3, cycle=cycle, reporting_status=False)
+        ReportingCheck().run(cycle)
         url = reverse("ranking_best")
         json_response = self.app.get(url, user="testuser").content.decode('utf8')
         data = loads(json_response)['values']
+        print data, FacilityCycleRecordScore.objects.all()
         self.assertEquals('dis1', data[0]['name'])
         self.assertEquals(100, data[0]['rate'])
 
@@ -78,8 +82,25 @@ class BestDistrictReportingView(WebTest):
         FacilityCycleRecord.objects.create(facility=loc, cycle=cycle, reporting_status=True)
         FacilityCycleRecord.objects.create(facility=loc2, cycle=cycle, reporting_status=True)
         FacilityCycleRecord.objects.create(facility=loc3, cycle=cycle, reporting_status=False)
+        ReportingCheck().run(cycle)
         url = reverse("ranking_worst")
         json_response = self.app.get(url, user="testuser").content.decode('utf8')
         data = loads(json_response)['values']
         self.assertEquals('dis2', data[0]['name'])
         self.assertEquals(50, data[0]['rate'])
+
+
+class WebBasedReportingCheckTestCase(TestCase):
+    def test_logic(self):
+        cycle = 'Jan - Feb %s' % now().format("YYYY")
+        dis, _ = District.objects.get_or_create(name="dis1")
+        dis2, _ = District.objects.get_or_create(name="dis2")
+        loc, _ = Facility.objects.get_or_create(name="AIC Jinja Special Clinic", district=dis)
+        loc2, _ = Facility.objects.get_or_create(name="AIC Special Clinic", district=dis2)
+        loc3, _ = Facility.objects.get_or_create(name="AIC Specialic", district=dis2)
+        FacilityCycleRecord.objects.create(facility=loc, cycle=cycle, reporting_status=True)
+        FacilityCycleRecord.objects.create(facility=loc2, cycle=cycle, reporting_status=True)
+        FacilityCycleRecord.objects.create(facility=loc3, cycle=cycle, reporting_status=False)
+        ReportingCheck().run(cycle)
+        self.assertEqual(3, FacilityCycleRecordScore.objects.count())
+        self.assertEqual(2, FacilityCycleRecordScore.objects.filter(score="YES").count())

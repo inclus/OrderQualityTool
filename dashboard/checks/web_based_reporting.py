@@ -8,7 +8,7 @@ class WebBasedReportingCheck(CycleFormulationCheck):
 
     def run(self, cycle):
         for record in FacilityCycleRecord.objects.filter(cycle=cycle):
-            result = YES if record.reporting_status else NO
+            result = YES if record.web_based else NO
             self.record_result_for_facility(record, result)
 
 
@@ -17,7 +17,7 @@ class ReportingCheck(CycleFormulationCheck):
 
     def run(self, cycle):
         for record in FacilityCycleRecord.objects.filter(cycle=cycle):
-            result = YES if record.web_based else NO
+            result = YES if record.reporting_status else NO
             self.record_result_for_facility(record, result)
 
 

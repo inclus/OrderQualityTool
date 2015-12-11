@@ -61,13 +61,11 @@ PAED = 'paed'
 PATIENTS_ADULT = "PATIENTS (ADULT)"
 PATIENTS_PAED = "PATIENTS (PAED)"
 MULTIPLE_ORDERS = "MULTIPLE_ORDERS"
+YES = "YES"
+NO = "NO"
+NOT_REPORTING = "NOT_REPORTING"
 
 
 def to_date(text):
     month = text.split('-')[1].strip()
     return arrow.get(month, 'MMM YYYY')
-
-
-YES = "YES"
-NO = "NO"
-NOT_REPORTING = "NOT_REPORTING"

@@ -164,6 +164,7 @@ class BestPerformingDistrictsView(APIView):
             data = current_model.objects.filter(**filters).values('name', 'records__cycle').annotate(count=Count('records__scores__pk'), yes=Count(Case(When(records__scores__score=YES, then=1))))
         else:
             data = current_model.objects.filter(**filters).values('name', 'facilities__records__cycle').annotate(count=Count('facilities__records__scores__pk'), yes=Count(Case(When(facilities__records__scores__score=YES, then=1))))
+        print "the ----------------", data
         for item in data:
             if item['yes'] == 0:
                 item['rate'] = 0
