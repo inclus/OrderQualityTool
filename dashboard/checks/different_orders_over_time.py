@@ -3,19 +3,19 @@ from dashboard.helpers import to_date, format_range, DIFFERENT_ORDERS_OVER_TIME,
 from dashboard.models import FacilityCycleRecord, FacilityConsumptionRecord
 
 
-def get_next_cycle(cycle):
+def get_prev_cycle(cycle):
     current_cycle_date = to_date(cycle)
-    start_month = current_cycle_date.replace(months=1)
-    end_month = current_cycle_date.replace(months=2)
-    next_cycle = format_range(start_month, end_month)
-    return next_cycle
+    start_month = current_cycle_date.replace(months=-3)
+    end_month = current_cycle_date.replace(months=-2)
+    prev_cycle = format_range(start_month, end_month)
+    return prev_cycle
 
 
 class DifferentOrdersOverTime(CycleFormulationCheck):
     test = DIFFERENT_ORDERS_OVER_TIME
 
     def run(self, cycle):
-        next_cycle = get_next_cycle(cycle)
+        prev_cycle = get_prev_cycle(cycle)
         formulations = [
             {"name": "TDF/3TC/EFV (Adult)", "consumption_query": "Efavirenz (TDF/3TC/EFV)"},
             {"name": "ABC/3TC (Paed)", "consumption_query": "Lamivudine (ABC/3TC) 60mg/30mg [Pack 60]"},
@@ -29,10 +29,10 @@ class DifferentOrdersOverTime(CycleFormulationCheck):
             total_count = FacilityCycleRecord.objects.filter(cycle=cycle).count()
 
             for facility_record in FacilityCycleRecord.objects.filter(cycle=cycle):
-                current_values = FacilityConsumptionRecord.objects.filter(facility_cycle=facility_record, formulation__icontains=name).order_by().values('opening_balance', 'art_consumption', 'estimated_number_of_new_patients')
-                new_values = FacilityConsumptionRecord.objects.filter(facility_cycle__facility=facility_record.facility, facility_cycle__cycle=next_cycle, formulation__icontains=name).order_by().values('opening_balance', 'art_consumption', 'estimated_number_of_new_patients')
+                new_values = FacilityConsumptionRecord.objects.filter(facility_cycle=facility_record, formulation__icontains=name).order_by().values('opening_balance', 'art_consumption', 'estimated_number_of_new_patients')
+                current_values = FacilityConsumptionRecord.objects.filter(facility_cycle__facility=facility_record.facility, facility_cycle__cycle=prev_cycle, formulation__icontains=name).order_by().values('opening_balance', 'art_consumption', 'estimated_number_of_new_patients')
                 result = NOT_REPORTING
-                if len(current_values) == 0 or len(new_values) == 0 or not facility_record.reporting_status:
+                if len(current_values) == 0 or len(new_values) == 0:
                     not_reporting += 1
                 else:
                     combined_list = list(current_values[0].values()) + list(new_values[0].values())

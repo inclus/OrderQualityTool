@@ -1,7 +1,7 @@
 from django.db.models import Sum, F
 
 from dashboard.checks.common import CycleFormulationCheck
-from dashboard.checks.different_orders_over_time import get_next_cycle
+from dashboard.checks.different_orders_over_time import get_prev_cycle
 from dashboard.helpers import STABLE_PATIENT_VOLUMES, NO, YES, NOT_REPORTING
 from dashboard.models import FacilityCycleRecord, AdultPatientsRecord, PAEDPatientsRecord
 
@@ -28,7 +28,7 @@ class StablePatientVolumes(CycleFormulationCheck):
     test = STABLE_PATIENT_VOLUMES
 
     def run(self, cycle):
-        next_cycle = get_next_cycle(cycle)
+        prev_cycle = get_prev_cycle(cycle)
         formulations = [
             {PATIENT_QUERY: "TDF/3TC/EFV", CONSUMPTION_QUERY: "Efavirenz (TDF/3TC/EFV)", MODEL: AdultPatientsRecord, THRESHOLD: 10},
             {PATIENT_QUERY: "ABC/3TC", CONSUMPTION_QUERY: "Lamivudine (ABC/3TC) 60mg/30mg [Pack 60]", MODEL: PAEDPatientsRecord, THRESHOLD: 5},
@@ -44,8 +44,8 @@ class StablePatientVolumes(CycleFormulationCheck):
             total_count = qs.count()
             for record in qs:
                 try:
-                    current_cycle_qs = model_class.objects.annotate(population=Sum(F(EXISTING) + F(NEW))).filter(facility_cycle=record, formulation__icontains=formulation[PATIENT_QUERY], population__gte=threshold)
-                    next_cycle_qs = model_class.objects.annotate(population=Sum(F(EXISTING) + F(NEW))).filter(facility_cycle__facility=record.facility, facility_cycle__cycle=next_cycle, formulation__icontains=formulation[PATIENT_QUERY], population__gte=threshold)
+                    next_cycle_qs = model_class.objects.annotate(population=Sum(F(EXISTING) + F(NEW))).filter(facility_cycle=record, formulation__icontains=formulation[PATIENT_QUERY], population__gte=threshold)
+                    current_cycle_qs = model_class.objects.annotate(population=Sum(F(EXISTING) + F(NEW))).filter(facility_cycle__facility=record.facility, facility_cycle__cycle=prev_cycle, formulation__icontains=formulation[PATIENT_QUERY], population__gte=threshold)
                     number_of_patient_records = current_cycle_qs.count()
                     number_of_patient_records_next_cycle = next_cycle_qs.count()
                     next_cycle_population = next_cycle_qs.aggregate(sum=Sum(F(EXISTING) + F(NEW))).get(SUM, 0)

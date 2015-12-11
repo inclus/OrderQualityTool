@@ -1,5 +1,5 @@
 from dashboard.checks.common import CycleFormulationCheck
-from dashboard.checks.different_orders_over_time import get_next_cycle
+from dashboard.checks.different_orders_over_time import get_prev_cycle
 from dashboard.helpers import CLOSING_BALANCE_MATCHES_OPENING_BALANCE, NOT_REPORTING, YES, NO
 from dashboard.models import FacilityConsumptionRecord, FacilityCycleRecord
 
@@ -8,7 +8,7 @@ class ClosingBalance(CycleFormulationCheck):
     test = CLOSING_BALANCE_MATCHES_OPENING_BALANCE
 
     def run(self, cycle):
-        next_cycle = get_next_cycle(cycle)
+        prev_cycle = get_prev_cycle(cycle)
         formulations = [
             {"name": "TDF/3TC/EFV (Adult)", "consumption_query": "Efavirenz (TDF/3TC/EFV)"},
             {"name": "ABC/3TC (Paed)", "consumption_query": "Lamivudine (ABC/3TC) 60mg/30mg [Pack 60]"},
@@ -21,8 +21,8 @@ class ClosingBalance(CycleFormulationCheck):
             not_reporting = 0
             total_count = FacilityCycleRecord.objects.filter(cycle=cycle).count()
             for facility_record in FacilityCycleRecord.objects.filter(cycle=cycle):
-                current_values = FacilityConsumptionRecord.objects.filter(facility_cycle=facility_record, formulation__icontains=name).order_by().values('closing_balance')
-                new_values = FacilityConsumptionRecord.objects.filter(facility_cycle__facility=facility_record.facility, facility_cycle__cycle=next_cycle, formulation__icontains=name).order_by().values('opening_balance')
+                new_values = FacilityConsumptionRecord.objects.filter(facility_cycle=facility_record, formulation__icontains=name).order_by().values('closing_balance')
+                current_values = FacilityConsumptionRecord.objects.filter(facility_cycle__facility=facility_record.facility, facility_cycle__cycle=prev_cycle, formulation__icontains=name).order_by().values('opening_balance')
                 result = NOT_REPORTING
                 if len(current_values) == 0 or len(new_values) == 0 or not facility_record.reporting_status:
                     not_reporting += 1

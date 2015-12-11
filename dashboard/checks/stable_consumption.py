@@ -1,7 +1,7 @@
 from django.db.models import Sum, F
 
 from dashboard.checks.common import CycleFormulationCheck
-from dashboard.checks.different_orders_over_time import get_next_cycle
+from dashboard.checks.different_orders_over_time import get_prev_cycle
 from dashboard.helpers import STABLE_CONSUMPTION, NOT_REPORTING, NO, YES
 from dashboard.models import FacilityCycleRecord, FacilityConsumptionRecord
 
@@ -20,7 +20,7 @@ class StableConsumption(CycleFormulationCheck):
     test = STABLE_CONSUMPTION
 
     def run(self, cycle):
-        next_cycle = get_next_cycle(cycle)
+        prev_cycle = get_prev_cycle(cycle)
         formulations = [
             {"name": "TDF/3TC/EFV (Adult)", CONSUMPTION_QUERY: "Efavirenz (TDF/3TC/EFV)", THRESHOLD: 20},
             {"name": "ABC/3TC (Paed)", CONSUMPTION_QUERY: "Lamivudine (ABC/3TC) 60mg/30mg [Pack 60]", THRESHOLD: 10},
@@ -35,8 +35,8 @@ class StableConsumption(CycleFormulationCheck):
             total_count = qs.count()
             for record in qs:
                 try:
-                    current_cycle_qs = FacilityConsumptionRecord.objects.annotate(consumption=Sum(F(ART_CONSUMPTION) + F(PMTCT_CONSUMPTION))).filter(facility_cycle=record, formulation__icontains=formulation[CONSUMPTION_QUERY], consumption__gte=threshold)
-                    next_cycle_qs = FacilityConsumptionRecord.objects.annotate(consumption=Sum(F(ART_CONSUMPTION) + F(PMTCT_CONSUMPTION))).filter(facility_cycle__facility=record.facility, facility_cycle__cycle=next_cycle, formulation__icontains=formulation[CONSUMPTION_QUERY], consumption__gte=threshold)
+                    next_cycle_qs = FacilityConsumptionRecord.objects.annotate(consumption=Sum(F(ART_CONSUMPTION) + F(PMTCT_CONSUMPTION))).filter(facility_cycle=record, formulation__icontains=formulation[CONSUMPTION_QUERY], consumption__gte=threshold)
+                    current_cycle_qs = FacilityConsumptionRecord.objects.annotate(consumption=Sum(F(ART_CONSUMPTION) + F(PMTCT_CONSUMPTION))).filter(facility_cycle__facility=record.facility, facility_cycle__cycle=prev_cycle, formulation__icontains=formulation[CONSUMPTION_QUERY], consumption__gte=threshold)
                     number_of_consumption_records = current_cycle_qs.count()
                     number_of_consumption_records_next_cycle = next_cycle_qs.count()
                     next_cycle_consumption = next_cycle_qs.aggregate(sum=Sum(F(ART_CONSUMPTION) + F(PMTCT_CONSUMPTION))).get(SUM, 0)

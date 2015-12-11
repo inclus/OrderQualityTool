@@ -1,6 +1,6 @@
 from django.test import TestCase
 
-from dashboard.checks.different_orders_over_time import get_next_cycle, DifferentOrdersOverTime
+from dashboard.checks.different_orders_over_time import get_prev_cycle, DifferentOrdersOverTime
 from dashboard.helpers import DIFFERENT_ORDERS_OVER_TIME
 from dashboard.models import FacilityCycleRecord, FacilityConsumptionRecord, CycleFormulationTestScore
 from locations.models import Facility
@@ -10,7 +10,7 @@ class DifferentOrdersOverTimeTestCase(TestCase):
     def test_gen_next_cycle(self):
         values = [('Jan - Feb 2013', 'Mar - Apr 2013'), ('Nov - Dec 2013', 'Jan - Feb 2014'), ('Mar - Apr 2014', 'May - Jun 2014')]
         for v in values:
-            self.assertEqual(get_next_cycle(v[0]), v[1])
+            self.assertEqual(get_prev_cycle(v[1]), v[0])
 
     def test_check(self):
         names = ["FA1", "FA2", "FA3"]
@@ -45,8 +45,8 @@ class DifferentOrdersOverTimeTestCase(TestCase):
                 record, _ = FacilityCycleRecord.objects.get_or_create(cycle=cycle, facility=facility, reporting_status=True)
             i += 1
 
-        DifferentOrdersOverTime().run(cycles[0])
-        score = CycleFormulationTestScore.objects.filter(test=DIFFERENT_ORDERS_OVER_TIME, cycle=cycles[0])[0]
+        DifferentOrdersOverTime().run(cycles[1])
+        score = CycleFormulationTestScore.objects.filter(test=DIFFERENT_ORDERS_OVER_TIME, cycle=cycles[1])[0]
         self.assertEquals(score.yes, 60.0)
         self.assertEquals(score.no, 0.0)
         self.assertEquals(score.not_reporting, 40.0)
