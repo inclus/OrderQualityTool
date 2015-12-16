@@ -45,6 +45,10 @@ angular.module('services').service('ReportService', ['$http',
             return $http.get('/api/filters/').then(handleResponse);
         };
 
+        var getRankingsAccess = function() {
+            return $http.get('/api/rankingsAccess/').then(handleResponse);
+        };
+
         return {
             "getCycles": getCycles,
             "getMetrics": getMetrics,
@@ -53,6 +57,7 @@ angular.module('services').service('ReportService', ['$http',
             "getDataForTest": getDataForTest,
             "getScores": getScores,
             "getFilters": getFilters,
+            "getRankingsAccess": getRankingsAccess,
         };
     }
 ])

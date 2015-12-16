@@ -7,13 +7,21 @@ from django.db.models import CharField
 from dashboard.helpers import NOT_REPORTING, YES, NO
 from locations.models import Facility
 
+MOH_CENTRAL = "MOH CENTRAL"
+
+IIP = "IP"
+
+DISTRICT = "District"
+
+WAREHOUSE = "Warehouse"
+
 logger = logging.getLogger(__name__)
 CONSUMPTION = "CONSUMPTION"
 LOCATION = "Facility Index"
 
 
 class DashboardUser(AbstractEmailUser):
-    access_level = CharField(choices=(("Warehouse", "Warehouse"), ("District", "District"), ("IP", "IP"), ("MOH CENTRAL", "MOH CENTRAL")), max_length=50)
+    access_level = CharField(choices=((WAREHOUSE, WAREHOUSE), (DISTRICT, DISTRICT), (IIP, IIP), (MOH_CENTRAL, MOH_CENTRAL)), max_length=50)
 
     def get_full_name(self):
         return self.email

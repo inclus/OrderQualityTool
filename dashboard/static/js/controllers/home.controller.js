@@ -3,12 +3,11 @@ angular.module('dashboard').controller('HomeController', ['$scope', 'ReportServi
         $scope.displayCycle = function(cycle) {
             return "CYCLE " + cycle.number + " '" + cycle.year;
         };
-        $scope.bestPerforming = 'District';
+
         $scope.selectBest = function(name) {
             $scope.bestPerforming = name;
         };
 
-        $scope.worstPerforming = 'District';
         $scope.selectWorst = function(name) {
             $scope.worstPerforming = name;
         };
@@ -99,6 +98,16 @@ angular.module('dashboard').controller('HomeController', ['$scope', 'ReportServi
             $scope.webRate = data.webBased;
             $scope.reportingRate = data.reporting;
             $scope.adherenceRate = data.adherence;
+        });
+        ReportService.getRankingsAccess().then(function(data) {
+            console.log(data);
+            $scope.rankingLevels = data.values;
+            $scope.bestPerforming = $scope.rankingLevels[0];
+            $scope.worstPerforming = $scope.rankingLevels[0];
+
+
+
+
         });
     }
 ])

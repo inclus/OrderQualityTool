@@ -63,10 +63,9 @@
                 <div class="dropdown ranking-dropdown">
                     <a class="dropdown-toggle " data-toggle="dropdown"> {{worstPerforming}} <b class="caret"></b></a>
                     <ul class="dropdown-menu">
-                        <li><a ng-click="selectWorst('District')">Districts</a></li>
-                        <li><a ng-click="selectWorst('Warehouse')">Warehouses</a></li>
-                        <li><a ng-click="selectWorst('IP')">IP</a></li>
-                        <li><a ng-click="selectWorst('Facility')">Facility</a></li>
+
+                        <li ng-repeat="level in rankingLevels"><a ng-click="selectWorst(level)">{{level}}</a></li>
+                      
                     </ul>
                 </div>
 
@@ -93,10 +92,7 @@
                 <div class="dropdown ranking-dropdown">
                     <a class="dropdown-toggle " data-toggle="dropdown"> {{bestPerforming}} <b class="caret"></b></a>
                     <ul class="dropdown-menu">
-                        <li><a ng-click="selectBest('District')">Districts</a></li>
-                        <li><a ng-click="selectBest('Warehouse')">Warehouses</a></li>
-                        <li><a ng-click="selectBest('IP')">IP</a></li>
-                        <li><a ng-click="selectBest('Facility')">Facility</a></li>
+                         <li ng-repeat="level in rankingLevels"><a ng-click="selectBest(level)">{{level}}</a></li>
                     </ul>
                    
                 </div>  

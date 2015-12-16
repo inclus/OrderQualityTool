@@ -31,4 +31,5 @@ urlpatterns = [
     url(r'^api/regimens', views.RegimensListView.as_view(), name='regimens'),
     url(r'^api/scores', views.FacilityTestCycleScoresListView.as_view(), name='scores'),
     url(r'^api/filters', views.FilterValuesView.as_view(), name='filters'),
+    url(r'^api/rankingsAccess', views.RankingsAccessView.as_view(), name='rankings-access'),
 ]

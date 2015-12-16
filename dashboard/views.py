@@ -18,7 +18,7 @@ from rest_framework.views import APIView
 
 from dashboard.forms import FileUploadForm
 from dashboard.helpers import generate_cycles, ORDER_FORM_FREE_OF_GAPS, ORDER_FORM_FREE_OF_NEGATIVE_NUMBERS, DIFFERENT_ORDERS_OVER_TIME, to_date, CLOSING_BALANCE_MATCHES_OPENING_BALANCE, CONSUMPTION_AND_PATIENTS, STABLE_CONSUMPTION, WAREHOUSE_FULFILMENT, STABLE_PATIENT_VOLUMES, GUIDELINE_ADHERENCE, NNRTI_CURRENT_ADULTS, NNRTI_CURRENT_PAED, NNRTI_NEW_ADULTS, NNRTI_NEW_PAED, YES
-from dashboard.models import FacilityCycleRecord, FacilityConsumptionRecord, CycleTestScore, CycleFormulationTestScore, FacilityCycleRecordScore
+from dashboard.models import FacilityCycleRecord, FacilityConsumptionRecord, CycleTestScore, CycleFormulationTestScore, FacilityCycleRecordScore, WAREHOUSE, DISTRICT
 from dashboard.serializers import FacilityCycleRecordSerializer
 from dashboard.tasks import import_general_report
 from locations.models import Facility, District, IP, WareHouse
@@ -321,3 +321,15 @@ class FacilityTestCycleScoresListView(ListAPIView):
     serializer_class = FacilityCycleRecordSerializer
     filter_backends = (filters.DjangoFilterBackend,)
     filter_fields = ('cycle', 'facility__district', 'facility__ip', 'facility__warehouse')
+
+
+class RankingsAccessView(LoginRequiredMixin, APIView):
+    def get(self, request):
+        levels = ['District', 'Warehouse', 'IP', 'Facility']
+        if request.user.access_level == "IP":
+            levels = ['District', 'Warehouse', 'Facility']
+        if request.user.access_level == WAREHOUSE:
+            levels = ['District', 'IP', 'Facility']
+        if request.user.access_level == DISTRICT:
+            levels = ['District', 'Warehouse']
+        return Response({"values": levels})
