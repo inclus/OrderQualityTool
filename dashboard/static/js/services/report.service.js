@@ -1,4 +1,4 @@
-angular.module('dashboard').service('ReportService', ['$http',
+angular.module('services').service('ReportService', ['$http',
     function($http) {
         var handleResponse = function(response) {
             return response.data;
@@ -35,12 +35,24 @@ angular.module('dashboard').service('ReportService', ['$http',
             }).then(handleResponse);
         };
 
+        var getScores = function(params) {
+            return $http.get('/api/scores/', {
+                params: params
+            }).then(handleResponse);
+        };
+
+        var getFilters = function(test) {
+            return $http.get('/api/filters/').then(handleResponse);
+        };
+
         return {
             "getCycles": getCycles,
             "getMetrics": getMetrics,
             "getBestRankings": getBestRankings,
             "getWorstRankings": getWorstRankings,
-            "getDataForTest": getDataForTest
+            "getDataForTest": getDataForTest,
+            "getScores": getScores,
+            "getFilters": getFilters,
         };
     }
 ])

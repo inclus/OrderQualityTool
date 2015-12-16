@@ -14,12 +14,12 @@ from django.views.generic import TemplateView, FormView
 from rest_framework import filters
 from rest_framework.generics import ListAPIView
 from rest_framework.response import Response
-from rest_framework.serializers import ModelSerializer
 from rest_framework.views import APIView
 
 from dashboard.forms import FileUploadForm
 from dashboard.helpers import generate_cycles, ORDER_FORM_FREE_OF_GAPS, ORDER_FORM_FREE_OF_NEGATIVE_NUMBERS, DIFFERENT_ORDERS_OVER_TIME, to_date, CLOSING_BALANCE_MATCHES_OPENING_BALANCE, CONSUMPTION_AND_PATIENTS, STABLE_CONSUMPTION, WAREHOUSE_FULFILMENT, STABLE_PATIENT_VOLUMES, GUIDELINE_ADHERENCE, NNRTI_CURRENT_ADULTS, NNRTI_CURRENT_PAED, NNRTI_NEW_ADULTS, NNRTI_NEW_PAED, YES
-from dashboard.models import FacilityCycleRecord, FacilityConsumptionRecord, CycleTestScore, CycleFormulationTestScore
+from dashboard.models import FacilityCycleRecord, FacilityConsumptionRecord, CycleTestScore, CycleFormulationTestScore, FacilityCycleRecordScore
+from dashboard.serializers import FacilityCycleRecordSerializer
 from dashboard.tasks import import_general_report
 from locations.models import Facility, District, IP, WareHouse
 
@@ -47,41 +47,14 @@ class DataImportView(LoginRequiredMixin, StaffuserRequiredMixin, FormView):
         return super(DataImportView, self).form_valid(form)
 
 
+class ReportsView(LoginRequiredMixin, TemplateView):
+    template_name = "reports.html"
+
+
 class FacilityConsumptionRecordFilter(django_filters.FilterSet):
     class Meta:
         model = FacilityConsumptionRecord
         fields = ['facility_cycle__facility']
-
-
-class FacilitySerializer(ModelSerializer):
-    class Meta:
-        model = Facility
-
-
-class FacilityCycleRecordSerializer(ModelSerializer):
-    facility = FacilitySerializer()
-
-    class Meta:
-        model = FacilityCycleRecord
-
-
-class FacilityConsumptionRecordSerializer(ModelSerializer):
-    facility_cycle = FacilityCycleRecordSerializer()
-
-    class Meta:
-        model = FacilityConsumptionRecord
-
-
-class CycleRecordsListView(ListAPIView):
-    queryset = FacilityCycleRecord.objects.all()
-    serializer_class = FacilityCycleRecordSerializer
-
-
-class ConsumptionRecordListView(ListAPIView):
-    queryset = FacilityConsumptionRecord.objects.all()
-    serializer_class = FacilityConsumptionRecordSerializer
-    filter_backends = (filters.DjangoFilterBackend,)
-    filter_class = FacilityConsumptionRecordFilter
 
 
 class FacilitiesReportingView(APIView):
@@ -164,7 +137,6 @@ class BestPerformingDistrictsView(APIView):
             data = current_model.objects.filter(**filters).values('name', 'records__cycle').annotate(count=Count('records__scores__pk'), yes=Count(Case(When(records__scores__score=YES, then=1))))
         else:
             data = current_model.objects.filter(**filters).values('name', 'facilities__records__cycle').annotate(count=Count('facilities__records__scores__pk'), yes=Count(Case(When(facilities__records__scores__score=YES, then=1))))
-        print "the ----------------", data
         for item in data:
             if item['yes'] == 0:
                 item['rate'] = 0
@@ -332,3 +304,20 @@ class NNRTINewAdultsView(OrderFormFreeOfGapsView):
 
 class NNRTINewPaedView(OrderFormFreeOfGapsView):
     test = NNRTI_NEW_PAED
+
+
+class FilterValuesView(APIView):
+    def get(self, request):
+        ips = IP.objects.values('pk', 'name').order_by('name').distinct()
+        warehouses = WareHouse.objects.values('pk', 'name').order_by('name').distinct()
+        districts = District.objects.values('pk', 'name').order_by('name').distinct()
+        cycles = FacilityCycleRecord.objects.values('cycle').distinct()
+        formulations = FacilityCycleRecordScore.objects.values('formulation').distinct()
+        return Response({"ips": ips, "warehouses": warehouses, "districts": districts, "cycles": cycles, "formulations": formulations})
+
+
+class FacilityTestCycleScoresListView(ListAPIView):
+    queryset = FacilityCycleRecord.objects.select_related('facility').all()
+    serializer_class = FacilityCycleRecordSerializer
+    filter_backends = (filters.DjangoFilterBackend,)
+    filter_fields = ('cycle', 'facility__district', 'facility__ip', 'facility__warehouse')

@@ -1,4 +1,4 @@
-var dashboard = angular.module('dashboard', ['ui.router', 'chart.js', 'ui.bootstrap', 'checklist-model', 'angularChart', 'ngTable']);
+var dashboard = angular.module('dashboard', ['ui.router', 'chart.js', 'ui.bootstrap', 'checklist-model', 'angularChart', 'ngTable', 'services']);
 dashboard.config(['$stateProvider', '$urlRouterProvider',
     function($stateProvider, $urlRouterProvider) {
         $urlRouterProvider.otherwise('/reportingRate');
@@ -20,6 +20,21 @@ dashboard.config(['$stateProvider', '$urlRouterProvider',
             }).state('home.addTests', {
                 url: '/addTests',
                 templateUrl: '/static/views/addTests.html'
+            });
+    }
+]);
+
+var services = angular.module('services', []);
+
+var reports = angular.module('reports', ['ui.router', 'services', 'datatables', 'datatables.fixedcolumns', 'ui.select', 'ngSanitize']);
+reports.config(['$stateProvider', '$urlRouterProvider',
+    function($stateProvider, $urlRouterProvider) {
+        $urlRouterProvider.otherwise('');
+        $stateProvider
+            .state('reports', {
+                url: '',
+                templateUrl: '/static/views/reports.html',
+                controller: 'ReportsController'
             });
     }
 ]);

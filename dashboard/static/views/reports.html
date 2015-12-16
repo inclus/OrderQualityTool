@@ -1,0 +1,95 @@
+<div class="container">
+    <div class="row">
+        <div class="col-md-2">
+            <h3>FILTERS</h3>
+        </div>
+        <div class="col-md-2">
+            <h3>
+                <span class="label label-success">{{selectedFilter.ip.name}}</span>
+            </h3>
+        </div>
+        <div class="col-md-2">
+            <h3>
+                <span class="label label-success">{{selectedFilter.district.name}}</span>
+            </h3>
+        </div>
+        <div class="col-md-2">
+            <h3>
+                <span class="label label-success">{{selectedFilter.warehouse.name}}</span>
+            </h3>
+        </div>
+        <div class="col-md-2">
+            <h3>
+                <span class="label label-success">{{selectedFilter.cycle.cycle}}</span>
+            </h3>
+        </div>
+        <div class="col-md-2">
+            <h3>
+                <span class="label label-success">{{selectedFilter.formulation.formulation}}</span>
+            </h3>
+        </div>
+    </div>
+    <div class="row">
+        {{ip}}
+        <ui-select ng-model="selectedFilter.ip" theme="selectize" class="filter" on-select="updateTable()">
+            <ui-select-match placeholder="IP">{{$select.selected.name}}</ui-select-match>
+            <ui-select-choices repeat="ip in filters.ips">
+                <span ng-bind-html="ip.name"></span>
+            </ui-select-choices>
+        </ui-select>
+        <ui-select ng-model="selectedFilter.district" theme="selectize" class="filter" on-select="updateTable()">
+            <ui-select-match placeholder="DISTRICT">{{$select.selected.name}}</ui-select-match>
+            <ui-select-choices repeat="district in filters.districts">
+                <span ng-bind-html="district.name"></span>
+            </ui-select-choices>
+        </ui-select>
+        <ui-select ng-model="selectedFilter.warehouse" theme="selectize" class="filter" on-select="updateTable()">
+            <ui-select-match placeholder="WAREHOUSE">{{$select.selected.name}}</ui-select-match>
+            <ui-select-choices repeat="warehouse in filters.warehouses">
+                <span ng-bind-html="warehouse.name"></span>
+            </ui-select-choices>
+        </ui-select>
+        <ui-select ng-model="selectedFilter.cycle" theme="selectize" class="filter" on-select="updateTable()">
+            <ui-select-match placeholder="CYCLE">{{$select.selected.cycle}}</ui-select-match>
+            <ui-select-choices repeat="cycle in filters.cycles">
+                <span ng-bind-html="cycle.cycle"></span>
+            </ui-select-choices>
+        </ui-select>
+        <ui-select ng-model="selectedFilter.formulation" theme="selectize" class="filter" on-select="updateTable()">
+            <ui-select-match placeholder="FORMULATIONS">{{$select.selected.formulation}}</ui-select-match>
+            <ui-select-choices repeat="formulation in formulations">
+                <span ng-bind-html="cleanFormulation(formulation.name)"></span>
+            </ui-select-choices>
+        </ui-select>
+    </div>
+    <div class="row">
+        <table class="table table-striped table-bordered" cellspacing="0" width="100%" id="main-report" datatable="ng" dt-options="dtOptions">
+            <thead>
+                <tr class="hide-border">
+                    <td colspan="4" class="column-search">
+                        <label>
+                            <input type="search" class="form-control input-md" placeholder="Search" aria-controls="main-report">
+                        </label>
+                    </td>
+                    <td class="column-sum" ng-repeat="test in tests">{{totals[test.test] | number: 1}} % </td>
+                </tr>
+                <tr>
+                    <th>FACILITY</th>
+                    <th>DISTRICT</th>
+                    <th>WAREHOUSE</th>
+                    <th>IP</th>
+                    <th ng-repeat="test in tests">{{test.display | uppercase}}</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="score in scores">
+                    <td>{{score.name}}</td>
+                    <td>{{score.district}}</td>
+                    <td>{{score.warehouse}}</td>
+                    <td>{{score.ip}}</td>
+                    <td ng-repeat="test in tests">{{score[test.test]}}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

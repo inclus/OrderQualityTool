@@ -5,8 +5,7 @@ from dashboard import views
 urlpatterns = [
     url(r'^$', views.HomeView.as_view(), name='home'),
     url(r'^import/$', views.DataImportView.as_view(), name='import'),
-    url(r'^api/cycleRecords$', views.CycleRecordsListView.as_view(), name='list_cycle_records'),
-    url(r'^api/consumptionRecords$', views.ConsumptionRecordListView.as_view(), name='list_consumption_record'),
+    url(r'^reports/$', views.ReportsView.as_view(), name='reports'),
     url(r'^api/test/submittedOrder', views.FacilitiesReportingView.as_view(), name='submiited_order'),
     url(r'^api/test/orderType', views.WebBasedReportingView.as_view(), name='order_type'),
     url(r'^api/test/facilitiesMultiple', views.FacilitiesMultipleReportingView.as_view(), name='facilities_multiple'),
@@ -29,5 +28,7 @@ urlpatterns = [
     url(r'^api/test/ranking/worst/csv$', views.WorstPerformingDistrictsCSVView.as_view(), name='ranking_worst_csv'),
     url(r'^api/cycles$', views.CyclesView.as_view(), name='cycles'),
     url(r'^api/test/metrics', views.ReportMetrics.as_view(), name='metrics'),
-    url(r'^api/regimens', views.RegimensListView.as_view(), name='regimens')
+    url(r'^api/regimens', views.RegimensListView.as_view(), name='regimens'),
+    url(r'^api/scores', views.FacilityTestCycleScoresListView.as_view(), name='scores'),
+    url(r'^api/filters', views.FilterValuesView.as_view(), name='filters'),
 ]

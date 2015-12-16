@@ -56,6 +56,7 @@ class UserAddViewTestCase(WebTest, SuperUserAuthMixin):
         form['email'] = "theuser@mail.com"
         form['password1'] = "secret"
         form['password2'] = "secret"
+        form['access_level'] = "IP"
         response = form.submit()
         print  response
         self.assertEquals(response.status_code, 302)

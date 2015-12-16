@@ -14,6 +14,10 @@ Menu.add_item("main", MenuItem("DASHBOARD",
                                reverse("home"),
                                weight=10))
 
+Menu.add_item("main", MenuItem("FACILITY REPORT",
+                               reverse("reports"),
+                               weight=10))
+
 Menu.add_item("main", MenuItem("IMPORT FILES",
                                reverse("import"),
                                check=user_is_admin,

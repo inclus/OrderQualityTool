@@ -71,5 +71,6 @@ class GuideLineAdherence(CycleFormulationCheck):
                     no += 1
                     result = NO
                 finally:
-                    self.record_result_for_facility(record, result, name)
+                    test_name = "%s%s" % (GUIDELINE_ADHERENCE, name)
+                    self.record_result_for_facility(record, result, test=test_name)
             self.build_cycle_formulation_score(cycle, name, yes, no, not_reporting, total_count)

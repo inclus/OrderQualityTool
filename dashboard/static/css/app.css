@@ -6767,6 +6767,14 @@ button.close {
 body {
   padding-top: 70px;
   padding-bottom: 30px;
+  letter-spacing: 1.5px;
+}
+body input,
+body textarea,
+body keygen,
+body select,
+body button {
+  letter-spacing: 1.5px;
 }
 h1,
 h2,
@@ -6946,6 +6954,24 @@ a.label-qdb:hover {
     width: 25%;
   }
 }
+.filter {
+  position: relative;
+  min-height: 1px;
+  padding-left: 15px;
+  padding-right: 15px;
+}
+@media (min-width: 768px) {
+  .filter {
+    float: left;
+    width: 20%;
+  }
+}
+@media (min-width: 992px) {
+  .filter {
+    float: left;
+    width: 20%;
+  }
+}
 .spacer {
   position: relative;
   min-height: 1px;
@@ -6966,5 +6992,23 @@ a.label-qdb:hover {
 [ng\:cloak],
 [ng-cloak],
 .ng-cloak {
+  display: none;
+}
+.table-bordered td,
+.table-bordered th {
+  text-align: center;
+  min-width: 110px;
+}
+.table-bordered .column-sum {
+  border: none;
+  background-color: #27ae60;
+  color: white;
+  min-width: 100px;
+}
+.table-bordered .column-search {
+  border: none;
+  text-align: left;
+}
+#main-report_filter {
   display: none;
 }

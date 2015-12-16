@@ -96,6 +96,10 @@ BROKER_URL = 'redis://redis:6379/0'
 CELERY_RESULT_BACKEND = 'redis://redis:6379/0'
 
 AUTH_USER_MODEL = 'dashboard.DashboardUser'
+REST_FRAMEWORK = {
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 100
+}
 SITE_ID = 1
 try:
     from local_settings import *
