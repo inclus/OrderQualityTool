@@ -3,7 +3,7 @@ import os
 
 import django_filters
 from arrow import now
-from braces.views import LoginRequiredMixin
+from braces.views import LoginRequiredMixin, StaffuserRequiredMixin
 from django.conf import settings
 from django.contrib import messages
 from django.core.files.base import ContentFile
@@ -32,7 +32,7 @@ class HomeView(LoginRequiredMixin, TemplateView):
         return context
 
 
-class DataImportView(LoginRequiredMixin, FormView):
+class DataImportView(LoginRequiredMixin, StaffuserRequiredMixin, FormView):
     template_name = "import.html"
     form_class = FileUploadForm
     success_url = '/'

@@ -13,7 +13,7 @@ from locations.models import Facility, WareHouse, IP, District
 
 class EmailUserAdmin(UserAdmin):
     fieldsets = (
-        (None, {'fields': ('email', 'password', 'location')}),
+        (None, {'fields': ('email', 'password')}),
         (_('Permissions'), {'fields': ('is_active', 'is_staff', 'is_superuser',
                                        'groups', 'user_permissions')}),
         (_('Important dates'), {'fields': ('last_login', 'date_joined')}),
@@ -21,7 +21,7 @@ class EmailUserAdmin(UserAdmin):
     add_fieldsets = ((
                          None, {
                              'classes': ('wide',),
-                             'fields': ('email', 'password1', 'password2', 'location')
+                             'fields': ('email', 'password1', 'password2')
                          }
                      ),
     )

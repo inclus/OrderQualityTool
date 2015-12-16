@@ -9,7 +9,7 @@ from mock import patch, ANY
 from webtest import Upload
 
 from dashboard.checks.web_based_reporting import ReportingCheck, WebBasedReportingCheck, MultipleOrdersCheck
-from dashboard.models import FacilityCycleRecord, FacilityCycleRecordScore
+from dashboard.models import FacilityCycleRecord, FacilityCycleRecordScore, DashboardUser
 from locations.models import Facility, District
 
 
@@ -30,9 +30,10 @@ class DataImportViewTestCase(WebTest):
 
     @patch('dashboard.views.import_general_report.delay')
     def test_valid_form_starts_import_process(self, mock_method):
+        user = DashboardUser.objects.create_superuser("a@a.com", "secret")
         cycle = 'Jan - Feb %s' % now().format("YYYY")
         url = '/import/'
-        import_page = self.app.get(url, user="testuser")
+        import_page = self.app.get(url, user=user)
         form = import_page.form
         form['cycle'] = cycle
         form['import_file'] = Upload(self.get_fixture_path("c.xlsx"))
