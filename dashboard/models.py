@@ -2,6 +2,7 @@ import logging
 
 from custom_user.models import AbstractEmailUser
 from django.db import models
+from django.db.models import CharField
 
 from dashboard.helpers import NOT_REPORTING, YES, NO
 from locations.models import Facility
@@ -12,6 +13,8 @@ LOCATION = "Facility Index"
 
 
 class DashboardUser(AbstractEmailUser):
+    access_level = CharField(choices=(("Warehouse", "Warehouse"), ("District", "District"), ("IP", "IP")), max_length=50)
+
     def get_full_name(self):
         return self.email
 

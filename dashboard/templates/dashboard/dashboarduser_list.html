@@ -9,6 +9,7 @@
                 <tr>
                     <th>Id</th>
                     <th>Email Address</th>
+                    <th>Access Level</th>
                     <th>Is Admin</th>
                 </tr>
                 </thead>
@@ -22,12 +23,19 @@
                         {{user.email}}
                     </td>
                     <td>
+                        {{user.access_level}}
+                    </td>
+                    <td>
                         {% if user.is_staff %}
                         <i class="fa fa-check"></i>
                         {% else %}
                         <i class="fa fa-times"></i>
                         {% endif %}
 
+                    </td>
+                    <td>
+                        <a href="{% url 'users-edit' user.id %}" class="btn btn-xs btn-primary">Edit</a>
+                        <a href="{% url 'users-password' user.id %}" class="btn btn-xs btn-primary">Change Password</a>
                     </td>
                 </tr>
                 {% empty %}
