@@ -88,7 +88,7 @@ def sort_cycle(item1, item2):
 class Pager(object):
     def __init__(self, data, page=1, page_count=20):
         self.data = data
-        if page and page > 0:
+        if page:
             self.page = int(page)
         else:
             self.page = 1
