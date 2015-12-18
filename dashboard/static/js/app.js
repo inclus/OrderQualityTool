@@ -26,7 +26,7 @@ dashboard.config(['$stateProvider', '$urlRouterProvider',
 
 var services = angular.module('services', []);
 
-var reports = angular.module('reports', ['ui.router', 'services', 'datatables', 'datatables.fixedcolumns', 'ui.select', 'ngSanitize']);
+var reports = angular.module('reports', ['ui.router', 'services', 'datatables', 'datatables.fixedcolumns', 'ui.select', 'ngSanitize', 'bw.paging']);
 reports.config(['$stateProvider', '$urlRouterProvider',
     function($stateProvider, $urlRouterProvider) {
         $urlRouterProvider.otherwise('');

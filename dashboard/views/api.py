@@ -1,60 +1,19 @@
 import csv
-import os
+import functools
+import operator
 
-import django_filters
 from arrow import now
-from braces.views import LoginRequiredMixin, StaffuserRequiredMixin
-from django.conf import settings
-from django.contrib import messages
-from django.core.files.base import ContentFile
-from django.core.files.storage import default_storage
-from django.db.models import Count, Case, When, Avg
+from braces.views import LoginRequiredMixin
+from django.db.models import Count, Case, When, Avg, Q
 from django.http import HttpResponse
-from django.views.generic import TemplateView, FormView
 from rest_framework import filters
-from rest_framework.generics import ListAPIView
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from dashboard.forms import FileUploadForm
-from dashboard.helpers import generate_cycles, ORDER_FORM_FREE_OF_GAPS, ORDER_FORM_FREE_OF_NEGATIVE_NUMBERS, DIFFERENT_ORDERS_OVER_TIME, to_date, CLOSING_BALANCE_MATCHES_OPENING_BALANCE, CONSUMPTION_AND_PATIENTS, STABLE_CONSUMPTION, WAREHOUSE_FULFILMENT, STABLE_PATIENT_VOLUMES, GUIDELINE_ADHERENCE, NNRTI_CURRENT_ADULTS, NNRTI_CURRENT_PAED, NNRTI_NEW_ADULTS, NNRTI_NEW_PAED, YES
-from dashboard.models import FacilityCycleRecord, FacilityConsumptionRecord, CycleTestScore, CycleFormulationTestScore, FacilityCycleRecordScore, WAREHOUSE, DISTRICT
-from dashboard.serializers import FacilityCycleRecordSerializer
-from dashboard.tasks import import_general_report
-from locations.models import Facility, District, IP, WareHouse
-
-
-class HomeView(LoginRequiredMixin, TemplateView):
-    template_name = "home.html"
-
-    def get_context_data(self, **kwargs):
-        context = super(HomeView, self).get_context_data(**kwargs)
-        return context
-
-
-class DataImportView(LoginRequiredMixin, StaffuserRequiredMixin, FormView):
-    template_name = "import.html"
-    form_class = FileUploadForm
-    success_url = '/'
-
-    def form_valid(self, form):
-        import_file = form.cleaned_data['import_file']
-        cycle = form.cleaned_data['cycle']
-        path = default_storage.save('tmp/workspace.xlsx', ContentFile(import_file.read()))
-        tmp_file = os.path.join(settings.MEDIA_ROOT, path)
-        import_general_report.delay(tmp_file, cycle)
-        messages.add_message(self.request, messages.INFO, 'Successfully started import for cycle %s' % (cycle))
-        return super(DataImportView, self).form_valid(form)
-
-
-class ReportsView(LoginRequiredMixin, TemplateView):
-    template_name = "reports.html"
-
-
-class FacilityConsumptionRecordFilter(django_filters.FilterSet):
-    class Meta:
-        model = FacilityConsumptionRecord
-        fields = ['facility_cycle__facility']
+from dashboard.helpers import generate_cycles, YES, to_date, GUIDELINE_ADHERENCE, ORDER_FORM_FREE_OF_GAPS, ORDER_FORM_FREE_OF_NEGATIVE_NUMBERS, DIFFERENT_ORDERS_OVER_TIME, CLOSING_BALANCE_MATCHES_OPENING_BALANCE, CONSUMPTION_AND_PATIENTS, STABLE_CONSUMPTION, WAREHOUSE_FULFILMENT, STABLE_PATIENT_VOLUMES, NNRTI_CURRENT_ADULTS, NNRTI_CURRENT_PAED, NNRTI_NEW_ADULTS, NNRTI_NEW_PAED, sort_cycle
+from dashboard.models import Cycle, CycleFormulationScore, CycleScore, Consumption, Score, WAREHOUSE, DISTRICT
+from dashboard.serializers import ScoreSerializer
+from locations.models import District, IP, WareHouse
 
 
 class FacilitiesReportingView(APIView):
@@ -69,7 +28,7 @@ class FacilitiesReportingView(APIView):
             cycles_included = cycles[start_index: end_index + 1]
             cycles = cycles_included
             filters['cycle__in'] = cycles_included
-        data = dict((record['cycle'], {'count': record['count'], 'reporting': record['reporting']}) for record in FacilityCycleRecord.objects.filter(**filters).values('cycle').annotate(count=Count('pk'), reporting=Count(Case(When(reporting_status=True, then=1)))))
+        data = dict((record['cycle'], {'count': record['count'], 'reporting': record['reporting']}) for record in Cycle.objects.filter(**filters).values('cycle').annotate(count=Count('pk'), reporting=Count(Case(When(reporting_status=True, then=1)))))
         results = []
         for cycle in cycles:
             if cycle in data:
@@ -93,7 +52,7 @@ class WebBasedReportingView(APIView):
             cycles_included = cycles[start_index: end_index + 1]
             cycles = cycles_included
             filters['cycle__in'] = cycles_included
-        data = dict((record['cycle'], {'count': record['count'], 'reporting': record['reporting']}) for record in FacilityCycleRecord.objects.values('cycle').annotate(count=Count('pk'), reporting=Count(Case(When(web_based=True, then=1)))))
+        data = dict((record['cycle'], {'count': record['count'], 'reporting': record['reporting']}) for record in Cycle.objects.values('cycle').annotate(count=Count('pk'), reporting=Count(Case(When(web_based=True, then=1)))))
         results = []
         for cycle in cycles:
             if cycle in data:
@@ -107,10 +66,10 @@ class WebBasedReportingView(APIView):
 
 class FacilitiesMultipleReportingView(APIView):
     def get(self, request):
-        records = [cycle['cycle'] for cycle in FacilityCycleRecord.objects.values('cycle').distinct()]
+        records = [cycle['cycle'] for cycle in Cycle.objects.values('cycle').distinct()]
         most_recent_cycle, = sorted(records, sort_cycle, reverse=True)[:1]
         cycle = request.GET.get('cycle', most_recent_cycle)
-        records = FacilityCycleRecord.objects.filter(cycle=cycle, multiple=True).values('multiple', 'facility__name')
+        records = Cycle.objects.filter(cycle=cycle, multiple=True).values('multiple', 'facility__name')
         return Response({"values": records})
 
 
@@ -123,20 +82,33 @@ class BestPerformingDistrictsView(APIView):
 
     def get_data(self, request):
         filters = {}
-        levels = {'district': District, 'ip': IP, 'warehouse': WareHouse, 'facility': Facility}
+        levels = {'district': 'district', 'ip': '', 'warehouse': 'warehouse', 'facility': 'name'}
         cycle = request.GET.get('cycle', None)
         level = request.GET.get('level', 'district').lower()
-        current_model = levels.get(level, District)
+        name = levels.get(level, District)
         if cycle:
-            filters['facilities__records__cycle'] = cycle
-            if level == 'facility':
-                filters = {}
-                filters['records__cycle'] = cycle
-
-        if level == 'facility':
-            data = current_model.objects.filter(**filters).values('name', 'records__cycle').annotate(count=Count('records__scores__pk'), yes=Count(Case(When(records__scores__score=YES, then=1))))
-        else:
-            data = current_model.objects.filter(**filters).values('name', 'facilities__records__cycle').annotate(count=Count('facilities__records__scores__pk'), yes=Count(Case(When(facilities__records__scores__score=YES, then=1))))
+            filters['cycle'] = cycle
+        fields = [Q(nnrtiNewPaed=YES),
+                  Q(stablePatientVolumes=YES),
+                  Q(REPORTING=YES),
+                  Q(consumptionAndPatients=YES),
+                  Q(nnrtiCurrentPaed=YES),
+                  Q(warehouseFulfilment=YES),
+                  Q(differentOrdersOverTime=YES),
+                  Q(closingBalanceMatchesOpeningBalance=YES),
+                  Q(WEB_BASED=YES),
+                  Q(OrderFormFreeOfGaps=YES),
+                  Q(MULTIPLE_ORDERS=YES),
+                  Q(nnrtiNewAdults=YES),
+                  Q(orderFormFreeOfNegativeNumbers=YES),
+                  Q(nnrtiCurrentAdults=YES),
+                  Q(stableConsumption=YES),
+                  Q(guidelineAdherenceAdultlL=YES),
+                  Q(guidelineAdherenceAdult2L=YES),
+                  Q(guidelineAdherencePaed1L=YES)
+                  ]
+        count_filters = functools.reduce(operator.or_, fields)
+        data = Score.objects.filter(**filters).values(name, 'cycle').annotate(count=Count('pk'), yes=Count(Case(When(count_filters, then=1))))
         for item in data:
             if item['yes'] == 0:
                 item['rate'] = 0
@@ -170,18 +142,9 @@ class WorstPerformingDistrictsCSVView(BestPerformingDistrictsCSVView):
     reverse = False
 
 
-def sort_cycle(item1, item2):
-    if to_date(item1) < to_date(item2):
-        return -1
-    elif to_date(item1) > to_date(item2):
-        return 1
-    else:
-        return 0
-
-
 class CyclesView(APIView):
     def get(self, request):
-        records = [cycle['cycle'] for cycle in FacilityCycleRecord.objects.values('cycle').distinct()]
+        records = [cycle['cycle'] for cycle in Cycle.objects.values('cycle').distinct()]
         most_recent_cycle, = sorted(records, sort_cycle, reverse=True)[:1]
         month = to_date(most_recent_cycle)
         cycles = generate_cycles(now().replace(years=-2), month)
@@ -191,15 +154,15 @@ class CyclesView(APIView):
 
 class ReportMetrics(APIView):
     def get(self, request):
-        records = [cycle['cycle'] for cycle in FacilityCycleRecord.objects.values('cycle').distinct()]
+        records = [cycle['cycle'] for cycle in Cycle.objects.values('cycle').distinct()]
         most_recent_cycle, = sorted(records, sort_cycle, reverse=True)[:1]
-        web = dict((record['cycle'], {'count': record['count'], 'reporting': record['reporting']}) for record in FacilityCycleRecord.objects.filter(cycle=most_recent_cycle).values('cycle').annotate(count=Count('pk'), reporting=Count(Case(When(web_based=True, then=1)))))
-        data = dict((record['cycle'], {'count': record['count'], 'reporting': record['reporting']}) for record in FacilityCycleRecord.objects.filter(cycle=most_recent_cycle).values('cycle').annotate(count=Count('pk'), reporting=Count(Case(When(reporting_status=True, then=1)))))
+        web = dict((record['cycle'], {'count': record['count'], 'reporting': record['reporting']}) for record in Cycle.objects.filter(cycle=most_recent_cycle).values('cycle').annotate(count=Count('pk'), reporting=Count(Case(When(web_based=True, then=1)))))
+        data = dict((record['cycle'], {'count': record['count'], 'reporting': record['reporting']}) for record in Cycle.objects.filter(cycle=most_recent_cycle).values('cycle').annotate(count=Count('pk'), reporting=Count(Case(When(reporting_status=True, then=1)))))
         item = web.get(most_recent_cycle)
         report_item = data.get(most_recent_cycle)
         web_rate = "{0:.1f}".format((float(item['reporting']) / float(item['count'])) * 100)
         report_rate = "{0:.1f}".format((float(report_item['reporting']) / float(report_item['count'])) * 100)
-        adherence = "{0:.1f}".format(CycleFormulationTestScore.objects.filter(test=GUIDELINE_ADHERENCE, cycle=cycle['cycle']).aggregate(adherence=Avg('yes')).get("adherence", 0))
+        adherence = "{0:.1f}".format(CycleFormulationScore.objects.filter(test=GUIDELINE_ADHERENCE, cycle=cycle['cycle']).aggregate(adherence=Avg('yes')).get("adherence", 0))
         return Response({"webBased": web_rate, "reporting": report_rate, "adherence": adherence})
 
 
@@ -217,7 +180,7 @@ class OrderFormFreeOfGapsView(APIView):
             cycles_included = cycles[start_index: end_index + 1]
             cycles = cycles_included
             filters['cycle__in'] = cycles_included
-        scores = CycleTestScore.objects.filter(test=self.test, **filters)
+        scores = CycleScore.objects.filter(test=self.test, **filters)
         data = dict((k.cycle, k) for k in scores)
         results = []
         for cycle in cycles:
@@ -231,7 +194,7 @@ class OrderFormFreeOfGapsView(APIView):
 
 class RegimensListView(APIView):
     def get(self, request):
-        values = FacilityConsumptionRecord.objects.order_by().values('formulation').distinct()
+        values = Consumption.objects.order_by().values('formulation').distinct()
         return Response({'values': values})
 
 
@@ -250,7 +213,7 @@ class OrderFormFreeOfNegativeNumbersView(APIView):
             cycles_included = cycles[start_index: end_index + 1]
             cycles = cycles_included
             filters['cycle__in'] = cycles_included
-        scores = CycleFormulationTestScore.objects.filter(test=self.test, **filters)
+        scores = CycleFormulationScore.objects.filter(test=self.test, **filters)
         data = dict((k.cycle, k) for k in scores)
         results = []
         for cycle in cycles:
@@ -311,16 +274,16 @@ class FilterValuesView(APIView):
         ips = IP.objects.values('pk', 'name').order_by('name').distinct()
         warehouses = WareHouse.objects.values('pk', 'name').order_by('name').distinct()
         districts = District.objects.values('pk', 'name').order_by('name').distinct()
-        cycles = FacilityCycleRecord.objects.values('cycle').distinct()
-        formulations = FacilityCycleRecordScore.objects.values('formulation').distinct()
+        cycles = Cycle.objects.values('cycle').distinct()
+        formulations = Score.objects.values('formulation').distinct()
         return Response({"ips": ips, "warehouses": warehouses, "districts": districts, "cycles": cycles, "formulations": formulations})
 
 
-class FacilityTestCycleScoresListView(ListAPIView):
-    queryset = FacilityCycleRecord.objects.select_related('facility').all()
-    serializer_class = FacilityCycleRecordSerializer
+class FacilityTestCycleScoresListView(APIView):
+    queryset = Score.objects.all()
+    serializer_class = ScoreSerializer
     filter_backends = (filters.DjangoFilterBackend,)
-    filter_fields = ('cycle', 'facility__district', 'facility__ip', 'facility__warehouse')
+    filter_fields = ('cycle', 'name', 'ip', 'warehouse', 'district', 'formulation')
 
 
 class RankingsAccessView(LoginRequiredMixin, APIView):

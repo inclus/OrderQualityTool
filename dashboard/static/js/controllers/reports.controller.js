@@ -1,6 +1,6 @@
 angular.module('reports').controller('ReportsController', ['$scope', 'ReportService', 'DTOptionsBuilder',
     function($scope, ReportService, DTOptionsBuilder) {
-
+        $scope.page_count = 20;
         ReportService.getFilters().then(function(data) {
             $scope.filters = data;
         });
@@ -9,7 +9,8 @@ angular.module('reports').controller('ReportsController', ['$scope', 'ReportServ
             .withOption('scrollX', '100%')
             .withOption('scrollCollapse', true)
             .withOption('bLengthChange', false)
-            .withOption('paging', true)
+            .withOption('paging', false)
+            .withOption('info', false)
             .withFixedColumns({
                 leftColumns: 4,
                 rightColumns: 0
@@ -101,7 +102,7 @@ angular.module('reports').controller('ReportsController', ['$scope', 'ReportServ
         var calculateTotal = function(name) {
             var size = $scope.scores.length;
             var count = _.countBy($scope.scores, name);
-            var percentage = (count.Pass / size) * 100;
+            var percentage = (count.YES / size) * 100;
             if (isNaN(percentage)) {
                 return 0;
             } else {
@@ -136,38 +137,18 @@ angular.module('reports').controller('ReportsController', ['$scope', 'ReportServ
             return newScore;
         }
         var cleanupData = function(data) {
-            $scope.scores = _.map(data.results, function(item) {
-                var cleanedUpScore = {
-                    "name": item.facility.name,
-                    "warehouse": item.facility.warehouse,
-                    "ip": item.facility.ip,
-                    "district": item.facility.district
-                };
-                _.forEach(tests, function(test) {
-                    var items = _.filter(item.scores, function(score) {
-                        if ($scope.selectedFilter.formulation && test.formulation) {
-                            return score.test == test.test && $scope.selectedFilter.formulation.value === score.formulation;
-                        } else {
-                            return score.test == test.test;
-                        }
-
-                    });
-                    if (items && items.length > 0) {
-                        cleanedUpScore[test.test] = cleanScore(items[0].score);
-                    } else {
-                        cleanedUpScore[test.test] = "N/A";
-                    }
-                });
-                return cleanedUpScore;
-            });
-
+            $scope.scores = data.results;
+            $scope.scores_count = data.count;
             $scope.totals = {};
             _.forEach(tests, function(test) {
                 $scope.totals[test.test] = calculateTotal(test.test);
             })
         };
-        var updateTable = function() {
-            var params = {};
+        var updateTable = function(page) {
+            $scope.page_number = page;
+            var params = {
+                page: page
+            };
             if ($scope.selectedFilter.ip) {
                 params['facility__ip'] = $scope.selectedFilter.ip.pk;
             }
@@ -187,7 +168,7 @@ angular.module('reports').controller('ReportsController', ['$scope', 'ReportServ
         };
 
         $scope.updateTable = updateTable;
-        updateTable();
+        updateTable(1);
 
 
 

@@ -2,8 +2,10 @@ from django.db.models import Sum, F
 
 from dashboard.checks.common import CycleFormulationCheck
 from dashboard.checks.different_orders_over_time import get_prev_cycle
-from dashboard.helpers import STABLE_PATIENT_VOLUMES, NO, YES, NOT_REPORTING
-from dashboard.models import FacilityCycleRecord, AdultPatientsRecord, PAEDPatientsRecord
+from dashboard.helpers import STABLE_PATIENT_VOLUMES, NO, YES, NOT_REPORTING, F3, F2, F1
+from dashboard.models import Cycle, AdultPatientsRecord, PAEDPatientsRecord
+
+NAME = "name"
 
 NEW = "new"
 
@@ -30,9 +32,9 @@ class StablePatientVolumes(CycleFormulationCheck):
     def run(self, cycle):
         prev_cycle = get_prev_cycle(cycle)
         formulations = [
-            {PATIENT_QUERY: "TDF/3TC/EFV", CONSUMPTION_QUERY: "Efavirenz (TDF/3TC/EFV)", MODEL: AdultPatientsRecord, THRESHOLD: 10},
-            {PATIENT_QUERY: "ABC/3TC", CONSUMPTION_QUERY: "Lamivudine (ABC/3TC) 60mg/30mg [Pack 60]", MODEL: PAEDPatientsRecord, THRESHOLD: 5},
-            {PATIENT_QUERY: "EFV", CONSUMPTION_QUERY: "(EFV) 200mg [Pack 90]", MODEL: PAEDPatientsRecord, THRESHOLD: 5}
+            {PATIENT_QUERY: "TDF/3TC/EFV", NAME: F1, CONSUMPTION_QUERY: "Efavirenz (TDF/3TC/EFV)", MODEL: AdultPatientsRecord, THRESHOLD: 10},
+            {PATIENT_QUERY: "ABC/3TC", NAME: F2, CONSUMPTION_QUERY: "Lamivudine (ABC/3TC) 60mg/30mg [Pack 60]", MODEL: PAEDPatientsRecord, THRESHOLD: 5},
+            {PATIENT_QUERY: "EFV", NAME: F3, CONSUMPTION_QUERY: "(EFV) 200mg [Pack 90]", MODEL: PAEDPatientsRecord, THRESHOLD: 5}
         ]
         for formulation in formulations:
             yes = 0
@@ -40,7 +42,7 @@ class StablePatientVolumes(CycleFormulationCheck):
             not_reporting = 0
             threshold = formulation[THRESHOLD]
             model_class = formulation[MODEL]
-            qs = FacilityCycleRecord.objects.filter(cycle=cycle)
+            qs = Cycle.objects.filter(cycle=cycle)
             total_count = qs.count()
             for record in qs:
                 try:
@@ -63,6 +65,6 @@ class StablePatientVolumes(CycleFormulationCheck):
                     no += 1
                     result = NO
                 finally:
-                    self.record_result_for_facility(record, result)
+                    self.record_result_for_facility(record, result, formulation[NAME])
 
-            self.build_cycle_formulation_score(cycle, formulation[CONSUMPTION_QUERY], yes, no, not_reporting, total_count)
+            self.build_cycle_formulation_score(cycle, formulation[NAME], yes, no, not_reporting, total_count)

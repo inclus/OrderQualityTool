@@ -4,7 +4,7 @@ from django.db.models import Q, F, Sum
 
 from dashboard.checks.common import Check
 from dashboard.helpers import NNRTI_CURRENT_ADULTS, NNRTI_CURRENT_PAED, NNRTI_NEW_ADULTS, NNRTI_NEW_PAED, NOT_REPORTING, YES, NO
-from dashboard.models import FacilityCycleRecord, CycleTestScore, FacilityConsumptionRecord
+from dashboard.models import Cycle, CycleScore, Consumption
 
 TEST = "test"
 
@@ -77,7 +77,7 @@ class NNRTI(Check):
         ]
         for formulation in formulations:
             test = formulation[TEST]
-            qs = FacilityCycleRecord.objects.filter(cycle=cycle)
+            qs = Cycle.objects.filter(cycle=cycle)
             total_count = qs.count()
             not_reporting = 0
             yes = 0
@@ -88,8 +88,8 @@ class NNRTI(Check):
                     df1_filter = reduce(operator.or_, (Q(formulation__contains=item) for item in formulation[DF1]))
                     df1_sum_fields = reduce(operator.add, (F(item) for item in formulation[FIELDS]))
                     df2_filter = reduce(operator.or_, (Q(formulation__contains=item) for item in formulation[DF1]))
-                    df1_qs = FacilityConsumptionRecord.objects.filter(facility_cycle=record).filter(df1_filter)
-                    df2_qs = FacilityConsumptionRecord.objects.filter(facility_cycle=record).filter(df2_filter)
+                    df1_qs = Consumption.objects.filter(facility_cycle=record).filter(df1_filter)
+                    df2_qs = Consumption.objects.filter(facility_cycle=record).filter(df2_filter)
                     df1_count = df1_qs.count()
                     df2_count = df2_qs.count()
                     sum_df1 = df1_qs.aggregate(sum=Sum(df1_sum_fields)).get("sum", 0)
@@ -110,7 +110,7 @@ class NNRTI(Check):
                     result = NO
                 finally:
                     self.record_result_for_facility(record, result, test=test)
-            score, _ = CycleTestScore.objects.get_or_create(cycle=cycle, test=test)
+            score, _ = CycleScore.objects.get_or_create(cycle=cycle, test=test)
             yes_rate = float(yes * 100) / float(total_count)
             not_reporting_rate = float(not_reporting * 100) / float(total_count)
             score.yes = yes_rate

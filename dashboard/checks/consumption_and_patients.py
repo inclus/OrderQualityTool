@@ -1,8 +1,8 @@
 from django.db.models import Sum, F
 
 from dashboard.checks.common import CycleFormulationCheck
-from dashboard.helpers import CONSUMPTION_AND_PATIENTS, YES, NO, NOT_REPORTING
-from dashboard.models import AdultPatientsRecord, PAEDPatientsRecord, FacilityCycleRecord, FacilityConsumptionRecord
+from dashboard.helpers import CONSUMPTION_AND_PATIENTS, YES, NO, NOT_REPORTING, F3, F2, F1
+from dashboard.models import AdultPatientsRecord, PAEDPatientsRecord, Cycle, Consumption
 
 NAME = "name"
 
@@ -28,19 +28,19 @@ class ConsumptionAndPatients(CycleFormulationCheck):
 
     def run(self, cycle):
         formulations = [
-            {NAME: "TDF/3TC/EFV (Adult)", PATIENT_QUERY: "TDF/3TC/EFV", CONSUMPTION_QUERY: "Efavirenz (TDF/3TC/EFV)", MODEL: AdultPatientsRecord, RATIO: 2.0},
-            {NAME: "ABC/3TC (Paed)", PATIENT_QUERY: "ABC/3TC", CONSUMPTION_QUERY: "Lamivudine (ABC/3TC) 60mg/30mg [Pack 60]", MODEL: PAEDPatientsRecord, RATIO: 4.6},
-            {NAME: "EFV200 (Paed)", PATIENT_QUERY: "EFV", CONSUMPTION_QUERY: "(EFV) 200mg [Pack 90]", MODEL: PAEDPatientsRecord, RATIO: 1}
+            {NAME: F1, PATIENT_QUERY: "TDF/3TC/EFV", CONSUMPTION_QUERY: "Efavirenz (TDF/3TC/EFV)", MODEL: AdultPatientsRecord, RATIO: 2.0},
+            {NAME: F2, PATIENT_QUERY: "ABC/3TC", CONSUMPTION_QUERY: "Lamivudine (ABC/3TC) 60mg/30mg [Pack 60]", MODEL: PAEDPatientsRecord, RATIO: 4.6},
+            {NAME: F3, PATIENT_QUERY: "EFV", CONSUMPTION_QUERY: "(EFV) 200mg [Pack 90]", MODEL: PAEDPatientsRecord, RATIO: 1}
         ]
         for formulation in formulations:
             yes = 0
             no = 0
             not_reporting = 0
-            qs = FacilityCycleRecord.objects.filter(cycle=cycle)
+            qs = Cycle.objects.filter(cycle=cycle)
             total_count = qs.count()
             for record in qs:
                 try:
-                    consumption_qs = FacilityConsumptionRecord.objects.filter(facility_cycle=record, formulation__icontains=formulation[CONSUMPTION_QUERY])
+                    consumption_qs = Consumption.objects.filter(facility_cycle=record, formulation__icontains=formulation[CONSUMPTION_QUERY])
                     patient_qs = formulation[MODEL].objects.filter(facility_cycle=record, formulation__icontains=formulation[PATIENT_QUERY])
                     number_of_consumption_records = consumption_qs.count()
                     number_of_patient_records = patient_qs.count()
@@ -57,7 +57,7 @@ class ConsumptionAndPatients(CycleFormulationCheck):
                     else:
                         no += 1
                         result = NO
-                    self.record_result_for_facility(record, result, formulation[PATIENT_QUERY])
+                    self.record_result_for_facility(record, result, formulation[NAME])
                 except TypeError as e:
                     no += 1
-            self.build_cycle_formulation_score(cycle, formulation[CONSUMPTION_QUERY], yes, no, not_reporting, total_count)
+            self.build_cycle_formulation_score(cycle, formulation[NAME], yes, no, not_reporting, total_count)

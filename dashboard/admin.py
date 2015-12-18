@@ -6,7 +6,7 @@ from django.contrib.auth.models import Group
 from django.utils.translation import ugettext_lazy
 from django.utils.translation import ugettext_lazy as _
 
-from dashboard.models import DashboardUser, FacilityConsumptionRecord, FacilityCycleRecord, AdultPatientsRecord, PAEDPatientsRecord, CycleTestScore, CycleFormulationTestScore, FacilityCycleRecordScore
+from dashboard.models import DashboardUser, Consumption, Cycle, AdultPatientsRecord, PAEDPatientsRecord, CycleScore, CycleFormulationScore, Score
 from dashboard.tasks import calculate_scores_for_checks_in_cycle
 from locations.models import Facility, WareHouse, IP, District
 
@@ -102,8 +102,23 @@ class FacilityCycleRecordAdmin(ModelAdmin):
 
 
 class ScoreAdmin(ModelAdmin):
-    list_display = ('facility', 'cycle', 'score', 'test', 'formulation')
-    list_filter = ('test', 'score', 'formulation')
+    list_display = ('name', 'cycle', 'formulation', 'district', 'ip', 'warehouse', 'nnrtiNewPaed',
+                    'stablePatientVolumes',
+                    'REPORTING',
+                    'consumptionAndPatients',
+                    'nnrtiCurrentPaed',
+                    'warehouseFulfilment',
+                    'differentOrdersOverTime',
+                    'closingBalanceMatchesOpeningBalance',
+                    'WEB_BASED',
+                    'OrderFormFreeOfGaps',
+                    'MULTIPLE_ORDERS',
+                    'nnrtiNewAdults',
+                    'orderFormFreeOfNegativeNumbers',
+                    'nnrtiCurrentAdults',
+                    'stableConsumption',
+                    )
+    list_filter = ('formulation', 'district', 'ip', 'warehouse')
 
     def cycle(self, obj):
         return obj.facility_cycle.cycle
@@ -119,10 +134,10 @@ admin_site.register(Facility, FacilityAdmin)
 admin_site.register(IP)
 admin_site.register(WareHouse)
 admin_site.register(District)
-admin_site.register(CycleTestScore)
-admin_site.register(FacilityCycleRecordScore, ScoreAdmin)
-admin_site.register(CycleFormulationTestScore)
+admin_site.register(CycleScore)
+admin_site.register(Score, ScoreAdmin)
+admin_site.register(CycleFormulationScore)
 admin_site.register(AdultPatientsRecord, PatientAdmin)
 admin_site.register(PAEDPatientsRecord, PatientAdmin)
-admin_site.register(FacilityConsumptionRecord, ConsumptionAdmin)
-admin_site.register(FacilityCycleRecord, FacilityCycleRecordAdmin)
+admin_site.register(Consumption, ConsumptionAdmin)
+admin_site.register(Cycle, FacilityCycleRecordAdmin)

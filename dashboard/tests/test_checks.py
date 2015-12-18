@@ -2,8 +2,8 @@ from django.test import TestCase
 
 from dashboard.checks.different_orders_over_time import get_prev_cycle, DifferentOrdersOverTime
 from dashboard.helpers import DIFFERENT_ORDERS_OVER_TIME
-from dashboard.models import FacilityCycleRecord, FacilityConsumptionRecord, CycleFormulationTestScore
-from locations.models import Facility
+from dashboard.models import Cycle, Consumption, CycleFormulationScore
+from locations.models import Facility, WareHouse, IP, District
 
 
 class DifferentOrdersOverTimeTestCase(TestCase):
@@ -31,22 +31,25 @@ class DifferentOrdersOverTimeTestCase(TestCase):
         consumption_data['total_quantity_to_be_ordered'] = 4.5
         consumption_data['notes'] = None
         i = 0
+        warehouse, _ = WareHouse.objects.get_or_create(name="warehouse")
+        ip, _ = IP.objects.get_or_create(name="ip")
+        district, _ = District.objects.get_or_create(name="dis")
         for cycle in cycles:
             for name in names:
-                facility, _ = Facility.objects.get_or_create(name=name)
-                record, _ = FacilityCycleRecord.objects.get_or_create(cycle=cycle, facility=facility, reporting_status=True)
+                facility, _ = Facility.objects.get_or_create(name=name, ip=ip, warehouse=warehouse, district=district)
+                record, _ = Cycle.objects.get_or_create(cycle=cycle, facility=facility, reporting_status=True)
                 consumption_data['facility_cycle'] = record
                 for reg in consumption_regimens:
                     consumption_data['formulation'] = reg
-                    FacilityConsumptionRecord.objects.create(**consumption_data)
+                    Consumption.objects.create(**consumption_data)
 
             for name in names_without_data:
-                facility, _ = Facility.objects.get_or_create(name=name)
-                record, _ = FacilityCycleRecord.objects.get_or_create(cycle=cycle, facility=facility, reporting_status=True)
+                facility, _ = Facility.objects.get_or_create(name=name, ip=ip, warehouse=warehouse, district=district)
+                record, _ = Cycle.objects.get_or_create(cycle=cycle, facility=facility, reporting_status=True)
             i += 1
 
         DifferentOrdersOverTime().run(cycles[1])
-        score = CycleFormulationTestScore.objects.filter(test=DIFFERENT_ORDERS_OVER_TIME, cycle=cycles[1])[0]
+        score = CycleFormulationScore.objects.filter(test=DIFFERENT_ORDERS_OVER_TIME, cycle=cycles[1])[0]
         self.assertEquals(score.yes, 60.0)
         self.assertEquals(score.no, 0.0)
         self.assertEquals(score.not_reporting, 40.0)

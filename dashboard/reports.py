@@ -5,7 +5,7 @@ from openpyxl import load_workbook
 from xlrd import open_workbook
 
 from dashboard.helpers import PATIENTS_ADULT, PATIENTS_PAED
-from dashboard.models import FacilityConsumptionRecord, FacilityCycleRecord, logger, PAEDPatientsRecord, AdultPatientsRecord, LOCATION, CONSUMPTION
+from dashboard.models import Consumption, Cycle, logger, PAEDPatientsRecord, AdultPatientsRecord, LOCATION, CONSUMPTION
 from locations.models import Facility, District, IP, WareHouse
 
 
@@ -31,7 +31,7 @@ class WaosStandardReport():
 
     def build_consumption_record(self, n, record):
         formulation_name = self.worksheet.cell_value(n, 1)
-        consumption_record, created = FacilityConsumptionRecord.objects.get_or_create(facility_cycle=record, formulation=formulation_name)
+        consumption_record, created = Consumption.objects.get_or_create(facility_cycle=record, formulation=formulation_name)
         consumption_record.opening_balance = self.get_numerical_value(n, 3)
         consumption_record.quantity_received = self.get_numerical_value(n, 4)
         consumption_record.pmtct_consumption = self.get_numerical_value(n, 5)
@@ -58,7 +58,7 @@ class WaosStandardReport():
         cycle = self.worksheet.cell_value(30, 1)
         try:
             location = Facility.objects.get(name__icontains=full_name)
-            record, exists = FacilityCycleRecord.objects.get_or_create(facility=location, cycle=cycle)
+            record, exists = Cycle.objects.get_or_create(facility=location, cycle=cycle)
             return record
         except ObjectDoesNotExist:
             return None
@@ -79,14 +79,14 @@ class GeneralReport():
     def get_facility_record(self, name):
         try:
             location = Facility.objects.get(name__icontains=name)
-            record, exists = FacilityCycleRecord.objects.get_or_create(facility=location, cycle=self.cycle)
+            record, exists = Cycle.objects.get_or_create(facility=location, cycle=self.cycle)
             return record
         except ObjectDoesNotExist:
             return None
         except MultipleObjectsReturned:
             logger.debug("%s matched several places" % name)
             location = Facility.objects.filter(name__icontains=name)[0]
-            record, exists = FacilityCycleRecord.objects.get_or_create(facility=location, cycle=self.cycle)
+            record, exists = Cycle.objects.get_or_create(facility=location, cycle=self.cycle)
             return record
 
     def get_value(self, row, i):
@@ -178,7 +178,7 @@ class GeneralReport():
         for row in consumption_sheet.iter_rows('A%s:X%s' % (consumption_sheet.min_row + 1, consumption_sheet.max_row)):
             facility_name = row[1].value
             if facility_name:
-                consumption_record = FacilityConsumptionRecord()
+                consumption_record = Consumption()
                 consumption_record.formulation = row[2].value
                 consumption_record.opening_balance = self.get_value(row, 4)
                 consumption_record.quantity_received = self.get_value(row, 5)
@@ -197,11 +197,11 @@ class GeneralReport():
             facility_record = self.get_facility_record(name)
             consumption_records = []
             if facility_record:
-                FacilityConsumptionRecord.objects.filter(facility_cycle=facility_record).delete()
+                Consumption.objects.filter(facility_cycle=facility_record).delete()
                 for r in values:
                     r.facility_cycle = facility_record
                     consumption_records.append(r)
-                FacilityConsumptionRecord.objects.bulk_create(consumption_records)
+                Consumption.objects.bulk_create(consumption_records)
 
     def get_district(self, name):
         if name not in self.districts:

@@ -1,4 +1,4 @@
-from dashboard.models import CycleFormulationTestScore, FacilityCycleRecordScore
+from dashboard.models import CycleFormulationScore, Score
 
 
 class Check(object):
@@ -7,15 +7,19 @@ class Check(object):
     def run(self, cycle):
         raise NotImplementedError()
 
-    def record_result_for_facility(self, record, result, formulation_name=None, test=None):
+    def record_result_for_facility(self, record, result, formulation_name="NOT_APPLICABLE", test=None):
         if test:
             f_test = test
         else:
             f_test = self.test
-        score_record, _ = FacilityCycleRecordScore.objects.get_or_create(facility_cycle=record, test=f_test)
+        score_record, _ = Score.objects.get_or_create(name=record.facility.name,
+                                                      cycle=record.cycle,
+                                                      district=record.facility.district.name,
+                                                      warehouse=record.facility.warehouse.name,
+                                                      ip=record.facility.ip.name,
+                                                      formulation=formulation_name)
         score_record.score = result
-        if formulation_name:
-            score_record.formulation = formulation_name
+        setattr(score_record, f_test, result)
         score_record.save()
 
 
@@ -24,7 +28,7 @@ class CycleFormulationCheck(Check):
         raise NotImplementedError()
 
     def build_cycle_formulation_score(self, cycle, formulation, yes, no, not_reporting, total_count):
-        score, _ = CycleFormulationTestScore.objects.get_or_create(cycle=cycle, test=self.test, formulation=formulation)
+        score, _ = CycleFormulationScore.objects.get_or_create(cycle=cycle, test=self.test, formulation=formulation)
         no_rate, not_reporting_rate, yes_rate = self.calculate_percentages(no, not_reporting, total_count, yes)
         score.yes = yes_rate
         score.no = no_rate

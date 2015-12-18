@@ -1,7 +1,7 @@
 from rest_framework.relations import StringRelatedField
 from rest_framework.serializers import ModelSerializer
 
-from dashboard.models import FacilityCycleRecordScore, FacilityCycleRecord
+from dashboard.models import Score, Cycle
 from locations.models import Facility
 
 
@@ -16,7 +16,7 @@ class FacilitySerializer(ModelSerializer):
 
 class FacilityScoreSerializer(ModelSerializer):
     class Meta:
-        model = FacilityCycleRecordScore
+        model = Score
 
 
 class FacilityCycleRecordSerializer(ModelSerializer):
@@ -24,4 +24,9 @@ class FacilityCycleRecordSerializer(ModelSerializer):
     facility = FacilitySerializer()
 
     class Meta:
-        model = FacilityCycleRecord
+        model = Cycle
+
+
+class ScoreSerializer(ModelSerializer):
+    class Meta:
+        model = Score

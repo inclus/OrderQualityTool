@@ -6,9 +6,9 @@ from mock import MagicMock, patch
 
 from dashboard.checks.order_form_free_of_gaps import OrderFormFreeOfGaps
 from dashboard.helpers import *
-from dashboard.models import AdultPatientsRecord, PAEDPatientsRecord
-from dashboard.views import *
-from locations.models import Facility
+from dashboard.models import AdultPatientsRecord, PAEDPatientsRecord, Cycle, Consumption
+from dashboard.views.api import OrderFormFreeOfNegativeNumbersView, DifferentOrdersOverTimeView, ClosingBalanceView, ConsumptionAndPatientsView, StableConsumptionView, WarehouseFulfilmentView, StablePatientVolumesView, GuideLineAdherenceView
+from locations.models import Facility, WareHouse, IP, District
 
 
 class RegimenCheckViewCaseMixin():
@@ -28,7 +28,7 @@ class OrderFormFreeOfNegativesViewTestCase(WebTest, RegimenCheckViewCaseMixin):
         regimen = "reg"
         return "%s?start=%s&&end=%s&&regimen=%s" % (url, start, end, regimen)
 
-    @patch("dashboard.views.CycleFormulationTestScore.objects.filter")
+    @patch("dashboard.views.api.CycleFormulationScore.objects.filter")
     def test_filter_is_setup(self, filter_mock):
         today = arrow.now()
         year = today.format("YYYY")
@@ -59,7 +59,7 @@ class OrderFormFreeOfGapsViewTestCase(WebTest, RegimenCheckViewCaseMixin):
         response = self.app.get(url, user="testuser")
         self.assertEqual(200, response.status_code)
 
-    @patch("dashboard.views.CycleTestScore.objects.filter")
+    @patch("dashboard.views.api.CycleScore.objects.filter")
     def test_filter_is_setup(self, filter_mock):
         today = arrow.now()
         year = today.format("YYYY")
@@ -99,21 +99,24 @@ class OrderFormFreeOfGapsViewTestCase(WebTest, RegimenCheckViewCaseMixin):
         consumption_data['estimated_number_of_new_pregnant_women'] = 4.5
         consumption_data['total_quantity_to_be_ordered'] = 4.5
         consumption_data['notes'] = None
+        warehouse, _ = WareHouse.objects.get_or_create(name="warehouse")
+        ip, _ = IP.objects.get_or_create(name="ip")
+        district, _ = District.objects.get_or_create(name="dis")
         for name in names:
-            facility, _ = Facility.objects.get_or_create(name=name)
-            record, _ = FacilityCycleRecord.objects.get_or_create(cycle=cycle, facility=facility)
+            facility, _ = Facility.objects.get_or_create(name=name, ip=ip, warehouse=warehouse, district=district)
+            record, _ = Cycle.objects.get_or_create(cycle=cycle, facility=facility)
             consumption_data['facility_cycle'] = record
             for reg in consumption_regimens:
                 consumption_data['formulation'] = reg
-                FacilityConsumptionRecord.objects.create(**consumption_data)
+                Consumption.objects.create(**consumption_data)
             for reg in adult_regimens:
                 AdultPatientsRecord.objects.create(facility_cycle=record, formulation=reg, existing=1.4, new=10.0)
             for reg in paed_regimens:
                 PAEDPatientsRecord.objects.create(facility_cycle=record, formulation=reg, existing=3, new=12.0)
 
         for name in names_without_data:
-            facility, _ = Facility.objects.get_or_create(name=name)
-            record, _ = FacilityCycleRecord.objects.get_or_create(cycle=cycle, facility=facility)
+            facility, _ = Facility.objects.get_or_create(name=name, ip=ip, warehouse=warehouse, district=district)
+            record, _ = Cycle.objects.get_or_create(cycle=cycle, facility=facility)
 
         score = OrderFormFreeOfGaps().run(cycle)
         self.assertEqual(cycle, score.cycle)

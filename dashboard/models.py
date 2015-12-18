@@ -33,7 +33,7 @@ class DashboardUser(AbstractEmailUser):
         app_label = 'dashboard'
 
 
-class CycleTestScore(models.Model):
+class CycleScore(models.Model):
     cycle = models.CharField(max_length=256)
     test = models.CharField(max_length=256)
     yes = models.FloatField(null=True)
@@ -47,7 +47,7 @@ class CycleTestScore(models.Model):
         return "%s %s YES:%s NO:%s NOT_REPORTING:%s" % (self.cycle, self.test, self.yes, self.no, self.not_reporting)
 
 
-class CycleFormulationTestScore(models.Model):
+class CycleFormulationScore(models.Model):
     cycle = models.CharField(max_length=256)
     test = models.CharField(max_length=256)
     yes = models.FloatField(null=True)
@@ -62,7 +62,7 @@ class CycleFormulationTestScore(models.Model):
         return "%s %s YES:%s NO:%s NOT_REPORTING:%s FORMULATION:%s" % (self.cycle, self.test, self.yes, self.no, self.not_reporting, self.formulation)
 
 
-class FacilityCycleRecord(models.Model):
+class Cycle(models.Model):
     facility = models.ForeignKey(Facility, related_name="records")
     cycle = models.CharField(max_length=256)
     reporting_status = models.BooleanField(default=False)
@@ -76,21 +76,42 @@ class FacilityCycleRecord(models.Model):
         return "%s %s" % (self.facility, self.cycle)
 
 
-class FacilityCycleRecordScore(models.Model):
-    facility_cycle = models.ForeignKey(FacilityCycleRecord, related_name="scores")
+choices = ((YES, YES), (NO, NO), (NOT_REPORTING, NOT_REPORTING))
+
+
+class Score(models.Model):
+    name = models.CharField(max_length=256)
+    cycle = models.CharField(max_length=256)
     test = models.CharField(max_length=256)
+    district = models.CharField(max_length=256)
+    ip = models.CharField(max_length=256)
+    warehouse = models.CharField(max_length=256)
     formulation = models.CharField(max_length=256, null=True)
-    score = models.CharField(choices=((YES, YES), (NO, NO), (NOT_REPORTING, NOT_REPORTING)), db_index=True, max_length=20)
+    nnrtiNewPaed = models.CharField(choices=choices, max_length=20)
+    stablePatientVolumes = models.CharField(choices=choices, max_length=20)
+    REPORTING = models.CharField(choices=choices, max_length=20)
+    consumptionAndPatients = models.CharField(choices=choices, max_length=20)
+    nnrtiCurrentPaed = models.CharField(choices=choices, max_length=20)
+    warehouseFulfilment = models.CharField(choices=choices, max_length=20)
+    differentOrdersOverTime = models.CharField(choices=choices, max_length=20)
+    closingBalanceMatchesOpeningBalance = models.CharField(choices=choices, max_length=20)
+    WEB_BASED = models.CharField(choices=choices, max_length=20)
+    OrderFormFreeOfGaps = models.CharField(choices=choices, max_length=20)
+    MULTIPLE_ORDERS = models.CharField(choices=choices, max_length=20)
+    nnrtiNewAdults = models.CharField(choices=choices, max_length=20)
+    orderFormFreeOfNegativeNumbers = models.CharField(choices=choices, max_length=20)
+    nnrtiCurrentAdults = models.CharField(choices=choices, max_length=20)
+    stableConsumption = models.CharField(choices=choices, max_length=20)
+    guidelineAdherenceAdultlL = models.CharField(choices=choices, max_length=20)
+    guidelineAdherenceAdult2L = models.CharField(choices=choices, max_length=20)
+    guidelineAdherencePaed1L = models.CharField(choices=choices, max_length=20)
 
     class Meta:
-        unique_together = ("facility_cycle", "formulation", "test")
-
-    def __unicode__(self):
-        return "%s %s %s" % (self.facility_cycle, self.test, self.score)
+        unique_together = ("name", "cycle", "test", "formulation")
 
 
-class FacilityConsumptionRecord(models.Model):
-    facility_cycle = models.ForeignKey(FacilityCycleRecord)
+class Consumption(models.Model):
+    facility_cycle = models.ForeignKey(Cycle)
     opening_balance = models.FloatField(null=True, blank=True)
     quantity_received = models.FloatField(null=True, blank=True)
     pmtct_consumption = models.FloatField(null=True, blank=True)
@@ -111,7 +132,7 @@ class FacilityConsumptionRecord(models.Model):
 
 
 class AdultPatientsRecord(models.Model):
-    facility_cycle = models.ForeignKey(FacilityCycleRecord)
+    facility_cycle = models.ForeignKey(Cycle)
     existing = models.FloatField(null=True, blank=True)
     new = models.FloatField(null=True, blank=True)
     formulation = models.CharField(max_length=256, null=True, blank=True)
@@ -121,7 +142,7 @@ class AdultPatientsRecord(models.Model):
 
 
 class PAEDPatientsRecord(models.Model):
-    facility_cycle = models.ForeignKey(FacilityCycleRecord)
+    facility_cycle = models.ForeignKey(Cycle)
     existing = models.FloatField(null=True, blank=True)
     new = models.FloatField(null=True, blank=True)
     formulation = models.CharField(max_length=256, null=True, blank=True)
