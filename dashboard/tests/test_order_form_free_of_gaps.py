@@ -1,13 +1,13 @@
 import json
-
 from django.core.urlresolvers import reverse
 from django_webtest import WebTest
 from mock import MagicMock, patch
-
 from dashboard.checks.order_form_free_of_gaps import OrderFormFreeOfGaps
 from dashboard.helpers import *
 from dashboard.models import AdultPatientsRecord, PAEDPatientsRecord, Cycle, Consumption
-from dashboard.views.api import OrderFormFreeOfNegativeNumbersView, DifferentOrdersOverTimeView, ClosingBalanceView, ConsumptionAndPatientsView, StableConsumptionView, WarehouseFulfilmentView, StablePatientVolumesView, GuideLineAdherenceView
+from dashboard.views.api import OrderFormFreeOfNegativeNumbersView, DifferentOrdersOverTimeView, ClosingBalanceView, \
+    ConsumptionAndPatientsView, StableConsumptionView, WarehouseFulfilmentView, StablePatientVolumesView, \
+    GuideLineAdherenceView
 from locations.models import Facility, WareHouse, IP, District
 
 
@@ -45,9 +45,11 @@ class OrderFormFreeOfNegativesViewTestCase(WebTest, RegimenCheckViewCaseMixin):
         self.assertEqual(200, response.status_code)
         json_content = response.content.decode('utf8')
         data = json.loads(json_content)
-        print(data)
         self.assertEqual(data['values'][0], {u'cycle': u'Mar - Apr 2015', u'no': 40, u'not_reporting': 60, u'yes': 20})
-        filter_mock.assert_called_with(cycle__in=[(u'Mar - Apr %s' % year), (u'May - Jun %s' % year), (u'Jul - Aug %s' % year), (u'Sep - Oct %s' % year), (u'Nov - Dec %s' % year)], formulation__icontains=u'reg', test=self.test)
+        filter_mock.assert_called_with(
+            cycle__in=[(u'Mar - Apr %s' % year), (u'May - Jun %s' % year), (u'Jul - Aug %s' % year),
+                       (u'Sep - Oct %s' % year), (u'Nov - Dec %s' % year)], formulation__icontains=u'reg',
+            test=self.test)
 
 
 class OrderFormFreeOfGapsViewTestCase(WebTest, RegimenCheckViewCaseMixin):
@@ -77,7 +79,9 @@ class OrderFormFreeOfGapsViewTestCase(WebTest, RegimenCheckViewCaseMixin):
         json_content = response.content.decode('utf8')
         data = json.loads(json_content)
         self.assertEqual(data['values'][0], {u'cycle': u'Mar - Apr 2015', u'no': 40, u'not_reporting': 60, u'yes': 20})
-        filter_mock.assert_called_with(cycle__in=[(u'Mar - Apr %s' % year), (u'May - Jun %s' % year), (u'Jul - Aug %s' % year), (u'Sep - Oct %s' % year), (u'Nov - Dec %s' % year)], test=self.test)
+        filter_mock.assert_called_with(
+            cycle__in=[(u'Mar - Apr %s' % year), (u'May - Jun %s' % year), (u'Jul - Aug %s' % year),
+                       (u'Sep - Oct %s' % year), (u'Nov - Dec %s' % year)], test=self.test)
 
     def test_logic(self):
         names = ["FA1", "FA2", "FA3"]

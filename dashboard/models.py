@@ -1,9 +1,7 @@
 import logging
-
 from custom_user.models import AbstractEmailUser
 from django.db import models
 from django.db.models import CharField
-
 from dashboard.helpers import NOT_REPORTING, YES, NO
 from locations.models import Facility
 
@@ -21,7 +19,8 @@ LOCATION = "Facility Index"
 
 
 class DashboardUser(AbstractEmailUser):
-    access_level = CharField(choices=((WAREHOUSE, WAREHOUSE), (DISTRICT, DISTRICT), (IIP, IIP), (MOH_CENTRAL, MOH_CENTRAL)), max_length=50)
+    access_level = CharField(
+        choices=((WAREHOUSE, WAREHOUSE), (DISTRICT, DISTRICT), (IIP, IIP), (MOH_CENTRAL, MOH_CENTRAL)), max_length=50)
 
     def get_full_name(self):
         return self.email
@@ -59,7 +58,8 @@ class CycleFormulationScore(models.Model):
         unique_together = ("cycle", "formulation", "test")
 
     def __unicode__(self):
-        return "%s %s YES:%s NO:%s NOT_REPORTING:%s FORMULATION:%s" % (self.cycle, self.test, self.yes, self.no, self.not_reporting, self.formulation)
+        return "%s %s YES:%s NO:%s NOT_REPORTING:%s FORMULATION:%s" % (
+            self.cycle, self.test, self.yes, self.no, self.not_reporting, self.formulation)
 
 
 class Cycle(models.Model):
@@ -105,6 +105,38 @@ class Score(models.Model):
     guidelineAdherenceAdultlL = models.CharField(choices=choices, max_length=20)
     guidelineAdherenceAdult2L = models.CharField(choices=choices, max_length=20)
     guidelineAdherencePaed1L = models.CharField(choices=choices, max_length=20)
+    pass_count = models.IntegerField()
+    fail_count = models.IntegerField()
+
+    def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
+        fields = ["nnrtiNewPaed",
+                  "stablePatientVolumes",
+                  "REPORTING",
+                  "consumptionAndPatients",
+                  "nnrtiCurrentPaed",
+                  "warehouseFulfilment",
+                  "differentOrdersOverTime",
+                  "closingBalanceMatchesOpeningBalance",
+                  "WEB_BASED",
+                  "OrderFormFreeOfGaps",
+                  "MULTIPLE_ORDERS",
+                  "nnrtiNewAdults",
+                  "orderFormFreeOfNegativeNumbers",
+                  "nnrtiCurrentAdults",
+                  "stableConsumption",
+                  "guidelineAdherenceAdultlL",
+                  "guidelineAdherenceAdult2L",
+                  "guidelineAdherencePaed1L"
+                  ]
+        self.pass_count = 0
+        self.fail_count = 0
+        for field in fields:
+            if getattr(self, field) == YES:
+                self.pass_count += 1
+            else:
+                self.fail_count += 1
+
+        super(Score, self).save(force_insert, force_update, using, update_fields)
 
     class Meta:
         unique_together = ("name", "cycle", "test", "formulation")
