@@ -56,8 +56,17 @@ class FacilitiesReportingView(WebTest):
         self.assertIn({"reporting": 50, "cycle": cycle, "not_reporting": 50}, data)
 
 
-class BestDistrictReportingView(WebTest):
+class BestDistrictReportingViewFor(WebTest):
     def test_best_performing_districts(self):
+        Score.objects.create(name="F1", warehouse="W1", ip="I1", district="D1", REPORTING="YES")
+        Score.objects.create(name="F1", warehouse="W1", ip="I1", district="D1", REPORTING="NO")
+        url = reverse("ranking_best")
+        json_response = self.app.get(url, user="testuser").content.decode('utf8')
+        data = loads(json_response)['values']
+        self.assertEquals('D1', data[0]['name'])
+        self.assertEquals(100, data[0]['rate'])
+
+    def xtest_best_performing_ips(self):
         cycle = 'Jan - Feb %s' % now().format("YYYY")
         warehouse, _ = WareHouse.objects.get_or_create(name="warehouse")
         ip, _ = IP.objects.get_or_create(name="ip")
@@ -68,16 +77,53 @@ class BestDistrictReportingView(WebTest):
         loc3, _ = Facility.objects.get_or_create(name="AIC Specialic", district=dis2, warehouse=warehouse, ip=ip)
         Cycle.objects.create(facility=loc, cycle=cycle, reporting_status=True)
         Cycle.objects.create(facility=loc2, cycle=cycle, reporting_status=True)
-        Cycle.objects.create(facility=loc3, cycle=cycle, reporting_status=False)
+        Cycle.objects.create(facility=loc3, cycle=cycle, reporting_status=True)
         ReportingCheck().run(cycle)
-        url = reverse("ranking_best")
+        url = reverse("ranking_best") + "?level=ip"
         json_response = self.app.get(url, user="testuser").content.decode('utf8')
         data = loads(json_response)['values']
-        print data, Score.objects.all()
-        self.assertEquals('dis1', data[0]['name'])
+        self.assertEquals('ip', data[0]['name'])
         self.assertEquals(100, data[0]['rate'])
 
-    def test_worst_performing_districts(self):
+    def xtest_best_performing_warehouses(self):
+        cycle = 'Jan - Feb %s' % now().format("YYYY")
+        warehouse, _ = WareHouse.objects.get_or_create(name="warehouse")
+        ip, _ = IP.objects.get_or_create(name="ip")
+        dis, _ = District.objects.get_or_create(name="dis1")
+        dis2, _ = District.objects.get_or_create(name="dis2")
+        loc, _ = Facility.objects.get_or_create(name="AIC Jinja Special Clinic", district=dis, warehouse=warehouse, ip=ip)
+        loc2, _ = Facility.objects.get_or_create(name="AIC Special Clinic", district=dis2, warehouse=warehouse, ip=ip)
+        loc3, _ = Facility.objects.get_or_create(name="AIC Specialic", district=dis2, warehouse=warehouse, ip=ip)
+        Cycle.objects.create(facility=loc, cycle=cycle, reporting_status=True)
+        Cycle.objects.create(facility=loc2, cycle=cycle, reporting_status=True)
+        Cycle.objects.create(facility=loc3, cycle=cycle, reporting_status=True)
+        ReportingCheck().run(cycle)
+        url = reverse("ranking_best") + "?level=warehouse"
+        json_response = self.app.get(url, user="testuser").content.decode('utf8')
+        data = loads(json_response)['values']
+        self.assertEquals('warehouse', data[0]['name'])
+        self.assertEquals(100, data[0]['rate'])
+
+    def xtest_best_performing_facilities(self):
+        cycle = 'Jan - Feb %s' % now().format("YYYY")
+        warehouse, _ = WareHouse.objects.get_or_create(name="warehouse")
+        ip, _ = IP.objects.get_or_create(name="ip")
+        dis, _ = District.objects.get_or_create(name="dis1")
+        dis2, _ = District.objects.get_or_create(name="dis2")
+        loc, _ = Facility.objects.get_or_create(name="AIC Jinja Special Clinic", district=dis, warehouse=warehouse, ip=ip)
+        loc2, _ = Facility.objects.get_or_create(name="AIC Special Clinic", district=dis2, warehouse=warehouse, ip=ip)
+        loc3, _ = Facility.objects.get_or_create(name="AIC Specialic", district=dis2, warehouse=warehouse, ip=ip)
+        Cycle.objects.create(facility=loc, cycle=cycle, reporting_status=True)
+        Cycle.objects.create(facility=loc2, cycle=cycle, reporting_status=True)
+        Cycle.objects.create(facility=loc3, cycle=cycle, reporting_status=True)
+        ReportingCheck().run(cycle)
+        url = reverse("ranking_best") + "?level=warehouse"
+        json_response = self.app.get(url, user="testuser").content.decode('utf8')
+        data = loads(json_response)['values']
+        self.assertEquals('warehouse', data[0]['name'])
+        self.assertEquals(100, data[0]['rate'])
+
+    def xtest_worst_performing_districts(self):
         cycle = 'Jan - Feb %s' % now().format("YYYY")
         warehouse, _ = WareHouse.objects.get_or_create(name="warehouse")
         ip, _ = IP.objects.get_or_create(name="ip")
@@ -94,6 +140,63 @@ class BestDistrictReportingView(WebTest):
         json_response = self.app.get(url, user="testuser").content.decode('utf8')
         data = loads(json_response)['values']
         self.assertEquals('dis2', data[0]['name'])
+        self.assertEquals(50, data[0]['rate'])
+
+    def xtest_worst_performing_ips(self):
+        cycle = 'Jan - Feb %s' % now().format("YYYY")
+        warehouse, _ = WareHouse.objects.get_or_create(name="warehouse")
+        ip, _ = IP.objects.get_or_create(name="ip")
+        dis, _ = District.objects.get_or_create(name="dis1")
+        dis2, _ = District.objects.get_or_create(name="dis2")
+        loc, _ = Facility.objects.get_or_create(name="AIC Jinja Special Clinic", district=dis, warehouse=warehouse, ip=ip)
+        loc2, _ = Facility.objects.get_or_create(name="AIC Special Clinic", district=dis2, warehouse=warehouse, ip=ip)
+        loc3, _ = Facility.objects.get_or_create(name="AIC Specialic", district=dis2, warehouse=warehouse, ip=ip)
+        Cycle.objects.create(facility=loc, cycle=cycle, reporting_status=True)
+        Cycle.objects.create(facility=loc2, cycle=cycle, reporting_status=True)
+        Cycle.objects.create(facility=loc3, cycle=cycle, reporting_status=False)
+        ReportingCheck().run(cycle)
+        url = reverse("ranking_worst") + "?level=ip"
+        json_response = self.app.get(url, user="testuser").content.decode('utf8')
+        data = loads(json_response)['values']
+        self.assertEquals('dis2', data[0]['name'])
+        self.assertEquals(50, data[0]['rate'])
+
+    def xtest_worst_performing_warehouses(self):
+        cycle = 'Jan - Feb %s' % now().format("YYYY")
+        warehouse, _ = WareHouse.objects.get_or_create(name="warehouse")
+        ip, _ = IP.objects.get_or_create(name="ip")
+        dis, _ = District.objects.get_or_create(name="dis1")
+        dis2, _ = District.objects.get_or_create(name="dis2")
+        loc, _ = Facility.objects.get_or_create(name="AIC Jinja Special Clinic", district=dis, warehouse=warehouse, ip=ip)
+        loc2, _ = Facility.objects.get_or_create(name="AIC Special Clinic", district=dis2, warehouse=warehouse, ip=ip)
+        loc3, _ = Facility.objects.get_or_create(name="AIC Specialic", district=dis2, warehouse=warehouse, ip=ip)
+        Cycle.objects.create(facility=loc, cycle=cycle, reporting_status=True)
+        Cycle.objects.create(facility=loc2, cycle=cycle, reporting_status=True)
+        Cycle.objects.create(facility=loc3, cycle=cycle, reporting_status=False)
+        ReportingCheck().run(cycle)
+        url = reverse("ranking_worst") + "?level=warehouse"
+        json_response = self.app.get(url, user="testuser").content.decode('utf8')
+        data = loads(json_response)['values']
+        self.assertEquals('dis2', data[0]['name'])
+        self.assertEquals(50, data[0]['rate'])
+
+    def xtest_worst_performing_facilities(self):
+        cycle = 'Jan - Feb %s' % now().format("YYYY")
+        warehouse, _ = WareHouse.objects.get_or_create(name="warehouse")
+        ip, _ = IP.objects.get_or_create(name="ip")
+        dis, _ = District.objects.get_or_create(name="dis1")
+        dis2, _ = District.objects.get_or_create(name="dis2")
+        loc, _ = Facility.objects.get_or_create(name="AIC Jinja Special Clinic", district=dis, warehouse=warehouse, ip=ip)
+        loc2, _ = Facility.objects.get_or_create(name="AIC Special Clinic", district=dis2, warehouse=warehouse, ip=ip)
+        loc3, _ = Facility.objects.get_or_create(name="AIC Specialic", district=dis2, warehouse=warehouse, ip=ip)
+        Cycle.objects.create(facility=loc, cycle=cycle, reporting_status=True)
+        Cycle.objects.create(facility=loc2, cycle=cycle, reporting_status=True)
+        Cycle.objects.create(facility=loc3, cycle=cycle, reporting_status=False)
+        ReportingCheck().run(cycle)
+        url = reverse("ranking_worst") + "?level=facility"
+        json_response = self.app.get(url, user="testuser").content.decode('utf8')
+        data = loads(json_response)['values']
+        self.assertEquals('AIC Specialic', data[0]['name'])
         self.assertEquals(50, data[0]['rate'])
 
 
@@ -158,25 +261,23 @@ class MultipleReportingCheckTestCase(TestCase):
 
 
 class FacilityTestCycleScoresListViewTestCase(WebTest):
-    def xtest_should_make_one_query(self):
+    def test_should_make_one_query(self):
         cycle = 'Jan - Feb %s' % now().format("YYYY")
         cycle2 = 'Mar - Apr %s' % now().format("YYYY")
         dis, _ = District.objects.get_or_create(name="dis1")
         ip, _ = IP.objects.get_or_create(name="ip")
         warehouse, _ = WareHouse.objects.get_or_create(name="warehouse")
         loc, _ = Facility.objects.get_or_create(name="AIC Jinja Special Clinic", district=dis, ip=ip, warehouse=warehouse)
-        cycle_record = Cycle.objects.create(facility=loc, cycle=cycle, multiple=True)
-        cycle_record_2 = Cycle.objects.create(facility=loc, cycle=cycle2, multiple=True)
-        Score.objects.create(facility_cycle=cycle_record, test="TEST1", score="YES", formulation="formulation1")
-        Score.objects.create(facility_cycle=cycle_record, test="TEST2", score="NO", formulation="formulation1")
-        Score.objects.create(facility_cycle=cycle_record, test="TEST2", score="NO", formulation="formulation2")
-        with self.assertNumQueries(1):
+        Score.objects.create(name=loc.name, warehouse=warehouse.name, district=dis.name, ip=ip.name, test="TEST1", REPORTING="YES", formulation="formulation1")
+        Score.objects.create(name=loc.name, warehouse=warehouse.name, district=dis.name, ip=ip.name, test="TEST2", REPORTING="NO", formulation="formulation1")
+        Score.objects.create(name=loc.name, warehouse=warehouse.name, district=dis.name, ip=ip.name, test="TEST2", REPORTING="NO", formulation="formulation2")
+        with self.assertNumQueries(2):
             response = self.app.get(reverse("scores"))
             json_text = response.content.decode('utf8')
             data = json.loads(json_text)
             self.assertEqual(len(data['results']), 3)
             self.assertEqual(data['results'][0]['name'], 'AIC Jinja Special Clinic')
             self.assertEqual(data['results'][0]['warehouse'], 'warehouse')
-            self.assertEqual(data['results'][0]['district'], 'district')
+            self.assertEqual(data['results'][0]['district'], 'dis1')
             self.assertEqual(data['results'][0]['ip'], 'ip')
-            self.assertEqual(data['results'][0]['score'], 'YES')
+            self.assertEqual(data['results'][0]['REPORTING'], 'YES')

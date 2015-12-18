@@ -7,6 +7,7 @@ from braces.views import LoginRequiredMixin
 from django.db.models import Count, Case, When, Avg, Q
 from django.http import HttpResponse
 from rest_framework import filters
+from rest_framework.generics import ListAPIView
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -82,10 +83,11 @@ class BestPerformingDistrictsView(APIView):
 
     def get_data(self, request):
         filters = {}
-        levels = {'district': 'district', 'ip': '', 'warehouse': 'warehouse', 'facility': 'name'}
+        levels = {'district': 'district', 'ip': 'ip', 'warehouse': 'warehouse', 'facility': 'name'}
         cycle = request.GET.get('cycle', None)
         level = request.GET.get('level', 'district').lower()
-        name = levels.get(level, District)
+        name = levels.get(level, 'district')
+
         if cycle:
             filters['cycle'] = cycle
         fields = [Q(nnrtiNewPaed=YES),
@@ -110,6 +112,7 @@ class BestPerformingDistrictsView(APIView):
         count_filters = functools.reduce(operator.or_, fields)
         data = Score.objects.filter(**filters).values(name, 'cycle').annotate(count=Count('pk'), yes=Count(Case(When(count_filters, then=1))))
         for item in data:
+            item['name'] = item[name]
             if item['yes'] == 0:
                 item['rate'] = 0
             else:
@@ -279,7 +282,7 @@ class FilterValuesView(APIView):
         return Response({"ips": ips, "warehouses": warehouses, "districts": districts, "cycles": cycles, "formulations": formulations})
 
 
-class FacilityTestCycleScoresListView(APIView):
+class FacilityTestCycleScoresListView(ListAPIView):
     queryset = Score.objects.all()
     serializer_class = ScoreSerializer
     filter_backends = (filters.DjangoFilterBackend,)
