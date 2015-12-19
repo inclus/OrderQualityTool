@@ -4,6 +4,7 @@ from mock import patch, call
 from model_mommy import mommy
 
 from dashboard.checks.different_orders_over_time import get_prev_cycle, DifferentOrdersOverTime
+from dashboard.checks.stable_consumption import StableConsumption
 from dashboard.helpers import DIFFERENT_ORDERS_OVER_TIME, NO, YES, F1, F2, F3
 from dashboard.models import Cycle, Consumption, CycleFormulationScore, Score
 from locations.models import Facility
@@ -91,3 +92,117 @@ class DifferentOrdersOverTimeTestCase(TestCase):
         self.assertEqual(Score.objects.all()[1].differentOrdersOverTime, "NOT_REPORTING")
         self.assertEqual(Score.objects.all()[2].differentOrdersOverTime, "NOT_REPORTING")
         self.assertEqual(Score.objects.all()[0].differentOrdersOverTime, "NOT_REPORTING")
+
+
+class StableConsumptionTestCase(TestCase):
+    @patch("dashboard.checks.stable_consumption.StableConsumption.record_result_for_facility")
+    def test_should_record_result_for_facility(self, mock_method):
+        prev_cycle = "Jan - Feb %s" % now().format("YYYY")
+        current_cycle = "Mar - Apr %s" % now().format("YYYY")
+        facility = mommy.make(Facility)
+        prev_record = mommy.make(Cycle, facility=facility, cycle=prev_cycle)
+        current_record = mommy.make(Cycle, facility=facility, cycle=current_cycle)
+        formulations = [StableConsumption.F1_QUERY, StableConsumption.F2_QUERY, StableConsumption.F3_QUERY]
+        for form in formulations:
+            mommy.make(Consumption, facility_cycle=prev_record, art_consumption=10, pmtct_consumption=30, formulation=form)
+            mommy.make(Consumption, facility_cycle=current_record, art_consumption=10, pmtct_consumption=30, formulation=form)
+        self.assertEqual(Score.objects.count(), 0)
+        StableConsumption().run(current_cycle)
+        calls = [call(current_record, YES, F1), call(current_record, YES, F2), call(current_record, YES, F3)]
+        mock_method.assert_has_calls(calls)
+
+    def test_should_calculate_correct_result(self):
+        prev_cycle = "Jan - Feb %s" % now().format("YYYY")
+        current_cycle = "Mar - Apr %s" % now().format("YYYY")
+        facility = mommy.make(Facility)
+        prev_record = mommy.make(Cycle, facility=facility, cycle=prev_cycle)
+        current_record = mommy.make(Cycle, facility=facility, cycle=current_cycle)
+        formulations = [StableConsumption.F1_QUERY, StableConsumption.F2_QUERY, StableConsumption.F3_QUERY]
+        for form in formulations:
+            mommy.make(Consumption, facility_cycle=prev_record, art_consumption=10, pmtct_consumption=30, formulation=form)
+            mommy.make(Consumption, facility_cycle=current_record, art_consumption=10, pmtct_consumption=30, formulation=form)
+        self.assertEqual(Score.objects.count(), 0)
+        StableConsumption().run(current_cycle)
+        self.assertEqual(Score.objects.count(), 3)
+        self.assertEqual(Score.objects.all()[1].stableConsumption, "YES")
+        self.assertEqual(Score.objects.all()[2].stableConsumption, "YES")
+        self.assertEqual(Score.objects.all()[0].stableConsumption, "YES")
+
+    def test_can_get_no(self):
+        prev_cycle = "Jan - Feb %s" % now().format("YYYY")
+        current_cycle = "Mar - Apr %s" % now().format("YYYY")
+        facility = mommy.make(Facility)
+        prev_record = mommy.make(Cycle, facility=facility, cycle=prev_cycle)
+        current_record = mommy.make(Cycle, facility=facility, cycle=current_cycle)
+        formulations = [StableConsumption.F1_QUERY, StableConsumption.F2_QUERY, StableConsumption.F3_QUERY]
+        for form in formulations:
+            mommy.make(Consumption, facility_cycle=prev_record, art_consumption=200, pmtct_consumption=300, formulation=form)
+            mommy.make(Consumption, facility_cycle=current_record, art_consumption=10, pmtct_consumption=30, formulation=form)
+        self.assertEqual(Score.objects.count(), 0)
+        StableConsumption().run(current_cycle)
+        self.assertEqual(Score.objects.count(), 3)
+        self.assertEqual(Score.objects.all()[1].stableConsumption, "NO")
+        self.assertEqual(Score.objects.all()[2].stableConsumption, "NO")
+        self.assertEqual(Score.objects.all()[0].stableConsumption, "NO")
+
+    def test_should_only_consider_facilities_with_consumption_over_20(self):
+        prev_cycle = "Jan - Feb %s" % now().format("YYYY")
+        current_cycle = "Mar - Apr %s" % now().format("YYYY")
+        facility = mommy.make(Facility)
+        prev_record = mommy.make(Cycle, facility=facility, cycle=prev_cycle)
+        current_record = mommy.make(Cycle, facility=facility, cycle=current_cycle)
+        formulations = [StableConsumption.F1_QUERY, StableConsumption.F2_QUERY, StableConsumption.F3_QUERY]
+        for form in formulations:
+            mommy.make(Consumption, facility_cycle=prev_record, art_consumption=None, pmtct_consumption=30, formulation=form)
+            mommy.make(Consumption, facility_cycle=current_record, art_consumption=5, pmtct_consumption=3, formulation=form)
+        self.assertEqual(Score.objects.count(), 0)
+        StableConsumption().run(current_cycle)
+        self.assertEqual(Score.objects.count(), 0)
+
+    @patch("dashboard.checks.stable_consumption.StableConsumption.build_cycle_formulation_score")
+    def test_should_record_result_for_cycle(self, mock_method):
+        prev_cycle = "Jan - Feb %s" % now().format("YYYY")
+        current_cycle = "Mar - Apr %s" % now().format("YYYY")
+        facility = mommy.make(Facility)
+        prev_record = mommy.make(Cycle, facility=facility, cycle=prev_cycle)
+        current_record = mommy.make(Cycle, facility=facility, cycle=current_cycle)
+        formulations = [StableConsumption.F1_QUERY, StableConsumption.F2_QUERY, StableConsumption.F3_QUERY]
+        for form in formulations:
+            mommy.make(Consumption, facility_cycle=prev_record, art_consumption=10, pmtct_consumption=30, formulation=form)
+            mommy.make(Consumption, facility_cycle=current_record, art_consumption=10, pmtct_consumption=30, formulation=form)
+        self.assertEqual(Score.objects.count(), 0)
+        StableConsumption().run(current_cycle)
+        self.assertEqual(Score.objects.count(), 3)
+        calls = [call(current_cycle, F1, 1, 0, 0, 1), call(current_cycle, F2, 1, 0, 0, 1), call(current_cycle, F3, 1, 0, 0, 1)]
+        mock_method.assert_has_calls(calls)
+
+    def test_should_handle_scenario_where_next_cycle_is_absent(self):
+        current_cycle = "Mar - Apr %s" % now().format("YYYY")
+        facility = mommy.make(Facility)
+        current_record = mommy.make(Cycle, facility=facility, cycle=current_cycle)
+        formulations = [StableConsumption.F1_QUERY, StableConsumption.F2_QUERY, StableConsumption.F3_QUERY]
+        for form in formulations:
+            mommy.make(Consumption, facility_cycle=current_record, art_consumption=10, pmtct_consumption=30, formulation=form)
+        self.assertEqual(Score.objects.count(), 0)
+        StableConsumption().run(current_cycle)
+        self.assertEqual(Score.objects.count(), 3)
+        self.assertEqual(Score.objects.all()[1].stableConsumption, "NOT_REPORTING")
+        self.assertEqual(Score.objects.all()[2].stableConsumption, "NOT_REPORTING")
+        self.assertEqual(Score.objects.all()[0].stableConsumption, "NOT_REPORTING")
+
+    def test_can_handle_blanks(self):
+        prev_cycle = "Jan - Feb %s" % now().format("YYYY")
+        current_cycle = "Mar - Apr %s" % now().format("YYYY")
+        facility = mommy.make(Facility)
+        prev_record = mommy.make(Cycle, facility=facility, cycle=prev_cycle)
+        current_record = mommy.make(Cycle, facility=facility, cycle=current_cycle)
+        formulations = [StableConsumption.F1_QUERY, StableConsumption.F2_QUERY, StableConsumption.F3_QUERY]
+        for form in formulations:
+            mommy.make(Consumption, facility_cycle=prev_record, art_consumption=None, pmtct_consumption=None, formulation=form)
+            mommy.make(Consumption, facility_cycle=current_record, art_consumption=40, pmtct_consumption=10, formulation=form)
+        self.assertEqual(Score.objects.count(), 0)
+        StableConsumption().run(current_cycle)
+        self.assertEqual(Score.objects.count(), 3)
+        self.assertEqual(Score.objects.all()[1].stableConsumption, "NO")
+        self.assertEqual(Score.objects.all()[2].stableConsumption, "NO")
+        self.assertEqual(Score.objects.all()[0].stableConsumption, "NO")

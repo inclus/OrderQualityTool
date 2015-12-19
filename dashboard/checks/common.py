@@ -48,7 +48,10 @@ class CycleFormulationCheck(Check):
         score.save()
 
     def calculate_percentages(self, no, not_reporting, total_count, yes):
-        yes_rate = float(yes * 100) / float(total_count)
-        no_rate = float(no * 100) / float(total_count)
-        not_reporting_rate = float(not_reporting * 100) / float(total_count)
+        if total_count > 0:
+            yes_rate = float(yes * 100) / float(total_count)
+            no_rate = float(no * 100) / float(total_count)
+            not_reporting_rate = float(not_reporting * 100) / float(total_count)
+        else:
+            no_rate = not_reporting_rate = yes_rate = 0
         return no_rate, not_reporting_rate, yes_rate
