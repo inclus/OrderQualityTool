@@ -12,15 +12,27 @@ class Check(object):
             f_test = test
         else:
             f_test = self.test
-        score_record, _ = Score.objects.get_or_create(name=record.facility.name,
+        score_record, _ = Score.objects.get_or_create(name=self.get_facility(record),
                                                       cycle=record.cycle,
-                                                      district=record.facility.district.name,
-                                                      warehouse=record.facility.warehouse.name,
-                                                      ip=record.facility.ip.name,
+                                                      district=self.get_district(record),
+                                                      warehouse=self.get_warehouse(record),
+                                                      ip=self.get_ip(record),
                                                       formulation=formulation_name)
         score_record.score = result
         setattr(score_record, f_test, result)
         score_record.save()
+
+    def get_ip(self, record):
+        return record.facility.ip.name if record.facility.ip  else ""
+
+    def get_warehouse(self, record):
+        return record.facility.warehouse.name if record.facility.warehouse  else ""
+
+    def get_district(self, record):
+        return record.facility.district.name if record.facility.district  else ""
+
+    def get_facility(self, record):
+        return record.facility.name
 
 
 class CycleFormulationCheck(Check):
