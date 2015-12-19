@@ -5,6 +5,8 @@ from dashboard.checks.different_orders_over_time import get_prev_cycle
 from dashboard.helpers import STABLE_CONSUMPTION, NOT_REPORTING, NO, YES, F3, F2, F1
 from dashboard.models import Cycle, Consumption
 
+NAME = "name"
+
 SUM = 'sum'
 
 THRESHOLD = "threshold"
@@ -18,13 +20,16 @@ ART_CONSUMPTION = 'art_consumption'
 
 class StableConsumption(CycleFormulationCheck):
     test = STABLE_CONSUMPTION
+    F1_QUERY = "Efavirenz (TDF/3TC/EFV)"
+    F2_QUERY = "Lamivudine (ABC/3TC) 60mg/30mg [Pack 60]"
+    F3_QUERY = "(EFV) 200mg [Pack 90]"
 
     def run(self, cycle):
         prev_cycle = get_prev_cycle(cycle)
         formulations = [
-            {"name": F1, CONSUMPTION_QUERY: "Efavirenz (TDF/3TC/EFV)", THRESHOLD: 20},
-            {"name": F2, CONSUMPTION_QUERY: "Lamivudine (ABC/3TC) 60mg/30mg [Pack 60]", THRESHOLD: 10},
-            {"name": F3, CONSUMPTION_QUERY: "(EFV) 200mg [Pack 90]", THRESHOLD: 10}
+            {NAME: F1, CONSUMPTION_QUERY: self.F1_QUERY, THRESHOLD: 20},
+            {NAME: F2, CONSUMPTION_QUERY: self.F2_QUERY, THRESHOLD: 10},
+            {NAME: F3, CONSUMPTION_QUERY: self.F3_QUERY, THRESHOLD: 10}
         ]
         for formulation in formulations:
             yes = 0
@@ -54,5 +59,5 @@ class StableConsumption(CycleFormulationCheck):
                     no += 1
                     result = NO
                 finally:
-                    self.record_result_for_facility(record, result, formulation["name"])
-            self.build_cycle_formulation_score(cycle, formulation["name"], yes, no, not_reporting, total_count)
+                    self.record_result_for_facility(record, result, formulation[NAME])
+            self.build_cycle_formulation_score(cycle, formulation[NAME], yes, no, not_reporting, total_count)

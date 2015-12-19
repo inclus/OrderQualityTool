@@ -1,9 +1,12 @@
+from arrow import now
 from django.test import TestCase
+from mock import patch, call
+from model_mommy import mommy
 
 from dashboard.checks.different_orders_over_time import get_prev_cycle, DifferentOrdersOverTime
-from dashboard.helpers import DIFFERENT_ORDERS_OVER_TIME
-from dashboard.models import Cycle, Consumption, CycleFormulationScore
-from locations.models import Facility, WareHouse, IP, District
+from dashboard.helpers import DIFFERENT_ORDERS_OVER_TIME, NO, YES, F1, F2, F3
+from dashboard.models import Cycle, Consumption, CycleFormulationScore, Score
+from locations.models import Facility
 
 
 class DifferentOrdersOverTimeTestCase(TestCase):
@@ -12,44 +15,79 @@ class DifferentOrdersOverTimeTestCase(TestCase):
         for v in values:
             self.assertEqual(get_prev_cycle(v[1]), v[0])
 
+    @patch("dashboard.checks.different_orders_over_time.DifferentOrdersOverTime.record_result_for_facility")
+    def test_should_record_result_for_facility(self, mock_method):
+        prev_cycle = "Jan - Feb %s" % now().format("YYYY")
+        current_cycle = "Mar - Apr %s" % now().format("YYYY")
+        facility = mommy.make(Facility)
+        prev_record = mommy.make(Cycle, facility=facility, cycle=prev_cycle)
+        current_record = mommy.make(Cycle, facility=facility, cycle=current_cycle)
+        formulations = [DifferentOrdersOverTime.F1_QUERY, DifferentOrdersOverTime.F2_QUERY, DifferentOrdersOverTime.F3_QUERY]
+        for form in formulations:
+            mommy.make(Consumption, facility_cycle=prev_record, opening_balance=13, estimated_number_of_new_patients=10, art_consumption=12, formulation=form)
+            mommy.make(Consumption, facility_cycle=current_record, opening_balance=120, estimated_number_of_new_patients=10, art_consumption=12, formulation=form)
+        self.assertEqual(Score.objects.count(), 0)
+
+        DifferentOrdersOverTime().run(current_cycle)
+        calls = [call(current_record, YES, F1), call(current_record, YES, F2), call(current_record, YES, F3)]
+        mock_method.assert_has_calls(calls)
+
+    def test_compare_values_when_same(self):
+        check = DifferentOrdersOverTime()
+        no, result, yes = check.compare_values([{'opening_balance': 10, 'art_consumption': 12, 'estimated_number_of_new_patients': 13}], [{'opening_balance': 10, 'art_consumption': 12, 'estimated_number_of_new_patients': 13}], 0, "", 0)
+        self.assertEqual(yes, 0)
+        self.assertEqual(no, 1)
+        self.assertEqual(result, NO)
+
+    def test_compare_values_when_one_same(self):
+        check = DifferentOrdersOverTime()
+        no, result, yes = check.compare_values([{'opening_balance': 10, 'art_consumption': 13, 'estimated_number_of_new_patients': 13}], [{'opening_balance': 10, 'art_consumption': 12, 'estimated_number_of_new_patients': 13}], 0, "", 0)
+        self.assertEqual(yes, 1)
+        self.assertEqual(no, 0)
+        self.assertEqual(result, YES)
+
+    def test_compare_values_when_one_same_with_blank(self):
+        check = DifferentOrdersOverTime()
+        no, result, yes = check.compare_values([{'opening_balance': 10, 'art_consumption': None, 'estimated_number_of_new_patients': 13}], [{'opening_balance': 10, 'art_consumption': 12, 'estimated_number_of_new_patients': 13}], 0, "", 0)
+        self.assertEqual(yes, 1)
+        self.assertEqual(no, 0)
+        self.assertEqual(result, YES)
+
+    def test_compare_values_when_one_same_when_all_zeros(self):
+        check = DifferentOrdersOverTime()
+        no, result, yes = check.compare_values([{'opening_balance': 0, 'art_consumption': 0, 'estimated_number_of_new_patients': 0}], [{'opening_balance': 0, 'art_consumption': 0, 'estimated_number_of_new_patients': 0}], 0, "", 0)
+        self.assertEqual(yes, 1)
+        self.assertEqual(no, 0)
+        self.assertEqual(result, YES)
+
     def test_check(self):
-        names = ["FA1", "FA2", "FA3"]
-        names_without_data = ["FA4", "FA5"]
-        consumption_regimens = ["Efavirenz (TDF/3TC/EFV)", "Lamivudine (ABC/3TC) 60mg/30mg [Pack 60]", "(EFV) 200mg [Pack 90]"]
-        cycles = ["Jan - Feb 2013", "Mar - Apr 2013"]
-        consumption_data = {}
-        consumption_data['opening_balance'] = 3
-        consumption_data['quantity_received'] = 4.5
-        consumption_data['pmtct_consumption'] = 4.5
-        consumption_data['art_consumption'] = 4.5
-        consumption_data['loses_adjustments'] = 4.5
-        consumption_data['closing_balance'] = 4.5
-        consumption_data['months_of_stock_of_hand'] = 4
-        consumption_data['quantity_required_for_current_patients'] = 4.5
-        consumption_data['estimated_number_of_new_patients'] = 4.5
-        consumption_data['estimated_number_of_new_pregnant_women'] = 4.5
-        consumption_data['total_quantity_to_be_ordered'] = 4.5
-        consumption_data['notes'] = None
-        i = 0
-        warehouse, _ = WareHouse.objects.get_or_create(name="warehouse")
-        ip, _ = IP.objects.get_or_create(name="ip")
-        district, _ = District.objects.get_or_create(name="dis")
-        for cycle in cycles:
-            for name in names:
-                facility, _ = Facility.objects.get_or_create(name=name, ip=ip, warehouse=warehouse, district=district)
-                record, _ = Cycle.objects.get_or_create(cycle=cycle, facility=facility, reporting_status=True)
-                consumption_data['facility_cycle'] = record
-                for reg in consumption_regimens:
-                    consumption_data['formulation'] = reg
-                    Consumption.objects.create(**consumption_data)
+        prev_cycle = "Jan - Feb %s" % now().format("YYYY")
+        current_cycle = "Mar - Apr %s" % now().format("YYYY")
+        facility = mommy.make(Facility)
+        prev_record = mommy.make(Cycle, facility=facility, cycle=prev_cycle)
+        current_record = mommy.make(Cycle, facility=facility, cycle=current_cycle)
+        formulations = [DifferentOrdersOverTime.F1_QUERY, DifferentOrdersOverTime.F2_QUERY, DifferentOrdersOverTime.F3_QUERY]
+        for form in formulations:
+            mommy.make(Consumption, facility_cycle=prev_record, opening_balance=13, estimated_number_of_new_patients=10, art_consumption=12, formulation=form)
+            mommy.make(Consumption, facility_cycle=current_record, opening_balance=120, estimated_number_of_new_patients=10, art_consumption=12, formulation=form)
+        self.assertEqual(Score.objects.count(), 0)
 
-            for name in names_without_data:
-                facility, _ = Facility.objects.get_or_create(name=name, ip=ip, warehouse=warehouse, district=district)
-                record, _ = Cycle.objects.get_or_create(cycle=cycle, facility=facility, reporting_status=True)
-            i += 1
-
-        DifferentOrdersOverTime().run(cycles[1])
-        score = CycleFormulationScore.objects.filter(test=DIFFERENT_ORDERS_OVER_TIME, cycle=cycles[1])[0]
-        self.assertEquals(score.yes, 60.0)
+        DifferentOrdersOverTime().run(current_cycle)
+        score = CycleFormulationScore.objects.filter(test=DIFFERENT_ORDERS_OVER_TIME, cycle=current_cycle)[0]
+        self.assertEquals(score.yes, 100.0)
         self.assertEquals(score.no, 0.0)
-        self.assertEquals(score.not_reporting, 40.0)
+        self.assertEquals(score.not_reporting, 0.0)
+
+    def test_should_handle_scenario_where_next_cycle_is_absent(self):
+        current_cycle = "Mar - Apr %s" % now().format("YYYY")
+        facility = mommy.make(Facility)
+        current_record = mommy.make(Cycle, facility=facility, cycle=current_cycle)
+        formulations = [DifferentOrdersOverTime.F1_QUERY, DifferentOrdersOverTime.F2_QUERY, DifferentOrdersOverTime.F3_QUERY]
+        for form in formulations:
+            mommy.make(Consumption, facility_cycle=current_record, opening_balance=120, formulation=form)
+        self.assertEqual(Score.objects.count(), 0)
+        DifferentOrdersOverTime().run(current_cycle)
+        self.assertEqual(Score.objects.count(), 3)
+        self.assertEqual(Score.objects.all()[1].differentOrdersOverTime, "NOT_REPORTING")
+        self.assertEqual(Score.objects.all()[2].differentOrdersOverTime, "NOT_REPORTING")
+        self.assertEqual(Score.objects.all()[0].differentOrdersOverTime, "NOT_REPORTING")
