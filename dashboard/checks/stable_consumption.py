@@ -42,8 +42,8 @@ class StableConsumption(CycleFormulationCheck):
             for record in qs:
                 include_record = True
                 result = NOT_REPORTING
-                current_qs = Consumption.objects.annotate(consumption=Sum(F(ART_CONSUMPTION) + F(PMTCT_CONSUMPTION))).filter(facility_cycle=record, formulation__icontains=formulation[CONSUMPTION_QUERY])
-                prev_qs = Consumption.objects.annotate(consumption=Sum(F(ART_CONSUMPTION) + F(PMTCT_CONSUMPTION))).filter(facility_cycle__facility=record.facility, facility_cycle__cycle=prev_cycle, formulation__icontains=formulation[CONSUMPTION_QUERY])
+                current_qs = Consumption.objects.filter(facility_cycle=record, formulation__icontains=formulation[CONSUMPTION_QUERY])
+                prev_qs = Consumption.objects.filter(facility_cycle__facility=record.facility, facility_cycle__cycle=prev_cycle, formulation__icontains=formulation[CONSUMPTION_QUERY])
                 number_of_consumption_records = prev_qs.count()
                 number_of_consumption_records_next_cycle = current_qs.count()
                 current_consumption = current_qs.aggregate(sum=Sum(Coalesce(F(ART_CONSUMPTION), 0) + Coalesce(F(PMTCT_CONSUMPTION), 0))).get(SUM, 0)
@@ -53,7 +53,7 @@ class StableConsumption(CycleFormulationCheck):
                     total_count += 1
                     if number_of_consumption_records == 0 or number_of_consumption_records_next_cycle == 0:
                         not_reporting += 1
-                    elif prev_consumption != 0 and 0.5 < (current_consumption / prev_consumption) < 1.5:
+                    elif prev_consumption != 0 and 0.5 <= (current_consumption / prev_consumption) <= 1.5:
                         yes += 1
                         result = YES
                     else:

@@ -5,8 +5,9 @@ from model_mommy import mommy
 
 from dashboard.checks.different_orders_over_time import get_prev_cycle, DifferentOrdersOverTime
 from dashboard.checks.stable_consumption import StableConsumption
+from dashboard.checks.stable_patient_volumes import StablePatientVolumes
 from dashboard.helpers import DIFFERENT_ORDERS_OVER_TIME, NO, YES, F1, F2, F3
-from dashboard.models import Cycle, Consumption, CycleFormulationScore, Score
+from dashboard.models import Cycle, Consumption, CycleFormulationScore, Score, AdultPatientsRecord, PAEDPatientsRecord
 from locations.models import Facility
 
 
@@ -206,3 +207,157 @@ class StableConsumptionTestCase(TestCase):
         self.assertEqual(Score.objects.all()[1].stableConsumption, "NO")
         self.assertEqual(Score.objects.all()[2].stableConsumption, "NO")
         self.assertEqual(Score.objects.all()[0].stableConsumption, "NO")
+
+
+class StablePatientVolumesTestCase(TestCase):
+    @patch("dashboard.checks.stable_patient_volumes.StablePatientVolumes.record_result_for_facility")
+    def test_should_record_result_for_facility(self, mock_method):
+        prev_cycle = "Jan - Feb %s" % now().format("YYYY")
+        current_cycle = "Mar - Apr %s" % now().format("YYYY")
+        facility = mommy.make(Facility)
+        prev_record = mommy.make(Cycle, facility=facility, cycle=prev_cycle)
+        current_record = mommy.make(Cycle, facility=facility, cycle=current_cycle)
+
+        mommy.make(AdultPatientsRecord, facility_cycle=prev_record, new=10, existing=10, formulation=StablePatientVolumes.F1_QUERY)
+        mommy.make(AdultPatientsRecord, facility_cycle=current_record, new=10, existing=10, formulation=StablePatientVolumes.F1_QUERY)
+
+        mommy.make(PAEDPatientsRecord, facility_cycle=prev_record, new=10, existing=10, formulation=StablePatientVolumes.F2_QUERY)
+        mommy.make(PAEDPatientsRecord, facility_cycle=current_record, new=10, existing=10, formulation=StablePatientVolumes.F2_QUERY)
+
+        mommy.make(PAEDPatientsRecord, facility_cycle=prev_record, new=10, existing=10, formulation=StablePatientVolumes.F3_QUERY)
+        mommy.make(PAEDPatientsRecord, facility_cycle=current_record, new=10, existing=10, formulation=StablePatientVolumes.F3_QUERY)
+
+        self.assertEqual(Score.objects.count(), 0)
+        StablePatientVolumes().run(current_cycle)
+        calls = [call(current_record, YES, F1), call(current_record, YES, F2), call(current_record, YES, F3)]
+        mock_method.assert_has_calls(calls)
+
+    def test_should_calculate_correct_result(self):
+        prev_cycle = "Jan - Feb %s" % now().format("YYYY")
+        current_cycle = "Mar - Apr %s" % now().format("YYYY")
+        facility = mommy.make(Facility)
+        prev_record = mommy.make(Cycle, facility=facility, cycle=prev_cycle)
+        current_record = mommy.make(Cycle, facility=facility, cycle=current_cycle)
+
+        mommy.make(AdultPatientsRecord, facility_cycle=prev_record, new=10, existing=10, formulation=StablePatientVolumes.F1_QUERY)
+        mommy.make(AdultPatientsRecord, facility_cycle=current_record, new=10, existing=10, formulation=StablePatientVolumes.F1_QUERY)
+
+        mommy.make(PAEDPatientsRecord, facility_cycle=prev_record, new=10, existing=10, formulation=StablePatientVolumes.F2_QUERY)
+        mommy.make(PAEDPatientsRecord, facility_cycle=current_record, new=10, existing=10, formulation=StablePatientVolumes.F2_QUERY)
+
+        mommy.make(PAEDPatientsRecord, facility_cycle=prev_record, new=10, existing=10, formulation=StablePatientVolumes.F3_QUERY)
+        mommy.make(PAEDPatientsRecord, facility_cycle=current_record, new=10, existing=10, formulation=StablePatientVolumes.F3_QUERY)
+
+        self.assertEqual(Score.objects.count(), 0)
+        StablePatientVolumes().run(current_cycle)
+        self.assertEqual(Score.objects.count(), 3)
+        self.assertEqual(Score.objects.all()[1].stablePatientVolumes, "YES")
+        self.assertEqual(Score.objects.all()[2].stablePatientVolumes, "YES")
+        self.assertEqual(Score.objects.all()[0].stablePatientVolumes, "YES")
+
+    def test_can_get_no(self):
+        prev_cycle = "Jan - Feb %s" % now().format("YYYY")
+        current_cycle = "Mar - Apr %s" % now().format("YYYY")
+        facility = mommy.make(Facility)
+        prev_record = mommy.make(Cycle, facility=facility, cycle=prev_cycle)
+        current_record = mommy.make(Cycle, facility=facility, cycle=current_cycle)
+
+        mommy.make(AdultPatientsRecord, facility_cycle=prev_record, new=10, existing=10, formulation=StablePatientVolumes.F1_QUERY)
+        mommy.make(AdultPatientsRecord, facility_cycle=current_record, new=10, existing=100, formulation=StablePatientVolumes.F1_QUERY)
+
+        mommy.make(PAEDPatientsRecord, facility_cycle=prev_record, new=10, existing=10, formulation=StablePatientVolumes.F2_QUERY)
+        mommy.make(PAEDPatientsRecord, facility_cycle=current_record, new=10, existing=100, formulation=StablePatientVolumes.F2_QUERY)
+
+        mommy.make(PAEDPatientsRecord, facility_cycle=prev_record, new=10, existing=10, formulation=StablePatientVolumes.F3_QUERY)
+        mommy.make(PAEDPatientsRecord, facility_cycle=current_record, new=10, existing=1000, formulation=StablePatientVolumes.F3_QUERY)
+
+        self.assertEqual(Score.objects.count(), 0)
+        StablePatientVolumes().run(current_cycle)
+        self.assertEqual(Score.objects.count(), 3)
+        self.assertEqual(Score.objects.all()[1].stablePatientVolumes, "NO")
+        self.assertEqual(Score.objects.all()[2].stablePatientVolumes, "NO")
+        self.assertEqual(Score.objects.all()[0].stablePatientVolumes, "NO")
+
+    def test_should_only_consider_facilities_with_population_over_threshold(self):
+        prev_cycle = "Jan - Feb %s" % now().format("YYYY")
+        current_cycle = "Mar - Apr %s" % now().format("YYYY")
+        facility = mommy.make(Facility)
+        prev_record = mommy.make(Cycle, facility=facility, cycle=prev_cycle)
+        current_record = mommy.make(Cycle, facility=facility, cycle=current_cycle)
+
+        mommy.make(AdultPatientsRecord, facility_cycle=prev_record, new=2, existing=2, formulation=StablePatientVolumes.F1_QUERY)
+        mommy.make(AdultPatientsRecord, facility_cycle=current_record, new=2, existing=2, formulation=StablePatientVolumes.F1_QUERY)
+
+        mommy.make(PAEDPatientsRecord, facility_cycle=prev_record, new=2, existing=2, formulation=StablePatientVolumes.F2_QUERY)
+        mommy.make(PAEDPatientsRecord, facility_cycle=current_record, new=2, existing=2, formulation=StablePatientVolumes.F2_QUERY)
+
+        mommy.make(PAEDPatientsRecord, facility_cycle=prev_record, new=1, existing=0, formulation=StablePatientVolumes.F3_QUERY)
+        mommy.make(PAEDPatientsRecord, facility_cycle=current_record, new=0, existing=1, formulation=StablePatientVolumes.F3_QUERY)
+
+        self.assertEqual(Score.objects.count(), 0)
+        StableConsumption().run(current_cycle)
+        self.assertEqual(Score.objects.count(), 0)
+
+    @patch("dashboard.checks.stable_patient_volumes.StablePatientVolumes.build_cycle_formulation_score")
+    def test_should_record_result_for_cycle(self, mock_method):
+        prev_cycle = "Jan - Feb %s" % now().format("YYYY")
+        current_cycle = "Mar - Apr %s" % now().format("YYYY")
+        facility = mommy.make(Facility)
+        prev_record = mommy.make(Cycle, facility=facility, cycle=prev_cycle)
+        current_record = mommy.make(Cycle, facility=facility, cycle=current_cycle)
+
+        mommy.make(AdultPatientsRecord, facility_cycle=prev_record, new=10, existing=10, formulation=StablePatientVolumes.F1_QUERY)
+        mommy.make(AdultPatientsRecord, facility_cycle=current_record, new=10, existing=10, formulation=StablePatientVolumes.F1_QUERY)
+
+        mommy.make(PAEDPatientsRecord, facility_cycle=prev_record, new=10, existing=10, formulation=StablePatientVolumes.F2_QUERY)
+        mommy.make(PAEDPatientsRecord, facility_cycle=current_record, new=10, existing=10, formulation=StablePatientVolumes.F2_QUERY)
+
+        mommy.make(PAEDPatientsRecord, facility_cycle=prev_record, new=10, existing=10, formulation=StablePatientVolumes.F3_QUERY)
+        mommy.make(PAEDPatientsRecord, facility_cycle=current_record, new=10, existing=10, formulation=StablePatientVolumes.F3_QUERY)
+
+        self.assertEqual(Score.objects.count(), 0)
+        StablePatientVolumes().run(current_cycle)
+        self.assertEqual(Score.objects.count(), 3)
+        calls = [call(current_cycle, F1, 1, 0, 0, 1), call(current_cycle, F2, 1, 0, 0, 1), call(current_cycle, F3, 1, 0, 0, 1)]
+        mock_method.assert_has_calls(calls)
+
+    def test_should_handle_scenario_where_next_cycle_is_absent(self):
+        current_cycle = "Mar - Apr %s" % now().format("YYYY")
+        facility = mommy.make(Facility)
+        current_record = mommy.make(Cycle, facility=facility, cycle=current_cycle)
+
+        mommy.make(AdultPatientsRecord, facility_cycle=current_record, new=10, existing=10, formulation=StablePatientVolumes.F1_QUERY)
+
+        mommy.make(PAEDPatientsRecord, facility_cycle=current_record, new=10, existing=10, formulation=StablePatientVolumes.F2_QUERY)
+
+        mommy.make(PAEDPatientsRecord, facility_cycle=current_record, new=10, existing=10, formulation=StablePatientVolumes.F3_QUERY)
+
+        self.assertEqual(Score.objects.count(), 0)
+        StablePatientVolumes().run(current_cycle)
+        self.assertEqual(Score.objects.count(), 3)
+        self.assertEqual(Score.objects.all()[1].stablePatientVolumes, "NOT_REPORTING")
+        self.assertEqual(Score.objects.all()[2].stablePatientVolumes, "NOT_REPORTING")
+        self.assertEqual(Score.objects.all()[0].stablePatientVolumes, "NOT_REPORTING")
+
+    def test_can_handle_blanks(self):
+        prev_cycle = "Jan - Feb %s" % now().format("YYYY")
+        current_cycle = "Mar - Apr %s" % now().format("YYYY")
+        facility = mommy.make(Facility)
+        prev_record = mommy.make(Cycle, facility=facility, cycle=prev_cycle)
+        current_record = mommy.make(Cycle, facility=facility, cycle=current_cycle)
+
+        mommy.make(AdultPatientsRecord, facility_cycle=prev_record, new=10, existing=10, formulation=StablePatientVolumes.F1_QUERY)
+        mommy.make(AdultPatientsRecord, facility_cycle=current_record, new=None, existing=11, formulation=StablePatientVolumes.F1_QUERY)
+
+        mommy.make(PAEDPatientsRecord, facility_cycle=prev_record, new=10, existing=10, formulation=StablePatientVolumes.F2_QUERY)
+        mommy.make(PAEDPatientsRecord, facility_cycle=current_record, new=None, existing=10, formulation=StablePatientVolumes.F2_QUERY)
+
+        mommy.make(PAEDPatientsRecord, facility_cycle=prev_record, new=10, existing=10, formulation=StablePatientVolumes.F3_QUERY)
+        mommy.make(PAEDPatientsRecord, facility_cycle=current_record, new=10, existing=10, formulation=StablePatientVolumes.F3_QUERY)
+
+        self.assertEqual(Score.objects.count(), 0)
+        StablePatientVolumes().run(current_cycle)
+        self.assertEqual(Score.objects.count(), 3)
+        self.assertEqual(Score.objects.all()[1].stablePatientVolumes, "YES")
+        self.assertEqual(Score.objects.all()[2].stablePatientVolumes, "YES")
+        self.assertEqual(Score.objects.all()[0].stablePatientVolumes, "YES")
