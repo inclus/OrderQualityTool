@@ -1,12 +1,14 @@
 import json
 import os
 from json import loads
+
 from arrow import now
 from django.core.urlresolvers import reverse
 from django.test import TestCase
 from django_webtest import WebTest
 from mock import patch, ANY
 from webtest import Upload
+
 from dashboard.checks.web_based_reporting import ReportingCheck, WebBasedReportingCheck, MultipleOrdersCheck
 from dashboard.helpers import WEB_BASED, REPORTING, MULTIPLE_ORDERS
 from dashboard.models import Cycle, Score, DashboardUser
@@ -127,7 +129,7 @@ class BestDistrictReportingViewFor(WebTest):
         json_response = self.app.get(url, user="testuser").content.decode('utf8')
         data = loads(json_response)['values']
         self.assertEquals('F2', data[0]['name'])
-        self.assertEquals(100.0/18, data[0]['rate'])
+        self.assertEquals(100.0 / 18, data[0]['rate'])
 
 
 class ReportingCheckTestCase(TestCase):
@@ -195,8 +197,6 @@ class MultipleReportingCheckTestCase(TestCase):
 
 class FacilityTestCycleScoresListViewTestCase(WebTest):
     def test_should_make_one_query(self):
-        cycle = 'Jan - Feb %s' % now().format("YYYY")
-        cycle2 = 'Mar - Apr %s' % now().format("YYYY")
         dis, _ = District.objects.get_or_create(name="dis1")
         ip, _ = IP.objects.get_or_create(name="ip")
         warehouse, _ = WareHouse.objects.get_or_create(name="warehouse")
