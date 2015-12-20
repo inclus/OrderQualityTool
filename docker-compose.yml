@@ -35,7 +35,7 @@ celery:
   volumes_from:
     - orderqualitytool
   env_file: .env
-  command: celery -A orderqualitytool.celery worker --concurrency=6
+  command: celery -A orderqualitytool.celery worker --concurrency=3
 
 flower:
   restart: always

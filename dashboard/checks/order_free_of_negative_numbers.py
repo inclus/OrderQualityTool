@@ -35,7 +35,6 @@ class OrderFormFreeOfNegativeNumbers(Check):
                 number_of_records = Consumption.objects.filter(facility_cycle=record, formulation__icontains=query).count()
                 number_of_valid_records = Consumption.objects.filter(facility_cycle__cycle=cycle, formulation__icontains=query).exclude(reduce(operator.or_, filter_list)).count()
                 result = NOT_REPORTING
-                print number_of_records, number_of_valid_records, Consumption.objects.filter(facility_cycle__cycle=cycle, formulation__icontains=query).exclude(reduce(operator.or_, filter_list)).values('opening_balance','quantity_received','pmtct_consumption','art_consumption','estimated_number_of_new_pregnant_women','total_quantity_to_be_ordered')
                 if number_of_records == 0:
                     not_reporting += 1
                 elif number_of_valid_records < 1:

@@ -42,7 +42,6 @@ class ClosingBalance(CycleFormulationCheck):
     def compare_values(self, current_values, new_values, no, result, yes):
         combined_list = current_values[0].values() + new_values[0].values()
         diff = list(set(new_values[0].values()) - set(current_values[0].values()))
-        print diff
         if len(diff) > 0 or None in combined_list:
             no += 1
             result = NO

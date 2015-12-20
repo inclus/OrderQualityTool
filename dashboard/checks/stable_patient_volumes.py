@@ -64,7 +64,6 @@ class StablePatientVolumes(CycleFormulationCheck):
                         yes += 1
                         result = YES
                     else:
-                        print((current_population / prev_population))
                         no += 1
                         result = NO
                     self.record_result_for_facility(record, result, formulation[NAME])
