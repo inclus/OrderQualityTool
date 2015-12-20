@@ -13,12 +13,15 @@ CONSUMPTION_QUERY = "consumption_query"
 
 class OrderFormFreeOfNegativeNumbers(Check):
     test = ORDER_FORM_FREE_OF_NEGATIVE_NUMBERS
+    F1_QUERY = "Efavirenz (TDF/3TC/EFV)"
+    F2_QUERY = "Lamivudine (ABC/3TC) 60mg/30mg [Pack 60]"
+    F3_QUERY = "EFV) 200mg [Pack 90]"
 
     def run(self, cycle):
         formulations = [
-            {NAME: F1, CONSUMPTION_QUERY: "Efavirenz (TDF/3TC/EFV)"},
-            {NAME: F2, CONSUMPTION_QUERY: "Lamivudine (ABC/3TC) 60mg/30mg [Pack 60]"},
-            {NAME: F3, CONSUMPTION_QUERY: "EFV) 200mg [Pack 90]"}
+            {NAME: F1, CONSUMPTION_QUERY: self.F1_QUERY},
+            {NAME: F2, CONSUMPTION_QUERY: self.F2_QUERY},
+            {NAME: F3, CONSUMPTION_QUERY: self.F3_QUERY}
         ]
         for formulation in formulations:
             query = formulation[CONSUMPTION_QUERY]
@@ -32,9 +35,10 @@ class OrderFormFreeOfNegativeNumbers(Check):
                 number_of_records = Consumption.objects.filter(facility_cycle=record, formulation__icontains=query).count()
                 number_of_valid_records = Consumption.objects.filter(facility_cycle__cycle=cycle, formulation__icontains=query).exclude(reduce(operator.or_, filter_list)).count()
                 result = NOT_REPORTING
-                if number_of_records == 0 or not record.reporting_status:
+                print number_of_records, number_of_valid_records, Consumption.objects.filter(facility_cycle__cycle=cycle, formulation__icontains=query).exclude(reduce(operator.or_, filter_list)).values('opening_balance','quantity_received','pmtct_consumption','art_consumption','estimated_number_of_new_pregnant_women','total_quantity_to_be_ordered')
+                if number_of_records == 0:
                     not_reporting += 1
-                elif number_of_valid_records > 0:
+                elif number_of_valid_records < 1:
                     no += 1
                     result = NO
                 else:

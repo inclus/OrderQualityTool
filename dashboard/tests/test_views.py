@@ -55,6 +55,54 @@ class FacilitiesReportingView(WebTest):
         data = loads(json_response)['values']
         self.assertIn({"reporting": 50, "cycle": cycle, "not_reporting": 50}, data)
 
+    def test_that_start_end_work(self):
+        cycle = 'Jan - Feb %s' % now().format("YYYY")
+        cycle_2 = 'Mar - Apr %s' % now().format("YYYY")
+        loc, _ = Facility.objects.get_or_create(name="AIC Jinja Special Clinic")
+        loc2, _ = Facility.objects.get_or_create(name="AIC Special Clinic")
+        Cycle.objects.create(facility=loc, cycle=cycle, web_based=True)
+        Cycle.objects.create(facility=loc2, cycle=cycle, web_based=False)
+        url = "/api/test/submittedOrder?start=%s&end=%s" % (cycle, cycle_2)
+        json_response = self.app.get(url, user="testuser").content.decode('utf8')
+        data = loads(json_response)['values']
+        self.assertEqual(len(data), 2)
+
+
+class WebBasedReportingViewTestCase(WebTest):
+    def test_that_cycles_are_padded(self):
+        cycle = 'Jan - Feb %s' % now().format("YYYY")
+        loc, _ = Facility.objects.get_or_create(name="AIC Jinja Special Clinic")
+        loc2, _ = Facility.objects.get_or_create(name="AIC Special Clinic")
+        Cycle.objects.create(facility=loc, cycle=cycle, web_based=True)
+        Cycle.objects.create(facility=loc2, cycle=cycle, web_based=False)
+        url = "/api/test/orderType"
+        json_response = self.app.get(url, user="testuser").content.decode('utf8')
+        data = loads(json_response)['values']
+        self.assertIn({"web": 50, "cycle": cycle, "paper": 50}, data)
+
+    def test_that_start_end_work(self):
+        cycle = 'Jan - Feb %s' % now().format("YYYY")
+        cycle_2 = 'Mar - Apr %s' % now().format("YYYY")
+        loc, _ = Facility.objects.get_or_create(name="AIC Jinja Special Clinic")
+        loc2, _ = Facility.objects.get_or_create(name="AIC Special Clinic")
+        Cycle.objects.create(facility=loc, cycle=cycle, web_based=True)
+        Cycle.objects.create(facility=loc2, cycle=cycle, web_based=False)
+        url = "/api/test/orderType?start=%s&end=%s" % (cycle, cycle_2)
+        json_response = self.app.get(url, user="testuser").content.decode('utf8')
+        data = loads(json_response)['values']
+        self.assertEqual(len(data), 2)
+
+class FacilitiesMultipleReportingViewTestCase(WebTest):
+    def test_shows_all_facilities_that_report_multiple_times(self):
+        cycle = 'Jan - Feb %s' % now().format("YYYY")
+        loc, _ = Facility.objects.get_or_create(name="AIC Jinja Special Clinic")
+        loc2, _ = Facility.objects.get_or_create(name="AIC Special Clinic")
+        Cycle.objects.create(facility=loc, cycle=cycle, multiple=True)
+        Cycle.objects.create(facility=loc2, cycle=cycle, web_based=False)
+        url = "/api/test/facilitiesMultiple"
+        json_response = self.app.get(url, user="testuser").content.decode('utf8')
+        data = loads(json_response)['values']
+        self.assertEqual(len(data), 1)
 
 class BestDistrictReportingViewFor(WebTest):
     def test_best_performing_districts(self):
@@ -130,6 +178,28 @@ class BestDistrictReportingViewFor(WebTest):
         data = loads(json_response)['values']
         self.assertEquals('F2', data[0]['name'])
         self.assertEquals(100.0 / 18, data[0]['rate'])
+
+    def test_worst_csv(self):
+        Score.objects.create(name="F1", warehouse="W1", ip="I1", district="D1", REPORTING="YES", WEB_BASED="YES")
+        Score.objects.create(name="F2", warehouse="W2", ip="I2", district="D2", REPORTING="NO", WEB_BASED="YES")
+        url = reverse("ranking_worst_csv") + "?level=facility"
+        csv = self.app.get(url, user="testuser").content.decode('utf8')
+        expected = """facility,reporting rate
+F2,5.555555555555555
+F1,11.11111111111111
+"""
+        self.assertEquals(csv.replace("\r",""), expected)
+
+    def test_best_csv(self):
+        Score.objects.create(name="F1", warehouse="W1", ip="I1", district="D1", REPORTING="YES", WEB_BASED="YES")
+        Score.objects.create(name="F2", warehouse="W2", ip="I2", district="D2", REPORTING="NO", WEB_BASED="YES")
+        url = reverse("ranking_best_csv") + "?level=facility"
+        csv = self.app.get(url, user="testuser").content.decode('utf8')
+        expected = """facility,reporting rate
+F1,11.11111111111111
+F2,5.555555555555555
+"""
+        self.assertEquals(csv.replace("\r",""), expected)
 
 
 class ReportingCheckTestCase(TestCase):
