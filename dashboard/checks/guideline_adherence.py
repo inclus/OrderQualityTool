@@ -4,7 +4,7 @@ from django.db.models import Q, F, Sum
 
 from dashboard.checks.common import CycleFormulationCheck
 from dashboard.helpers import GUIDELINE_ADHERENCE, NOT_REPORTING, YES, NO
-from dashboard.models import FacilityCycleRecord, FacilityConsumptionRecord
+from dashboard.models import Cycle, Consumption
 
 FIELDS = "fields"
 
@@ -39,7 +39,7 @@ class GuideLineAdherence(CycleFormulationCheck):
 
         for formulation in formulations:
             name = formulation[NAME]
-            qs = FacilityCycleRecord.objects.filter(cycle=cycle)
+            qs = Cycle.objects.filter(cycle=cycle)
             total_count = qs.count()
             not_reporting = 0
             yes = 0
@@ -50,8 +50,8 @@ class GuideLineAdherence(CycleFormulationCheck):
                     df1_filter = reduce(operator.or_, (Q(formulation__contains=item) for item in formulation[DF1]))
                     df1_sum_fields = reduce(operator.add, (F(item) for item in formulation[FIELDS]))
                     df2_filter = reduce(operator.or_, (Q(formulation__contains=item) for item in formulation[DF1]))
-                    df1_qs = FacilityConsumptionRecord.objects.filter(facility_cycle=record).filter(df1_filter)
-                    df2_qs = FacilityConsumptionRecord.objects.filter(facility_cycle=record).filter(df2_filter)
+                    df1_qs = Consumption.objects.filter(facility_cycle=record).filter(df1_filter)
+                    df2_qs = Consumption.objects.filter(facility_cycle=record).filter(df2_filter)
                     df1_count = df1_qs.count()
                     df2_count = df2_qs.count()
                     sum_df1 = df1_qs.aggregate(sum=Sum(df1_sum_fields)).get("sum", 0)
@@ -71,6 +71,6 @@ class GuideLineAdherence(CycleFormulationCheck):
                     no += 1
                     result = NO
                 finally:
-                    test_name = "%s%s" % (GUIDELINE_ADHERENCE, name)
+                    test_name = "%s%s" % (GUIDELINE_ADHERENCE, name.replace(" ", ""))
                     self.record_result_for_facility(record, result, test=test_name)
             self.build_cycle_formulation_score(cycle, name, yes, no, not_reporting, total_count)

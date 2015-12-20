@@ -5,61 +5,61 @@
         </div>
         <div class="col-md-2">
             <h3>
-                <span class="label label-success">{{selectedFilter.ip.name}}</span>
+            <span class="label label-success">{{selectedFilter.ip.name}}</span>
             </h3>
         </div>
         <div class="col-md-2">
             <h3>
-                <span class="label label-success">{{selectedFilter.district.name}}</span>
+            <span class="label label-success">{{selectedFilter.district.name}}</span>
             </h3>
         </div>
         <div class="col-md-2">
             <h3>
-                <span class="label label-success">{{selectedFilter.warehouse.name}}</span>
+            <span class="label label-success">{{selectedFilter.warehouse.name}}</span>
             </h3>
         </div>
         <div class="col-md-2">
             <h3>
-                <span class="label label-success">{{selectedFilter.cycle.cycle}}</span>
+            <span class="label label-success">{{selectedFilter.cycle.cycle}}</span>
             </h3>
         </div>
         <div class="col-md-2">
             <h3>
-                <span class="label label-success">{{selectedFilter.formulation.formulation}}</span>
+            <span class="label label-success">{{selectedFilter.formulation.formulation}}</span>
             </h3>
         </div>
     </div>
     <div class="row">
         {{ip}}
-        <ui-select ng-model="selectedFilter.ip" theme="selectize" class="filter" on-select="updateTable()">
-            <ui-select-match placeholder="IP">{{$select.selected.name}}</ui-select-match>
-            <ui-select-choices repeat="ip in filters.ips">
-                <span ng-bind-html="ip.name"></span>
-            </ui-select-choices>
+        <ui-select ng-model="selectedFilter.ip" theme="selectize" class="filter" on-select="updateTable(1)">
+        <ui-select-match placeholder="IP">{{$select.selected.name}}</ui-select-match>
+        <ui-select-choices repeat="ip in filters.ips">
+        <span ng-bind-html="ip.name"></span>
+        </ui-select-choices>
         </ui-select>
-        <ui-select ng-model="selectedFilter.district" theme="selectize" class="filter" on-select="updateTable()">
-            <ui-select-match placeholder="DISTRICT">{{$select.selected.name}}</ui-select-match>
-            <ui-select-choices repeat="district in filters.districts">
-                <span ng-bind-html="district.name"></span>
-            </ui-select-choices>
+        <ui-select ng-model="selectedFilter.district" theme="selectize" class="filter" on-select="updateTable(1)">
+        <ui-select-match placeholder="DISTRICT">{{$select.selected.name}}</ui-select-match>
+        <ui-select-choices repeat="district in filters.districts">
+        <span ng-bind-html="district.name"></span>
+        </ui-select-choices>
         </ui-select>
-        <ui-select ng-model="selectedFilter.warehouse" theme="selectize" class="filter" on-select="updateTable()">
-            <ui-select-match placeholder="WAREHOUSE">{{$select.selected.name}}</ui-select-match>
-            <ui-select-choices repeat="warehouse in filters.warehouses">
-                <span ng-bind-html="warehouse.name"></span>
-            </ui-select-choices>
+        <ui-select ng-model="selectedFilter.warehouse" theme="selectize" class="filter" on-select="updateTable(1)">
+        <ui-select-match placeholder="WAREHOUSE">{{$select.selected.name}}</ui-select-match>
+        <ui-select-choices repeat="warehouse in filters.warehouses">
+        <span ng-bind-html="warehouse.name"></span>
+        </ui-select-choices>
         </ui-select>
-        <ui-select ng-model="selectedFilter.cycle" theme="selectize" class="filter" on-select="updateTable()">
-            <ui-select-match placeholder="CYCLE">{{$select.selected.cycle}}</ui-select-match>
-            <ui-select-choices repeat="cycle in filters.cycles">
-                <span ng-bind-html="cycle.cycle"></span>
-            </ui-select-choices>
+        <ui-select ng-model="selectedFilter.cycle" theme="selectize" class="filter" on-select="updateTable(1)">
+        <ui-select-match placeholder="CYCLE">{{$select.selected.cycle}}</ui-select-match>
+        <ui-select-choices repeat="cycle in filters.cycles">
+        <span ng-bind-html="cycle.cycle"></span>
+        </ui-select-choices>
         </ui-select>
-        <ui-select ng-model="selectedFilter.formulation" theme="selectize" class="filter" on-select="updateTable()">
-            <ui-select-match placeholder="FORMULATIONS">{{$select.selected.formulation}}</ui-select-match>
-            <ui-select-choices repeat="formulation in formulations">
-                <span ng-bind-html="cleanFormulation(formulation.name)"></span>
-            </ui-select-choices>
+        <ui-select ng-model="selectedFilter.formulation" theme="selectize" class="filter" on-select="updateTable(1)">
+        <ui-select-match placeholder="FORMULATIONS">{{$select.selected.formulation}}</ui-select-match>
+        <ui-select-choices repeat="formulation in formulations">
+        <span ng-bind-html="cleanFormulation(formulation.name)"></span>
+        </ui-select-choices>
         </ui-select>
     </div>
     <div class="row">
@@ -71,7 +71,10 @@
                             <input type="search" class="form-control input-md" placeholder="Search" aria-controls="main-report">
                         </label>
                     </td>
-                    <td class="column-sum" ng-repeat="test in tests">{{totals[test.test] | number: 1}} % </td>
+                    <td class="column-sum" ng-repeat="test in tests" >
+                    <p ng-show="totals[test.test]">
+                        {{totals[test.test] | number: 1}} %
+                    </p> </td>
                 </tr>
                 <tr>
                     <th>FACILITY</th>
@@ -91,5 +94,14 @@
                 </tr>
             </tbody>
         </table>
+    </div>
+    <div class="row">
+        <div paging
+            page="page_number"
+            page-size="page_count"
+            total="scores_count"
+            paging-action="updateTable(page)">
+        </div>
+        <p ng-show="scores_count > 0">Showing {{1 + (page_number - 1) * page_count }} to {{(page_number) * page_count }}  of {{scores_count}} entries</p>
     </div>
 </div>

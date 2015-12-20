@@ -69,3 +69,37 @@ NOT_REPORTING = "NOT_REPORTING"
 def to_date(text):
     month = text.split('-')[1].strip()
     return arrow.get(month, 'MMM YYYY')
+
+
+F3 = "EFV200 (Paed)"
+F2 = "ABC/3TC (Paed)"
+F1 = "TDF/3TC/EFV (Adult)"
+
+
+def sort_cycle(item1, item2):
+    if to_date(item1) < to_date(item2):
+        return -1
+    elif to_date(item1) > to_date(item2):
+        return 1
+    else:
+        return 0
+
+
+class Pager(object):
+    def __init__(self, data, page=1, page_count=20):
+        self.data = data
+        if page:
+            self.page = int(page)
+        else:
+            self.page = 1
+
+        if page_count:
+            self.page_count = int(page_count)
+        else:
+            self.page_count = 20
+
+    def get_data(self):
+        offset = (self.page - 1) * self.page_count
+        end = offset + self.page_count
+        s = slice(offset, end)
+        return self.data[s]
