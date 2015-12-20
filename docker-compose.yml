@@ -1,6 +1,8 @@
+app:
+  build: ./
 orderqualitytool:
   restart: always
-  build: ./
+  extends: app
   ports:
     - "9000:9000"
   volumes:
@@ -28,7 +30,7 @@ redis:
 
 celery:
   restart: always
-  build: ./
+  extends: app
   links:
     - postgres:postgres
     - redis:redis
@@ -39,7 +41,7 @@ celery:
 
 flower:
   restart: always
-  build: ./
+  extends: app
   ports:
     - "5555:5555"
   links:
