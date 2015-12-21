@@ -1,10 +1,10 @@
 import operator
 
-from django.db.models import Q
+from django.db.models import Q, Count, Case, When
 
 from dashboard.checks.common import Check
 from dashboard.helpers import ORDER_FORM_FREE_OF_NEGATIVE_NUMBERS, NOT_REPORTING, NO, YES, F3, F2, F1
-from dashboard.models import Consumption, Cycle, CycleFormulationScore
+from dashboard.models import Cycle, CycleFormulationScore
 
 NAME = "name"
 
@@ -31,20 +31,28 @@ class OrderFormFreeOfNegativeNumbers(Check):
             not_reporting = 0
             yes = 0
             no = 0
-            for record in Cycle.objects.filter(cycle=cycle):
-                number_of_records = Consumption.objects.filter(facility_cycle=record, formulation__icontains=query).count()
-                number_of_valid_records = Consumption.objects.filter(facility_cycle__cycle=cycle, formulation__icontains=query).exclude(reduce(operator.or_, filter_list)).count()
+            fil = reduce(operator.or_, filter_list)
+            data = Cycle.objects.filter(cycle=cycle).annotate(
+                    number_of_records=Count(Case(When(consumption__formulation__icontains=query, then=1))),
+                    number_in_valid_records=Count(Case(
+                            When(consumption__opening_balance__lt=0, then=1),
+                            When(consumption__quantity_received__lt=0, then=1),
+                            When(consumption__pmtct_consumption__lt=0, then=1),
+                            When(consumption__art_consumption__lt=0, then=1),
+                            When(consumption__estimated_number_of_new_pregnant_women__lt=0, then=1),
+                            When(consumption__total_quantity_to_be_ordered__lt=0, then=1),
+                    )))
+            for record in data:
                 result = NOT_REPORTING
-                if number_of_records == 0:
+                if record.number_of_records == 0:
                     not_reporting += 1
-                elif number_of_valid_records < 1:
+                elif record.number_in_valid_records > 0:
                     no += 1
                     result = NO
                 else:
                     yes += 1
                     result = YES
                 self.record_result_for_facility(record, result, actual_name)
-
             score, _ = CycleFormulationScore.objects.get_or_create(cycle=cycle, test=ORDER_FORM_FREE_OF_NEGATIVE_NUMBERS, formulation=actual_name)
             yes_rate = float(yes * 100) / float(total_count)
             not_reporting_rate = float(not_reporting * 100) / float(total_count)

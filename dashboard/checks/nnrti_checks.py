@@ -111,7 +111,7 @@ class NNRTI(Check):
         adjusted_sum_df1 = (sum_df1 / ratio)
         if df1_count == 0 or df2_count == 0:
             not_reporting += 1
-        elif total == 0 or 0.7 < (adjusted_sum_df1 / sum_df2) < 1.429:
+        elif sum_df2 == 0 or (total == 0 or 0.7 < (adjusted_sum_df1 / sum_df2) < 1.429):
             yes += 1
             result = YES
         else:

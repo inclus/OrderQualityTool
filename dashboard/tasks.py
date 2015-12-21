@@ -38,7 +38,6 @@ def calculate_scores_for_checks_in_cycle(cycle):
     process_test.delay(NNRTI, cycle)
 
 
-
 @shared_task
 def import_general_report(path, cycle):
     GeneralReport(path, cycle).get_data()

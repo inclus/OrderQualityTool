@@ -118,7 +118,7 @@ class ScoreAdmin(ModelAdmin):
                     'nnrtiCurrentAdults',
                     'stableConsumption',
                     )
-    list_filter = ('formulation', 'district', 'ip', 'warehouse')
+    list_filter = ('formulation', 'cycle')
 
     def cycle(self, obj):
         return obj.facility_cycle.cycle

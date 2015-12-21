@@ -58,7 +58,7 @@ class StablePatientVolumes(CycleFormulationCheck):
                 prev_population = prev_qs.aggregate(sum=Sum(Coalesce(F(EXISTING), 0) + Coalesce(F(NEW), 0))).get(SUM, 0)
                 if current_population >= threshold:
                     total_count += 1
-                    if number_of_prev_patient_records == 0 or number_of_current_patient_records == 0:
+                    if number_of_prev_patient_records == 0 or number_of_current_patient_records == 0 or prev_population < 1:
                         not_reporting += 1
                     elif 0.5 <= (current_population / prev_population) <= 1.5:
                         yes += 1
