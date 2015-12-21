@@ -36,11 +36,11 @@ class ConsumptionAndPatients(CycleFormulationCheck):
             yes = 0
             no = 0
             not_reporting = 0
-            qs = Cycle.objects.filter(cycle=cycle)
+            qs = Cycle.objects.select_related('facility', 'facility__district', 'facility__ip', 'facility__warehouse').filter(cycle=cycle)
             total_count = qs.count()
             for record in qs:
                 try:
-                    consumption_qs = Consumption.objects.filter(facility_cycle=record, formulation__icontains=formulation[CONSUMPTION_QUERY])
+                    consumption_qs = Consumption.objects.select_related('facility', 'facility__district', 'facility__ip', 'facility__warehouse').filter(facility_cycle=record, formulation__icontains=formulation[CONSUMPTION_QUERY])
                     patient_qs = formulation[MODEL].objects.filter(facility_cycle=record, formulation__icontains=formulation[PATIENT_QUERY])
                     number_of_consumption_records = consumption_qs.count()
                     number_of_patient_records = patient_qs.count()

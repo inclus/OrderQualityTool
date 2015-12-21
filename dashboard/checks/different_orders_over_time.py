@@ -39,7 +39,7 @@ class DifferentOrdersOverTime(CycleFormulationCheck):
             not_reporting = 0
             total_count = Cycle.objects.filter(cycle=cycle).count()
 
-            for facility_record in Cycle.objects.filter(cycle=cycle):
+            for facility_record in Cycle.objects.select_related('facility', 'facility__district', 'facility__ip', 'facility__warehouse').filter(cycle=cycle):
                 current_values = Consumption.objects.filter(facility_cycle=facility_record, formulation__icontains=query).order_by().values(BALANCE, ART_CONSUMPTION, PATIENTS)
                 prev_values = Consumption.objects.filter(facility_cycle__facility=facility_record.facility, facility_cycle__cycle=prev_cycle, formulation__icontains=query).order_by().values(BALANCE, ART_CONSUMPTION, PATIENTS)
                 result = NOT_REPORTING

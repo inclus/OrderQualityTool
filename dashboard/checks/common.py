@@ -1,6 +1,7 @@
 from dashboard.models import CycleFormulationScore, Score
 
 
+
 class Check(object):
     test = ''
 

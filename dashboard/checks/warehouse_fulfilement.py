@@ -33,7 +33,7 @@ class WarehouseFulfilment(CycleFormulationCheck):
             yes = 0
             no = 0
             not_reporting = 0
-            qs = Cycle.objects.filter(cycle=cycle)
+            qs = Cycle.objects.select_related('facility', 'facility__district', 'facility__ip', 'facility__warehouse').filter(cycle=cycle)
             total_count = qs.count()
             for record in qs:
                 current_qs = Consumption.objects.annotate(consumption=Sum(PACKS_ORDERED)).filter(facility_cycle=record, formulation__icontains=formulation[CONSUMPTION_QUERY])

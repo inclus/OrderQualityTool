@@ -32,7 +32,7 @@ class OrderFormFreeOfNegativeNumbers(Check):
             yes = 0
             no = 0
             fil = reduce(operator.or_, filter_list)
-            data = Cycle.objects.filter(cycle=cycle).annotate(
+            data = Cycle.objects.select_related('facility', 'facility__district', 'facility__ip', 'facility__warehouse').filter(cycle=cycle).annotate(
                     number_of_records=Count(Case(When(consumption__formulation__icontains=query, then=1))),
                     number_in_valid_records=Count(Case(
                             When(consumption__opening_balance__lt=0, then=1),

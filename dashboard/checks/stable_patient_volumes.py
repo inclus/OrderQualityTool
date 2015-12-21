@@ -46,7 +46,7 @@ class StablePatientVolumes(CycleFormulationCheck):
             not_reporting = 0
             threshold = formulation[THRESHOLD]
             model_class = formulation[MODEL]
-            qs = Cycle.objects.filter(cycle=cycle)
+            qs = Cycle.objects.select_related('facility', 'facility__district', 'facility__ip', 'facility__warehouse').filter(cycle=cycle)
             total_count = 0
             for record in qs:
                 current_qs = model_class.objects.filter(facility_cycle=record, formulation__icontains=formulation[PATIENT_QUERY])

@@ -39,7 +39,7 @@ class GuideLineAdherence(CycleFormulationCheck):
 
         for formulation in formulations:
             name = formulation[NAME]
-            qs = Cycle.objects.filter(cycle=cycle)
+            qs = Cycle.objects.select_related('facility', 'facility__district', 'facility__ip', 'facility__warehouse').filter(cycle=cycle)
             total_count = qs.count()
             not_reporting = 0
             yes = 0

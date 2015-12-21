@@ -13,7 +13,7 @@ class OrderFormFreeOfGaps(Check):
         no = 0
         not_reporting = 0
         number_of_facilities = Cycle.objects.filter(cycle=cycle).count()
-        data = Cycle.objects.filter(cycle=cycle).annotate(
+        data = Cycle.objects.select_related('facility', 'facility__district', 'facility__ip', 'facility__warehouse').filter(cycle=cycle).annotate(
                 count=Count("consumption__pk"),
                 number_facility_consumption_records=Count(Case(
                         When(consumption__opening_balance__isnull=False, consumption__quantity_received__isnull=False, consumption__art_consumption__isnull=False, consumption__loses_adjustments__isnull=False, consumption__estimated_number_of_new_patients__isnull=False, then=1)

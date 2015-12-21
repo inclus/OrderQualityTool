@@ -16,7 +16,7 @@ class ReportingCheck(CycleFormulationCheck):
     test = REPORTING
 
     def run(self, cycle):
-        for record in Cycle.objects.filter(cycle=cycle):
+        for record in Cycle.objects.select_related('facility', 'facility__district', 'facility__ip', 'facility__warehouse').filter(cycle=cycle):
             result = YES if record.reporting_status else NO
             self.record_result_for_facility(record, result)
 
@@ -25,6 +25,6 @@ class MultipleOrdersCheck(CycleFormulationCheck):
     test = MULTIPLE_ORDERS
 
     def run(self, cycle):
-        for record in Cycle.objects.filter(cycle=cycle):
+        for record in Cycle.objects.select_related('facility', 'facility__district', 'facility__ip', 'facility__warehouse').filter(cycle=cycle):
             result = YES if record.multiple else NO
             self.record_result_for_facility(record, result)

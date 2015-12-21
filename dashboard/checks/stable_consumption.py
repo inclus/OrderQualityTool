@@ -37,7 +37,7 @@ class StableConsumption(CycleFormulationCheck):
             no = 0
             not_reporting = 0
             threshold = formulation[THRESHOLD]
-            qs = Cycle.objects.filter(cycle=cycle)
+            qs = Cycle.objects.select_related('facility', 'facility__district', 'facility__ip', 'facility__warehouse').filter(cycle=cycle)
             total_count = 0
             for record in qs:
                 include_record = True

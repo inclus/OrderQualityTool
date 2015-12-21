@@ -28,7 +28,7 @@ class ClosingBalance(CycleFormulationCheck):
             yes = 0
             not_reporting = 0
             total_count = Cycle.objects.filter(cycle=cycle).count()
-            for facility_record in Cycle.objects.filter(cycle=cycle):
+            for facility_record in Cycle.objects.select_related('facility', 'facility__district', 'facility__ip', 'facility__warehouse').filter(cycle=cycle):
                 new_values = self.get_values_for_previous_cycle(facility_record, query)
                 current_values = self.get_values_for_current_cycle(facility_record, prev_cycle, query)
                 result = NOT_REPORTING
