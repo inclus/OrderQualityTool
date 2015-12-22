@@ -7,7 +7,7 @@ from dashboard.checks.closing_balance import ClosingBalance
 from dashboard.checks.common import Check
 from dashboard.checks.consumption_and_patients import ConsumptionAndPatients
 from dashboard.checks.different_orders_over_time import DifferentOrdersOverTime
-from dashboard.checks.guideline_adherence import GuideLineAdherence
+from dashboard.checks.guideline_adherence import GuidelineAdherence
 from dashboard.checks.nnrti_checks import NNRTI
 from dashboard.checks.order_form_free_of_gaps import OrderFormFreeOfGaps
 from dashboard.checks.order_free_of_negative_numbers import OrderFormFreeOfNegativeNumbers
@@ -34,7 +34,7 @@ class TaskTestCase(TestCase):
             call(StableConsumption, cycle),
             call(WarehouseFulfilment, cycle),
             call(StablePatientVolumes, cycle),
-            call(GuideLineAdherence, cycle),
+            call(GuidelineAdherence, cycle),
             call(NNRTI, cycle)]
         calculate_scores_for_checks_in_cycle(cycle)
         mock_method.assert_has_calls(calls)

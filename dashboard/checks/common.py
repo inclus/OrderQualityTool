@@ -1,7 +1,6 @@
 from dashboard.models import CycleFormulationScore, Score
 
 
-
 class Check(object):
     test = ''
 
@@ -24,7 +23,7 @@ class Check(object):
         score_record.save()
 
     def get_ip(self, record):
-        return record.facility.ip.name if record.facility.ip  else ""
+        return record.facility.ip.name if record.facility.ip else ""
 
     def get_warehouse(self, record):
         return record.facility.warehouse.name if record.facility.warehouse  else ""

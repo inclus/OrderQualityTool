@@ -104,7 +104,7 @@ class Score(models.Model):
     orderFormFreeOfNegativeNumbers = models.CharField(choices=choices, max_length=20)
     nnrtiCurrentAdults = models.CharField(choices=choices, max_length=20)
     stableConsumption = models.CharField(choices=choices, max_length=20)
-    guidelineAdherenceAdultlL = models.CharField(choices=choices, max_length=20)
+    guidelineAdherenceAdult1L = models.CharField(choices=choices, max_length=20)
     guidelineAdherenceAdult2L = models.CharField(choices=choices, max_length=20)
     guidelineAdherencePaed1L = models.CharField(choices=choices, max_length=20)
     pass_count = models.IntegerField()
@@ -126,7 +126,7 @@ class Score(models.Model):
                   "orderFormFreeOfNegativeNumbers",
                   "nnrtiCurrentAdults",
                   "stableConsumption",
-                  "guidelineAdherenceAdultlL",
+                  "guidelineAdherenceAdult1L",
                   "guidelineAdherenceAdult2L",
                   "guidelineAdherencePaed1L"
                   ]
