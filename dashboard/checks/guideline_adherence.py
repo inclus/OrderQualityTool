@@ -65,14 +65,12 @@ class GuidelineAdherence(CycleFormulationCheck):
                     all_df1_fields_are_blank = self.check_if_all_fields_null(df1_qs, formulation)
                     all_df2_fields_are_blank = self.check_if_all_fields_null(df2_qs, formulation)
                     sum_df2 = self.get_sum(df2_qs, df1_sum_fields)
-                    print(all_df1_fields_are_blank, all_df2_fields_are_blank, sum_df1, sum_df2)
                     no, not_reporting, result, yes = self.calculate_score(df1_count, df2_count, sum_df1, sum_df2, ratio, yes, no, not_reporting, all_df1_fields_are_blank, all_df2_fields_are_blank)
                 except TypeError as e:
                     no += 1
                     result = NO
                 finally:
                     test_name = "%s%s" % (GUIDELINE_ADHERENCE, name.replace(" ", ""))
-                    print(test_name, result)
                     self.record_result_for_facility(record, result, test=test_name)
             self.build_cycle_formulation_score(cycle, name, yes, no, not_reporting, total_count)
 

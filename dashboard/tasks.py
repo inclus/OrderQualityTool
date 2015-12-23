@@ -1,4 +1,5 @@
 import os
+import time
 
 from celery import shared_task
 
@@ -18,24 +19,27 @@ from dashboard.reports import GeneralReport
 
 @shared_task
 def process_test(check_class, cycle):
-    return check_class().run(cycle)
+    start_time = time.clock()
+    result = check_class().run(cycle)
+    print ("TIMER =================> ", check_class.__name__, time.clock() - start_time, "seconds")
+    return result
 
 
 @shared_task
 def calculate_scores_for_checks_in_cycle(cycle):
-    process_test.delay(WebBasedReportingCheck, cycle)
-    process_test.delay(ReportingCheck, cycle)
-    process_test.delay(MultipleOrdersCheck, cycle)
-    process_test.delay(OrderFormFreeOfGaps, cycle)
-    process_test.delay(OrderFormFreeOfNegativeNumbers, cycle)
-    process_test.delay(DifferentOrdersOverTime, cycle)
-    process_test.delay(ClosingBalance, cycle)
-    process_test.delay(ConsumptionAndPatients, cycle)
-    process_test.delay(StableConsumption, cycle)
-    process_test.delay(WarehouseFulfilment, cycle)
-    process_test.delay(StablePatientVolumes, cycle)
-    process_test.delay(GuidelineAdherence, cycle)
-    process_test.delay(NNRTI, cycle)
+    process_test(WebBasedReportingCheck, cycle)
+    process_test(ReportingCheck, cycle)
+    process_test(MultipleOrdersCheck, cycle)
+    process_test(OrderFormFreeOfGaps, cycle)
+    process_test(OrderFormFreeOfNegativeNumbers, cycle)
+    process_test(DifferentOrdersOverTime, cycle)
+    process_test(ClosingBalance, cycle)
+    process_test(ConsumptionAndPatients, cycle)
+    process_test(StableConsumption, cycle)
+    process_test(WarehouseFulfilment, cycle)
+    process_test(StablePatientVolumes, cycle)
+    process_test(GuidelineAdherence, cycle)
+    process_test(NNRTI, cycle)
 
 
 @shared_task

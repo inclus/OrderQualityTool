@@ -50,19 +50,17 @@ class ConsumptionAndPatients(CycleFormulationCheck):
                     number_of_patient_records = patient_qs.count()
                     patient_sum = patient_qs.aggregate(sum=Sum(Coalesce(F(EXISTING) + F(NEW), 0))).get(SUM, 0)
                     art_consumption = consumption_qs.aggregate(sum=Sum(Coalesce(ART_CONSUMPTION, 0))).get(SUM, 0)
-                    print art_consumption
                     total = patient_sum + art_consumption
                     adjusted_consumption_sum = art_consumption / formulation[RATIO]
                 except TypeError as e:
-                    not_reporting +=1
-                    adjusted_consumption_sum = total= 0
+                    not_reporting += 1
+                    adjusted_consumption_sum = total = 0
                 finally:
                     no, not_reporting, result, yes = self.calculate_score(adjusted_consumption_sum, patient_sum, number_of_consumption_records, number_of_patient_records, total, yes, no, not_reporting, result)
                 self.record_result_for_facility(record, result, formulation[NAME])
             self.build_cycle_formulation_score(cycle, formulation[NAME], yes, no, not_reporting, total_count)
 
     def calculate_score(self, adjusted_consumption_sum, patient_sum, number_of_consumption_records, number_of_patient_records, total, yes, no, not_reporting, result):
-        print adjusted_consumption_sum, patient_sum, number_of_consumption_records, number_of_patient_records, total, yes, no, not_reporting, result
         if number_of_consumption_records == 0 or number_of_patient_records == 0:
             not_reporting += 1
         elif total == 0 or (0.7 * patient_sum) < adjusted_consumption_sum < (1.429 * patient_sum):

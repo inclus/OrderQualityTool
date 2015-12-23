@@ -19,7 +19,7 @@ from dashboard.tasks import calculate_scores_for_checks_in_cycle, process_test, 
 
 
 class TaskTestCase(TestCase):
-    @patch("dashboard.tasks.process_test.delay")
+    @patch("dashboard.tasks.process_test")
     def test_calculate_scores_for_checks_in_cycle(self, mock_method):
         cycle = "Jan - Feb %s" % now().format("YYYY")
         calls = [
