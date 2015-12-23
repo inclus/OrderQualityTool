@@ -282,7 +282,7 @@ class FacilityTestCycleScoresListView(ListAPIView):
     queryset = Score.objects.all()
     serializer_class = ScoreSerializer
     filter_backends = (filters.DjangoFilterBackend,)
-    filter_fields = ('cycle', 'name', 'ip', 'warehouse', 'district', 'formulation')
+    filter_fields = ('cycle', 'name', 'ip', 'warehouse', 'district')
 
 
 class RankingsAccessView(LoginRequiredMixin, APIView):

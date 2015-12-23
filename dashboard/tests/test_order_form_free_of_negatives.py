@@ -20,7 +20,7 @@ class OrderFormFreeOfNegativesTestCase(WebTest, RegimenCheckViewCaseMixin):
             mommy.make(Consumption, facility_cycle=current_record, opening_balance=120, formulation=form)
         self.assertEqual(Score.objects.count(), 0)
         OrderFormFreeOfNegativeNumbers().run(current_cycle)
-        self.assertEqual(Score.objects.count(), 3)
+        self.assertEqual(Score.objects.count(), 1)
         self.assertEqual([score['name'] for score in (Score.objects.values('name').distinct())], [facility.name])
 
     def test_save_score_for_cycle(self):
@@ -45,9 +45,10 @@ class OrderFormFreeOfNegativesTestCase(WebTest, RegimenCheckViewCaseMixin):
 
         self.assertEqual(Score.objects.count(), 0)
         OrderFormFreeOfNegativeNumbers().run(current_cycle)
-        self.assertEqual(Score.objects.count(), 3)
-        self.assertEqual([score['orderFormFreeOfNegativeNumbers'] for score in (Score.objects.values('orderFormFreeOfNegativeNumbers').distinct())], [YES])
-
+        self.assertEqual(Score.objects.count(), 1)
+        self.assertEqual(Score.objects.all()[0].orderFormFreeOfNegativeNumbers[F1], YES)
+        self.assertEqual(Score.objects.all()[0].orderFormFreeOfNegativeNumbers[F2], YES)
+        self.assertEqual(Score.objects.all()[0].orderFormFreeOfNegativeNumbers[F3], YES)
     def test_fails_if_some_negatives(self):
         current_cycle = "Mar - Apr %s" % now().format("YYYY")
         facility = mommy.make(Facility)
@@ -57,8 +58,11 @@ class OrderFormFreeOfNegativesTestCase(WebTest, RegimenCheckViewCaseMixin):
             mommy.make(Consumption, facility_cycle=current_record, formulation=form, opening_balance=-10, quantity_received=10, pmtct_consumption=10, art_consumption=10, estimated_number_of_new_pregnant_women=10, total_quantity_to_be_ordered=10)
         self.assertEqual(Score.objects.count(), 0)
         OrderFormFreeOfNegativeNumbers().run(current_cycle)
-        self.assertEqual(Score.objects.count(), 3)
-        self.assertEqual([score['orderFormFreeOfNegativeNumbers'] for score in (Score.objects.values('orderFormFreeOfNegativeNumbers').distinct())], [NO])
+        self.assertEqual(Score.objects.count(), 1)
+        self.assertEqual(Score.objects.count(), 1)
+        self.assertEqual(Score.objects.all()[0].orderFormFreeOfNegativeNumbers[F1], NO)
+        self.assertEqual(Score.objects.all()[0].orderFormFreeOfNegativeNumbers[F2], NO)
+        self.assertEqual(Score.objects.all()[0].orderFormFreeOfNegativeNumbers[F3], NO)
 
     def test_not_reporting_if_formulations_not_found(self):
         current_cycle = "Mar - Apr %s" % now().format("YYYY")
@@ -69,5 +73,7 @@ class OrderFormFreeOfNegativesTestCase(WebTest, RegimenCheckViewCaseMixin):
             mommy.make(Consumption, facility_cycle=current_record, formulation="YES FORM", opening_balance=-10, quantity_received=10, pmtct_consumption=10, art_consumption=10, estimated_number_of_new_pregnant_women=10, total_quantity_to_be_ordered=10)
         self.assertEqual(Score.objects.count(), 0)
         OrderFormFreeOfNegativeNumbers().run(current_cycle)
-        self.assertEqual(Score.objects.count(), 3)
-        self.assertEqual([score['orderFormFreeOfNegativeNumbers'] for score in (Score.objects.values('orderFormFreeOfNegativeNumbers').distinct())], [NOT_REPORTING])
+        self.assertEqual(Score.objects.count(), 1)
+        self.assertEqual(Score.objects.all()[0].orderFormFreeOfNegativeNumbers[F1], NOT_REPORTING)
+        self.assertEqual(Score.objects.all()[0].orderFormFreeOfNegativeNumbers[F2], NOT_REPORTING)
+        self.assertEqual(Score.objects.all()[0].orderFormFreeOfNegativeNumbers[F3], NOT_REPORTING)

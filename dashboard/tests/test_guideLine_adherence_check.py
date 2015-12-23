@@ -38,9 +38,9 @@ class GuidelineAdherenceAdult1LTestCase(TestCase):
         self.assertEqual(0, Score.objects.all().count())
         self.check.run(self.cycle)
         self.assertEqual(1, Score.objects.all().count())
-        self.assertEqual(YES, Score.objects.all()[0].guidelineAdherenceAdult1L)
-        self.assertEqual(NO, Score.objects.all()[0].guidelineAdherenceAdult2L)
-        self.assertEqual(NO, Score.objects.all()[0].guidelineAdherencePaed1L)
+        self.assertEqual({'DEFAULT': YES}, Score.objects.all()[0].guidelineAdherenceAdult1L)
+        self.assertEqual({'DEFAULT': NO}, Score.objects.all()[0].guidelineAdherenceAdult2L)
+        self.assertEqual({'DEFAULT': NO}, Score.objects.all()[0].guidelineAdherencePaed1L)
 
     def test_should_result_is_no_if_both_df2_fields_null(self):
         facility = mommy.make(Facility)
@@ -57,9 +57,9 @@ class GuidelineAdherenceAdult1LTestCase(TestCase):
         self.assertEqual(Score.objects.all().count(), 0)
         self.check.run(self.cycle)
         self.assertEqual(Score.objects.all().count(), 1)
-        self.assertEqual(Score.objects.all()[0].guidelineAdherenceAdult1L, NO)
-        self.assertEqual(Score.objects.all()[0].guidelineAdherenceAdult2L, NO)
-        self.assertEqual(Score.objects.all()[0].guidelineAdherencePaed1L, NO)
+        self.assertEqual(Score.objects.all()[0].guidelineAdherenceAdult1L, {'DEFAULT': NO})
+        self.assertEqual(Score.objects.all()[0].guidelineAdherenceAdult2L, {'DEFAULT': NO})
+        self.assertEqual(Score.objects.all()[0].guidelineAdherencePaed1L, {'DEFAULT': NO})
 
     def test_should_result_is_no_if_both_df1_fields_null(self):
         facility = mommy.make(Facility)
@@ -76,9 +76,9 @@ class GuidelineAdherenceAdult1LTestCase(TestCase):
         self.assertEqual(Score.objects.all().count(), 0)
         self.check.run(self.cycle)
         self.assertEqual(Score.objects.all().count(), 1)
-        self.assertEqual(Score.objects.all()[0].guidelineAdherenceAdult1L, NO)
-        self.assertEqual(Score.objects.all()[0].guidelineAdherenceAdult2L, NO)
-        self.assertEqual(Score.objects.all()[0].guidelineAdherencePaed1L, NO)
+        self.assertEqual(Score.objects.all()[0].guidelineAdherenceAdult1L, {'DEFAULT': NO})
+        self.assertEqual(Score.objects.all()[0].guidelineAdherenceAdult2L, {'DEFAULT': NO})
+        self.assertEqual(Score.objects.all()[0].guidelineAdherencePaed1L, {'DEFAULT': NO})
 
     def test_can_handle_blanks(self):
         facility = mommy.make(Facility)
@@ -95,9 +95,9 @@ class GuidelineAdherenceAdult1LTestCase(TestCase):
         self.assertEqual(Score.objects.all().count(), 0)
         self.check.run(self.cycle)
         self.assertEqual(Score.objects.all().count(), 1)
-        self.assertEqual(Score.objects.all()[0].guidelineAdherenceAdult1L, YES)
-        self.assertEqual(Score.objects.all()[0].guidelineAdherenceAdult2L, NO)
-        self.assertEqual(Score.objects.all()[0].guidelineAdherencePaed1L, NO)
+        self.assertEqual(Score.objects.all()[0].guidelineAdherenceAdult1L, {'DEFAULT': YES})
+        self.assertEqual(Score.objects.all()[0].guidelineAdherenceAdult2L, {'DEFAULT': NO})
+        self.assertEqual(Score.objects.all()[0].guidelineAdherencePaed1L, {'DEFAULT': NO})
 
     def test_should_record_score_for_each_cycle(self):
         facility = mommy.make(Facility)
@@ -200,9 +200,9 @@ class GuidelineAdherenceAdult2LTestCase(TestCase):
         self.assertEqual(0, Score.objects.all().count())
         self.check.run(self.cycle)
         self.assertEqual(1, Score.objects.all().count())
-        self.assertEqual(NO, Score.objects.all()[0].guidelineAdherenceAdult1L)
-        self.assertEqual(YES, Score.objects.all()[0].guidelineAdherenceAdult2L)
-        self.assertEqual(NO, Score.objects.all()[0].guidelineAdherencePaed1L)
+        self.assertEqual({'DEFAULT': NO}, Score.objects.all()[0].guidelineAdherenceAdult1L)
+        self.assertEqual({'DEFAULT': YES}, Score.objects.all()[0].guidelineAdherenceAdult2L)
+        self.assertEqual({'DEFAULT': NO}, Score.objects.all()[0].guidelineAdherencePaed1L)
 
     def test_should_result_is_no_if_both_df2_fields_null(self):
         facility = mommy.make(Facility)
@@ -219,9 +219,9 @@ class GuidelineAdherenceAdult2LTestCase(TestCase):
         self.assertEqual(Score.objects.all().count(), 0)
         self.check.run(self.cycle)
         self.assertEqual(Score.objects.all().count(), 1)
-        self.assertEqual(Score.objects.all()[0].guidelineAdherenceAdult1L, NO)
-        self.assertEqual(Score.objects.all()[0].guidelineAdherenceAdult2L, NO)
-        self.assertEqual(Score.objects.all()[0].guidelineAdherencePaed1L, NO)
+        self.assertEqual(Score.objects.all()[0].guidelineAdherenceAdult1L, {'DEFAULT': NO})
+        self.assertEqual(Score.objects.all()[0].guidelineAdherenceAdult2L, {'DEFAULT': NO})
+        self.assertEqual(Score.objects.all()[0].guidelineAdherencePaed1L, {'DEFAULT': NO})
 
     def test_should_result_is_no_if_both_df1_fields_null(self):
         facility = mommy.make(Facility)
@@ -238,9 +238,9 @@ class GuidelineAdherenceAdult2LTestCase(TestCase):
         self.assertEqual(Score.objects.all().count(), 0)
         self.check.run(self.cycle)
         self.assertEqual(Score.objects.all().count(), 1)
-        self.assertEqual(Score.objects.all()[0].guidelineAdherenceAdult1L, NO)
-        self.assertEqual(Score.objects.all()[0].guidelineAdherenceAdult2L, NO)
-        self.assertEqual(Score.objects.all()[0].guidelineAdherencePaed1L, NO)
+        self.assertEqual(Score.objects.all()[0].guidelineAdherenceAdult1L, {'DEFAULT': NO})
+        self.assertEqual(Score.objects.all()[0].guidelineAdherenceAdult2L, {'DEFAULT': NO})
+        self.assertEqual(Score.objects.all()[0].guidelineAdherencePaed1L, {'DEFAULT': NO})
 
     def test_can_handle_blanks(self):
         facility = mommy.make(Facility)
@@ -257,9 +257,9 @@ class GuidelineAdherenceAdult2LTestCase(TestCase):
         self.assertEqual(Score.objects.all().count(), 0)
         self.check.run(self.cycle)
         self.assertEqual(Score.objects.all().count(), 1)
-        self.assertEqual(Score.objects.all()[0].guidelineAdherenceAdult1L, NO)
-        self.assertEqual(Score.objects.all()[0].guidelineAdherenceAdult2L, YES)
-        self.assertEqual(Score.objects.all()[0].guidelineAdherencePaed1L, NO)
+        self.assertEqual(Score.objects.all()[0].guidelineAdherenceAdult1L, {'DEFAULT': NO})
+        self.assertEqual(Score.objects.all()[0].guidelineAdherenceAdult2L, {'DEFAULT': YES})
+        self.assertEqual(Score.objects.all()[0].guidelineAdherencePaed1L, {'DEFAULT': NO})
 
     def test_should_record_score_for_each_cycle(self):
         facility = mommy.make(Facility)
@@ -302,9 +302,9 @@ class GuidelineAdherencePaed1LTestCase(TestCase):
         self.assertEqual(0, Score.objects.all().count())
         self.check.run(self.cycle)
         self.assertEqual(1, Score.objects.all().count())
-        self.assertEqual(NO, Score.objects.all()[0].guidelineAdherenceAdult1L)
-        self.assertEqual(NO, Score.objects.all()[0].guidelineAdherenceAdult2L)
-        self.assertEqual(YES, Score.objects.all()[0].guidelineAdherencePaed1L)
+        self.assertEqual({'DEFAULT': NO}, Score.objects.all()[0].guidelineAdherenceAdult1L)
+        self.assertEqual({'DEFAULT': NO}, Score.objects.all()[0].guidelineAdherenceAdult2L)
+        self.assertEqual({'DEFAULT': YES}, Score.objects.all()[0].guidelineAdherencePaed1L)
 
     def test_should_result_is_no_if_both_df2_fields_null(self):
         facility = mommy.make(Facility)
@@ -321,9 +321,9 @@ class GuidelineAdherencePaed1LTestCase(TestCase):
         self.assertEqual(Score.objects.all().count(), 0)
         self.check.run(self.cycle)
         self.assertEqual(Score.objects.all().count(), 1)
-        self.assertEqual(Score.objects.all()[0].guidelineAdherenceAdult1L, NO)
-        self.assertEqual(Score.objects.all()[0].guidelineAdherenceAdult2L, NO)
-        self.assertEqual(Score.objects.all()[0].guidelineAdherencePaed1L, NO)
+        self.assertEqual(Score.objects.all()[0].guidelineAdherenceAdult1L, {'DEFAULT': NO})
+        self.assertEqual(Score.objects.all()[0].guidelineAdherenceAdult2L, {'DEFAULT': NO})
+        self.assertEqual(Score.objects.all()[0].guidelineAdherencePaed1L, {'DEFAULT': NO})
 
     def test_should_result_is_no_if_both_df1_fields_null(self):
         facility = mommy.make(Facility)
@@ -340,9 +340,9 @@ class GuidelineAdherencePaed1LTestCase(TestCase):
         self.assertEqual(Score.objects.all().count(), 0)
         self.check.run(self.cycle)
         self.assertEqual(Score.objects.all().count(), 1)
-        self.assertEqual(Score.objects.all()[0].guidelineAdherenceAdult1L, NO)
-        self.assertEqual(Score.objects.all()[0].guidelineAdherenceAdult2L, NO)
-        self.assertEqual(Score.objects.all()[0].guidelineAdherencePaed1L, NO)
+        self.assertEqual(Score.objects.all()[0].guidelineAdherenceAdult1L, {'DEFAULT': NO})
+        self.assertEqual(Score.objects.all()[0].guidelineAdherenceAdult2L, {'DEFAULT': NO})
+        self.assertEqual(Score.objects.all()[0].guidelineAdherencePaed1L, {'DEFAULT': NO})
 
     def test_should_record_score_for_each_cycle(self):
         facility = mommy.make(Facility)

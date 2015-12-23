@@ -102,7 +102,7 @@ class FacilityCycleRecordAdmin(ModelAdmin):
 
 
 class ScoreAdmin(ModelAdmin):
-    list_display = ('name', 'cycle', 'formulation', 'district', 'ip', 'warehouse', 'nnrtiNewPaed',
+    list_display = ('name', 'cycle', 'district', 'ip', 'warehouse', 'nnrtiNewPaed',
                     'stablePatientVolumes',
                     'REPORTING',
                     'consumptionAndPatients',
@@ -118,7 +118,7 @@ class ScoreAdmin(ModelAdmin):
                     'nnrtiCurrentAdults',
                     'stableConsumption',
                     )
-    list_filter = ('formulation', 'cycle')
+    list_filter = ('cycle',)
 
     def cycle(self, obj):
         return obj.facility_cycle.cycle

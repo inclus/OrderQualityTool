@@ -4,7 +4,7 @@ from mock import patch, call
 from model_mommy import mommy
 
 from dashboard.checks.warehouse_fulfilement import WarehouseFulfilment
-from dashboard.helpers import YES, F1, F2, F3
+from dashboard.helpers import YES, F1, F2, F3, NOT_REPORTING, NO
 from dashboard.models import Cycle, Consumption, Score
 from locations.models import Facility
 
@@ -38,10 +38,10 @@ class TestWareHouseFulfilmentBalance(TestCase):
             mommy.make(Consumption, facility_cycle=current_record, quantity_received=120, formulation=form)
         self.assertEqual(Score.objects.count(), 0)
         WarehouseFulfilment().run(current_cycle)
-        self.assertEqual(Score.objects.count(), 3)
-        self.assertEqual(Score.objects.all()[1].warehouseFulfilment, "YES")
-        self.assertEqual(Score.objects.all()[2].warehouseFulfilment, "YES")
-        self.assertEqual(Score.objects.all()[0].warehouseFulfilment, "YES")
+        self.assertEqual(Score.objects.count(), 1)
+        self.assertEqual(Score.objects.all()[0].warehouseFulfilment[F1], YES)
+        self.assertEqual(Score.objects.all()[0].warehouseFulfilment[F2], YES)
+        self.assertEqual(Score.objects.all()[0].warehouseFulfilment[F3], YES)
 
     @patch("dashboard.checks.warehouse_fulfilement.WarehouseFulfilment.build_cycle_formulation_score")
     def test_should_record_result_for_cycle(self, mock_method):
@@ -56,7 +56,7 @@ class TestWareHouseFulfilmentBalance(TestCase):
             mommy.make(Consumption, facility_cycle=current_record, quantity_received=120, formulation=form)
         self.assertEqual(Score.objects.count(), 0)
         WarehouseFulfilment().run(current_cycle)
-        self.assertEqual(Score.objects.count(), 3)
+        self.assertEqual(Score.objects.count(), 1)
         calls = [call(current_cycle, F1, 1, 0, 0, 1), call(current_cycle, F2, 1, 0, 0, 1), call(current_cycle, F3, 1, 0, 0, 1)]
         mock_method.assert_has_calls(calls)
 
@@ -69,10 +69,10 @@ class TestWareHouseFulfilmentBalance(TestCase):
             mommy.make(Consumption, facility_cycle=current_record, quantity_received=120, formulation=form)
         self.assertEqual(Score.objects.count(), 0)
         WarehouseFulfilment().run(current_cycle)
-        self.assertEqual(Score.objects.count(), 3)
-        self.assertEqual(Score.objects.all()[1].warehouseFulfilment, "NOT_REPORTING")
-        self.assertEqual(Score.objects.all()[2].warehouseFulfilment, "NOT_REPORTING")
-        self.assertEqual(Score.objects.all()[0].warehouseFulfilment, "NOT_REPORTING")
+        self.assertEqual(Score.objects.count(), 1)
+        self.assertEqual(Score.objects.all()[0].warehouseFulfilment[F1], NOT_REPORTING)
+        self.assertEqual(Score.objects.all()[0].warehouseFulfilment[F2], NOT_REPORTING)
+        self.assertEqual(Score.objects.all()[0].warehouseFulfilment[F3], NOT_REPORTING)
 
     def test_should_can_get_no(self):
         prev_cycle = "Jan - Feb %s" % now().format("YYYY")
@@ -86,10 +86,10 @@ class TestWareHouseFulfilmentBalance(TestCase):
             mommy.make(Consumption, facility_cycle=current_record, quantity_received=10, formulation=form)
         self.assertEqual(Score.objects.count(), 0)
         WarehouseFulfilment().run(current_cycle)
-        self.assertEqual(Score.objects.count(), 3)
-        self.assertEqual(Score.objects.all()[1].warehouseFulfilment, "NO")
-        self.assertEqual(Score.objects.all()[2].warehouseFulfilment, "NO")
-        self.assertEqual(Score.objects.all()[0].warehouseFulfilment, "NO")
+        self.assertEqual(Score.objects.count(), 1)
+        self.assertEqual(Score.objects.all()[0].warehouseFulfilment[F1], NO)
+        self.assertEqual(Score.objects.all()[0].warehouseFulfilment[F2], NO)
+        self.assertEqual(Score.objects.all()[0].warehouseFulfilment[F3], NO)
 
     def test_should_can_handle_blanks(self):
         prev_cycle = "Jan - Feb %s" % now().format("YYYY")
@@ -103,7 +103,7 @@ class TestWareHouseFulfilmentBalance(TestCase):
             mommy.make(Consumption, facility_cycle=current_record, quantity_received=None, formulation=form)
         self.assertEqual(Score.objects.count(), 0)
         WarehouseFulfilment().run(current_cycle)
-        self.assertEqual(Score.objects.count(), 3)
-        self.assertEqual(Score.objects.all()[1].warehouseFulfilment, "NO")
-        self.assertEqual(Score.objects.all()[2].warehouseFulfilment, "NO")
-        self.assertEqual(Score.objects.all()[0].warehouseFulfilment, "NO")
+        self.assertEqual(Score.objects.count(), 1)
+        self.assertEqual(Score.objects.all()[0].warehouseFulfilment[F1], NO)
+        self.assertEqual(Score.objects.all()[0].warehouseFulfilment[F2], NO)
+        self.assertEqual(Score.objects.all()[0].warehouseFulfilment[F3], NO)

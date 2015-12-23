@@ -3,6 +3,7 @@ import logging
 from custom_user.models import AbstractEmailUser
 from django.db import models
 from django.db.models import CharField
+from jsonfield import JSONField
 
 from dashboard.helpers import NOT_REPORTING, YES, NO
 from locations.models import Facility
@@ -84,36 +85,34 @@ choices = ((YES, YES), (NO, NO), (NOT_REPORTING, NOT_REPORTING))
 class Score(models.Model):
     name = models.CharField(max_length=256)
     cycle = models.CharField(max_length=256)
-    test = models.CharField(max_length=256)
     district = models.CharField(max_length=256)
     ip = models.CharField(max_length=256)
     warehouse = models.CharField(max_length=256)
-    formulation = models.CharField(max_length=256, null=True)
-    nnrtiNewPaed = models.CharField(choices=choices, max_length=20)
-    stablePatientVolumes = models.CharField(choices=choices, max_length=20)
-    REPORTING = models.CharField(choices=choices, max_length=20)
-    consumptionAndPatients = models.CharField(choices=choices, max_length=20)
-    nnrtiCurrentPaed = models.CharField(choices=choices, max_length=20)
-    warehouseFulfilment = models.CharField(choices=choices, max_length=20)
-    differentOrdersOverTime = models.CharField(choices=choices, max_length=20)
-    closingBalanceMatchesOpeningBalance = models.CharField(choices=choices, max_length=20)
-    WEB_BASED = models.CharField(choices=choices, max_length=20)
-    OrderFormFreeOfGaps = models.CharField(choices=choices, max_length=20)
-    MULTIPLE_ORDERS = models.CharField(choices=choices, max_length=20)
-    nnrtiNewAdults = models.CharField(choices=choices, max_length=20)
-    orderFormFreeOfNegativeNumbers = models.CharField(choices=choices, max_length=20)
-    nnrtiCurrentAdults = models.CharField(choices=choices, max_length=20)
-    stableConsumption = models.CharField(choices=choices, max_length=20)
-    guidelineAdherenceAdult1L = models.CharField(choices=choices, max_length=20)
-    guidelineAdherenceAdult2L = models.CharField(choices=choices, max_length=20)
-    guidelineAdherencePaed1L = models.CharField(choices=choices, max_length=20)
+    REPORTING = JSONField()
+    WEB_BASED = JSONField()
+    MULTIPLE_ORDERS = JSONField()
+    OrderFormFreeOfGaps = JSONField()
+    guidelineAdherenceAdult1L = JSONField()
+    guidelineAdherenceAdult2L = JSONField()
+    guidelineAdherencePaed1L = JSONField()
+    nnrtiNewPaed = JSONField()
+    nnrtiCurrentPaed = JSONField()
+    nnrtiNewAdults = JSONField()
+    nnrtiCurrentAdults = JSONField()
+    stablePatientVolumes = JSONField()
+    consumptionAndPatients = JSONField()
+    warehouseFulfilment = JSONField()
+    differentOrdersOverTime = JSONField()
+    closingBalanceMatchesOpeningBalance = JSONField()
+    orderFormFreeOfNegativeNumbers = JSONField()
+    stableConsumption = JSONField()
     pass_count = models.IntegerField()
     fail_count = models.IntegerField()
 
     def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
         fields = ["nnrtiNewPaed",
-                  "stablePatientVolumes",
                   "REPORTING",
+                  "stablePatientVolumes",
                   "consumptionAndPatients",
                   "nnrtiCurrentPaed",
                   "warehouseFulfilment",
@@ -141,7 +140,7 @@ class Score(models.Model):
         super(Score, self).save(force_insert, force_update, using, update_fields)
 
     class Meta:
-        unique_together = ("name", "cycle", "test", "formulation")
+        unique_together = ("name", "cycle", "district")
 
 
 class Consumption(models.Model):

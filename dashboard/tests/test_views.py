@@ -92,6 +92,7 @@ class WebBasedReportingViewTestCase(WebTest):
         data = loads(json_response)['values']
         self.assertEqual(len(data), 2)
 
+
 class FacilitiesMultipleReportingViewTestCase(WebTest):
     def test_shows_all_facilities_that_report_multiple_times(self):
         cycle = 'Jan - Feb %s' % now().format("YYYY")
@@ -103,6 +104,7 @@ class FacilitiesMultipleReportingViewTestCase(WebTest):
         json_response = self.app.get(url, user="testuser").content.decode('utf8')
         data = loads(json_response)['values']
         self.assertEqual(len(data), 1)
+
 
 class BestDistrictReportingViewFor(WebTest):
     def test_best_performing_districts(self):
@@ -188,7 +190,7 @@ class BestDistrictReportingViewFor(WebTest):
 F2,5.555555555555555
 F1,11.11111111111111
 """
-        self.assertEquals(csv.replace("\r",""), expected)
+        self.assertEquals(csv.replace("\r", ""), expected)
 
     def test_best_csv(self):
         Score.objects.create(name="F1", warehouse="W1", ip="I1", district="D1", REPORTING="YES", WEB_BASED="YES")
@@ -199,7 +201,7 @@ F1,11.11111111111111
 F1,11.11111111111111
 F2,5.555555555555555
 """
-        self.assertEquals(csv.replace("\r",""), expected)
+        self.assertEquals(csv.replace("\r", ""), expected)
 
 
 class ReportingCheckTestCase(TestCase):
@@ -219,7 +221,7 @@ class ReportingCheckTestCase(TestCase):
         ReportingCheck().run(cycle)
         self.assertEqual(3, Score.objects.count())
         filters = {}
-        filters[REPORTING] = "YES"
+        filters[REPORTING] = {"DEFAULT":"YES"}
         self.assertEqual(2, Score.objects.filter(**filters).count())
 
 
@@ -240,7 +242,7 @@ class WebBasedReportingCheckTestCase(TestCase):
         WebBasedReportingCheck().run(cycle)
         self.assertEqual(3, Score.objects.count())
         filters = {}
-        filters[WEB_BASED] = "YES"
+        filters[WEB_BASED] = {"DEFAULT":"YES"}
         self.assertEqual(2, Score.objects.filter(**filters).count())
 
 
@@ -261,7 +263,7 @@ class MultipleReportingCheckTestCase(TestCase):
         MultipleOrdersCheck().run(cycle)
         self.assertEqual(3, Score.objects.count())
         filters = {}
-        filters[MULTIPLE_ORDERS] = "YES"
+        filters[MULTIPLE_ORDERS] = {"DEFAULT":"YES"}
         self.assertEqual(2, Score.objects.filter(**filters).count())
 
 
@@ -272,19 +274,15 @@ class FacilityTestCycleScoresListViewTestCase(WebTest):
         warehouse, _ = WareHouse.objects.get_or_create(name="warehouse")
         loc, _ = Facility.objects.get_or_create(name="AIC Jinja Special Clinic", district=dis, ip=ip,
                                                 warehouse=warehouse)
-        Score.objects.create(name=loc.name, warehouse=warehouse.name, district=dis.name, ip=ip.name, test="TEST1",
-                             REPORTING="YES", formulation="formulation1")
-        Score.objects.create(name=loc.name, warehouse=warehouse.name, district=dis.name, ip=ip.name, test="TEST2",
-                             REPORTING="NO", formulation="formulation1")
-        Score.objects.create(name=loc.name, warehouse=warehouse.name, district=dis.name, ip=ip.name, test="TEST2",
-                             REPORTING="NO", formulation="formulation2")
+        Score.objects.create(name=loc.name, warehouse=warehouse.name, district=dis.name, ip=ip.name,
+                             REPORTING={"formulation1": "YES", "formulation2": "NO"})
         with self.assertNumQueries(2):
             response = self.app.get(reverse("scores"))
             json_text = response.content.decode('utf8')
             data = json.loads(json_text)
-            self.assertEqual(len(data['results']), 3)
+            self.assertEqual(len(data['results']), 1)
             self.assertEqual(data['results'][0]['name'], 'AIC Jinja Special Clinic')
             self.assertEqual(data['results'][0]['warehouse'], 'warehouse')
             self.assertEqual(data['results'][0]['district'], 'dis1')
             self.assertEqual(data['results'][0]['ip'], 'ip')
-            self.assertEqual(data['results'][0]['REPORTING'], 'YES')
+            self.assertEqual(data['results'][0]['REPORTING'], "{u'formulation1': u'YES', u'formulation2': u'NO'}")

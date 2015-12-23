@@ -89,10 +89,10 @@ class DifferentOrdersOverTimeTestCase(TestCase):
             mommy.make(Consumption, facility_cycle=current_record, opening_balance=120, formulation=form)
         self.assertEqual(Score.objects.count(), 0)
         DifferentOrdersOverTime().run(current_cycle)
-        self.assertEqual(Score.objects.count(), 3)
-        self.assertEqual(Score.objects.all()[1].differentOrdersOverTime, "NOT_REPORTING")
-        self.assertEqual(Score.objects.all()[2].differentOrdersOverTime, "NOT_REPORTING")
-        self.assertEqual(Score.objects.all()[0].differentOrdersOverTime, "NOT_REPORTING")
+        self.assertEqual(Score.objects.count(), 1)
+        self.assertEqual(Score.objects.all()[0].differentOrdersOverTime[F1], "NOT_REPORTING")
+        self.assertEqual(Score.objects.all()[0].differentOrdersOverTime[F2], "NOT_REPORTING")
+        self.assertEqual(Score.objects.all()[0].differentOrdersOverTime[F3], "NOT_REPORTING")
 
 
 class StableConsumptionTestCase(TestCase):
@@ -124,10 +124,10 @@ class StableConsumptionTestCase(TestCase):
             mommy.make(Consumption, facility_cycle=current_record, art_consumption=10, pmtct_consumption=30, formulation=form)
         self.assertEqual(Score.objects.count(), 0)
         StableConsumption().run(current_cycle)
-        self.assertEqual(Score.objects.count(), 3)
-        self.assertEqual(Score.objects.all()[1].stableConsumption, "YES")
-        self.assertEqual(Score.objects.all()[2].stableConsumption, "YES")
-        self.assertEqual(Score.objects.all()[0].stableConsumption, "YES")
+        self.assertEqual(Score.objects.count(), 1)
+        self.assertEqual(Score.objects.all()[0].stableConsumption[F1], "YES")
+        self.assertEqual(Score.objects.all()[0].stableConsumption[F2], "YES")
+        self.assertEqual(Score.objects.all()[0].stableConsumption[F3], "YES")
 
     def test_can_get_no(self):
         prev_cycle = "Jan - Feb %s" % now().format("YYYY")
@@ -141,10 +141,10 @@ class StableConsumptionTestCase(TestCase):
             mommy.make(Consumption, facility_cycle=current_record, art_consumption=10, pmtct_consumption=30, formulation=form)
         self.assertEqual(Score.objects.count(), 0)
         StableConsumption().run(current_cycle)
-        self.assertEqual(Score.objects.count(), 3)
-        self.assertEqual(Score.objects.all()[1].stableConsumption, "NO")
-        self.assertEqual(Score.objects.all()[2].stableConsumption, "NO")
-        self.assertEqual(Score.objects.all()[0].stableConsumption, "NO")
+        self.assertEqual(Score.objects.count(), 1)
+        self.assertEqual(Score.objects.all()[0].stableConsumption[F1], "NO")
+        self.assertEqual(Score.objects.all()[0].stableConsumption[F2], "NO")
+        self.assertEqual(Score.objects.all()[0].stableConsumption[F3], "NO")
 
     def test_should_only_consider_facilities_with_consumption_over_20(self):
         prev_cycle = "Jan - Feb %s" % now().format("YYYY")
@@ -173,7 +173,7 @@ class StableConsumptionTestCase(TestCase):
             mommy.make(Consumption, facility_cycle=current_record, art_consumption=10, pmtct_consumption=30, formulation=form)
         self.assertEqual(Score.objects.count(), 0)
         StableConsumption().run(current_cycle)
-        self.assertEqual(Score.objects.count(), 3)
+        self.assertEqual(Score.objects.count(), 1)
         calls = [call(current_cycle, F1, 1, 0, 0, 1), call(current_cycle, F2, 1, 0, 0, 1), call(current_cycle, F3, 1, 0, 0, 1)]
         mock_method.assert_has_calls(calls)
 
@@ -186,10 +186,10 @@ class StableConsumptionTestCase(TestCase):
             mommy.make(Consumption, facility_cycle=current_record, art_consumption=10, pmtct_consumption=30, formulation=form)
         self.assertEqual(Score.objects.count(), 0)
         StableConsumption().run(current_cycle)
-        self.assertEqual(Score.objects.count(), 3)
-        self.assertEqual(Score.objects.all()[1].stableConsumption, "NOT_REPORTING")
-        self.assertEqual(Score.objects.all()[2].stableConsumption, "NOT_REPORTING")
-        self.assertEqual(Score.objects.all()[0].stableConsumption, "NOT_REPORTING")
+        self.assertEqual(Score.objects.count(), 1)
+        self.assertEqual(Score.objects.all()[0].stableConsumption[F1], "NOT_REPORTING")
+        self.assertEqual(Score.objects.all()[0].stableConsumption[F2], "NOT_REPORTING")
+        self.assertEqual(Score.objects.all()[0].stableConsumption[F3], "NOT_REPORTING")
 
     def test_can_handle_blanks(self):
         prev_cycle = "Jan - Feb %s" % now().format("YYYY")
@@ -203,10 +203,10 @@ class StableConsumptionTestCase(TestCase):
             mommy.make(Consumption, facility_cycle=current_record, art_consumption=40, pmtct_consumption=10, formulation=form)
         self.assertEqual(Score.objects.count(), 0)
         StableConsumption().run(current_cycle)
-        self.assertEqual(Score.objects.count(), 3)
-        self.assertEqual(Score.objects.all()[1].stableConsumption, "NO")
-        self.assertEqual(Score.objects.all()[2].stableConsumption, "NO")
-        self.assertEqual(Score.objects.all()[0].stableConsumption, "NO")
+        self.assertEqual(Score.objects.count(), 1)
+        self.assertEqual(Score.objects.all()[0].stableConsumption[F1], "NO")
+        self.assertEqual(Score.objects.all()[0].stableConsumption[F2], "NO")
+        self.assertEqual(Score.objects.all()[0].stableConsumption[F3], "NO")
 
 
 class StablePatientVolumesTestCase(TestCase):
@@ -250,10 +250,11 @@ class StablePatientVolumesTestCase(TestCase):
 
         self.assertEqual(Score.objects.count(), 0)
         StablePatientVolumes().run(current_cycle)
-        self.assertEqual(Score.objects.count(), 3)
-        self.assertEqual(Score.objects.all()[1].stablePatientVolumes, "YES")
-        self.assertEqual(Score.objects.all()[2].stablePatientVolumes, "YES")
-        self.assertEqual(Score.objects.all()[0].stablePatientVolumes, "YES")
+        self.assertEqual(Score.objects.count(), 1)
+        self.assertEqual(Score.objects.all()[0].stablePatientVolumes[F1], "YES")
+        self.assertEqual(Score.objects.all()[0].stablePatientVolumes[F2], "YES")
+        self.assertEqual(Score.objects.all()[0].stablePatientVolumes[F3], "YES")
+
 
     def test_can_get_no(self):
         prev_cycle = "Jan - Feb %s" % now().format("YYYY")
@@ -273,10 +274,10 @@ class StablePatientVolumesTestCase(TestCase):
 
         self.assertEqual(Score.objects.count(), 0)
         StablePatientVolumes().run(current_cycle)
-        self.assertEqual(Score.objects.count(), 3)
-        self.assertEqual(Score.objects.all()[1].stablePatientVolumes, "NO")
-        self.assertEqual(Score.objects.all()[2].stablePatientVolumes, "NO")
-        self.assertEqual(Score.objects.all()[0].stablePatientVolumes, "NO")
+        self.assertEqual(Score.objects.count(), 1)
+        self.assertEqual(Score.objects.all()[0].stablePatientVolumes[F1], "NO")
+        self.assertEqual(Score.objects.all()[0].stablePatientVolumes[F2], "NO")
+        self.assertEqual(Score.objects.all()[0].stablePatientVolumes[F3], "NO")
 
     def test_should_only_consider_facilities_with_population_over_threshold(self):
         prev_cycle = "Jan - Feb %s" % now().format("YYYY")
@@ -317,7 +318,7 @@ class StablePatientVolumesTestCase(TestCase):
 
         self.assertEqual(Score.objects.count(), 0)
         StablePatientVolumes().run(current_cycle)
-        self.assertEqual(Score.objects.count(), 3)
+        self.assertEqual(Score.objects.count(), 1)
         calls = [call(current_cycle, F1, 1, 0, 0, 1), call(current_cycle, F2, 1, 0, 0, 1), call(current_cycle, F3, 1, 0, 0, 1)]
         mock_method.assert_has_calls(calls)
 
@@ -334,10 +335,11 @@ class StablePatientVolumesTestCase(TestCase):
 
         self.assertEqual(Score.objects.count(), 0)
         StablePatientVolumes().run(current_cycle)
-        self.assertEqual(Score.objects.count(), 3)
-        self.assertEqual(Score.objects.all()[1].stablePatientVolumes, "NOT_REPORTING")
-        self.assertEqual(Score.objects.all()[2].stablePatientVolumes, "NOT_REPORTING")
-        self.assertEqual(Score.objects.all()[0].stablePatientVolumes, "NOT_REPORTING")
+        self.assertEqual(Score.objects.count(), 1)
+        self.assertEqual(Score.objects.all()[0].stablePatientVolumes[F1], "NOT_REPORTING")
+        self.assertEqual(Score.objects.all()[0].stablePatientVolumes[F2], "NOT_REPORTING")
+        self.assertEqual(Score.objects.all()[0].stablePatientVolumes[F3], "NOT_REPORTING")
+
 
     def test_can_handle_blanks(self):
         prev_cycle = "Jan - Feb %s" % now().format("YYYY")
@@ -357,7 +359,8 @@ class StablePatientVolumesTestCase(TestCase):
 
         self.assertEqual(Score.objects.count(), 0)
         StablePatientVolumes().run(current_cycle)
-        self.assertEqual(Score.objects.count(), 3)
-        self.assertEqual(Score.objects.all()[1].stablePatientVolumes, "YES")
-        self.assertEqual(Score.objects.all()[2].stablePatientVolumes, "YES")
-        self.assertEqual(Score.objects.all()[0].stablePatientVolumes, "YES")
+        self.assertEqual(Score.objects.count(), 1)
+        self.assertEqual(Score.objects.all()[0].stablePatientVolumes[F1], "YES")
+        self.assertEqual(Score.objects.all()[0].stablePatientVolumes[F2], "YES")
+        self.assertEqual(Score.objects.all()[0].stablePatientVolumes[F3], "YES")
+

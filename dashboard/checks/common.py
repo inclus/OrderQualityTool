@@ -1,5 +1,7 @@
 from dashboard.models import CycleFormulationScore, Score
 
+NOT_APPLICABLE = "DEFAULT"
+
 
 class Check(object):
     test = ''
@@ -7,7 +9,7 @@ class Check(object):
     def run(self, cycle):
         raise NotImplementedError()
 
-    def record_result_for_facility(self, record, result, formulation_name="NOT_APPLICABLE", test=None):
+    def record_result_for_facility(self, record, result, formulation_name=NOT_APPLICABLE, test=None):
         if test:
             f_test = test
         else:
@@ -16,10 +18,13 @@ class Check(object):
                                                       cycle=record.cycle,
                                                       district=self.get_district(record),
                                                       warehouse=self.get_warehouse(record),
-                                                      ip=self.get_ip(record),
-                                                      formulation=formulation_name)
-        score_record.score = result
-        setattr(score_record, f_test, result)
+                                                      ip=self.get_ip(record))
+
+        json_value = getattr(score_record, f_test, dict())
+        if json_value == '':
+            json_value = dict()
+        json_value[formulation_name] = result
+        setattr(score_record, f_test, json_value)
         score_record.save()
 
     def get_ip(self, record):

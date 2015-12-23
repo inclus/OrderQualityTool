@@ -38,10 +38,11 @@ class TestClosingBalance(TestCase):
             mommy.make(Consumption, facility_cycle=current_record, opening_balance=120, formulation=form)
         self.assertEqual(Score.objects.count(), 0)
         ClosingBalance().run(current_cycle)
-        self.assertEqual(Score.objects.count(), 3)
-        self.assertEqual(Score.objects.all()[1].closingBalanceMatchesOpeningBalance, "YES")
-        self.assertEqual(Score.objects.all()[2].closingBalanceMatchesOpeningBalance, "YES")
-        self.assertEqual(Score.objects.all()[0].closingBalanceMatchesOpeningBalance, "YES")
+        self.assertEqual(Score.objects.count(), 1)
+        self.assertEqual(Score.objects.all()[0].closingBalanceMatchesOpeningBalance[F1], "YES")
+        self.assertEqual(Score.objects.all()[0].closingBalanceMatchesOpeningBalance[F2], "YES")
+        self.assertEqual(Score.objects.all()[0].closingBalanceMatchesOpeningBalance[F3], "YES")
+
 
     @patch("dashboard.checks.closing_balance.ClosingBalance.build_cycle_formulation_score")
     def test_should_record_result_for_cycle(self, mock_method):
@@ -56,7 +57,7 @@ class TestClosingBalance(TestCase):
             mommy.make(Consumption, facility_cycle=current_record, opening_balance=120, formulation=form)
         self.assertEqual(Score.objects.count(), 0)
         ClosingBalance().run(current_cycle)
-        self.assertEqual(Score.objects.count(), 3)
+        self.assertEqual(Score.objects.count(), 1)
         calls = [call(current_cycle, F1, 1, 0, 0, 1), call(current_cycle, F2, 1, 0, 0, 1), call(current_cycle, F3, 1, 0, 0, 1)]
         mock_method.assert_has_calls(calls)
 
@@ -69,10 +70,10 @@ class TestClosingBalance(TestCase):
             mommy.make(Consumption, facility_cycle=current_record, opening_balance=120, formulation=form)
         self.assertEqual(Score.objects.count(), 0)
         ClosingBalance().run(current_cycle)
-        self.assertEqual(Score.objects.count(), 3)
-        self.assertEqual(Score.objects.all()[1].closingBalanceMatchesOpeningBalance, "NOT_REPORTING")
-        self.assertEqual(Score.objects.all()[2].closingBalanceMatchesOpeningBalance, "NOT_REPORTING")
-        self.assertEqual(Score.objects.all()[0].closingBalanceMatchesOpeningBalance, "NOT_REPORTING")
+        self.assertEqual(Score.objects.count(), 1)
+        self.assertEqual(Score.objects.all()[0].closingBalanceMatchesOpeningBalance[F1], "NOT_REPORTING")
+        self.assertEqual(Score.objects.all()[0].closingBalanceMatchesOpeningBalance[F2], "NOT_REPORTING")
+        self.assertEqual(Score.objects.all()[0].closingBalanceMatchesOpeningBalance[F3], "NOT_REPORTING")
 
     def test_should_query_correct_formulation(self):
         prev_cycle = "Jan - Feb %s" % now().format("YYYY")
@@ -86,10 +87,10 @@ class TestClosingBalance(TestCase):
             mommy.make(Consumption, facility_cycle=current_record, opening_balance=10, formulation=form)
         self.assertEqual(Score.objects.count(), 0)
         ClosingBalance().run(current_cycle)
-        self.assertEqual(Score.objects.count(), 3)
-        self.assertEqual(Score.objects.all()[1].closingBalanceMatchesOpeningBalance, "NO")
-        self.assertEqual(Score.objects.all()[2].closingBalanceMatchesOpeningBalance, "NO")
-        self.assertEqual(Score.objects.all()[0].closingBalanceMatchesOpeningBalance, "NO")
+        self.assertEqual(Score.objects.count(), 1)
+        self.assertEqual(Score.objects.all()[0].closingBalanceMatchesOpeningBalance[F1], "NO")
+        self.assertEqual(Score.objects.all()[0].closingBalanceMatchesOpeningBalance[F2], "NO")
+        self.assertEqual(Score.objects.all()[0].closingBalanceMatchesOpeningBalance[F3], "NO")
 
     def test_compare_values(self):
         check = ClosingBalance()
