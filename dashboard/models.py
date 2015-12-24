@@ -1,3 +1,4 @@
+import json
 import logging
 
 from custom_user.models import AbstractEmailUser
@@ -83,11 +84,11 @@ choices = ((YES, YES), (NO, NO), (NOT_REPORTING, NOT_REPORTING))
 
 
 class Score(models.Model):
-    name = models.CharField(max_length=256)
-    cycle = models.CharField(max_length=256)
-    district = models.CharField(max_length=256)
-    ip = models.CharField(max_length=256)
-    warehouse = models.CharField(max_length=256)
+    name = models.CharField(max_length=256, db_index=True)
+    cycle = models.CharField(max_length=256, db_index=True)
+    district = models.CharField(max_length=256, db_index=True)
+    ip = models.CharField(max_length=256, db_index=True)
+    warehouse = models.CharField(max_length=256, db_index=True)
     REPORTING = JSONField()
     WEB_BASED = JSONField()
     MULTIPLE_ORDERS = JSONField()
@@ -132,10 +133,13 @@ class Score(models.Model):
         self.pass_count = 0
         self.fail_count = 0
         for field in fields:
-            if getattr(self, field) == YES:
-                self.pass_count += 1
-            else:
-                self.fail_count += 1
+            attr = getattr(self, field)
+            if type(attr) == dict:
+                for f, result in attr.items():
+                    if result == YES:
+                        self.pass_count += 1
+                    else:
+                        self.fail_count += 1
 
         super(Score, self).save(force_insert, force_update, using, update_fields)
 

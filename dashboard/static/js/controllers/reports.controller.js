@@ -3,6 +3,7 @@ angular.module('reports').controller('ReportsController', ['$scope', 'ReportServ
         $scope.page_count = 20;
         ReportService.getFilters().then(function(data) {
             $scope.filters = data;
+            $scope.selectedFilter.cycle = data.cycles[0];
         });
         $scope.selectedFilter = {};
         $scope.dtOptions = DTOptionsBuilder.newOptions()
@@ -17,14 +18,15 @@ angular.module('reports').controller('ReportsController', ['$scope', 'ReportServ
             });
         $scope.formulations = [{
             name: "TDF/3TC/EFV (Adult)",
-            value: "TDF/3TC/EFV"
+            value: "TDF/3TC/EFV (Adult)"
         }, {
             name: "ABC/3TC (Paed)",
-            value: "ABC/3TC"
+            value: "ABC/3TC (Paed)"
         }, {
             name: "EFV200 (Paed)",
-            value: "(EFV) 200mg"
+            value: "EFV200 (Paed)"
         }];
+        $scope.selectedFilter.formulation = $scope.formulations[0];
         var tests = [{
             'test': 'REPORTING',
             'display': 'REPORTING',
@@ -34,15 +36,15 @@ angular.module('reports').controller('ReportsController', ['$scope', 'ReportServ
             'display': 'WEB/PAPER',
             'formulation': false
         }, {
-            'test': 'guidelineAdherenceAdult lL',
+            'test': 'guidelineAdherenceAdult1L',
             'display': 'Adult 1L',
             'formulation': false
         }, {
-            'test': 'guidelineAdherenceAdult 2L',
+            'test': 'guidelineAdherenceAdult2L',
             'display': 'Adult 2L',
             'formulation': false
         }, {
-            'test': 'guidelineAdherencePaed 1L',
+            'test': 'guidelineAdherencePaed1L',
             'display': 'Adult 2L',
             'formulation': false
         }, {
@@ -101,28 +103,32 @@ angular.module('reports').controller('ReportsController', ['$scope', 'ReportServ
         $scope.tests = tests;
         var calculateTotal = function(name) {
             var size = $scope.scores.length;
-            var count = _.countBy($scope.scores, name);
-            var percentage = (count.YES / size) * 100;
+            var count = _.countBy($scope.scores, function(item) {
+                if (item && name in item) {
+                    var hash = item[name];
+                    if (hash) {
+                        if ('DEFAULT' in hash) {
+                            return hash['DEFAULT'];
+                        }
+                        if ($scope.selectedFilter.formulation.name in hash) {
+                            var result = hash[$scope.selectedFilter.formulation.name];
+                            return hash[$scope.selectedFilter.formulation.name];
+                        }
+                    }
+                }
+            });
+
+            var yes_count = count.YES;
+            if (!yes_count) {
+                yes_count = 0;
+            }
+            var percentage = (yes_count / size) * 100;
             if (isNaN(percentage)) {
                 return 0;
             } else {
                 return percentage;
             }
 
-        };
-        $scope.cleanFormulation = function(name) {
-            var map = {
-                "TDF/3TC/EFV": "TDF/3TC/EFV",
-                "EFV": "EFV",
-                "EFV) 200mg [Pack 90]": "(EFV) 200mg [Pack 90]",
-                "ABC/3TC": "ABC/3TC",
-                "(EFV) 200mg [Pack 90]": "(EFV) 200mg [Pack 90]",
-            }
-            var newName = map[name];
-            if (!newName) {
-                return name;
-            }
-            return newName;
         };
         var cleanScore = function(score) {
             var map = {
@@ -150,15 +156,15 @@ angular.module('reports').controller('ReportsController', ['$scope', 'ReportServ
                 page: page
             };
             if ($scope.selectedFilter.ip) {
-                params['facility__ip'] = $scope.selectedFilter.ip.pk;
+                params['ip'] = $scope.selectedFilter.ip.name;
             }
 
             if ($scope.selectedFilter.district) {
-                params['facility__district'] = $scope.selectedFilter.district.pk;
+                params['district'] = $scope.selectedFilter.district.name;
             }
 
             if ($scope.selectedFilter.warehouse) {
-                params['facility__warehouse'] = $scope.selectedFilter.warehouse.pk;
+                params['warehouse'] = $scope.selectedFilter.warehouse.name;
             }
 
             if ($scope.selectedFilter.cycle) {
@@ -169,8 +175,33 @@ angular.module('reports').controller('ReportsController', ['$scope', 'ReportServ
 
         $scope.updateTable = updateTable;
         updateTable(1);
-
-
-
     }
 ]);
+
+angular.module('reports').directive('score', function() {
+    return {
+        scope: {
+            result: '=',
+            formulation: '='
+        },
+        controller: ['$scope', function($scope) {
+            if ($scope.result && $scope.formulation) {
+                if ($scope.formulation in $scope.result) {
+                    $scope.toDisplay = $scope.result[$scope.formulation];
+                } else if ('DEFAULT' in $scope.result) {
+                    $scope.toDisplay = $scope.result['DEFAULT'];
+                }
+                var map = {
+                    "YES": "PASS",
+                    "NO": "FAIL",
+                    "NOT_REPORTING": "N/A"
+                };
+                if ($scope.toDisplay) {
+                    $scope.display = map[$scope.toDisplay];
+                }
+            }
+
+        }],
+        template: '<span class="score_{{display}}">{{display}}</span>'
+    };
+})

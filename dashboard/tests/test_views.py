@@ -108,98 +108,98 @@ class FacilitiesMultipleReportingViewTestCase(WebTest):
 
 class BestDistrictReportingViewFor(WebTest):
     def test_best_performing_districts(self):
-        Score.objects.create(name="F1", warehouse="W1", ip="I1", district="D1", REPORTING="YES", WEB_BASED="YES")
-        Score.objects.create(name="F1", warehouse="W1", ip="I1", district="D2", REPORTING="NO", WEB_BASED="YES")
+        Score.objects.create(name="F1", warehouse="W1", ip="I1", district="D1", REPORTING={"DEFAULT": "YES"}, WEB_BASED={"DEFAULT": "YES"})
+        Score.objects.create(name="F1", warehouse="W1", ip="I1", district="D2", REPORTING={"DEFAULT": "NO"}, WEB_BASED={"DEFAULT": "YES"})
         url = reverse("ranking_best")
         json_response = self.app.get(url, user="testuser").content.decode('utf8')
         data = loads(json_response)['values']
         self.assertEquals('D1', data[0]['name'])
-        self.assertEquals(200.0 / 18, data[0]['rate'])
+        self.assertEquals(100.0, data[0]['rate'])
         self.assertEquals('D2', data[1]['name'])
-        self.assertEquals(100.0 / 18, data[1]['rate'])
+        self.assertEquals(50.0, data[1]['rate'])
 
     def test_best_performing_ips(self):
-        Score.objects.create(name="F1", warehouse="W1", ip="I1", district="D1", REPORTING="YES", WEB_BASED="YES")
-        Score.objects.create(name="F1", warehouse="W1", ip="I2", district="D2", REPORTING="NO", WEB_BASED="YES")
+        Score.objects.create(name="F1", warehouse="W1", ip="I1", district="D1", REPORTING={"DEFAULT": "YES"}, WEB_BASED={"DEFAULT": "YES"})
+        Score.objects.create(name="F1", warehouse="W1", ip="I2", district="D2", REPORTING= {"DEFAULT": "NO"}, WEB_BASED={"DEFAULT": "YES"})
         url = reverse("ranking_best") + "?level=ip"
         json_response = self.app.get(url, user="testuser").content.decode('utf8')
         data = loads(json_response)['values']
         self.assertEquals('I1', data[0]['name'])
-        self.assertEquals(200.0 / 18, data[0]['rate'])
+        self.assertEquals(100.0, data[0]['rate'])
 
     def test_best_performing_warehouses(self):
-        Score.objects.create(name="F1", warehouse="W1", ip="I1", district="D1", REPORTING="YES", WEB_BASED="YES")
-        Score.objects.create(name="F1", warehouse="W1", ip="I2", district="D2", REPORTING="NO", WEB_BASED="YES")
+        Score.objects.create(name="F1", warehouse="W1", ip="I1", district="D1", REPORTING={"DEFAULT": "YES"}, WEB_BASED={"DEFAULT": "YES"})
+        Score.objects.create(name="F1", warehouse="W1", ip="I2", district="D2", REPORTING={"DEFAULT": "NO"}, WEB_BASED={"DEFAULT": "YES"})
         url = reverse("ranking_best") + "?level=warehouse"
         json_response = self.app.get(url, user="testuser").content.decode('utf8')
         data = loads(json_response)['values']
         self.assertEquals('W1', data[0]['name'])
-        self.assertAlmostEqual(300.0 / 36, data[0]['rate'])
+        self.assertAlmostEqual(75.0, data[0]['rate'])
 
     def test_best_performing_facilities(self):
-        Score.objects.create(name="F1", warehouse="W1", ip="I1", district="D1", REPORTING="YES", WEB_BASED="YES")
-        Score.objects.create(name="F2", warehouse="W1", ip="I2", district="D2", REPORTING="NO", WEB_BASED="YES")
+        Score.objects.create(name="F1", warehouse="W1", ip="I1", district="D1", REPORTING={"DEFAULT": "YES"}, WEB_BASED={"DEFAULT": "YES"})
+        Score.objects.create(name="F2", warehouse="W1", ip="I2", district="D2", REPORTING={"DEFAULT": "NO"}, WEB_BASED={"DEFAULT": "YES"})
         url = reverse("ranking_best") + "?level=facility"
         json_response = self.app.get(url, user="testuser").content.decode('utf8')
         data = loads(json_response)['values']
         self.assertEquals('F1', data[0]['name'])
-        self.assertEquals(200.0 / 18, data[0]['rate'])
+        self.assertEquals(100.0, data[0]['rate'])
 
     def test_worst_performing_districts(self):
-        Score.objects.create(name="F1", warehouse="W1", ip="I1", district="D1", REPORTING="YES", WEB_BASED="YES")
-        Score.objects.create(name="F2", warehouse="W1", ip="I2", district="D2", REPORTING="NO", WEB_BASED="YES")
+        Score.objects.create(name="F1", warehouse="W1", ip="I1", district="D1", REPORTING={"DEFAULT": "YES"}, WEB_BASED={"DEFAULT": "YES"})
+        Score.objects.create(name="F2", warehouse="W1", ip="I2", district="D2", REPORTING={"DEFAULT": "NO"}, WEB_BASED={"DEFAULT": "YES"})
         url = reverse("ranking_worst")
         json_response = self.app.get(url, user="testuser").content.decode('utf8')
         data = loads(json_response)['values']
         self.assertEquals('D2', data[0]['name'])
-        self.assertEquals(100.0 / 18, data[0]['rate'])
+        self.assertEquals(50.0, data[0]['rate'])
 
     def test_worst_performing_ips(self):
-        Score.objects.create(name="F1", warehouse="W1", ip="I1", district="D1", REPORTING="YES", WEB_BASED="YES")
-        Score.objects.create(name="F2", warehouse="W1", ip="I2", district="D2", REPORTING="NO", WEB_BASED="YES")
+        Score.objects.create(name="F1", warehouse="W1", ip="I1", district="D1", REPORTING={"DEFAULT": "YES"}, WEB_BASED={"DEFAULT": "YES"})
+        Score.objects.create(name="F2", warehouse="W1", ip="I2", district="D2", REPORTING={"DEFAULT": "NO"}, WEB_BASED={"DEFAULT": "YES"})
         url = reverse("ranking_worst") + "?level=ip"
         json_response = self.app.get(url, user="testuser").content.decode('utf8')
         data = loads(json_response)['values']
         self.assertEquals('I2', data[0]['name'])
-        self.assertEquals(100.0 / 18, data[0]['rate'])
+        self.assertEquals(50.0, data[0]['rate'])
 
-    def xtest_worst_performing_warehouses(self):
-        Score.objects.create(name="F1", warehouse="W1", ip="I1", district="D1", REPORTING="YES", WEB_BASED="YES")
-        Score.objects.create(name="F2", warehouse="W2", ip="I2", district="D2", REPORTING="NO", WEB_BASED="YES")
+    def test_worst_performing_warehouses(self):
+        Score.objects.create(name="F1", warehouse="W1", ip="I1", district="D1", REPORTING={"DEFAULT": "YES"}, WEB_BASED={"DEFAULT": "YES"})
+        Score.objects.create(name="F2", warehouse="W2", ip="I2", district="D2", REPORTING={"DEFAULT": "NO"}, WEB_BASED={"DEFAULT": "YES"})
         url = reverse("ranking_worst") + "?level=warehouse"
         json_response = self.app.get(url, user="testuser").content.decode('utf8')
         data = loads(json_response)['values']
         self.assertEquals('W2', data[0]['name'])
-        self.assertEquals(100.0 / 18, data[0]['rate'])
+        self.assertEquals(50.0, data[0]['rate'])
 
     def test_worst_performing_facilities(self):
-        Score.objects.create(name="F1", warehouse="W1", ip="I1", district="D1", REPORTING="YES", WEB_BASED="YES")
-        Score.objects.create(name="F2", warehouse="W2", ip="I2", district="D2", REPORTING="NO", WEB_BASED="YES")
+        Score.objects.create(name="F1", warehouse="W1", ip="I1", district="D1", REPORTING={"DEFAULT": "YES"}, WEB_BASED={"DEFAULT": "YES"})
+        Score.objects.create(name="F2", warehouse="W2", ip="I2", district="D2", REPORTING={"DEFAULT": "NO"}, WEB_BASED={"DEFAULT": "YES"})
         url = reverse("ranking_worst") + "?level=facility"
         json_response = self.app.get(url, user="testuser").content.decode('utf8')
         data = loads(json_response)['values']
         self.assertEquals('F2', data[0]['name'])
-        self.assertEquals(100.0 / 18, data[0]['rate'])
+        self.assertEquals(50.0, data[0]['rate'])
 
     def test_worst_csv(self):
-        Score.objects.create(name="F1", warehouse="W1", ip="I1", district="D1", REPORTING="YES", WEB_BASED="YES")
-        Score.objects.create(name="F2", warehouse="W2", ip="I2", district="D2", REPORTING="NO", WEB_BASED="YES")
+        Score.objects.create(name="F1", warehouse="W1", ip="I1", district="D1", REPORTING={"DEFAULT": "YES"}, WEB_BASED={"DEFAULT": "YES"})
+        Score.objects.create(name="F2", warehouse="W2", ip="I2", district="D2", REPORTING={"DEFAULT": "NO"}, WEB_BASED={"DEFAULT": "YES"})
         url = reverse("ranking_worst_csv") + "?level=facility"
         csv = self.app.get(url, user="testuser").content.decode('utf8')
         expected = """facility,reporting rate
-F2,5.555555555555555
-F1,11.11111111111111
+F2,50.0
+F1,100.0
 """
         self.assertEquals(csv.replace("\r", ""), expected)
 
     def test_best_csv(self):
-        Score.objects.create(name="F1", warehouse="W1", ip="I1", district="D1", REPORTING="YES", WEB_BASED="YES")
-        Score.objects.create(name="F2", warehouse="W2", ip="I2", district="D2", REPORTING="NO", WEB_BASED="YES")
+        Score.objects.create(name="F1", warehouse="W1", ip="I1", district="D1", REPORTING={"DEFAULT": "YES"}, WEB_BASED={"DEFAULT": "YES"})
+        Score.objects.create(name="F2", warehouse="W2", ip="I2", district="D2", REPORTING={"DEFAULT": "NO"}, WEB_BASED={"DEFAULT": "YES"})
         url = reverse("ranking_best_csv") + "?level=facility"
         csv = self.app.get(url, user="testuser").content.decode('utf8')
         expected = """facility,reporting rate
-F1,11.11111111111111
-F2,5.555555555555555
+F1,100.0
+F2,50.0
 """
         self.assertEquals(csv.replace("\r", ""), expected)
 
@@ -285,4 +285,4 @@ class FacilityTestCycleScoresListViewTestCase(WebTest):
             self.assertEqual(data['results'][0]['warehouse'], 'warehouse')
             self.assertEqual(data['results'][0]['district'], 'dis1')
             self.assertEqual(data['results'][0]['ip'], 'ip')
-            self.assertEqual(data['results'][0]['REPORTING'], "{u'formulation1': u'YES', u'formulation2': u'NO'}")
+            self.assertEqual(data['results'][0]['REPORTING'], {'formulation1': 'YES', 'formulation2': 'NO'})

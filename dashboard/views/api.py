@@ -273,9 +273,7 @@ class FilterValuesView(APIView):
         warehouses = WareHouse.objects.values('pk', 'name').order_by('name').distinct()
         districts = District.objects.values('pk', 'name').order_by('name').distinct()
         cycles = Cycle.objects.values('cycle').distinct()
-        formulations = Score.objects.values('formulation').distinct()
-        return Response({"ips": ips, "warehouses": warehouses, "districts": districts, "cycles": cycles,
-                         "formulations": formulations})
+        return Response({"ips": ips, "warehouses": warehouses, "districts": districts, "cycles": cycles})
 
 
 class FacilityTestCycleScoresListView(ListAPIView):

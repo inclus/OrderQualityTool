@@ -100,7 +100,6 @@ angular.module('dashboard').controller('HomeController', ['$scope', 'ReportServi
             $scope.adherenceRate = data.adherence;
         });
         ReportService.getRankingsAccess().then(function(data) {
-            console.log(data);
             $scope.rankingLevels = data.values;
             $scope.bestPerforming = $scope.rankingLevels[0];
             $scope.worstPerforming = $scope.rankingLevels[0];

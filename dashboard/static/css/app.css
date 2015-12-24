@@ -7012,3 +7012,9 @@ a.label-qdb:hover {
 #main-report_filter {
   display: none;
 }
+span.score_PASS {
+  color: #27ae60;
+}
+span.score_FAIL {
+  color: red;
+}
