@@ -95,10 +95,20 @@ class FacilityCycleRecordAdmin(ModelAdmin):
                     'reporting_status',
                     'web_based',
                     'multiple',
-                    'cycle'
+                    'cycle',
+                    'consumption_count'
                     )
+    search_fields = ['facility__name']
     list_filter = ('reporting_status', 'multiple', 'cycle')
     actions = [run_tests]
+
+    def consumption_count(self, inst):
+        return inst.consumption.count()
+
+
+class CycleFormulationScoreAdmin(ModelAdmin):
+    list_display = ('formulation', 'cycle', 'test', 'yes', 'no', 'not_reporting')
+    list_filter = ('cycle', 'test', 'formulation')
 
 
 class ScoreAdmin(ModelAdmin):
@@ -136,7 +146,7 @@ admin_site.register(WareHouse)
 admin_site.register(District)
 admin_site.register(CycleScore)
 admin_site.register(Score, ScoreAdmin)
-admin_site.register(CycleFormulationScore)
+admin_site.register(CycleFormulationScore, CycleFormulationScoreAdmin)
 admin_site.register(AdultPatientsRecord, PatientAdmin)
 admin_site.register(PAEDPatientsRecord, PatientAdmin)
 admin_site.register(Consumption, ConsumptionAdmin)

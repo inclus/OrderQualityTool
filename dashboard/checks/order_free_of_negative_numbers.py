@@ -40,7 +40,7 @@ class OrderFormFreeOfNegativeNumbers(Check):
                             When(consumption__pmtct_consumption__lt=0, then=1),
                             When(consumption__art_consumption__lt=0, then=1),
                             When(consumption__estimated_number_of_new_pregnant_women__lt=0, then=1),
-                            When(consumption__total_quantity_to_be_ordered__lt=0, then=1),
+                            When(consumption__estimated_number_of_new_patients__lt=0, then=1),
                     )))
             for record in data:
                 result = NOT_REPORTING

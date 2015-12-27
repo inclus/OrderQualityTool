@@ -2,66 +2,10 @@ from collections import defaultdict
 
 from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 from openpyxl import load_workbook
-from xlrd import open_workbook
 
 from dashboard.helpers import PATIENTS_ADULT, PATIENTS_PAED
 from dashboard.models import Consumption, Cycle, logger, PAEDPatientsRecord, AdultPatientsRecord, LOCATION, CONSUMPTION
 from locations.models import Facility, District, IP, WareHouse
-
-
-class WaosStandardReport():
-    def __init__(self, path):
-        self.path = path
-        self.worksheet = self.load_worksheet()
-
-    def load_worksheet(self):
-        workbook = open_workbook(self.path)
-        return workbook.sheet_by_index(0)
-
-    def get_data(self):
-        record = self.get_facility_record()
-        if record:
-            for n in range(4, 14):
-                self.build_consumption_record(n, record)
-
-            for n in range(16, 24):
-                self.build_consumption_record(n, record)
-
-            return record
-
-    def build_consumption_record(self, n, record):
-        formulation_name = self.worksheet.cell_value(n, 1)
-        consumption_record, created = Consumption.objects.get_or_create(facility_cycle=record, formulation=formulation_name)
-        consumption_record.opening_balance = self.get_numerical_value(n, 3)
-        consumption_record.quantity_received = self.get_numerical_value(n, 4)
-        consumption_record.pmtct_consumption = self.get_numerical_value(n, 5)
-        consumption_record.art_consumption = self.get_numerical_value(n, 6)
-        consumption_record.loses_adjustments = self.get_numerical_value(n, 7)
-        consumption_record.closing_balance = self.get_numerical_value(n, 8)
-        consumption_record.months_of_stock_of_hand = self.get_numerical_value(n, 9)
-        consumption_record.quantity_required_for_current_patients = self.get_numerical_value(n, 10)
-        consumption_record.estimated_number_of_new_patients = self.get_numerical_value(n, 11)
-        consumption_record.estimated_number_of_new_pregnant_women = self.get_numerical_value(n, 12)
-        consumption_record.total_quantity_to_be_ordered = self.get_numerical_value(n, 13)
-        consumption_record.notes = self.worksheet.cell_value(n, 14)
-        consumption_record.save()
-
-    def get_numerical_value(self, n, i):
-        value = self.worksheet.cell_value(n, i)
-        if value:
-            return value
-
-    def get_facility_record(self):
-        facility_name = self.worksheet.cell_value(27, 1)
-        level = self.worksheet.cell_value(28, 1)
-        full_name = "%s %s" % (facility_name, level)
-        cycle = self.worksheet.cell_value(30, 1)
-        try:
-            location = Facility.objects.get(name__icontains=full_name)
-            record, exists = Cycle.objects.get_or_create(facility=location, cycle=cycle)
-            return record
-        except ObjectDoesNotExist:
-            return None
 
 
 class GeneralReport():

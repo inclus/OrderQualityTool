@@ -1,7 +1,9 @@
 import json
+
 from django.core.urlresolvers import reverse
 from django_webtest import WebTest
-from mock import MagicMock, patch
+from mock import MagicMock, patch, call
+
 from dashboard.checks.order_form_free_of_gaps import OrderFormFreeOfGaps
 from dashboard.helpers import *
 from dashboard.models import AdultPatientsRecord, PAEDPatientsRecord, Cycle, Consumption
@@ -47,9 +49,9 @@ class OrderFormFreeOfNegativesViewTestCase(WebTest, RegimenCheckViewCaseMixin):
         data = json.loads(json_content)
         self.assertEqual(data['values'][0], {u'cycle': u'Mar - Apr 2015', u'no': 40, u'not_reporting': 60, u'yes': 20})
         filter_mock.assert_called_with(
-            cycle__in=[(u'Mar - Apr %s' % year), (u'May - Jun %s' % year), (u'Jul - Aug %s' % year),
-                       (u'Sep - Oct %s' % year), (u'Nov - Dec %s' % year)], formulation__icontains=u'reg',
-            test=self.test)
+                cycle__in=[(u'Mar - Apr %s' % year), (u'May - Jun %s' % year), (u'Jul - Aug %s' % year),
+                           (u'Sep - Oct %s' % year), (u'Nov - Dec %s' % year)], formulation__icontains=u'reg',
+                test=self.test)
 
 
 class OrderFormFreeOfGapsViewTestCase(WebTest, RegimenCheckViewCaseMixin):
@@ -80,8 +82,8 @@ class OrderFormFreeOfGapsViewTestCase(WebTest, RegimenCheckViewCaseMixin):
         data = json.loads(json_content)
         self.assertEqual(data['values'][0], {u'cycle': u'Mar - Apr 2015', u'no': 40, u'not_reporting': 60, u'yes': 20})
         filter_mock.assert_called_with(
-            cycle__in=[(u'Mar - Apr %s' % year), (u'May - Jun %s' % year), (u'Jul - Aug %s' % year),
-                       (u'Sep - Oct %s' % year), (u'Nov - Dec %s' % year)], test=self.test)
+                cycle__in=[(u'Mar - Apr %s' % year), (u'May - Jun %s' % year), (u'Jul - Aug %s' % year),
+                           (u'Sep - Oct %s' % year), (u'Nov - Dec %s' % year)], test=self.test)
 
     def test_logic(self):
         names = ["FA1", "FA2", "FA3"]
@@ -101,7 +103,6 @@ class OrderFormFreeOfGapsViewTestCase(WebTest, RegimenCheckViewCaseMixin):
         consumption_data['quantity_required_for_current_patients'] = 4.5
         consumption_data['estimated_number_of_new_patients'] = 4.5
         consumption_data['estimated_number_of_new_pregnant_women'] = 4.5
-        consumption_data['total_quantity_to_be_ordered'] = 4.5
         consumption_data['notes'] = None
         warehouse, _ = WareHouse.objects.get_or_create(name="warehouse")
         ip, _ = IP.objects.get_or_create(name="ip")
@@ -127,6 +128,51 @@ class OrderFormFreeOfGapsViewTestCase(WebTest, RegimenCheckViewCaseMixin):
         self.assertEqual(60.0, score.yes)
         self.assertEqual(0.0, score.no)
         self.assertEqual(40.0, score.not_reporting)
+
+    @patch('dashboard.checks.order_form_free_of_gaps.OrderFormFreeOfGaps.process_facility')
+    def test_should_calculate_correct_number_of_blanks(self, mock_method):
+        mock_method.return_value = (0, 0, 0, NOT_REPORTING)
+        names = ["FA1", "FA2", "FA3"]
+        names_without_data = ["FA4", "FA5"]
+        consumption_regimens = ["CREG-%s" % n for n in range(1, 26)]
+        adult_regimens = ["AREG-%s" % n for n in range(1, 23)]
+        paed_regimens = ["PREG-%s" % n for n in range(1, 9)]
+        cycle = "Jan - Feb 2013"
+        consumption_data = {}
+        consumption_data['opening_balance'] = 3
+        consumption_data['quantity_received'] = 4.5
+        consumption_data['pmtct_consumption'] = 4.5
+        consumption_data['art_consumption'] = 4.5
+        consumption_data['loses_adjustments'] = 4.5
+        consumption_data['closing_balance'] = 4.5
+        consumption_data['months_of_stock_of_hand'] = 4
+        consumption_data['quantity_required_for_current_patients'] = 4.5
+        consumption_data['estimated_number_of_new_patients'] = 4.5
+        consumption_data['estimated_number_of_new_pregnant_women'] = 4.5
+        consumption_data['notes'] = None
+        warehouse, _ = WareHouse.objects.get_or_create(name="warehouse")
+        ip, _ = IP.objects.get_or_create(name="ip")
+        district, _ = District.objects.get_or_create(name="dis")
+        for name in names:
+            facility, _ = Facility.objects.get_or_create(name=name, ip=ip, warehouse=warehouse, district=district)
+            record, _ = Cycle.objects.get_or_create(cycle=cycle, facility=facility)
+            consumption_data['facility_cycle'] = record
+            for reg in consumption_regimens:
+                consumption_data['formulation'] = reg
+                Consumption.objects.create(**consumption_data)
+            n = 0
+            for reg in adult_regimens:
+                if n % 2 == 0:
+                    AdultPatientsRecord.objects.create(facility_cycle=record, formulation=reg, existing=12, new=None)
+                else:
+                    AdultPatientsRecord.objects.create(facility_cycle=record, formulation=reg, existing=None, new=None)
+                n += 1
+            for reg in paed_regimens:
+                PAEDPatientsRecord.objects.create(facility_cycle=record, formulation=reg, existing=3, new=12.0)
+
+        OrderFormFreeOfGaps().run(cycle)
+        expected_calls = [call(0, 0, 0, 33, 25, 22, 8)]
+        mock_method.assert_has_calls(expected_calls)
 
 
 class DifferentOrdersOverTimeViewTestCase(OrderFormFreeOfNegativesViewTestCase):

@@ -16,10 +16,9 @@ class Check(object):
             f_test = self.test
         score_record, _ = Score.objects.get_or_create(name=self.get_facility(record),
                                                       cycle=record.cycle,
-                                                      district=self.get_district(record),
-                                                      warehouse=self.get_warehouse(record),
-                                                      ip=self.get_ip(record))
-
+                                                      district=self.get_district(record))
+        score_record.warehouse = self.get_warehouse(record)
+        score_record.ip = self.get_ip(record)
         json_value = getattr(score_record, f_test, dict())
         if json_value == '':
             json_value = dict()

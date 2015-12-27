@@ -1,4 +1,3 @@
-import json
 import logging
 
 from custom_user.models import AbstractEmailUser
@@ -160,7 +159,6 @@ class Consumption(models.Model):
     estimated_number_of_new_patients = models.FloatField(null=True, blank=True)
     estimated_number_of_new_pregnant_women = models.FloatField(null=True, blank=True)
     packs_ordered = models.FloatField(null=True, blank=True)
-    total_quantity_to_be_ordered = models.FloatField(null=True, blank=True)
     notes = models.CharField(max_length=256, null=True, blank=True)
     formulation = models.CharField(max_length=256, null=True, blank=True, db_index=True)
 

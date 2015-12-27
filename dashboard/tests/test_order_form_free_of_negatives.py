@@ -41,7 +41,7 @@ class OrderFormFreeOfNegativesTestCase(WebTest, RegimenCheckViewCaseMixin):
         current_record = mommy.make(Cycle, facility=facility, cycle=current_cycle)
         formulations = [OrderFormFreeOfNegativeNumbers.F1_QUERY, OrderFormFreeOfNegativeNumbers.F2_QUERY, OrderFormFreeOfNegativeNumbers.F3_QUERY]
         for form in formulations:
-            mommy.make(Consumption, facility_cycle=current_record, formulation=form, opening_balance=10, quantity_received=10, pmtct_consumption=10, art_consumption=10, estimated_number_of_new_pregnant_women=10, total_quantity_to_be_ordered=10)
+            mommy.make(Consumption, facility_cycle=current_record, formulation=form, opening_balance=10, quantity_received=10, pmtct_consumption=10, art_consumption=10, estimated_number_of_new_pregnant_women=10, estimated_number_of_new_patients=10)
 
         self.assertEqual(Score.objects.count(), 0)
         OrderFormFreeOfNegativeNumbers().run(current_cycle)
@@ -55,7 +55,7 @@ class OrderFormFreeOfNegativesTestCase(WebTest, RegimenCheckViewCaseMixin):
         current_record = mommy.make(Cycle, facility=facility, cycle=current_cycle)
         formulations = [OrderFormFreeOfNegativeNumbers.F1_QUERY, OrderFormFreeOfNegativeNumbers.F2_QUERY, OrderFormFreeOfNegativeNumbers.F3_QUERY]
         for form in formulations:
-            mommy.make(Consumption, facility_cycle=current_record, formulation=form, opening_balance=-10, quantity_received=10, pmtct_consumption=10, art_consumption=10, estimated_number_of_new_pregnant_women=10, total_quantity_to_be_ordered=10)
+            mommy.make(Consumption, facility_cycle=current_record, formulation=form, opening_balance=-10, quantity_received=10, pmtct_consumption=10, art_consumption=10, estimated_number_of_new_pregnant_women=10, estimated_number_of_new_patients=10)
         self.assertEqual(Score.objects.count(), 0)
         OrderFormFreeOfNegativeNumbers().run(current_cycle)
         self.assertEqual(Score.objects.count(), 1)
@@ -70,7 +70,7 @@ class OrderFormFreeOfNegativesTestCase(WebTest, RegimenCheckViewCaseMixin):
         current_record = mommy.make(Cycle, facility=facility, cycle=current_cycle)
         formulations = [OrderFormFreeOfNegativeNumbers.F1_QUERY, OrderFormFreeOfNegativeNumbers.F2_QUERY, OrderFormFreeOfNegativeNumbers.F3_QUERY]
         for form in formulations:
-            mommy.make(Consumption, facility_cycle=current_record, formulation="YES FORM", opening_balance=-10, quantity_received=10, pmtct_consumption=10, art_consumption=10, estimated_number_of_new_pregnant_women=10, total_quantity_to_be_ordered=10)
+            mommy.make(Consumption, facility_cycle=current_record, formulation="YES FORM", opening_balance=-10, quantity_received=10, pmtct_consumption=10, art_consumption=10, estimated_number_of_new_pregnant_women=10, estimated_number_of_new_patients=10)
         self.assertEqual(Score.objects.count(), 0)
         OrderFormFreeOfNegativeNumbers().run(current_cycle)
         self.assertEqual(Score.objects.count(), 1)
