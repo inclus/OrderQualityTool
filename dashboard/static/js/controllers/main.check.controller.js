@@ -1,5 +1,5 @@
 angular.module('dashboard').controller('MainChecksController', ['$scope',
-    function($scope) {
+    function ($scope) {
         $scope.tests = [{
             "url": "orderFormFreeOfGaps",
             "desc": "NO BLANKS: If the facility reported, is the whole order form free of blanks?",
@@ -12,6 +12,7 @@ angular.module('dashboard').controller('MainChecksController', ['$scope',
             "desc": "DUPLICATE ORDERS: Facilities that submitted more than one order over the cycle",
             "hasRegimen": false,
             "hasChart": false,
+            "hasCycle": true,
             "testNumber": 4,
             "template": "/static/views/table.html"
         }, {
@@ -109,24 +110,33 @@ angular.module('dashboard').controller('MainChecksController', ['$scope',
     }
 ]);
 angular.module('dashboard').controller('MultipleOrdersController', ['$scope', 'ReportService', 'NgTableParams',
-    function($scope, ReportService, NgTableParams) {
-        ReportService.getDataForTest('facilitiesMultiple').then(function(data) {
-            var values = data.values;
-            $scope.tableParams = new NgTableParams({
-                page: 1,
-                count: 10
-            }, {
-                filterDelay: 0,
-                counts: [],
-                data: values
+    function ($scope, ReportService, NgTableParams) {
+        var updateData = function () {
+            ReportService.getDataForTest('facilitiesMultiple', {'cycle': $scope.selectedCycle}).then(function (data) {
+                var values = data.values;
+                $scope.tableParams = new NgTableParams({
+                    page: 1,
+                    count: 10
+                }, {
+                    filterDelay: 0,
+                    counts: [],
+                    data: values
+                });
             });
-        });
+        }
+
+        updateData();
+
+        $scope.$watch('selectedCycle', function () {
+            updateData();
+        }, true);
+
 
     }
 ]);
 angular.module('dashboard').controller('LineChartController', ['$scope', 'ReportService',
-    function($scope, ReportService) {
-        var update = function(start, end) {
+    function ($scope, ReportService) {
+        var update = function (start, end) {
             var test = $scope.selectedTest.url;
             var regimen = undefined;
             if ($scope.selectedRegimen) {
@@ -136,7 +146,7 @@ angular.module('dashboard').controller('LineChartController', ['$scope', 'Report
                 start: start,
                 end: end,
                 regimen: regimen
-            }).then(function(data) {
+            }).then(function (data) {
                 var values = data.values;
                 $scope.options = {};
                 $scope.options = {
@@ -173,28 +183,28 @@ angular.module('dashboard').controller('LineChartController', ['$scope', 'Report
 
 
         };
-        $scope.$watch('startCycle', function(start) {
+        $scope.$watch('startCycle', function (start) {
             if (start && $scope.selectedTest) {
                 update($scope.startCycle, $scope.endCycle);
             }
 
         }, true);
 
-        $scope.$watch('endCycle', function(end) {
+        $scope.$watch('endCycle', function (end) {
             if (end && $scope.selectedTest) {
                 update($scope.startCycle, $scope.endCycle);
             }
 
         }, true);
 
-        $scope.$watch('selectedTest', function(test) {
+        $scope.$watch('selectedTest', function (test) {
             if (test) {
                 update($scope.startCycle, $scope.endCycle);
             }
 
         }, true);
 
-        $scope.$watch('selectedRegimen', function(regimen) {
+        $scope.$watch('selectedRegimen', function (regimen) {
             if (regimen) {
                 update($scope.startCycle, $scope.endCycle);
             }
