@@ -15,7 +15,7 @@ class ConsumptionAndPatientsCheckTestCase(TestCase):
 
     def test_should_record_score_for_each_facility(self):
         facility = mommy.make(Facility)
-        current_record = mommy.make(Cycle, facility=facility, cycle=self.cycle)
+        current_record = mommy.make(Cycle, facility=facility, cycle=self.cycle, reporting_status=True)
         for form in self.check.formulations:
             mommy.make(Consumption, facility_cycle=current_record, pmtct_consumption=1, art_consumption=16, formulation=form[CONSUMPTION_QUERY])
             mommy.make(form[MODEL], facility_cycle=current_record, existing=5, new=5, formulation=form[PATIENT_QUERY])
@@ -26,7 +26,7 @@ class ConsumptionAndPatientsCheckTestCase(TestCase):
 
     def test_should_record_pass_score_if_both_sums_of_df1_and_df2_zero(self):
         facility = mommy.make(Facility)
-        current_record = mommy.make(Cycle, facility=facility, cycle=self.cycle)
+        current_record = mommy.make(Cycle, facility=facility, cycle=self.cycle, reporting_status=True)
         for form in self.check.formulations:
             mommy.make(Consumption, facility_cycle=current_record, art_consumption=0, formulation=form[CONSUMPTION_QUERY])
             mommy.make(form[MODEL], facility_cycle=current_record, existing=0, new=0, formulation=form[PATIENT_QUERY])
@@ -37,7 +37,7 @@ class ConsumptionAndPatientsCheckTestCase(TestCase):
 
     def test_should_record_no_score_if_one_sums_of_df1_and_df2_zero(self):
         facility = mommy.make(Facility)
-        current_record = mommy.make(Cycle, facility=facility, cycle=self.cycle)
+        current_record = mommy.make(Cycle, facility=facility, cycle=self.cycle, reporting_status=True)
         for form in self.check.formulations:
             mommy.make(Consumption, facility_cycle=current_record, art_consumption=0, formulation=form[CONSUMPTION_QUERY])
             mommy.make(form[MODEL], facility_cycle=current_record, existing=5, new=5, formulation=form[PATIENT_QUERY])
@@ -48,7 +48,7 @@ class ConsumptionAndPatientsCheckTestCase(TestCase):
 
     def test_should_record_pass_score_if_df1_is_null(self):
         facility = mommy.make(Facility)
-        current_record = mommy.make(Cycle, facility=facility, cycle=self.cycle)
+        current_record = mommy.make(Cycle, facility=facility, cycle=self.cycle, reporting_status=True)
         for form in self.check.formulations:
             mommy.make(Consumption, facility_cycle=current_record, art_consumption=None, formulation=form[CONSUMPTION_QUERY])
             mommy.make(form[MODEL], facility_cycle=current_record, existing=4, new=6, formulation=form[PATIENT_QUERY])
@@ -59,7 +59,7 @@ class ConsumptionAndPatientsCheckTestCase(TestCase):
 
     def test_should_record_pass_score_if_df2_is_null(self):
         facility = mommy.make(Facility)
-        current_record = mommy.make(Cycle, facility=facility, cycle=self.cycle)
+        current_record = mommy.make(Cycle, facility=facility, cycle=self.cycle, reporting_status=True)
         for form in self.check.formulations:
             mommy.make(Consumption, facility_cycle=current_record, pmtct_consumption=12, art_consumption=12, formulation=form[CONSUMPTION_QUERY])
             mommy.make(form[MODEL], facility_cycle=current_record, existing=None, new=None, formulation=form[PATIENT_QUERY])
@@ -70,7 +70,7 @@ class ConsumptionAndPatientsCheckTestCase(TestCase):
 
     def test_should_record_not_reporting_if_df1_has_no_records(self):
         facility = mommy.make(Facility)
-        current_record = mommy.make(Cycle, facility=facility, cycle=self.cycle)
+        current_record = mommy.make(Cycle, facility=facility, cycle=self.cycle, reporting_status=True)
         for form in self.check.formulations:
             mommy.make(Consumption, facility_cycle=current_record, art_consumption=12, formulation="dummy")
             mommy.make(form[MODEL], facility_cycle=current_record, existing=None, new=None, formulation=form[PATIENT_QUERY])
