@@ -17,7 +17,7 @@ class ConsumptionAndPatientsCheckTestCase(TestCase):
         facility = mommy.make(Facility)
         current_record = mommy.make(Cycle, facility=facility, cycle=self.cycle)
         for form in self.check.formulations:
-            mommy.make(Consumption, facility_cycle=current_record, art_consumption=16, formulation=form[CONSUMPTION_QUERY])
+            mommy.make(Consumption, facility_cycle=current_record, pmtct_consumption=1, art_consumption=16, formulation=form[CONSUMPTION_QUERY])
             mommy.make(form[MODEL], facility_cycle=current_record, existing=5, new=5, formulation=form[PATIENT_QUERY])
         self.assertEqual(Score.objects.all().count(), 0)
         self.check.run(self.cycle)
@@ -61,7 +61,7 @@ class ConsumptionAndPatientsCheckTestCase(TestCase):
         facility = mommy.make(Facility)
         current_record = mommy.make(Cycle, facility=facility, cycle=self.cycle)
         for form in self.check.formulations:
-            mommy.make(Consumption, facility_cycle=current_record, art_consumption=12, formulation=form[CONSUMPTION_QUERY])
+            mommy.make(Consumption, facility_cycle=current_record, pmtct_consumption=12, art_consumption=12, formulation=form[CONSUMPTION_QUERY])
             mommy.make(form[MODEL], facility_cycle=current_record, existing=None, new=None, formulation=form[PATIENT_QUERY])
         self.assertEqual(Score.objects.all().count(), 0)
         self.check.run(self.cycle)

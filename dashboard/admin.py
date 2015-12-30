@@ -63,6 +63,8 @@ class ConsumptionAdmin(ModelAdmin):
         'estimated_number_of_new_patients',
         'estimated_number_of_new_pregnant_women'
     )
+    search_fields = ('facility_cycle__facility__name',)
+    list_filter = ('facility_cycle__cycle', 'formulation')
 
 
 class PatientAdmin(ModelAdmin):
@@ -112,6 +114,7 @@ class CycleFormulationScoreAdmin(ModelAdmin):
 
 
 class ScoreAdmin(ModelAdmin):
+    search_fields = ('name',)
     list_display = ('name', 'cycle', 'district', 'ip', 'warehouse', 'nnrtiNewPaed',
                     'stablePatientVolumes',
                     'REPORTING',

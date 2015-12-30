@@ -18,3 +18,5 @@ openpyxl==2.2.5
 ujson==1.34
 flower==0.8.3
 jsonfield==1.0.3
+django-click==1.0.0
+assertlib==0.3.1

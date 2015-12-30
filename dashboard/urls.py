@@ -29,7 +29,6 @@ urlpatterns = [
     url(r'^api/test/ranking/worst/csv$', dashboard.views.api.WorstPerformingDistrictsCSVView.as_view(), name='ranking_worst_csv'),
     url(r'^api/cycles$', dashboard.views.api.CyclesView.as_view(), name='cycles'),
     url(r'^api/test/metrics', dashboard.views.api.ReportMetrics.as_view(), name='metrics'),
-    url(r'^api/regimens', dashboard.views.api.RegimensListView.as_view(), name='regimens'),
     url(r'^api/scores', dashboard.views.api.FacilityTestCycleScoresListView.as_view(), name='scores'),
     url(r'^api/filters', dashboard.views.api.FilterValuesView.as_view(), name='filters'),
     url(r'^api/rankingsAccess', dashboard.views.api.RankingsAccessView.as_view(), name='rankings-access'),

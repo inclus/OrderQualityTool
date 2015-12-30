@@ -13,7 +13,7 @@ from dashboard.helpers import generate_cycles, to_date, GUIDELINE_ADHERENCE, ORD
     ORDER_FORM_FREE_OF_NEGATIVE_NUMBERS, DIFFERENT_ORDERS_OVER_TIME, CLOSING_BALANCE_MATCHES_OPENING_BALANCE, \
     CONSUMPTION_AND_PATIENTS, STABLE_CONSUMPTION, WAREHOUSE_FULFILMENT, STABLE_PATIENT_VOLUMES, NNRTI_CURRENT_ADULTS, \
     NNRTI_CURRENT_PAED, NNRTI_NEW_ADULTS, NNRTI_NEW_PAED, sort_cycle
-from dashboard.models import Cycle, CycleFormulationScore, CycleScore, Consumption, Score, WAREHOUSE, DISTRICT
+from dashboard.models import Cycle, CycleFormulationScore, CycleScore, Score, WAREHOUSE, DISTRICT
 from dashboard.serializers import ScoreSerializer
 from locations.models import District, IP, WareHouse
 
@@ -32,7 +32,7 @@ class FacilitiesReportingView(APIView):
             filters['cycle__in'] = cycles_included
         data = dict((record['cycle'], {'count': record['count'], 'reporting': record['reporting']}) for record in
                     Cycle.objects.filter(**filters).values('cycle').annotate(count=Count('pk'), reporting=Count(
-                        Case(When(reporting_status=True, then=1)))))
+                            Case(When(reporting_status=True, then=1)))))
         results = []
         for cycle in cycles:
             if cycle in data:
@@ -147,20 +147,20 @@ class ReportMetrics(APIView):
         web = dict((record['cycle'], {'count': record['count'], 'reporting': record['reporting']}) for record in
                    Cycle.objects.filter(cycle=most_recent_cycle).values('cycle').annotate(count=Count('pk'),
                                                                                           reporting=Count(Case(
-                                                                                              When(web_based=True,
-                                                                                                   then=1)))))
+                                                                                                  When(web_based=True,
+                                                                                                       then=1)))))
         data = dict((record['cycle'], {'count': record['count'], 'reporting': record['reporting']}) for record in
                     Cycle.objects.filter(cycle=most_recent_cycle).values('cycle').annotate(count=Count('pk'),
                                                                                            reporting=Count(Case(When(
-                                                                                               reporting_status=True,
-                                                                                               then=1)))))
+                                                                                                   reporting_status=True,
+                                                                                                   then=1)))))
         item = web.get(most_recent_cycle)
         report_item = data.get(most_recent_cycle)
         web_rate = "{0:.1f}".format((float(item['reporting']) / float(item['count'])) * 100)
         report_rate = "{0:.1f}".format((float(report_item['reporting']) / float(report_item['count'])) * 100)
         adherence = "{0:.1f}".format(
-            CycleFormulationScore.objects.filter(test=GUIDELINE_ADHERENCE, cycle=cycle['cycle']).aggregate(
-                adherence=Avg('yes')).get("adherence", 0))
+                CycleFormulationScore.objects.filter(test=GUIDELINE_ADHERENCE, cycle=cycle['cycle']).aggregate(
+                        adherence=Avg('yes')).get("adherence", 0))
         return Response({"webBased": web_rate, "reporting": report_rate, "adherence": adherence})
 
 
@@ -188,12 +188,6 @@ class OrderFormFreeOfGapsView(APIView):
             else:
                 results.append({"cycle": cycle, "rate": 0, "yes": 0, "no": 0, "not_reporting": 0})
         return Response({'values': results})
-
-
-class RegimensListView(APIView):
-    def get(self, request):
-        values = Consumption.objects.order_by().values('formulation').distinct()
-        return Response({'values': values})
 
 
 class OrderFormFreeOfNegativeNumbersView(APIView):
@@ -291,5 +285,5 @@ class RankingsAccessView(LoginRequiredMixin, APIView):
         if request.user.access_level == WAREHOUSE:
             levels = ['District', 'IP', 'Facility']
         if request.user.access_level == DISTRICT:
-            levels = ['District', 'Warehouse']
+            levels = ['IP', 'Warehouse', 'Facility']
         return Response({"values": levels})

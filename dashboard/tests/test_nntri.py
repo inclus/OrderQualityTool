@@ -19,7 +19,7 @@ class NNRTITestCase(TestCase):
         sum_df2 = df2_count * DF2_VALUE
         total = sum_df2 + sum_df1
         check = NNRTI()
-        no, not_reporting, result, yes = check.compare_values(4.6, 0, 0, 0, NOT_REPORTING, df1_count, df2_count, sum_df1, sum_df2, total)
+        no, not_reporting, result, yes = check.compare_values(4.6, 0, 0, 0, df1_count, df2_count, sum_df1, sum_df2, total)
         self.assertEqual(result, NOT_REPORTING)
         self.assertEqual(yes, 0)
         self.assertEqual(no, 0)
@@ -34,7 +34,7 @@ class NNRTITestCase(TestCase):
         sum_df2 = df2_count * DF2_VALUE
         total = sum_df2 + sum_df1
         check = NNRTI()
-        no, not_reporting, result, yes = check.compare_values(4.6, 0, 0, 0, NOT_REPORTING, df1_count, df2_count, sum_df1, sum_df2, total)
+        no, not_reporting, result, yes = check.compare_values(4.6, 0, 0, 0, df1_count, df2_count, sum_df1, sum_df2, total)
         self.assertEqual(result, NOT_REPORTING)
         self.assertEqual(yes, 0)
         self.assertEqual(no, 0)
@@ -49,7 +49,7 @@ class NNRTITestCase(TestCase):
         sum_df2 = df2_count * DF2_VALUE
         total = sum_df2 + sum_df1
         check = NNRTI()
-        no, not_reporting, result, yes = check.compare_values(4.6, 0, 0, 0, NOT_REPORTING, df1_count, df2_count, sum_df1, sum_df2, total)
+        no, not_reporting, result, yes = check.compare_values(4.6, 0, 0, 0, df1_count, df2_count, sum_df1, sum_df2, total)
         self.assertEqual(result, YES)
         self.assertEqual(yes, 1)
         self.assertEqual(no, 0)
@@ -64,7 +64,7 @@ class NNRTITestCase(TestCase):
         sum_df2 = df2_count * DF2_VALUE
         total = sum_df2 + sum_df1
         check = NNRTI()
-        no, not_reporting, result, yes = check.compare_values(4.6, 0, 0, 0, NOT_REPORTING, df1_count, df2_count, sum_df1, sum_df2, total)
+        no, not_reporting, result, yes = check.compare_values(4.6, 0, 0, 0, df1_count, df2_count, sum_df1, sum_df2, total)
         self.assertEqual(result, YES)
 
     def test_can_fail(self):
@@ -76,7 +76,7 @@ class NNRTITestCase(TestCase):
         sum_df2 = df2_count * DF2_VALUE
         total = sum_df2 + sum_df1
         check = NNRTI()
-        no, not_reporting, result, yes = check.compare_values(4.6, 0, 0, 0, NOT_REPORTING, df1_count, df2_count, sum_df1, sum_df2, total)
+        no, not_reporting, result, yes = check.compare_values(4.6, 0, 0, 0, df1_count, df2_count, sum_df1, sum_df2, total)
         self.assertEqual(result, NO)
 
     @patch("dashboard.checks.nnrti_checks.NNRTI.record_result_for_facility")
@@ -85,7 +85,7 @@ class NNRTITestCase(TestCase):
         mock_method.return_value = (0, 0, YES, 1)
         current_cycle = "Mar - Apr %s" % now().format("YYYY")
         facility = mommy.make(Facility)
-        current_record = mommy.make(Cycle, facility=facility, cycle=current_cycle)
+        current_record = mommy.make(Cycle, facility=facility, cycle=current_cycle, reporting_status=True)
         NNRTI().run(current_cycle)
         calls = [call(current_record, YES, test=NNRTI_CURRENT_PAED), call(current_record, YES, test=NNRTI_NEW_ADULTS), call(current_record, YES, test=NNRTI_NEW_PAED)]
         mock_facility_method.assert_has_calls(calls)
@@ -95,7 +95,7 @@ class NNRTITestCase(TestCase):
         mock_method.return_value = (0, 0, YES, 1)
         current_cycle = "Mar - Apr %s" % now().format("YYYY")
         facility = mommy.make(Facility)
-        current_record = mommy.make(Cycle, facility=facility, cycle=current_cycle)
+        current_record = mommy.make(Cycle, facility=facility, cycle=current_cycle, reporting_status=True)
         NNRTI().run(current_cycle)
         self.assertEqual(CycleScore.objects.count(), 4)
         self.assertEqual(CycleScore.objects.all()[0].yes, 100.0)
@@ -108,17 +108,17 @@ class TestNNRTI_CURRENT_PAED(TestCase):
     def test_check_queries_correct_data(self, mock_method):
         current_cycle = "Mar - Apr %s" % now().format("YYYY")
         facility = mommy.make(Facility)
-        current_record = mommy.make(Cycle, facility=facility, cycle=current_cycle)
-        DF1 = [
-            "(ABC/3TC) 60mg/30mg [Pack 60]",
-            "(AZT/3TC) 60mg/30mg [Pack 60]"
-        ]
+        current_record = mommy.make(Cycle, facility=facility, cycle=current_cycle, reporting_status=True)
         DF2 = [
-            "(EFV) 200mg [Pack 90]",
-            "(NVP) 50mg [Pack 60]",
-            "80mg/20ml oral susp [Bottle 60ml]",
-            "(LPV/r) 100mg/25mg",
+            "Efavirenz (EFV) 200mg [Pack 90]",
+            "Nevirapine (NVP) 50mg [Pack 60]",
+            "Lopinavir/Ritonavir (LPV/r) 80mg/20ml oral susp [Bottle 60ml]",
+            "Lopinavir/Ritonavir (LPV/r) 100mg/25mg",
         ]
+        DF1 = [
+                  "Zidovudine/Lamivudine (AZT/3TC) 60mg/30mg [Pack 60]",
+                  "Zidovudine/Lamivudine (AZT/3TC) 60mg/30mg [Pack 60]"
+              ],
         DF1_VALUE = 10
         DF2_VALUE = 5
         for f in DF1:
@@ -136,6 +136,5 @@ class TestNNRTI_CURRENT_PAED(TestCase):
         sum_df1 = len(DF1) * DF1_VALUE
         sum_df2 = len(DF2) * DF2_VALUE
         total = sum_df2 + sum_df1
-        expected_call = call(ratio, no, not_reporting, yes, NOT_REPORTING, df1_count, df2_count, sum_df1, sum_df2, total)
+        expected_call = call(ratio, no, not_reporting, yes, df1_count, df2_count, sum_df1, sum_df2, total)
         mock_method.assert_has_calls([expected_call])
-

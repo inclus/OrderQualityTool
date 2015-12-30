@@ -101,8 +101,8 @@ class StableConsumptionTestCase(TestCase):
         prev_cycle = "Jan - Feb %s" % now().format("YYYY")
         current_cycle = "Mar - Apr %s" % now().format("YYYY")
         facility = mommy.make(Facility)
-        prev_record = mommy.make(Cycle, facility=facility, cycle=prev_cycle)
-        current_record = mommy.make(Cycle, facility=facility, cycle=current_cycle)
+        prev_record = mommy.make(Cycle, facility=facility, cycle=prev_cycle, reporting_status=True)
+        current_record = mommy.make(Cycle, facility=facility, cycle=current_cycle, reporting_status=True)
         formulations = [StableConsumption.F1_QUERY, StableConsumption.F2_QUERY, StableConsumption.F3_QUERY]
         for form in formulations:
             mommy.make(Consumption, facility_cycle=prev_record, art_consumption=10, pmtct_consumption=30, formulation=form)
@@ -116,8 +116,8 @@ class StableConsumptionTestCase(TestCase):
         prev_cycle = "Jan - Feb %s" % now().format("YYYY")
         current_cycle = "Mar - Apr %s" % now().format("YYYY")
         facility = mommy.make(Facility)
-        prev_record = mommy.make(Cycle, facility=facility, cycle=prev_cycle)
-        current_record = mommy.make(Cycle, facility=facility, cycle=current_cycle)
+        prev_record = mommy.make(Cycle, facility=facility, cycle=prev_cycle, reporting_status=True)
+        current_record = mommy.make(Cycle, facility=facility, cycle=current_cycle, reporting_status=True)
         formulations = [StableConsumption.F1_QUERY, StableConsumption.F2_QUERY, StableConsumption.F3_QUERY]
         for form in formulations:
             mommy.make(Consumption, facility_cycle=prev_record, art_consumption=10, pmtct_consumption=30, formulation=form)
@@ -133,8 +133,8 @@ class StableConsumptionTestCase(TestCase):
         prev_cycle = "Jan - Feb %s" % now().format("YYYY")
         current_cycle = "Mar - Apr %s" % now().format("YYYY")
         facility = mommy.make(Facility)
-        prev_record = mommy.make(Cycle, facility=facility, cycle=prev_cycle)
-        current_record = mommy.make(Cycle, facility=facility, cycle=current_cycle)
+        prev_record = mommy.make(Cycle, facility=facility, cycle=prev_cycle, reporting_status=True)
+        current_record = mommy.make(Cycle, facility=facility, cycle=current_cycle, reporting_status=True)
         formulations = [StableConsumption.F1_QUERY, StableConsumption.F2_QUERY, StableConsumption.F3_QUERY]
         for form in formulations:
             mommy.make(Consumption, facility_cycle=prev_record, art_consumption=200, pmtct_consumption=300, formulation=form)
@@ -165,8 +165,8 @@ class StableConsumptionTestCase(TestCase):
         prev_cycle = "Jan - Feb %s" % now().format("YYYY")
         current_cycle = "Mar - Apr %s" % now().format("YYYY")
         facility = mommy.make(Facility)
-        prev_record = mommy.make(Cycle, facility=facility, cycle=prev_cycle)
-        current_record = mommy.make(Cycle, facility=facility, cycle=current_cycle)
+        prev_record = mommy.make(Cycle, facility=facility, cycle=prev_cycle, reporting_status=True)
+        current_record = mommy.make(Cycle, facility=facility, cycle=current_cycle, reporting_status=True)
         formulations = [StableConsumption.F1_QUERY, StableConsumption.F2_QUERY, StableConsumption.F3_QUERY]
         for form in formulations:
             mommy.make(Consumption, facility_cycle=prev_record, art_consumption=10, pmtct_consumption=30, formulation=form)
@@ -180,7 +180,7 @@ class StableConsumptionTestCase(TestCase):
     def test_should_handle_scenario_where_next_cycle_is_absent(self):
         current_cycle = "Mar - Apr %s" % now().format("YYYY")
         facility = mommy.make(Facility)
-        current_record = mommy.make(Cycle, facility=facility, cycle=current_cycle)
+        current_record = mommy.make(Cycle, facility=facility, cycle=current_cycle, reporting_status=True)
         formulations = [StableConsumption.F1_QUERY, StableConsumption.F2_QUERY, StableConsumption.F3_QUERY]
         for form in formulations:
             mommy.make(Consumption, facility_cycle=current_record, art_consumption=10, pmtct_consumption=30, formulation=form)
@@ -195,8 +195,8 @@ class StableConsumptionTestCase(TestCase):
         prev_cycle = "Jan - Feb %s" % now().format("YYYY")
         current_cycle = "Mar - Apr %s" % now().format("YYYY")
         facility = mommy.make(Facility)
-        prev_record = mommy.make(Cycle, facility=facility, cycle=prev_cycle)
-        current_record = mommy.make(Cycle, facility=facility, cycle=current_cycle)
+        prev_record = mommy.make(Cycle, facility=facility, cycle=prev_cycle, reporting_status=True)
+        current_record = mommy.make(Cycle, facility=facility, cycle=current_cycle, reporting_status=True)
         formulations = [StableConsumption.F1_QUERY, StableConsumption.F2_QUERY, StableConsumption.F3_QUERY]
         for form in formulations:
             mommy.make(Consumption, facility_cycle=prev_record, art_consumption=None, pmtct_consumption=None, formulation=form)
@@ -215,8 +215,8 @@ class StablePatientVolumesTestCase(TestCase):
         prev_cycle = "Jan - Feb %s" % now().format("YYYY")
         current_cycle = "Mar - Apr %s" % now().format("YYYY")
         facility = mommy.make(Facility)
-        prev_record = mommy.make(Cycle, facility=facility, cycle=prev_cycle)
-        current_record = mommy.make(Cycle, facility=facility, cycle=current_cycle)
+        prev_record = mommy.make(Cycle, facility=facility, cycle=prev_cycle, reporting_status=True)
+        current_record = mommy.make(Cycle, facility=facility, cycle=current_cycle, reporting_status=True)
 
         mommy.make(AdultPatientsRecord, facility_cycle=prev_record, new=10, existing=10, formulation=StablePatientVolumes.F1_QUERY)
         mommy.make(AdultPatientsRecord, facility_cycle=current_record, new=10, existing=10, formulation=StablePatientVolumes.F1_QUERY)
@@ -236,8 +236,8 @@ class StablePatientVolumesTestCase(TestCase):
         prev_cycle = "Jan - Feb %s" % now().format("YYYY")
         current_cycle = "Mar - Apr %s" % now().format("YYYY")
         facility = mommy.make(Facility)
-        prev_record = mommy.make(Cycle, facility=facility, cycle=prev_cycle)
-        current_record = mommy.make(Cycle, facility=facility, cycle=current_cycle)
+        prev_record = mommy.make(Cycle, facility=facility, cycle=prev_cycle, reporting_status=True)
+        current_record = mommy.make(Cycle, facility=facility, cycle=current_cycle, reporting_status=True)
 
         mommy.make(AdultPatientsRecord, facility_cycle=prev_record, new=10, existing=10, formulation=StablePatientVolumes.F1_QUERY)
         mommy.make(AdultPatientsRecord, facility_cycle=current_record, new=10, existing=10, formulation=StablePatientVolumes.F1_QUERY)
@@ -255,13 +255,12 @@ class StablePatientVolumesTestCase(TestCase):
         self.assertEqual(Score.objects.all()[0].stablePatientVolumes[F2], "YES")
         self.assertEqual(Score.objects.all()[0].stablePatientVolumes[F3], "YES")
 
-
     def test_can_get_no(self):
         prev_cycle = "Jan - Feb %s" % now().format("YYYY")
         current_cycle = "Mar - Apr %s" % now().format("YYYY")
         facility = mommy.make(Facility)
-        prev_record = mommy.make(Cycle, facility=facility, cycle=prev_cycle)
-        current_record = mommy.make(Cycle, facility=facility, cycle=current_cycle)
+        prev_record = mommy.make(Cycle, facility=facility, cycle=prev_cycle, reporting_status=True)
+        current_record = mommy.make(Cycle, facility=facility, cycle=current_cycle, reporting_status=True)
 
         mommy.make(AdultPatientsRecord, facility_cycle=prev_record, new=10, existing=10, formulation=StablePatientVolumes.F1_QUERY)
         mommy.make(AdultPatientsRecord, facility_cycle=current_record, new=10, existing=100, formulation=StablePatientVolumes.F1_QUERY)
@@ -304,8 +303,8 @@ class StablePatientVolumesTestCase(TestCase):
         prev_cycle = "Jan - Feb %s" % now().format("YYYY")
         current_cycle = "Mar - Apr %s" % now().format("YYYY")
         facility = mommy.make(Facility)
-        prev_record = mommy.make(Cycle, facility=facility, cycle=prev_cycle)
-        current_record = mommy.make(Cycle, facility=facility, cycle=current_cycle)
+        prev_record = mommy.make(Cycle, facility=facility, cycle=prev_cycle, reporting_status=True)
+        current_record = mommy.make(Cycle, facility=facility, cycle=current_cycle, reporting_status=True)
 
         mommy.make(AdultPatientsRecord, facility_cycle=prev_record, new=10, existing=10, formulation=StablePatientVolumes.F1_QUERY)
         mommy.make(AdultPatientsRecord, facility_cycle=current_record, new=10, existing=10, formulation=StablePatientVolumes.F1_QUERY)
@@ -325,7 +324,7 @@ class StablePatientVolumesTestCase(TestCase):
     def test_should_handle_scenario_where_next_cycle_is_absent(self):
         current_cycle = "Mar - Apr %s" % now().format("YYYY")
         facility = mommy.make(Facility)
-        current_record = mommy.make(Cycle, facility=facility, cycle=current_cycle)
+        current_record = mommy.make(Cycle, facility=facility, cycle=current_cycle, reporting_status=True)
 
         mommy.make(AdultPatientsRecord, facility_cycle=current_record, new=10, existing=10, formulation=StablePatientVolumes.F1_QUERY)
 
@@ -340,13 +339,12 @@ class StablePatientVolumesTestCase(TestCase):
         self.assertEqual(Score.objects.all()[0].stablePatientVolumes[F2], "NOT_REPORTING")
         self.assertEqual(Score.objects.all()[0].stablePatientVolumes[F3], "NOT_REPORTING")
 
-
     def test_can_handle_blanks(self):
         prev_cycle = "Jan - Feb %s" % now().format("YYYY")
         current_cycle = "Mar - Apr %s" % now().format("YYYY")
         facility = mommy.make(Facility)
-        prev_record = mommy.make(Cycle, facility=facility, cycle=prev_cycle)
-        current_record = mommy.make(Cycle, facility=facility, cycle=current_cycle)
+        prev_record = mommy.make(Cycle, facility=facility, cycle=prev_cycle, reporting_status=True)
+        current_record = mommy.make(Cycle, facility=facility, cycle=current_cycle, reporting_status=True)
 
         mommy.make(AdultPatientsRecord, facility_cycle=prev_record, new=10, existing=10, formulation=StablePatientVolumes.F1_QUERY)
         mommy.make(AdultPatientsRecord, facility_cycle=current_record, new=None, existing=11, formulation=StablePatientVolumes.F1_QUERY)
@@ -363,4 +361,3 @@ class StablePatientVolumesTestCase(TestCase):
         self.assertEqual(Score.objects.all()[0].stablePatientVolumes[F1], "YES")
         self.assertEqual(Score.objects.all()[0].stablePatientVolumes[F2], "YES")
         self.assertEqual(Score.objects.all()[0].stablePatientVolumes[F3], "YES")
-
