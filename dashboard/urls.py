@@ -1,7 +1,9 @@
 from django.conf.urls import url
+from django.views.decorators.csrf import csrf_exempt
 
 import dashboard.views.api
 import dashboard.views.main
+import dashboard.views.tables
 
 urlpatterns = [
     url(r'^$', dashboard.views.main.HomeView.as_view(), name='home'),
@@ -32,4 +34,5 @@ urlpatterns = [
     url(r'^api/scores', dashboard.views.api.FacilityTestCycleScoresListView.as_view(), name='scores'),
     url(r'^api/filters', dashboard.views.api.FilterValuesView.as_view(), name='filters'),
     url(r'^api/rankingsAccess', dashboard.views.api.RankingsAccessView.as_view(), name='rankings-access'),
+    url(r'^api/table/scores', csrf_exempt(dashboard.views.tables.ScoresTableView.as_view()), name='scores-table'),
 ]

@@ -114,9 +114,8 @@ a.label-qdb {
   .make-md-column(3);
   .select-drop;
 }
-.filter {
-  .make-sm-column(2.4);
-  .make-md-column(2.4);
+.select2-container--default {
+  min-width: 19.5%;
   // .form-control;
   // .select-drop;
 }
@@ -151,9 +150,30 @@ a.label-qdb {
 #main-report_filter {
   display: none;
 }
-span.score_PASS {
+td.score_PASS {
   color: @chai-green;
 }
-span.score_FAIL {
+td.score_FAIL {
   color: red;
+}
+.filter-title {
+  padding-left: 0px;
+
+  h3 {
+    margin-top: 0px;
+  }
+}
+.filter-tag {
+  .make-sm-column(0.7);
+  .make-md-column(0.7);
+  padding-left: 0px;
+  min-width: 20%;
+  border: 1px solid @chai-green;
+  color: white;
+  background-color: @chai-green;
+  border-radius: 5px;
+  .text-center;
+  line-height: 30px;
+  margin-bottom: 10px;
+  margin-left: 4px;
 }

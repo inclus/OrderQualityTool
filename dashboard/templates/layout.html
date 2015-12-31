@@ -17,6 +17,7 @@
     <link rel="stylesheet" href='{% static "vendor/datatables/media/css/dataTables.bootstrap.css"%}' />
     <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Open+Sans" />
     <link rel="stylesheet" href='{% static "vendor/components-font-awesome/css/font-awesome.min.css"%}'>
+    <link rel="stylesheet" href='{% static "vendor/select2/dist/css/select2.min.css"%}'>
 </head>
 <body>
 
@@ -55,7 +56,7 @@
 </div>
 <script type="text/javascript" src='{% static "vendor/jquery/jquery.min.js" %}'></script>
 <script type="text/javascript" src='{% static "vendor/bootstrap/dist/js/bootstrap.min.js" %}'></script>
-<script type="text/javascript" src='{% static "vendor/datatables/media/js/jquery.dataTables.min.js" %}'></script>
+<script type="text/javascript" src='{% static "vendor/datatables/media/js/jquery.dataTables.js" %}'></script>
 <script type="text/javascript" src='{% static "vendor/datatables/media/js/dataTables.bootstrap.min.js" %}'></script>
 <script type="text/javascript" src='{% static "vendor/datatables-fixedcolumns/js/dataTables.fixedColumns.js" %}'></script>
 <script type="text/javascript" src='{% static "vendor/angular/angular.min.js" %}'></script>
@@ -69,11 +70,6 @@
 <script type="text/javascript" src='{% static "vendor/c3/c3.js"%}'></script>
 <script type="text/javascript" src='{% static "vendor/angular-chart/angular-chart.js"%}'></script>
 <script type="text/javascript" src='{% static "vendor/ng-table/dist/ng-table.js"%}'></script>
-<script type="text/javascript" src='{% static "vendor/angular-datatables/dist/angular-datatables.js"%}'></script>
-<script type="text/javascript" src='{% static "vendor/angular-datatables/dist/plugins/fixedcolumns/angular-datatables.fixedcolumns.js"%}'></script>
-<script type="text/javascript" src='{% static "vendor/angular-sanitize/angular-sanitize.js" %}'></script>
-<script type="text/javascript" src='{% static "vendor/angular-paging/dist/paging.min.js" %}'></script>
-<script type="text/javascript" src='{% static "js/ui-select/select.js" %}'></script>
 <script type="text/javascript" src='{% static "js/app.js" %}'></script>
 <script type="text/javascript" src='{% static "js/services/report.service.js" %}'></script>
 <script type="text/javascript" src='{% static "js/controllers/home.controller.js" %}'></script>
@@ -81,8 +77,7 @@
 <script type="text/javascript" src='{% static "js/controllers/web.based.rate.controller.js" %}'></script>
 <script type="text/javascript" src='{% static "js/controllers/main.check.controller.js" %}'></script>
 <script type="text/javascript" src='{% static "js/controllers/guideline.adherence.controller.js" %}'></script>
-<script type="text/javascript" src='{% static "js/controllers/reports.controller.js" %}'></script>
 {% block js %}
-    {% endblock js %}
+{% endblock js %}
 </body>
 </html>

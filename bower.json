@@ -31,9 +31,9 @@
     "components-font-awesome": "~4.5.0",
     "datatables": "~1.10.10",
     "datatables-fixedcolumns": "~3.2.0",
-    "angular-datatables": "~0.5.2",
     "angular-sanitize": "~1.4.8",
-    "angular-paging": "~2.0.0"
+    "select2": "~4.0.1",
+    "jsrender": "~0.9.71"
   },
   "resolutions": {
     "jquery": "1.9"

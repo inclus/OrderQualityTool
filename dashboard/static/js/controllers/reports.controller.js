@@ -1,7 +1,7 @@
 angular.module('reports').controller('ReportsController', ['$scope', 'ReportService', 'DTOptionsBuilder',
-    function($scope, ReportService, DTOptionsBuilder) {
+    function ($scope, ReportService, DTOptionsBuilder) {
         $scope.page_count = 20;
-        ReportService.getFilters().then(function(data) {
+        ReportService.getFilters().then(function (data) {
             $scope.filters = data;
             $scope.selectedFilter.cycle = data.cycles[0];
         });
@@ -12,6 +12,12 @@ angular.module('reports').controller('ReportsController', ['$scope', 'ReportServ
             .withOption('bLengthChange', false)
             .withOption('paging', false)
             .withOption('info', false)
+            //.withOption('ajax', {
+            //    url: '/api/table/scores',
+            //    type: 'POST'
+            //})
+            .withOption('processing', true)
+            .withOption('serverSide', true)
             .withFixedColumns({
                 leftColumns: 4,
                 rightColumns: 0
@@ -101,9 +107,9 @@ angular.module('reports').controller('ReportsController', ['$scope', 'ReportServ
             'formulation': false
         }];
         $scope.tests = tests;
-        var calculateTotal = function(name) {
+        var calculateTotal = function (name) {
             var size = $scope.scores.length;
-            var count = _.countBy($scope.scores, function(item) {
+            var count = _.countBy($scope.scores, function (item) {
                 if (item && name in item) {
                     var hash = item[name];
                     if (hash) {
@@ -130,7 +136,7 @@ angular.module('reports').controller('ReportsController', ['$scope', 'ReportServ
             }
 
         };
-        var cleanScore = function(score) {
+        var cleanScore = function (score) {
             var map = {
                 "YES": "Pass",
                 "NO": "Fail",
@@ -142,15 +148,15 @@ angular.module('reports').controller('ReportsController', ['$scope', 'ReportServ
             }
             return newScore;
         }
-        var cleanupData = function(data) {
+        var cleanupData = function (data) {
             $scope.scores = data.results;
             $scope.scores_count = data.count;
             $scope.totals = {};
-            _.forEach(tests, function(test) {
+            _.forEach(tests, function (test) {
                 $scope.totals[test.test] = calculateTotal(test.test);
             })
         };
-        var updateTable = function(page) {
+        var updateTable = function (page) {
             $scope.page_number = page;
             var params = {
                 page: page
@@ -170,7 +176,7 @@ angular.module('reports').controller('ReportsController', ['$scope', 'ReportServ
             if ($scope.selectedFilter.cycle) {
                 params['cycle'] = $scope.selectedFilter.cycle.cycle;
             }
-            ReportService.getScores(params).then(cleanupData);
+            //ReportService.getScores(params).then(cleanupData);
         };
 
         $scope.updateTable = updateTable;
@@ -178,13 +184,13 @@ angular.module('reports').controller('ReportsController', ['$scope', 'ReportServ
     }
 ]);
 
-angular.module('reports').directive('score', function() {
+angular.module('reports').directive('score', function () {
     return {
         scope: {
             result: '=',
             formulation: '='
         },
-        controller: ['$scope', function($scope) {
+        controller: ['$scope', function ($scope) {
             if ($scope.result && $scope.formulation) {
                 if ($scope.formulation in $scope.result) {
                     $scope.toDisplay = $scope.result[$scope.formulation];

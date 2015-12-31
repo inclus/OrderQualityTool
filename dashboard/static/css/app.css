@@ -6954,23 +6954,8 @@ a.label-qdb:hover {
     width: 25%;
   }
 }
-.filter {
-  position: relative;
-  min-height: 1px;
-  padding-left: 15px;
-  padding-right: 15px;
-}
-@media (min-width: 768px) {
-  .filter {
-    float: left;
-    width: 20%;
-  }
-}
-@media (min-width: 992px) {
-  .filter {
-    float: left;
-    width: 20%;
-  }
+.select2-container--default {
+  min-width: 19.5%;
 }
 .spacer {
   position: relative;
@@ -7012,9 +6997,43 @@ a.label-qdb:hover {
 #main-report_filter {
   display: none;
 }
-span.score_PASS {
+td.score_PASS {
   color: #27ae60;
 }
-span.score_FAIL {
+td.score_FAIL {
   color: red;
+}
+.filter-title {
+  padding-left: 0px;
+}
+.filter-title h3 {
+  margin-top: 0px;
+}
+.filter-tag {
+  position: relative;
+  min-height: 1px;
+  padding-left: 15px;
+  padding-right: 15px;
+  padding-left: 0px;
+  min-width: 20%;
+  border: 1px solid #27ae60;
+  color: white;
+  background-color: #27ae60;
+  border-radius: 5px;
+  text-align: center;
+  line-height: 30px;
+  margin-bottom: 10px;
+  margin-left: 4px;
+}
+@media (min-width: 768px) {
+  .filter-tag {
+    float: left;
+    width: 5.83333333%;
+  }
+}
+@media (min-width: 992px) {
+  .filter-tag {
+    float: left;
+    width: 5.83333333%;
+  }
 }

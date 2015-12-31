@@ -5,10 +5,14 @@ from django.conf import settings
 from django.contrib import messages
 from django.core.files.base import ContentFile
 from django.core.files.storage import default_storage
+from django.db.models import Count, Case, When
 from django.views.generic import TemplateView, FormView
 
 from dashboard.forms import FileUploadForm
+from dashboard.helpers import YES, F3, F2, F1
+from dashboard.models import Score, Cycle
 from dashboard.tasks import import_general_report
+from locations.models import WareHouse, District, IP
 
 
 class HomeView(LoginRequiredMixin, TemplateView):
@@ -34,5 +38,43 @@ class DataImportView(LoginRequiredMixin, StaffuserRequiredMixin, FormView):
         return super(DataImportView, self).form_valid(form)
 
 
+DEFAULT = 'DEFAULT'
+
+
 class ReportsView(LoginRequiredMixin, TemplateView):
-    template_name = "reports.html"
+    template_name = "scores_table.html"
+
+    def get_context_data(self, *args, **kwargs):
+        context = super(ReportsView, self).get_context_data(*args, **kwargs)
+        ips = IP.objects.values('pk', 'name').order_by('name').distinct()
+        warehouses = WareHouse.objects.values('pk', 'name').order_by('name').distinct()
+        districts = District.objects.values('pk', 'name').order_by('name').distinct()
+        cycles = Cycle.objects.values('cycle').distinct()
+        context['districts'] = districts
+        context['ips'] = ips
+        context['warehouses'] = warehouses
+        context['cycles'] = cycles
+        context['formulations'] = [F1, F2, F3]
+        return context
+
+    def build_totals(self, context):
+        qs = Score.objects.all()
+        aggregates = qs.aggregate(
+                count=Count('pk'),
+                REPORTING=Count(Case(When(REPORTING={DEFAULT: YES}, then=1))),
+                WEB_BASED=Count(Case(When(WEB_BASED={DEFAULT: YES}, then=1))),
+                MULTIPLE_ORDERS=Count(Case(When(MULTIPLE_ORDERS={DEFAULT: YES}, then=1))),
+                OrderFormFreeOfGaps=Count(Case(When(OrderFormFreeOfGaps={DEFAULT: YES}, then=1))),
+                guidelineAdherenceAdult1L=Count(Case(When(guidelineAdherenceAdult1L={DEFAULT: YES}, then=1))),
+                guidelineAdherenceAdult2L=Count(Case(When(guidelineAdherenceAdult2L={DEFAULT: YES}, then=1))),
+                guidelineAdherencePaed1L=Count(Case(When(guidelineAdherencePaed1L={DEFAULT: YES}, then=1))),
+                nnrtiNewPaed=Count(Case(When(nnrtiNewPaed={DEFAULT: YES}, then=1))),
+                nnrtiCurrentPaed=Count(Case(When(nnrtiCurrentPaed={DEFAULT: YES}, then=1))),
+                nnrtiNewAdults=Count(Case(When(nnrtiNewAdults={DEFAULT: YES}, then=1))),
+                nnrtiCurrentAdults=Count(Case(When(nnrtiCurrentAdults={DEFAULT: YES}, then=1))),
+        )
+        totals = dict()
+        for key, value in aggregates.items():
+            if key != "count":
+                totals[key] = "{0:.2f}".format(float(value) * 100 / float(aggregates['count'])) + " %"
+        context['totals'] = totals
