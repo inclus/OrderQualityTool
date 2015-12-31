@@ -43,11 +43,13 @@ class ScoresTableView(BaseDatatableView):
         formulation_columns = ['stablePatientVolumes', 'consumptionAndPatients', 'warehouseFulfilment', 'differentOrdersOverTime', 'closingBalanceMatchesOpeningBalance', 'orderFormFreeOfNegativeNumbers', 'stableConsumption', ]
         formulation = self.request.POST.get(u'formulation', F1)
         if column in default_columns:
-            return display_text[getattr(row, column)['DEFAULT']]
+            actual_result = getattr(row, column)['DEFAULT']
+            return display_text[actual_result] if actual_result else actual_result
         elif column in formulation_columns:
             result = getattr(row, column)
             if type(result) == dict and formulation in result:
-                return display_text[result[formulation]]
+                actual_result = result[formulation]
+                return display_text[actual_result] if actual_result else actual_result
             else:
                 return ""
         else:
