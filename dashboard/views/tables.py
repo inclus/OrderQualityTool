@@ -6,6 +6,8 @@ from dashboard.models import Score
 
 DEFAULT = 'DEFAULT'
 
+DEFAULT = 'DEFAULT'
+
 
 class ScoresTableView(BaseDatatableView):
     model = Score
@@ -43,8 +45,12 @@ class ScoresTableView(BaseDatatableView):
         formulation_columns = ['stablePatientVolumes', 'consumptionAndPatients', 'warehouseFulfilment', 'differentOrdersOverTime', 'closingBalanceMatchesOpeningBalance', 'orderFormFreeOfNegativeNumbers', 'stableConsumption', ]
         formulation = self.request.POST.get(u'formulation', F1)
         if column in default_columns:
-            actual_result = getattr(row, column)['DEFAULT']
-            return display_text[actual_result] if actual_result else actual_result
+            value_for_column = getattr(row, column)
+            if type(value_for_column) == dict and DEFAULT in value_for_column:
+                actual_result = value_for_column[DEFAULT]
+                return display_text[actual_result] if actual_result else actual_result
+            else:
+                return ""
         elif column in formulation_columns:
             result = getattr(row, column)
             if type(result) == dict and formulation in result:
