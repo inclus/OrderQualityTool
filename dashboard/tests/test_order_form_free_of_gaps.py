@@ -31,9 +31,10 @@ class OrderFormFreeOfNegativesViewTestCase(WebTest, RegimenCheckViewCaseMixin):
         return "%s?start=%s&&end=%s&&regimen=%s" % (url, start, end, regimen)
 
     @patch("dashboard.views.api.CycleFormulationScore.objects.filter")
-    def test_filter_is_setup(self, filter_mock):
-        today = arrow.now()
-        year = today.format("YYYY")
+    @patch("dashboard.views.api.now")
+    def test_filter_is_setup(self, time_mock, filter_mock):
+        time_mock.return_value = arrow.Arrow(2015, 12, 01)
+        year = "2015"
         url = reverse(self.url_name)
         start = "Mar - Apr %s" % year
         end = "Nov - Dec %s" % year
@@ -64,9 +65,10 @@ class OrderFormFreeOfGapsViewTestCase(WebTest, RegimenCheckViewCaseMixin):
         self.assertEqual(200, response.status_code)
 
     @patch("dashboard.views.api.CycleScore.objects.filter")
-    def test_filter_is_setup(self, filter_mock):
-        today = arrow.now()
-        year = today.format("YYYY")
+    @patch("dashboard.views.api.now")
+    def test_filter_is_setup(self, time_mock, filter_mock):
+        time_mock.return_value = arrow.Arrow(2015, 12, 01)
+        year = "2015"
         url = reverse(self.url_name)
         start = "Mar - Apr %s" % year
         end = "Nov - Dec %s" % year

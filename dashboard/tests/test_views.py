@@ -2,6 +2,7 @@ import json
 import os
 from json import loads
 
+import arrow
 from arrow import now
 from django.core.urlresolvers import reverse
 from django.test import TestCase
@@ -55,9 +56,11 @@ class FacilitiesReportingView(WebTest):
         data = loads(json_response)['values']
         self.assertIn({"reporting": 50, "cycle": cycle, "not_reporting": 50}, data)
 
-    def test_that_start_end_work(self):
-        cycle = 'Jan - Feb %s' % now().format("YYYY")
-        cycle_2 = 'Mar - Apr %s' % now().format("YYYY")
+    @patch("dashboard.views.api.now")
+    def test_that_start_end_work(self, time_mock):
+        time_mock.return_value = arrow.Arrow(2015, 12, 01)
+        cycle = 'Jan - Feb 2015'
+        cycle_2 = 'Mar - Apr 2015'
         loc, _ = Facility.objects.get_or_create(name="AIC Jinja Special Clinic")
         loc2, _ = Facility.objects.get_or_create(name="AIC Special Clinic")
         Cycle.objects.create(facility=loc, cycle=cycle, web_based=True)
@@ -80,9 +83,11 @@ class WebBasedReportingViewTestCase(WebTest):
         data = loads(json_response)['values']
         self.assertIn({"web": 50, "cycle": cycle, "paper": 50}, data)
 
-    def test_that_start_end_work(self):
-        cycle = 'Jan - Feb %s' % now().format("YYYY")
-        cycle_2 = 'Mar - Apr %s' % now().format("YYYY")
+    @patch("dashboard.views.api.now")
+    def test_that_start_end_work(self, time_mock):
+        time_mock.return_value = arrow.Arrow(2015, 12, 01)
+        cycle = 'Jan - Feb 2015'
+        cycle_2 = 'Mar - Apr 2015'
         loc, _ = Facility.objects.get_or_create(name="AIC Jinja Special Clinic")
         loc2, _ = Facility.objects.get_or_create(name="AIC Special Clinic")
         Cycle.objects.create(facility=loc, cycle=cycle, web_based=True)
@@ -120,7 +125,7 @@ class BestDistrictReportingViewFor(WebTest):
 
     def test_best_performing_ips(self):
         Score.objects.create(name="F1", warehouse="W1", ip="I1", district="D1", REPORTING={"DEFAULT": "YES"}, WEB_BASED={"DEFAULT": "YES"})
-        Score.objects.create(name="F1", warehouse="W1", ip="I2", district="D2", REPORTING= {"DEFAULT": "NO"}, WEB_BASED={"DEFAULT": "YES"})
+        Score.objects.create(name="F1", warehouse="W1", ip="I2", district="D2", REPORTING={"DEFAULT": "NO"}, WEB_BASED={"DEFAULT": "YES"})
         url = reverse("ranking_best") + "?level=ip"
         json_response = self.app.get(url, user="testuser").content.decode('utf8')
         data = loads(json_response)['values']
@@ -221,7 +226,7 @@ class ReportingCheckTestCase(TestCase):
         ReportingCheck().run(cycle)
         self.assertEqual(3, Score.objects.count())
         filters = {}
-        filters[REPORTING] = {"DEFAULT":"YES"}
+        filters[REPORTING] = {"DEFAULT": "YES"}
         self.assertEqual(2, Score.objects.filter(**filters).count())
 
 
@@ -242,7 +247,7 @@ class WebBasedReportingCheckTestCase(TestCase):
         WebBasedReportingCheck().run(cycle)
         self.assertEqual(3, Score.objects.count())
         filters = {}
-        filters[WEB_BASED] = {"DEFAULT":"YES"}
+        filters[WEB_BASED] = {"DEFAULT": "YES"}
         self.assertEqual(2, Score.objects.filter(**filters).count())
 
 
@@ -263,7 +268,7 @@ class MultipleReportingCheckTestCase(TestCase):
         MultipleOrdersCheck().run(cycle)
         self.assertEqual(3, Score.objects.count())
         filters = {}
-        filters[MULTIPLE_ORDERS] = {"DEFAULT":"YES"}
+        filters[MULTIPLE_ORDERS] = {"DEFAULT": "YES"}
         self.assertEqual(2, Score.objects.filter(**filters).count())
 
 
