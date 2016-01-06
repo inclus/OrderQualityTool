@@ -1,7 +1,7 @@
 import os
 from unittest import TestCase
 
-from dashboard.data.blanks import BlanksQualityCheck
+from dashboard.data.blanks import BlanksQualityCheck, IsReportingCheck, MultipleCheck, WebBasedCheck
 from dashboard.data.consumption_patients import ConsumptionAndPatientsQualityCheck
 from dashboard.data.free_form_report import FreeFormReport
 from dashboard.data.negatives import NegativeNumbersQualityCheck
@@ -68,8 +68,27 @@ class DataTestCase(TestCase):
         file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', 'tests', 'fixtures',
                                  "new_format.xlsx")
         report = FreeFormReport(file_path, "May Jun").load()
-        result = BlanksQualityCheck(report).run()['DEFAULT']
-        assert result[YES] == 8.0
+        cases = [{'test': BlanksQualityCheck, 'expected': 8.0},
+                 {'test': MultipleCheck, 'expected': 20.0},
+                 {'test': IsReportingCheck, 'expected': 96.0},
+                 {'test': WebBasedCheck, 'expected': 96.0}
+                 ]
+        for case in cases:
+            result = case['test'](report).run()['DEFAULT']
+            self.assertEquals(result[YES], case['expected'])
+
+    def test_publishing_scores(self):
+        file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', 'tests', 'fixtures',
+                                 "new_format.xlsx")
+        report = FreeFormReport(file_path, "May Jun").load()
+        cases = [{'test': BlanksQualityCheck, 'expected': 8.0},
+                 {'test': MultipleCheck, 'expected': 20.0},
+                 {'test': IsReportingCheck, 'expected': 96.0},
+                 {'test': WebBasedCheck, 'expected': 96.0}
+                 ]
+        for case in cases:
+            result = case['test'](report).run()['DEFAULT']
+            self.assertEquals(result[YES], case['expected'])
 
     def x_test_calculate_score(self):
         file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', 'tests', 'fixtures',

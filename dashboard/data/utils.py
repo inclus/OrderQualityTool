@@ -1,6 +1,8 @@
 import json
 import logging
 import time
+from abc import abstractmethod
+
 import pydash
 
 from dashboard.helpers import NO, NOT_REPORTING, YES
@@ -59,7 +61,6 @@ def calculate_percentages(no, not_reporting, total_count, yes):
 
 def build_cycle_formulation_score(formulation, yes, no, not_reporting, total_count):
     no, not_reporting, yes = calculate_percentages(no, not_reporting, total_count, yes)
-
     return {NO: no, NOT_REPORTING: not_reporting, YES: yes}
 
 
@@ -95,3 +96,34 @@ SUM = 'sum'
 F1_QUERY = "Tenofovir/Lamivudine/Efavirenz (TDF/3TC/EFV) 300mg/300mg/600mg[Pack 30]"
 F3_QUERY = "Efavirenz (EFV) 200mg [Pack 90]"
 F2_QUERY = "Abacavir/Lamivudine (ABC/3TC) 60mg/30mg [Pack 60]"
+
+
+class QCheck:
+    combinations = []
+    test = ""
+
+    def __init__(self, report):
+        self.report = report
+
+    @timeit
+    def run(self):
+        scores = dict()
+        for combination in self.combinations:
+            self.for_each_combination(combination, scores)
+        return scores
+
+    def for_each_combination(self, combination, scores):
+        facilities = self.report.locs
+        yes = 0
+        no = 0
+        not_reporting = 0
+        total_count = len(facilities)
+        formulation_name = combination[NAME]
+        for facility in facilities:
+            result, no, not_reporting, yes = self.for_each_facility(facility, no, not_reporting, yes, combination)
+            facility['scores'][self.test][formulation_name] = result
+        out = build_cycle_formulation_score(formulation_name, yes, no, not_reporting, total_count)
+        scores[formulation_name] = out
+
+    def for_each_facility(self, facility, no, not_reporting, yes, combination):
+        pass

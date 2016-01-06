@@ -2,59 +2,41 @@ import pydash
 
 from dashboard.data.utils import NAME, PATIENT_QUERY, CONSUMPTION_QUERY, F1_QUERY, RATIO, FIELDS, ART_CONSUMPTION, \
     PMTCT_CONSUMPTION, IS_ADULT, F2_QUERY, F3_QUERY, timeit, get_patient_total, get_consumption_totals, has_all_blanks, \
-    NEW, EXISTING, build_cycle_formulation_score, FORMULATION
+    NEW, EXISTING, build_cycle_formulation_score, FORMULATION, QCheck
 from dashboard.helpers import CONSUMPTION_AND_PATIENTS, F1, F2, F3, NOT_REPORTING, YES, NO
 
 
-class ConsumptionAndPatientsQualityCheck():
-    def __init__(self, report):
-        self.report = report
-
+class ConsumptionAndPatientsQualityCheck(QCheck):
     test = CONSUMPTION_AND_PATIENTS
-    formulations = [{NAME: F1, PATIENT_QUERY: "TDF/3TC/EFV", CONSUMPTION_QUERY: F1_QUERY, RATIO: 2.0,
+    combinations = [{NAME: F1, PATIENT_QUERY: "TDF/3TC/EFV", CONSUMPTION_QUERY: F1_QUERY, RATIO: 2.0,
                      FIELDS: [ART_CONSUMPTION, PMTCT_CONSUMPTION], IS_ADULT: True},
                     {NAME: F2, PATIENT_QUERY: "ABC/3TC", CONSUMPTION_QUERY: F2_QUERY, RATIO: 4.6,
                      FIELDS: [ART_CONSUMPTION], IS_ADULT: False},
                     {NAME: F3, PATIENT_QUERY: "EFV", CONSUMPTION_QUERY: F3_QUERY, RATIO: 1, FIELDS: [ART_CONSUMPTION],
                      IS_ADULT: False}]
 
-    @timeit
-    def run(self):
-        scores = dict()
-        formulations = self.formulations
-        for formulation in formulations:
-            facilities = self.report.locs
-            yes = 0
-            no = 0
-            not_reporting = 0
-            total_count = len(facilities)
-            formulation_name = formulation[NAME]
-            for facility in facilities:
-                result = NOT_REPORTING
+    def for_each_facility(self, facility, no, not_reporting, yes, combination):
+        result = NOT_REPORTING
 
-                facility_name = facility[NAME]
-                df1_records = self.get_consumption_records(facility_name, formulation[CONSUMPTION_QUERY])
-                df2_records = self.get_patient_records(facility_name, formulation[PATIENT_QUERY],
-                                                       formulation[IS_ADULT])
-                df1_count = len(df1_records)
-                df2_count = len(df2_records)
+        facility_name = facility[NAME]
+        df1_records = self.get_consumption_records(facility_name, combination[CONSUMPTION_QUERY])
+        df2_records = self.get_patient_records(facility_name, combination[PATIENT_QUERY],
+                                               combination[IS_ADULT])
+        df1_count = len(df1_records)
+        df2_count = len(df2_records)
 
-                df2_sum = get_patient_total(df2_records)
-                df1_sum = get_consumption_totals(formulation[FIELDS], df1_records)
-                all_df1_blank = has_all_blanks(df1_records, formulation[FIELDS])
-                all_df2_blank = has_all_blanks(df2_records, [NEW, EXISTING])
-                adjusted_df1_sum = df1_sum / formulation[RATIO]
-                no, not_reporting, result, yes = self.calculate_score(adjusted_df1_sum, df2_sum,
-                                                                      df1_count,
-                                                                      df2_count, yes,
-                                                                      no,
-                                                                      not_reporting, result, all_df1_blank,
-                                                                      all_df2_blank)
-                facility['scores'][self.test][formulation_name] = result
-
-            out = build_cycle_formulation_score(formulation_name, yes, no, not_reporting, total_count)
-            scores[formulation_name] = out
-        return scores
+        df2_sum = get_patient_total(df2_records)
+        df1_sum = get_consumption_totals(combination[FIELDS], df1_records)
+        all_df1_blank = has_all_blanks(df1_records, combination[FIELDS])
+        all_df2_blank = has_all_blanks(df2_records, [NEW, EXISTING])
+        adjusted_df1_sum = df1_sum / combination[RATIO]
+        no, not_reporting, result, yes = self.calculate_score(adjusted_df1_sum, df2_sum,
+                                                              df1_count,
+                                                              df2_count, yes,
+                                                              no,
+                                                              not_reporting, result, all_df1_blank,
+                                                              all_df2_blank)
+        return result, no, not_reporting, yes
 
     def calculate_score(self, df1_sum, df2_sum, number_of_consumption_records,
                         number_of_patient_records, yes, no, not_reporting, result, all_df1_blank,
