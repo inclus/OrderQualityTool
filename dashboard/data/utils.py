@@ -1,8 +1,9 @@
 import json
 import logging
 import time
-
 import pydash
+
+from dashboard.helpers import NO, NOT_REPORTING, YES
 
 logger = logging.getLogger(__name__)
 
@@ -57,7 +58,9 @@ def calculate_percentages(no, not_reporting, total_count, yes):
 
 
 def build_cycle_formulation_score(formulation, yes, no, not_reporting, total_count):
-    return calculate_percentages(no, not_reporting, total_count, yes)
+    no, not_reporting, yes = calculate_percentages(no, not_reporting, total_count, yes)
+
+    return {NO: no, NOT_REPORTING: not_reporting, YES: yes}
 
 
 def has_blank(records, fields):

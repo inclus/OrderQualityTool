@@ -1,7 +1,7 @@
 import pydash
 
 from dashboard.data.utils import NAME, timeit, build_cycle_formulation_score, values_for_records, NEW, EXISTING
-from dashboard.helpers import CONSUMPTION_AND_PATIENTS, NOT_REPORTING, YES, NO
+from dashboard.helpers import CONSUMPTION_AND_PATIENTS, NOT_REPORTING, YES, NO, REPORTING, WEB_BASED, MULTIPLE_ORDERS
 
 F1_QUERY = "Efavirenz (TDF/3TC/EFV)"
 F2_QUERY = "Lamivudine (ABC/3TC) 60mg/30mg [Pack 60]"
@@ -21,7 +21,7 @@ class BlanksQualityCheck():
         self.report = report
 
     test = CONSUMPTION_AND_PATIENTS
-    formulations = [{NAME: 'DEFAULT'}]
+    combinations = [{NAME: 'DEFAULT'}]
 
     fields = ["opening_balance",
               "quantity_received",
@@ -32,14 +32,13 @@ class BlanksQualityCheck():
     @timeit
     def run(self):
         scores = dict()
-        formulations = self.formulations
-        for formulation in formulations:
+        for combination in self.combinations:
             facilities = self.report.locs
             yes = 0
             no = 0
             not_reporting = 0
             total_count = len(facilities)
-            formulation_name = formulation[NAME]
+            formulation_name = combination[NAME]
             for facility in facilities:
                 result = NOT_REPORTING
                 facility_name = facility[NAME]
@@ -71,6 +70,90 @@ class BlanksQualityCheck():
                     not_reporting += 1
                 facility['scores'][self.test][formulation_name] = result
 
+            out = build_cycle_formulation_score(formulation_name, yes, no, not_reporting, total_count)
+            scores[formulation_name] = out
+        return scores
+
+
+class WebBasedCheck():
+    def __init__(self, report):
+        self.report = report
+
+    test = WEB_BASED
+    combinations = [{NAME: 'DEFAULT'}]
+
+    def run(self):
+        scores = dict()
+        for combination in self.combinations:
+            facilities = self.report.locs
+            yes = 0
+            no = 0
+            not_reporting = 0
+            total_count = len(facilities)
+            formulation_name = combination[NAME]
+            for facility in facilities:
+                result = NO if facility['Web/Paper'].strip() != 'Web' else YES
+                if result == NO:
+                    no += 1
+                else:
+                    yes += 1
+                facility['scores'][self.test][formulation_name] = result
+            out = build_cycle_formulation_score(formulation_name, yes, no, not_reporting, total_count)
+            scores[formulation_name] = out
+        return scores
+
+
+class IsReportingCheck():
+    def __init__(self, report):
+        self.report = report
+
+    test = REPORTING
+    combinations = [{NAME: 'DEFAULT'}]
+
+    def run(self):
+        scores = dict()
+        for combination in self.combinations:
+            facilities = self.report.locs
+            yes = 0
+            no = 0
+            not_reporting = 0
+            total_count = len(facilities)
+            formulation_name = combination[NAME]
+            for facility in facilities:
+                result = NO if facility['status'].strip() != 'Reporting' else YES
+                if result == NO:
+                    no += 1
+                else:
+                    yes += 1
+                facility['scores'][self.test][formulation_name] = result
+            out = build_cycle_formulation_score(formulation_name, yes, no, not_reporting, total_count)
+            scores[formulation_name] = out
+        return scores
+
+
+class MultipleCheck():
+    def __init__(self, report):
+        self.report = report
+
+    test = MULTIPLE_ORDERS
+    combinations = [{NAME: 'DEFAULT'}]
+
+    def run(self):
+        scores = dict()
+        for combination in self.combinations:
+            facilities = self.report.locs
+            yes = 0
+            no = 0
+            not_reporting = 0
+            total_count = len(facilities)
+            formulation_name = combination[NAME]
+            for facility in facilities:
+                result = NO if facility['Multiple'].strip() != 'Multiple orders' else YES
+                if result == NO:
+                    no += 1
+                else:
+                    yes += 1
+                facility['scores'][self.test][formulation_name] = result
             out = build_cycle_formulation_score(formulation_name, yes, no, not_reporting, total_count)
             scores[formulation_name] = out
         return scores

@@ -7,6 +7,7 @@ from dashboard.data.free_form_report import FreeFormReport
 from dashboard.data.negatives import NegativeNumbersQualityCheck
 from dashboard.data.utils import clean_name, FORMULATION, NEW, get_patient_total, EXISTING, get_consumption_totals, \
     values_for_records
+from dashboard.helpers import YES
 
 
 class FakeReport():
@@ -67,8 +68,8 @@ class DataTestCase(TestCase):
         file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', 'tests', 'fixtures',
                                  "new_format.xlsx")
         report = FreeFormReport(file_path, "May Jun").load()
-        no, not_reporting, yes = BlanksQualityCheck(report).run()['DEFAULT']
-        assert yes == 8.0
+        result = BlanksQualityCheck(report).run()['DEFAULT']
+        assert result[YES] == 8.0
 
     def x_test_calculate_score(self):
         file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', 'tests', 'fixtures',

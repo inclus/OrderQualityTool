@@ -2,9 +2,8 @@ import logging
 
 import djclick as click
 
-from dashboard.data.blanks import BlanksQualityCheck
+from dashboard.data.blanks import BlanksQualityCheck, MultipleCheck, WebBasedCheck, IsReportingCheck
 from dashboard.data.free_form_report import FreeFormReport
-from dashboard.data.negatives import NegativeNumbersQualityCheck
 
 logger = logging.getLogger(__name__)
 
@@ -17,3 +16,6 @@ def command(path, cycle):
     report = FreeFormReport(path, cycle).load()
     print len(report.cs)
     print BlanksQualityCheck(report).run()
+    print MultipleCheck(report).run()
+    print WebBasedCheck(report).run()
+    print IsReportingCheck(report).run()
