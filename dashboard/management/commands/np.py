@@ -1,11 +1,10 @@
-import json
 import logging
 
 import djclick as click
 
-from dashboard.data.consumption_patients import ConsumptionAndPatients
+from dashboard.data.blanks import BlanksQualityCheck
 from dashboard.data.free_form_report import FreeFormReport
-from dashboard.data.negatives import NegativeNumbers
+from dashboard.data.negatives import NegativeNumbersQualityCheck
 
 logger = logging.getLogger(__name__)
 
@@ -17,5 +16,4 @@ def command(path, cycle):
     click.secho('Importing {}'.format(path), fg='red')
     report = FreeFormReport(path, cycle).load()
     print len(report.cs)
-    # print ConsumptionAndPatients(report).run()
-    print NegativeNumbers(report).run()
+    print BlanksQualityCheck(report).run()

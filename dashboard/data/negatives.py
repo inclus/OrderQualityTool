@@ -1,7 +1,6 @@
 import pydash
-from dashboard.data.utils import NAME, PATIENT_QUERY, CONSUMPTION_QUERY, F1_QUERY, RATIO, FIELDS, ART_CONSUMPTION, \
-    PMTCT_CONSUMPTION, IS_ADULT, timeit, get_patient_total, get_consumption_totals, has_all_blanks, \
-    NEW, EXISTING, build_cycle_formulation_score, FORMULATION, values_for_records
+
+from dashboard.data.utils import NAME, CONSUMPTION_QUERY, F1_QUERY, timeit, build_cycle_formulation_score, FORMULATION, values_for_records
 from dashboard.helpers import CONSUMPTION_AND_PATIENTS, F1, F2, F3, NOT_REPORTING, YES, NO
 
 F1_QUERY = "Efavirenz (TDF/3TC/EFV)"
@@ -9,7 +8,7 @@ F2_QUERY = "Lamivudine (ABC/3TC) 60mg/30mg [Pack 60]"
 F3_QUERY = "EFV) 200mg [Pack 90]"
 
 
-class NegativeNumbers():
+class NegativeNumbersQualityCheck():
     def __init__(self, report):
         self.report = report
 

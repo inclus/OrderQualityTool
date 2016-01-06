@@ -6,7 +6,7 @@ from dashboard.data.utils import NAME, PATIENT_QUERY, CONSUMPTION_QUERY, F1_QUER
 from dashboard.helpers import CONSUMPTION_AND_PATIENTS, F1, F2, F3, NOT_REPORTING, YES, NO
 
 
-class ConsumptionAndPatients():
+class ConsumptionAndPatientsQualityCheck():
     def __init__(self, report):
         self.report = report
 
