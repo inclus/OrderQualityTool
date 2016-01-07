@@ -105,7 +105,6 @@ class QCheck:
     def __init__(self, report):
         self.report = report
 
-    @timeit
     def run(self):
         scores = dict()
         for combination in self.combinations:

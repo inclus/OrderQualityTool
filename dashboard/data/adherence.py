@@ -1,4 +1,5 @@
 import pydash
+
 from dashboard.data.utils import QCheck, NAME, FORMULATION, values_for_records
 from dashboard.helpers import NOT_REPORTING, YES, NO
 
@@ -9,8 +10,6 @@ PAED_1L = "Paed 1L"
 ADULT_1L = "Adult 1L"
 
 FIELDS = "fields"
-
-NAME = "name"
 
 MODEL = 'model'
 
@@ -96,12 +95,12 @@ class GuidelineAdherenceCheckPaed1L(GuidelineAdherenceCheckAdult1L):
 def calculate_score(df1_count, df2_count, sum_df1, sum_df2, ratio, yes, no, not_reporting,
                     all_df1_fields_are_blank=False, all_df2_fields_are_blank=False):
     total = sum_df1 + sum_df2
-    result = NOT_REPORTING
     has_blanks = (all_df2_fields_are_blank or all_df1_fields_are_blank)
     has_no_blanks = not has_blanks
     has_no_records = df1_count == 0 or df2_count == 0
     adjusted_total = (ratio * total)
     df1_is_at_least_adjusted_total = sum_df1 >= adjusted_total
+    result = NOT_REPORTING
     if has_no_records:
         not_reporting += 1
     elif has_no_blanks and ((sum_df1 == 0 and sum_df2 == 0) or df1_is_at_least_adjusted_total):

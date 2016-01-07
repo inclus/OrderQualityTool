@@ -1,10 +1,9 @@
 import operator
-
 from django.db.models import Q, F, Sum
 from django.db.models.functions import Coalesce
-
 from dashboard.checks.common import Check
-from dashboard.helpers import NNRTI_CURRENT_ADULTS, NNRTI_CURRENT_PAED, NNRTI_NEW_ADULTS, NNRTI_NEW_PAED, NOT_REPORTING, YES, NO
+from dashboard.helpers import NNRTI_CURRENT_ADULTS, NNRTI_CURRENT_PAED, NNRTI_NEW_ADULTS, NNRTI_NEW_PAED, NOT_REPORTING, \
+    YES, NO
 from dashboard.models import Cycle, CycleScore, Consumption
 
 TEST = "test"
@@ -95,7 +94,8 @@ class NNRTI(Check):
     def run(self, cycle):
         for formulation in self.formulations:
             test = formulation[TEST]
-            qs = Cycle.objects.select_related('facility', 'facility__district', 'facility__ip', 'facility__warehouse').filter(cycle=cycle, reporting_status=True)
+            qs = Cycle.objects.select_related('facility', 'facility__district', 'facility__ip',
+                                              'facility__warehouse').filter(cycle=cycle, reporting_status=True)
             total_count = Cycle.objects.filter(cycle=cycle).count()
             not_reporting = Cycle.objects.filter(cycle=cycle, reporting_status=False).count()
             yes = 0
@@ -125,7 +125,8 @@ class NNRTI(Check):
         sum_df1 = df1_agg.get("sum", 0)
         sum_df2 = df2_agg.get("sum", 0)
         total = sum_df1 + sum_df2
-        no, not_reporting, result, yes = self.compare_values(ratio, no, not_reporting, yes, df1_count, df2_count, sum_df1, sum_df2, total)
+        no, not_reporting, result, yes = self.compare_values(ratio, no, not_reporting, yes, df1_count, df2_count,
+                                                             sum_df1, sum_df2, total)
         self.record_result_for_facility(record, result, test=test)
         return no, not_reporting, yes
 
