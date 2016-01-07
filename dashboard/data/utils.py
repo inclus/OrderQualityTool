@@ -126,4 +126,4 @@ class QCheck:
         scores[formulation_name] = out
 
     def for_each_facility(self, facility, no, not_reporting, yes, combination):
-        pass
+        raise NotImplementedError

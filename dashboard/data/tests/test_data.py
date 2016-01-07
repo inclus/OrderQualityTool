@@ -1,13 +1,15 @@
 import os
+from collections import defaultdict
 from unittest import TestCase
 
+from dashboard.data.adherence import GuidelineAdherenceCheckAdult1L, calculate_score, GuidelineAdherenceCheckAdult2L
 from dashboard.data.blanks import BlanksQualityCheck, IsReportingCheck, MultipleCheck, WebBasedCheck
 from dashboard.data.consumption_patients import ConsumptionAndPatientsQualityCheck
 from dashboard.data.free_form_report import FreeFormReport
 from dashboard.data.negatives import NegativeNumbersQualityCheck
 from dashboard.data.utils import clean_name, FORMULATION, NEW, get_patient_total, EXISTING, get_consumption_totals, \
     values_for_records
-from dashboard.helpers import YES
+from dashboard.helpers import YES, NOT_REPORTING, NO
 
 
 class FakeReport():
@@ -96,3 +98,98 @@ class DataTestCase(TestCase):
         report = FreeFormReport(file_path, "May Jun").load()
         no, not_reporting, yes = NegativeNumbersQualityCheck(report).run()['DEFAULT']
         assert yes == 57.3
+
+
+class GuidelineAdherenceAdult1LTestCase(TestCase):
+    def test_score_is_yes_if_sum_of_new_hiv_positive_women_and_new_art_for_tdf_is_80_percent_that_for_AZT(self):
+        df1_count = df2_count = 1
+        sum_df1 = 9
+        sum_df2 = 2
+        ratio = 0.8
+        result, no, not_reporting, yes = calculate_score(df1_count, df2_count, sum_df1, sum_df2, ratio, 0, 0, 0)
+        self.assertEqual(result, YES)
+        self.assertEqual(yes, 1)
+        self.assertEqual(no, 0)
+        self.assertEqual(not_reporting, 0)
+
+    def test_score_is_yes_if_sum_of_new_hiv_positive_women_and_new_art_for_tdf_is_zero_and_that_for_AZT_is_also_zero(
+            self):
+        df1_count = df2_count = 1
+        sum_df1 = 0
+        sum_df2 = 0
+        ratio = 0.8
+        result, no, not_reporting, yes = calculate_score(df1_count, df2_count, sum_df1, sum_df2, ratio, 0, 0, 0)
+        self.assertEqual(result, YES)
+        self.assertEqual(yes, 1)
+        self.assertEqual(no, 0)
+        self.assertEqual(not_reporting, 0)
+
+    def test_score_is_no_if_tdf_cells_are_blank(self):
+        df1_count = df2_count = 1
+        sum_df1 = 0
+        sum_df2 = 12
+        ratio = 0.8
+        result, no, not_reporting, yes = calculate_score(df1_count, df2_count, sum_df1, sum_df2, ratio, 0, 0, 0, True,
+                                                         False)
+        self.assertEqual(result, NO)
+        self.assertEqual(yes, 0)
+        self.assertEqual(no, 1)
+        self.assertEqual(not_reporting, 0)
+
+    def test_score_is_no_if_azt_cells_are_blank(self):
+        df1_count = df2_count = 1
+        sum_df1 = 0
+        sum_df2 = 0
+        ratio = 0.8
+        result, no, not_reporting, yes = calculate_score(df1_count, df2_count, sum_df1, sum_df2, ratio, 0, 0, 0, False,
+                                                         True)
+        self.assertEqual(result, NO)
+        self.assertEqual(yes, 0)
+        self.assertEqual(no, 1)
+        self.assertEqual(not_reporting, 0)
+
+    def test_score_is_not_reporting_if_azt_or_tdf_cells_are_not_found(self):
+        df1_count = df2_count = 0
+        sum_df1 = 0
+        sum_df2 = 0
+        ratio = 0.8
+        result, no, not_reporting, yes = calculate_score(df1_count, df2_count, sum_df1, sum_df2, ratio, 0, 0, 0, False,
+                                                         True)
+        self.assertEqual(result, NOT_REPORTING)
+        self.assertEqual(yes, 0)
+        self.assertEqual(no, 0)
+        self.assertEqual(not_reporting, 1)
+
+    def test_run(self):
+        report = FakeReport()
+        report.cs = {"PLACE1": [{FORMULATION: "A", "openingBalance": 1},
+                                {FORMULATION: "B", "openingBalance": 2},
+                                {FORMULATION: "C", "openingBalance": 3},
+                                {FORMULATION: "E", "openingBalance": 4},
+                                {FORMULATION: "A", "openingBalance": 12}]}
+        check = GuidelineAdherenceCheckAdult1L(report)
+
+    def test_adherence_filter(self):
+        report = FakeReport()
+        report.locs = [{"name": "PLACE1", "scores": defaultdict(dict)}]
+        report.cs = {"PLACE1": [
+            {
+                FORMULATION: "Tenofovir/Lamivudine (TDF/3TC) 300mg/300mg [Pack 30]",
+                "estimated_number_of_new_pregnant_women": 4,
+                "estimated_number_of_new_patients": 4
+            },
+            {
+                FORMULATION: "Tenofovir/Lamivudine/Efavirenz (TDF/3TC/EFV) 300mg/300mg/600mg[Pack 30]",
+                "estimated_number_of_new_pregnant_women": 4,
+                "estimated_number_of_new_patients": 4},
+            {
+                FORMULATION: "Zidovudine/Lamivudine (AZT/3TC) 300mg/150mg [Pack 60]",
+                "estimated_number_of_new_pregnant_women": 1,
+                "estimated_number_of_new_patients": 1},
+            {
+                FORMULATION: "Zidovudine/Lamivudine/Nevirapine (AZT/3TC/NVP) 300mg/150mg/200mg [Pack 60]",
+                "estimated_number_of_new_pregnant_women": 1,
+                "estimated_number_of_new_patients": 1},
+            {FORMULATION: "A", "openingBalance": 12}]}
+        check = GuidelineAdherenceCheckAdult1L(report)
+        assert check.run()['DEFAULT']['YES'] == 100
