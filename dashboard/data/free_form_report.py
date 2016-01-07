@@ -1,10 +1,9 @@
 import logging
 from collections import defaultdict
-
 from openpyxl import load_workbook
-
 from dashboard.helpers import PATIENTS_PAED, PATIENTS_ADULT
 from dashboard.data.utils import timeit, NEW, EXISTING, FORMULATION, LOCATION, CONSUMPTION
+from dashboard.models import Cycle
 
 logger = logging.getLogger(__name__)
 
@@ -18,7 +17,13 @@ class FreeFormReport():
         self.ips = dict()
         self.warehouses = dict()
 
-    @timeit
+    def save(self):
+        cycle, created = Cycle.objects.get_or_create(title=self.cycle)
+        state = {'ads': self.ads, 'pds': self.pds, 'cs': self.cs}
+        cycle.state = state
+        cycle.save()
+        return cycle
+
     def get_workbook(self):
         return load_workbook(self.path)
 
@@ -29,7 +34,6 @@ class FreeFormReport():
             if value != "-" and value != '':
                 return real_value
 
-    @timeit
     def load(self):
         self.locs = self.locations()
         self.ads = self.adult_patients()

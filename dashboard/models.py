@@ -1,12 +1,10 @@
 import logging
-
 from custom_user.models import AbstractEmailUser
 from django.db import models
 from django.db.models import CharField
 from jsonfield import JSONField
-
+from picklefield import PickledObjectField
 from dashboard.helpers import NOT_REPORTING, YES, NO
-from locations.models import Facility
 
 MOH_CENTRAL = "MOH CENTRAL"
 
@@ -23,7 +21,7 @@ LOCATION = "Facility Index"
 
 class DashboardUser(AbstractEmailUser):
     access_level = CharField(
-            choices=((WAREHOUSE, WAREHOUSE), (DISTRICT, DISTRICT), (IIP, IIP), (MOH_CENTRAL, MOH_CENTRAL)), max_length=50)
+        choices=((WAREHOUSE, WAREHOUSE), (DISTRICT, DISTRICT), (IIP, IIP), (MOH_CENTRAL, MOH_CENTRAL)), max_length=50)
 
     def get_full_name(self):
         return self.email
@@ -35,30 +33,16 @@ class DashboardUser(AbstractEmailUser):
         app_label = 'dashboard'
 
 
-class CycleScore(models.Model):
-    cycle = models.CharField(max_length=256)
-    test = models.CharField(max_length=256)
-    yes = models.FloatField(null=True)
-    no = models.FloatField(null=True)
-    not_reporting = models.FloatField(null=True)
-
-    class Meta:
-        unique_together = ("cycle", "test")
-
-    def __unicode__(self):
-        return "%s %s YES:%s NO:%s NOT_REPORTING:%s" % (self.cycle, self.test, self.yes, self.no, self.not_reporting)
-
-
 class CycleFormulationScore(models.Model):
     cycle = models.CharField(max_length=256)
     test = models.CharField(max_length=256)
     yes = models.FloatField(null=True)
     no = models.FloatField(null=True)
     not_reporting = models.FloatField(null=True)
-    formulation = models.CharField(max_length=256, null=True, blank=True)
+    combination = models.CharField(max_length=256, null=True, blank=True)
 
     class Meta:
-        unique_together = ("cycle", "formulation", "test")
+        unique_together = ("cycle", "combination", "test")
 
     def __unicode__(self):
         return "%s %s YES:%s NO:%s NOT_REPORTING:%s FORMULATION:%s" % (
@@ -66,17 +50,11 @@ class CycleFormulationScore(models.Model):
 
 
 class Cycle(models.Model):
-    facility = models.ForeignKey(Facility, related_name="records")
-    cycle = models.CharField(max_length=256, db_index=True)
-    reporting_status = models.BooleanField(default=False)
-    web_based = models.BooleanField(default=False)
-    multiple = models.BooleanField(default=False)
-
-    class Meta:
-        unique_together = ("cycle", "facility")
+    title = models.CharField(max_length=256, db_index=True, unique=True)
+    state = PickledObjectField()
 
     def __unicode__(self):
-        return "%s %s" % (self.facility, self.cycle)
+        return "%s" % (self.title)
 
 
 choices = ((YES, YES), (NO, NO), (NOT_REPORTING, NOT_REPORTING))
@@ -106,47 +84,19 @@ class Score(models.Model):
     closingBalanceMatchesOpeningBalance = JSONField()
     orderFormFreeOfNegativeNumbers = JSONField()
     stableConsumption = JSONField()
-    pass_count = models.IntegerField()
-    fail_count = models.IntegerField()
-
-    def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
-        fields = ["nnrtiNewPaed",
-                  "REPORTING",
-                  "stablePatientVolumes",
-                  "consumptionAndPatients",
-                  "nnrtiCurrentPaed",
-                  "warehouseFulfilment",
-                  "differentOrdersOverTime",
-                  "closingBalanceMatchesOpeningBalance",
-                  "WEB_BASED",
-                  "OrderFormFreeOfGaps",
-                  "MULTIPLE_ORDERS",
-                  "nnrtiNewAdults",
-                  "orderFormFreeOfNegativeNumbers",
-                  "nnrtiCurrentAdults",
-                  "stableConsumption",
-                  "guidelineAdherenceAdult1L",
-                  "guidelineAdherenceAdult2L",
-                  "guidelineAdherencePaed1L"
-                  ]
-        self.pass_count = 0
-        self.fail_count = 0
-        for field in fields:
-            attr = getattr(self, field)
-            if type(attr) == dict:
-                for f, result in attr.items():
-                    if result == YES:
-                        self.pass_count += 1
-                    else:
-                        self.fail_count += 1
-
-        super(Score, self).save(force_insert, force_update, using, update_fields)
+    pass_count = models.IntegerField(default=0)
+    fail_count = models.IntegerField(default=0)
 
     class Meta:
-        unique_together = ("name", "cycle", "district")
+        unique_together = ("name", "cycle", "district", "ip", "warehouse")
 
 
 class Consumption(models.Model):
+    name = models.CharField(max_length=256, db_index=True)
+    cycle = models.CharField(max_length=256, db_index=True)
+    district = models.CharField(max_length=256, db_index=True)
+    ip = models.CharField(max_length=256, db_index=True)
+    warehouse = models.CharField(max_length=256, db_index=True)
     facility_cycle = models.ForeignKey(Cycle, related_name="consumption")
     opening_balance = models.FloatField(null=True, blank=True)
     quantity_received = models.FloatField(null=True, blank=True)
@@ -167,7 +117,11 @@ class Consumption(models.Model):
 
 
 class AdultPatientsRecord(models.Model):
-    facility_cycle = models.ForeignKey(Cycle, related_name="ads")
+    name = models.CharField(max_length=256, db_index=True)
+    cycle = models.CharField(max_length=256, db_index=True)
+    district = models.CharField(max_length=256, db_index=True)
+    ip = models.CharField(max_length=256, db_index=True)
+    warehouse = models.CharField(max_length=256, db_index=True)
     existing = models.FloatField(null=True, blank=True)
     new = models.FloatField(null=True, blank=True)
     formulation = models.CharField(max_length=256, null=True, blank=True)
@@ -177,7 +131,11 @@ class AdultPatientsRecord(models.Model):
 
 
 class PAEDPatientsRecord(models.Model):
-    facility_cycle = models.ForeignKey(Cycle, related_name="pds")
+    name = models.CharField(max_length=256, db_index=True)
+    cycle = models.CharField(max_length=256, db_index=True)
+    district = models.CharField(max_length=256, db_index=True)
+    ip = models.CharField(max_length=256, db_index=True)
+    warehouse = models.CharField(max_length=256, db_index=True)
     existing = models.FloatField(null=True, blank=True)
     new = models.FloatField(null=True, blank=True)
     formulation = models.CharField(max_length=256, null=True, blank=True)

@@ -2,10 +2,9 @@ import json
 import logging
 import time
 from abc import abstractmethod
-
 import pydash
-
 from dashboard.helpers import NO, NOT_REPORTING, YES
+from dashboard.models import CycleFormulationScore
 
 logger = logging.getLogger(__name__)
 
@@ -104,6 +103,16 @@ class QCheck:
 
     def __init__(self, report):
         self.report = report
+
+    def score(self):
+        formulation_scores = list()
+        scores = self.run()
+        print (self.test, scores)
+        for key, value in scores.items():
+            formulation_scores.append(
+                CycleFormulationScore(cycle=self.report.cycle, combination=key, yes=value[YES], no=value[NO],
+                                      not_reporting=value[NOT_REPORTING], test=self.test))
+        return formulation_scores
 
     def run(self):
         scores = dict()

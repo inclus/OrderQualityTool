@@ -5,10 +5,9 @@ from django.contrib.auth.admin import GroupAdmin, UserAdmin
 from django.contrib.auth.models import Group
 from django.utils.translation import ugettext_lazy
 from django.utils.translation import ugettext_lazy as _
-
-from dashboard.models import DashboardUser, Consumption, Cycle, AdultPatientsRecord, PAEDPatientsRecord, CycleScore, CycleFormulationScore, Score
+from dashboard.models import DashboardUser, Consumption, Cycle, AdultPatientsRecord, PAEDPatientsRecord, \
+    CycleFormulationScore, Score
 from dashboard.tasks import calculate_scores_for_checks_in_cycle
-from locations.models import Facility, WareHouse, IP, District
 
 
 class EmailUserAdmin(UserAdmin):
@@ -50,7 +49,11 @@ class MyModelAdmin(HierarchicalModelAdmin):
 
 class ConsumptionAdmin(ModelAdmin):
     list_display = (
-        'facility_cycle',
+        'name',
+        'cycle',
+        'district',
+        'ip',
+        'warehouse',
         'formulation',
         'opening_balance',
         'quantity_received',
@@ -63,23 +66,19 @@ class ConsumptionAdmin(ModelAdmin):
         'estimated_number_of_new_patients',
         'estimated_number_of_new_pregnant_women'
     )
-    search_fields = ('facility_cycle__facility__name',)
-    list_filter = ('facility_cycle__cycle', 'formulation')
+    search_fields = ('name', 'cycle', 'district', 'ip')
+    list_filter = ('cycle', 'formulation')
 
 
 class PatientAdmin(ModelAdmin):
-    list_display = ('facility_cycle',
+    list_display = ('name',
+                    'cycle',
+                    'district',
+                    'ip',
+                    'warehouse',
                     'formulation',
                     'existing',
                     'new'
-                    )
-
-
-class FacilityAdmin(ModelAdmin):
-    list_display = ('name',
-                    'warehouse',
-                    'ip',
-                    'district'
                     )
 
 
@@ -92,30 +91,21 @@ def run_tests(model_admin, request, queryset):
 run_tests.short_description = "Run quality tests for these cycles"
 
 
-class FacilityCycleRecordAdmin(ModelAdmin):
-    list_display = ('facility',
-                    'reporting_status',
-                    'web_based',
-                    'multiple',
-                    'cycle',
-                    'consumption_count'
-                    )
-    search_fields = ['facility__name']
-    list_filter = ('reporting_status', 'multiple', 'cycle')
-    actions = [run_tests]
-
-    def consumption_count(self, inst):
-        return inst.consumption.count()
-
-
 class CycleFormulationScoreAdmin(ModelAdmin):
-    list_display = ('formulation', 'cycle', 'test', 'yes', 'no', 'not_reporting')
-    list_filter = ('cycle', 'test', 'formulation')
+    list_display = ('combination', 'cycle', 'test', 'yes', 'no', 'not_reporting')
+    list_filter = ('cycle', 'test', 'combination')
 
 
 class ScoreAdmin(ModelAdmin):
     search_fields = ('name',)
-    list_display = ('name', 'cycle', 'district', 'ip', 'warehouse', 'nnrtiNewPaed',
+    list_display = ('name',
+                    'cycle',
+                    'district',
+                    'ip',
+                    'warehouse',
+                    'fail_count',
+                    'pass_count',
+                    'nnrtiNewPaed',
                     'stablePatientVolumes',
                     'REPORTING',
                     'consumptionAndPatients',
@@ -143,14 +133,9 @@ class ScoreAdmin(ModelAdmin):
 admin_site = QdbSite()
 admin_site.register(Group, GroupAdmin)
 admin_site.register(DashboardUser, EmailUserAdmin)
-admin_site.register(Facility, FacilityAdmin)
-admin_site.register(IP)
-admin_site.register(WareHouse)
-admin_site.register(District)
-admin_site.register(CycleScore)
 admin_site.register(Score, ScoreAdmin)
 admin_site.register(CycleFormulationScore, CycleFormulationScoreAdmin)
 admin_site.register(AdultPatientsRecord, PatientAdmin)
 admin_site.register(PAEDPatientsRecord, PatientAdmin)
 admin_site.register(Consumption, ConsumptionAdmin)
-admin_site.register(Cycle, FacilityCycleRecordAdmin)
+admin_site.register(Cycle)

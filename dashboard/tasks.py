@@ -1,49 +1,62 @@
 import os
 import time
-
 from celery import shared_task
 
-from dashboard.checks.closing_balance import ClosingBalance
-from dashboard.checks.consumption_and_patients import ConsumptionAndPatients
-from dashboard.checks.different_orders_over_time import DifferentOrdersOverTime
-from dashboard.checks.guideline_adherence import GuidelineAdherence
-from dashboard.checks.nnrti_checks import NNRTI
-from dashboard.checks.order_form_free_of_gaps import OrderFormFreeOfGaps
-from dashboard.checks.order_free_of_negative_numbers import OrderFormFreeOfNegativeNumbers
-from dashboard.checks.stable_consumption import StableConsumption
-from dashboard.checks.stable_patient_volumes import StablePatientVolumes
-from dashboard.checks.warehouse_fulfilement import WarehouseFulfilment
-from dashboard.checks.web_based_reporting import WebBasedReportingCheck, ReportingCheck, MultipleOrdersCheck
-from dashboard.reports import GeneralReport
+from dashboard.data.adherence import GuidelineAdherenceCheckAdult1L, GuidelineAdherenceCheckPaed1L
+from dashboard.data.adherence import GuidelineAdherenceCheckAdult2L
+from dashboard.data.blanks import BlanksQualityCheck, MultipleCheck, WebBasedCheck, IsReportingCheck
+from dashboard.data.consumption_patients import ConsumptionAndPatientsQualityCheck
+from dashboard.data.free_form_report import FreeFormReport
+from dashboard.data.nn import NNRTICURRENTADULTSCheck, NNRTINewAdultsCheck, NNRTINEWPAEDCheck
+from dashboard.data.nn import NNRTICURRENTPAEDCheck
+from dashboard.helpers import YES
+from dashboard.models import CycleFormulationScore, Score
 
 
 @shared_task
 def process_test(check_class, cycle):
-    start_time = time.clock()
     result = check_class().run(cycle)
-    print ("TIMER =================> ", check_class.__name__, time.clock() - start_time, "seconds")
     return result
 
 
 @shared_task
-def calculate_scores_for_checks_in_cycle(cycle):
-    process_test(WebBasedReportingCheck, cycle)
-    process_test(ReportingCheck, cycle)
-    process_test(MultipleOrdersCheck, cycle)
-    process_test(OrderFormFreeOfGaps, cycle)
-    process_test(OrderFormFreeOfNegativeNumbers, cycle)
-    process_test(DifferentOrdersOverTime, cycle)
-    process_test(ClosingBalance, cycle)
-    process_test(ConsumptionAndPatients, cycle)
-    process_test(StableConsumption, cycle)
-    process_test(WarehouseFulfilment, cycle)
-    process_test(StablePatientVolumes, cycle)
-    process_test(GuidelineAdherence, cycle)
-    process_test(NNRTI, cycle)
+def calculate_scores_for_checks_in_cycle(report):
+    formulation_scores = list()
+    formulation_scores.extend(BlanksQualityCheck(report).score())
+    formulation_scores.extend(ConsumptionAndPatientsQualityCheck(report).score())
+    formulation_scores.extend(MultipleCheck(report).score())
+    formulation_scores.extend(WebBasedCheck(report).score())
+    formulation_scores.extend(IsReportingCheck(report).score())
+    formulation_scores.extend(GuidelineAdherenceCheckAdult1L(report).score())
+    formulation_scores.extend(GuidelineAdherenceCheckAdult2L(report).score())
+    formulation_scores.extend(GuidelineAdherenceCheckPaed1L(report).score())
+    formulation_scores.extend(NNRTICURRENTADULTSCheck(report).score())
+    formulation_scores.extend(NNRTICURRENTPAEDCheck(report).score())
+    formulation_scores.extend(NNRTINewAdultsCheck(report).score())
+    formulation_scores.extend(NNRTINEWPAEDCheck(report).score())
+    CycleFormulationScore.objects.filter(cycle=report.cycle).delete()
+    CycleFormulationScore.objects.bulk_create(formulation_scores)
+
+    scores = list()
+    for facility in report.locs:
+        s = Score(name=facility['name'], ip=facility['IP'], district=facility['District'],
+                  warehouse=facility['Warehouse'], cycle=report.cycle, fail_count=0, pass_count=0)
+        for key, value in facility['scores'].items():
+            setattr(s, key, value)
+            for f, result in value.items():
+                if result == YES:
+                    s.pass_count += 1
+                else:
+                    s.fail_count += 1
+
+        scores.append(s)
+    Score.objects.filter(cycle=report.cycle).delete()
+    Score.objects.bulk_create(scores)
 
 
 @shared_task
 def import_general_report(path, cycle):
-    GeneralReport(path, cycle).get_data()
+    report = FreeFormReport(path, cycle).load()
+
     os.remove(path)
-    calculate_scores_for_checks_in_cycle.delay(cycle)
+    calculate_scores_for_checks_in_cycle(report)

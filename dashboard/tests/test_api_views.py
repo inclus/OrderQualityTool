@@ -1,11 +1,8 @@
 import json
-
 from django.core.urlresolvers import reverse
 from django_webtest import WebTest
 from model_mommy import mommy
-
-from dashboard.models import DashboardUser, IIP, DISTRICT, WAREHOUSE, Cycle
-from locations.models import District, WareHouse, IP
+from dashboard.models import DashboardUser, IIP, DISTRICT, WAREHOUSE, Cycle, Score
 
 
 class RankingsAccessViewTestCase(WebTest):
@@ -25,14 +22,12 @@ class RankingsAccessViewTestCase(WebTest):
 
 class FilterValuesViewTestCase(WebTest):
     def test_filters(self):
-        ips = mommy.make(IP, _quantity=5)
-        districts = mommy.make(District, _quantity=10)
-        warehouses = mommy.make(WareHouse, _quantity=13)
-        cycles = mommy.make(Cycle, _quantity=13)
-        expected_warehouses = [{"pk": warehouse.pk, "name": warehouse.name} for warehouse in sorted(warehouses, key=lambda x: x.name)]
-        expected_ips = [{"pk": ip.pk, "name": ip.name} for ip in sorted(ips, key=lambda x: x.name)]
-        expected_districts = [{"pk": dis.pk, "name": dis.name} for dis in sorted(districts, key=lambda x: x.name)]
-        expected_cycles = [{"cycle": cy.cycle} for cy in sorted(cycles, key=lambda x: x.cycle)]
+        Score.objects.create(warehouse='warehouse1', ip='ip1', district='district1', name="fa", cycle="Ja")
+        Score.objects.create(warehouse='warehouse2', ip='ip1', district='district1', name="fa", cycle="Ja")
+        expected_warehouses = [{'warehouse': 'warehouse1'}, {'warehouse': 'warehouse2'}]
+        expected_ips = [{'ip': 'ip1'}]
+        expected_districts = [{'district': 'district1'}]
+        expected_cycles = [{'cycle': 'Ja'}]
         url = reverse("filters")
         response = self.app.get(url)
         data = json.loads(response.content)
@@ -44,8 +39,8 @@ class FilterValuesViewTestCase(WebTest):
 
 class CyclesViewTestCase(WebTest):
     def test_cycles(self):
-        cycle = mommy.make(Cycle, cycle="May - Jun 2015")
+        cycle = mommy.make(Cycle, title="May - Jun 2015", state={})
         url = reverse("cycles")
         response = self.app.get(url)
         data = json.loads(response.content)
-        self.assertTrue(cycle.cycle in data['values'])
+        self.assertTrue(cycle.title in data['values'])

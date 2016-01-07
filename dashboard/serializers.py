@@ -1,20 +1,7 @@
 import json
-
 from rest_framework import serializers
-from rest_framework.relations import StringRelatedField
 from rest_framework.serializers import ModelSerializer
-
 from dashboard.models import Score, Cycle
-from locations.models import Facility
-
-
-class FacilitySerializer(ModelSerializer):
-    warehouse = StringRelatedField()
-    ip = StringRelatedField()
-    district = StringRelatedField()
-
-    class Meta:
-        model = Facility
 
 
 class FacilityScoreSerializer(ModelSerializer):
@@ -22,21 +9,15 @@ class FacilityScoreSerializer(ModelSerializer):
         model = Score
 
 
-class FacilityCycleRecordSerializer(ModelSerializer):
-    scores = FacilityScoreSerializer(many=True)
-    facility = FacilitySerializer()
-
-    class Meta:
-        model = Cycle
-
-
 class JSONSerializerField(serializers.Field):
     """ Serializer for JSONField -- required to make field writable"""
+
     def to_internal_value(self, data):
         return data
 
     def to_representation(self, value):
         return value
+
 
 class ScoreSerializer(ModelSerializer):
     REPORTING = JSONSerializerField()
