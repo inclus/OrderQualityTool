@@ -39,8 +39,8 @@ class FilterValuesViewTestCase(WebTest):
 
 class CyclesViewTestCase(WebTest):
     def test_cycles(self):
-        cycle = mommy.make(Cycle, title="May - Jun 2015", state={})
+        score = Score.objects.create(cycle="May - Jun 2015")
         url = reverse("cycles")
         response = self.app.get(url)
         data = json.loads(response.content)
-        self.assertTrue(cycle.title in data['values'])
+        self.assertTrue(score.cycle in data['values'])

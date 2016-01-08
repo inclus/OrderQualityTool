@@ -48,7 +48,7 @@ class OrderFormFreeOfNegativesViewTestCase(WebTest, RegimenCheckViewCaseMixin):
         self.assertEqual(data['values'][0], {u'cycle': u'Mar - Apr 2015', u'no': 40, u'not_reporting': 60, u'yes': 20})
         filter_mock.assert_called_with(
             cycle__in=[(u'Mar - Apr %s' % year), (u'May - Jun %s' % year), (u'Jul - Aug %s' % year),
-                       (u'Sep - Oct %s' % year), (u'Nov - Dec %s' % year)], formulation__icontains=u'reg',
+                       (u'Sep - Oct %s' % year), (u'Nov - Dec %s' % year)], combination__icontains=u'reg',
             test=self.test)
 
 
