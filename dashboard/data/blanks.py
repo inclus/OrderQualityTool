@@ -1,7 +1,8 @@
 import pydash
 
 from dashboard.data.utils import NAME, timeit, build_cycle_formulation_score, values_for_records, NEW, EXISTING, QCheck
-from dashboard.helpers import CONSUMPTION_AND_PATIENTS, NOT_REPORTING, YES, NO, REPORTING, WEB_BASED, MULTIPLE_ORDERS
+from dashboard.helpers import CONSUMPTION_AND_PATIENTS, NOT_REPORTING, YES, NO, REPORTING, WEB_BASED, MULTIPLE_ORDERS, \
+    ORDER_FORM_FREE_OF_GAPS
 
 F1_QUERY = "Efavirenz (TDF/3TC/EFV)"
 F2_QUERY = "Lamivudine (ABC/3TC) 60mg/30mg [Pack 60]"
@@ -17,7 +18,7 @@ def has_blank_in_fields(fields):
 
 
 class BlanksQualityCheck(QCheck):
-    test = CONSUMPTION_AND_PATIENTS
+    test = ORDER_FORM_FREE_OF_GAPS
     combinations = [{NAME: 'DEFAULT'}]
 
     fields = ["opening_balance",

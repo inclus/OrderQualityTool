@@ -226,6 +226,31 @@ class StablePatientVolumesView(DifferentOrdersOverTimeView):
 class GuideLineAdherenceView(DifferentOrdersOverTimeView):
     test = GUIDELINE_ADHERENCE
 
+    def get(self, request):
+        start = request.GET.get('start', None)
+        end = request.GET.get('end', None)
+        formulation = request.GET.get('regimen', None)
+        filters = {'combination__icontains': 'DEFAULT'}
+        cycles = generate_cycles(now().replace(years=-2), now())
+        if start and end:
+            start_index = cycles.index(start)
+            end_index = cycles.index(end)
+            cycles_included = cycles[start_index: end_index + 1]
+            cycles = cycles_included
+            filters['cycle__in'] = cycles_included
+
+        test_name = "%s%s" % (self.test, formulation.replace(" ", ""))
+        scores = CycleFormulationScore.objects.filter(test=test_name, **filters)
+        data = dict((k.cycle, k) for k in scores)
+        results = []
+        for cycle in cycles:
+            if cycle in data:
+                item = data.get(cycle)
+                results.append({"cycle": cycle, "yes": item.yes, "no": item.no, "not_reporting": item.not_reporting})
+            else:
+                results.append({"cycle": cycle, "rate": 0, "yes": 0, "no": 0, "not_reporting": 0})
+        return Response({'values': results})
+
 
 class NNRTICurrentAdultsView(OrderFormFreeOfGapsView):
     test = NNRTI_CURRENT_ADULTS

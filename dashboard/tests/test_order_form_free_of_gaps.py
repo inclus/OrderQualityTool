@@ -1,9 +1,7 @@
 import json
-
 from django.core.urlresolvers import reverse
 from django_webtest import WebTest
 from mock import MagicMock, patch
-
 from dashboard.helpers import *
 from dashboard.views.api import OrderFormFreeOfNegativeNumbersView, DifferentOrdersOverTimeView, ClosingBalanceView, \
     ConsumptionAndPatientsView, StableConsumptionView, WarehouseFulfilmentView, StablePatientVolumesView, \
@@ -125,3 +123,27 @@ class GuideLineAdherenceViewTestCase(OrderFormFreeOfNegativesViewTestCase):
     url_name = 'guideline_adherence'
     test = GUIDELINE_ADHERENCE
     view = GuideLineAdherenceView
+
+    @patch("dashboard.views.api.CycleFormulationScore.objects.filter")
+    @patch("dashboard.views.api.now")
+    def test_filter_is_setup(self, time_mock, filter_mock):
+        time_mock.return_value = arrow.Arrow(2015, 12, 01)
+        year = "2015"
+        url = reverse(self.url_name)
+        start = "Mar - Apr %s" % year
+        end = "Nov - Dec %s" % year
+        score = MagicMock()
+        score.cycle = 'Mar - Apr %s' % year
+        score.yes = 20
+        score.no = 40
+        score.not_reporting = 60
+        filter_mock.return_value = [score]
+        response = self.app.get(self.get_url(end, start, url), user="testuser")
+        self.assertEqual(200, response.status_code)
+        json_content = response.content.decode('utf8')
+        data = json.loads(json_content)
+        self.assertEqual(data['values'][0], {u'cycle': u'Mar - Apr 2015', u'no': 40, u'not_reporting': 60, u'yes': 20})
+        filter_mock.assert_called_with(
+            cycle__in=[(u'Mar - Apr %s' % year), (u'May - Jun %s' % year), (u'Jul - Aug %s' % year),
+                       (u'Sep - Oct %s' % year), (u'Nov - Dec %s' % year)], combination__icontains=u'DEFAULT',
+            test=self.test + "reg")

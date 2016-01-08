@@ -3,7 +3,8 @@ import pydash
 from dashboard.data.utils import NAME, CONSUMPTION_QUERY, F1_QUERY, timeit, build_cycle_formulation_score, FORMULATION, \
     values_for_records, \
     QCheck
-from dashboard.helpers import CONSUMPTION_AND_PATIENTS, F1, F2, F3, NOT_REPORTING, YES, NO
+from dashboard.helpers import CONSUMPTION_AND_PATIENTS, F1, F2, F3, NOT_REPORTING, YES, NO, \
+    ORDER_FORM_FREE_OF_NEGATIVE_NUMBERS
 
 F1_QUERY = "Efavirenz (TDF/3TC/EFV)"
 F2_QUERY = "Lamivudine (ABC/3TC) 60mg/30mg [Pack 60]"
@@ -11,7 +12,7 @@ F3_QUERY = "EFV) 200mg [Pack 90]"
 
 
 class NegativeNumbersQualityCheck(QCheck):
-    test = CONSUMPTION_AND_PATIENTS
+    test = ORDER_FORM_FREE_OF_NEGATIVE_NUMBERS
     combinations = [{NAME: F1, CONSUMPTION_QUERY: F1_QUERY},
                     {NAME: F2, CONSUMPTION_QUERY: F2_QUERY},
                     {NAME: F3, CONSUMPTION_QUERY: F3_QUERY}]

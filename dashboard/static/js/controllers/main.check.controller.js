@@ -101,7 +101,7 @@ angular.module('dashboard').controller('MainChecksController', ['$scope',
             value: "ABC/3TC"
         }, {
             name: "EFV200 (Paed)",
-            value: "(EFV) 200mg"
+            value: "EFV200 (Paed)"
         }];
         $scope.selectedRegimen = $scope.regimens[0];
 

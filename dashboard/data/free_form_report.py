@@ -1,5 +1,7 @@
 import logging
 from collections import defaultdict
+
+import pydash
 from openpyxl import load_workbook
 from dashboard.helpers import PATIENTS_PAED, PATIENTS_ADULT
 from dashboard.data.utils import timeit, NEW, EXISTING, FORMULATION, LOCATION, CONSUMPTION
@@ -12,14 +14,24 @@ class FreeFormReport():
     def __init__(self, path, cycle):
         self.path = path
         self.cycle = cycle
-        self.workbook = self.get_workbook()
-        self.districts = dict()
-        self.ips = dict()
-        self.warehouses = dict()
+        self.name_cache = dict()
+        self.locs = []
+        self.pds = defaultdict(list)
+        self.ads = defaultdict(list)
+        self.cs = defaultdict(list)
+
+    def build_form_db(self, cycle):
+        state = cycle.state
+        self.cycle = cycle.title
+        self.locs = state['locs']
+        self.pds = state['pds']
+        self.ads = state['ads']
+        self.cs = state['cs']
+        return self
 
     def save(self):
         cycle, created = Cycle.objects.get_or_create(title=self.cycle)
-        state = {'ads': self.ads, 'pds': self.pds, 'cs': self.cs}
+        state = {'ads': self.ads, 'pds': self.pds, 'cs': self.cs, 'locs': self.locs}
         cycle.state = state
         cycle.save()
         return cycle
@@ -35,6 +47,7 @@ class FreeFormReport():
                 return real_value
 
     def load(self):
+        self.workbook = self.get_workbook()
         self.locs = self.locations()
         self.ads = self.adult_patients()
         self.pds = self.paed_patients()
@@ -46,7 +59,7 @@ class FreeFormReport():
         records = defaultdict(list)
         for row in paed_patients_sheet.iter_rows(
                         'A%s:M%s' % (paed_patients_sheet.min_row + 1, paed_patients_sheet.max_row)):
-            facility_name = row[1].value
+            facility_key, facility_name = self.get_facility_name(row)
             if facility_name:
                 patient_record = dict()
                 patient_record[FORMULATION] = row[2].value
@@ -62,7 +75,7 @@ class FreeFormReport():
         records = defaultdict(list)
         for row in adult_patients_sheet.iter_rows(
                         'A%s:M%s' % (adult_patients_sheet.min_row + 1, adult_patients_sheet.max_row)):
-            facility_name = row[1].value
+            facility_key, facility_name = self.get_facility_name(row)
             if facility_name:
                 patient_record = dict()
                 patient_record[FORMULATION] = row[2].value
@@ -94,7 +107,7 @@ class FreeFormReport():
         consumption_sheet = self.workbook.get_sheet_by_name(CONSUMPTION)
         records = defaultdict(list)
         for row in consumption_sheet.iter_rows('A%s:X%s' % (consumption_sheet.min_row + 1, consumption_sheet.max_row)):
-            facility_name = row[1].value
+            facility_key, facility_name = self.get_facility_name(row)
             if facility_name:
                 consumption_record = dict()
                 consumption_record[FORMULATION] = row[2].value
@@ -109,5 +122,23 @@ class FreeFormReport():
                 consumption_record['estimated_number_of_new_patients'] = self.get_value(row, 12)
                 consumption_record['estimated_number_of_new_pregnant_women'] = self.get_value(row, 13)
                 consumption_record['packs_ordered'] = self.get_value(row, 14)
-                records[facility_name].append(consumption_record)
+                records[facility_key].append(consumption_record)
         return records
+
+    def get_facility_name(self, row):
+        facility_name = row[1].value
+        if facility_name:
+            if facility_name not in self.name_cache:
+                locations = pydash.chain(self.locs).reject(lambda x: x['name'] is None).select(
+                    lambda x: facility_name in x['name']).value()
+                if len(locations) > 0:
+                    facility_key = locations[0]['name']
+                else:
+                    facility_key = facility_name
+
+                self.name_cache[facility_name] = facility_key
+            else:
+                facility_key = self.name_cache[facility_name]
+        else:
+            facility_key = facility_name
+        return facility_key, facility_name
