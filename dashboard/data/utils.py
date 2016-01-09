@@ -135,3 +135,7 @@ class QCheck:
 
     def for_each_facility(self, facility, no, not_reporting, yes, combination):
         raise NotImplementedError
+
+
+def facility_not_reporting(facility):
+    return facility['status'].strip() != 'Reporting'

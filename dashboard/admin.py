@@ -5,6 +5,8 @@ from django.contrib.auth.admin import GroupAdmin, UserAdmin
 from django.contrib.auth.models import Group
 from django.utils.translation import ugettext_lazy
 from django.utils.translation import ugettext_lazy as _
+
+from dashboard.data.free_form_report import FreeFormReport
 from dashboard.models import DashboardUser, Consumption, Cycle, AdultPatientsRecord, PAEDPatientsRecord, \
     CycleFormulationScore, Score
 from dashboard.tasks import calculate_scores_for_checks_in_cycle
@@ -83,9 +85,10 @@ class PatientAdmin(ModelAdmin):
 
 
 def run_tests(model_admin, request, queryset):
-    data = queryset.order_by().values('cycle').distinct()
-    for value in data:
-        calculate_scores_for_checks_in_cycle.delay(value['cycle'])
+    data = queryset.all()
+    for cycle in data:
+        report = FreeFormReport(None, cycle.title).build_form_db(cycle)
+        calculate_scores_for_checks_in_cycle.delay(report)
 
 
 run_tests.short_description = "Run quality tests for these cycles"
@@ -130,6 +133,10 @@ class ScoreAdmin(ModelAdmin):
         return obj.facility_cycle.facility
 
 
+class CycleAdmin(ModelAdmin):
+    actions = [run_tests]
+
+
 admin_site = QdbSite()
 admin_site.register(Group, GroupAdmin)
 admin_site.register(DashboardUser, EmailUserAdmin)
@@ -138,4 +145,4 @@ admin_site.register(CycleFormulationScore, CycleFormulationScoreAdmin)
 admin_site.register(AdultPatientsRecord, PatientAdmin)
 admin_site.register(PAEDPatientsRecord, PatientAdmin)
 admin_site.register(Consumption, ConsumptionAdmin)
-admin_site.register(Cycle)
+admin_site.register(Cycle, CycleAdmin)

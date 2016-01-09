@@ -1,7 +1,7 @@
 import pydash
 
-from dashboard.data.utils import NAME, timeit, build_cycle_formulation_score, values_for_records, NEW, EXISTING, QCheck
-from dashboard.helpers import CONSUMPTION_AND_PATIENTS, NOT_REPORTING, YES, NO, REPORTING, WEB_BASED, MULTIPLE_ORDERS, \
+from dashboard.data.utils import NAME, values_for_records, NEW, EXISTING, QCheck, facility_not_reporting
+from dashboard.helpers import NOT_REPORTING, YES, NO, REPORTING, WEB_BASED, MULTIPLE_ORDERS, \
     ORDER_FORM_FREE_OF_GAPS
 
 F1_QUERY = "Efavirenz (TDF/3TC/EFV)"
@@ -77,7 +77,7 @@ class IsReportingCheck(QCheck):
     combinations = [{NAME: 'DEFAULT'}]
 
     def for_each_facility(self, facility, no, not_reporting, yes, combination):
-        result = NO if facility['status'].strip() != 'Reporting' else YES
+        result = NO if facility_not_reporting(facility) else YES
         if result == NO:
             no += 1
         else:
