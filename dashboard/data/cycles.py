@@ -123,14 +123,30 @@ class STABLECONSUMPTIONCheck(TwoCycleQCheck):
 
 class WAREHOUSEFULFILMENTCheck(TwoCycleQCheck):
     test = WAREHOUSE_FULFILMENT
-    combinations = [{NAME: 'DEFAULT'}]
+    combinations = [
+        {NAME: F1, CONSUMPTION_QUERY: "Tenofovir/Lamivudine/Efavirenz (TDF/3TC/EFV) 300mg/300mg/600mg[Pack 30]"},
+        {NAME: F2, CONSUMPTION_QUERY: "Abacavir/Lamivudine (ABC/3TC) 60mg/30mg [Pack 60]"},
+        {NAME: F3, CONSUMPTION_QUERY: "Efavirenz (EFV) 200mg [Pack 90]"}
+    ]
 
     def for_each_facility(self, facility, no, not_reporting, yes, combination):
-        result = NO if facility['status'].strip() != 'Reporting' else YES
-        if result == NO:
-            no += 1
-        else:
+        facility_name = facility[NAME]
+        prev_records = self.get_consumption_records(self.other_cycle_report, facility_name,
+                                                    combination[CONSUMPTION_QUERY])
+        current_records = self.get_consumption_records(self.report, facility_name, combination[CONSUMPTION_QUERY])
+        count_prev = len(prev_records)
+        count_current = len(current_records)
+        amount_ordered = pydash.chain(values_for_records(['packs_ordered', ], prev_records)).reject(lambda x: x is None).sum().value()
+        amount_received = pydash.chain(values_for_records(['quantity_received'], current_records)).reject(lambda x: x is None).sum().value()
+        result = NOT_REPORTING
+        if count_prev == 0 or count_current == 0:
+            not_reporting += 1
+        elif amount_ordered == amount_received:
             yes += 1
+            result = YES
+        else:
+            no += 1
+            result = NO
         return result, no, not_reporting, yes
 
 
