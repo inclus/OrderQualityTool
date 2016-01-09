@@ -97,7 +97,6 @@ class Consumption(models.Model):
     district = models.CharField(max_length=256, db_index=True)
     ip = models.CharField(max_length=256, db_index=True)
     warehouse = models.CharField(max_length=256, db_index=True)
-    facility_cycle = models.ForeignKey(Cycle, related_name="consumption")
     opening_balance = models.FloatField(null=True, blank=True)
     quantity_received = models.FloatField(null=True, blank=True)
     pmtct_consumption = models.FloatField(null=True, blank=True)

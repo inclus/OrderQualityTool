@@ -1,24 +1,18 @@
 import os
-import time
+
 from celery import shared_task
+
 from dashboard.data.adherence import GuidelineAdherenceCheckAdult1L, GuidelineAdherenceCheckPaed1L
 from dashboard.data.adherence import GuidelineAdherenceCheckAdult2L
 from dashboard.data.blanks import BlanksQualityCheck, MultipleCheck, WebBasedCheck, IsReportingCheck
 from dashboard.data.consumption_patients import ConsumptionAndPatientsQualityCheck
-from dashboard.data.cycles import DIFFERENTORDERSOVERTIMECheck, CLOSINGBALANCEMATCHESOPENINGBALANCECheck, \
-    STABLECONSUMPTIONCheck, WAREHOUSEFULFILMENTCheck, STABLEPATIENTVOLUMESCheck
+from dashboard.data.cycles import CLOSINGBALANCEMATCHESOPENINGBALANCECheck, STABLEPATIENTVOLUMESCheck, WAREHOUSEFULFILMENTCheck, STABLECONSUMPTIONCheck, DIFFERENTORDERSOVERTIMECheck
 from dashboard.data.free_form_report import FreeFormReport
 from dashboard.data.negatives import NegativeNumbersQualityCheck
 from dashboard.data.nn import NNRTICURRENTADULTSCheck, NNRTINewAdultsCheck, NNRTINEWPAEDCheck
 from dashboard.data.nn import NNRTICURRENTPAEDCheck
 from dashboard.helpers import YES, to_date, format_range
-from dashboard.models import CycleFormulationScore, Score, Cycle
-
-
-@shared_task
-def process_test(check_class, cycle):
-    result = check_class().run(cycle)
-    return result
+from dashboard.models import CycleFormulationScore, Score, Cycle, Consumption, AdultPatientsRecord, PAEDPatientsRecord
 
 
 def get_prev_cycle(cycle):
@@ -29,39 +23,103 @@ def get_prev_cycle(cycle):
     return prev_cycle
 
 
+def persist_consumption(report):
+    persist_records(report.locs, Consumption, report.cs, report.cycle)
+
+
+def persist_adult_records(report):
+    persist_records(report.locs, AdultPatientsRecord, report.ads, report.cycle)
+
+
+def persist_paed_records(report):
+    persist_records(report.locs, PAEDPatientsRecord, report.pds, report.cycle)
+
+
+def persist_records(locs, model, collection, cycle):
+    adult_records = []
+    for facility in locs:
+        facility_name = facility.get('name', None)
+        records = collection.get(facility_name)
+        ip = facility.get('IP', None)
+        district = facility.get('District', None)
+        warehouse = facility.get('Warehouse', None)
+        for r in records:
+            c = model(
+                    name=facility_name,
+                    ip=ip,
+                    district=district,
+                    warehouse=warehouse,
+                    cycle=cycle,
+                    **r
+            )
+            adult_records.append(c)
+    model.objects.filter(cycle=cycle).delete()
+    model.objects.bulk_create(adult_records)
+
+
 @shared_task
 def calculate_scores_for_checks_in_cycle(report):
+    run_checks_and_persist_formulation_scores(report)
+    persist_scores(report)
+    persist_consumption(report)
+    persist_adult_records(report)
+    persist_paed_records(report)
+
+
+def run_checks_and_persist_formulation_scores(report):
     formulation_scores = list()
-    formulation_scores.extend(BlanksQualityCheck(report).score())
-    formulation_scores.extend(NegativeNumbersQualityCheck(report).score())
-    formulation_scores.extend(ConsumptionAndPatientsQualityCheck(report).score())
-    formulation_scores.extend(MultipleCheck(report).score())
-    formulation_scores.extend(WebBasedCheck(report).score())
-    formulation_scores.extend(IsReportingCheck(report).score())
-    formulation_scores.extend(GuidelineAdherenceCheckAdult1L(report).score())
-    formulation_scores.extend(GuidelineAdherenceCheckAdult2L(report).score())
-    formulation_scores.extend(GuidelineAdherenceCheckPaed1L(report).score())
-    formulation_scores.extend(NNRTICURRENTADULTSCheck(report).score())
-    formulation_scores.extend(NNRTICURRENTPAEDCheck(report).score())
-    formulation_scores.extend(NNRTINewAdultsCheck(report).score())
-    formulation_scores.extend(NNRTINEWPAEDCheck(report).score())
+    one_cycle_checks = [
+        BlanksQualityCheck,
+        NegativeNumbersQualityCheck,
+        ConsumptionAndPatientsQualityCheck,
+        MultipleCheck,
+        WebBasedCheck,
+        IsReportingCheck,
+        GuidelineAdherenceCheckAdult1L,
+        GuidelineAdherenceCheckAdult2L,
+        GuidelineAdherenceCheckPaed1L,
+        NNRTICURRENTADULTSCheck,
+        NNRTICURRENTPAEDCheck,
+        NNRTINewAdultsCheck,
+        NNRTINEWPAEDCheck
+    ]
+    for check in one_cycle_checks:
+        score = check(report).score()
+        formulation_scores.extend(score)
+    other_report = get_report_for_other_cycle(report)
+    two_cycle_checks = [CLOSINGBALANCEMATCHESOPENINGBALANCECheck,
+                        DIFFERENTORDERSOVERTIMECheck,
+                        STABLECONSUMPTIONCheck,
+                        WAREHOUSEFULFILMENTCheck,
+                        STABLEPATIENTVOLUMESCheck
+                        ]
+    for check in two_cycle_checks:
+        score = check(report, other_report).score()
+        formulation_scores.extend(score)
+    CycleFormulationScore.objects.filter(cycle=report.cycle).delete()
+    CycleFormulationScore.objects.bulk_create(formulation_scores)
+
+
+def get_report_for_other_cycle(report):
     prev_cycle_title = get_prev_cycle(report.cycle)
     other_report = FreeFormReport(None, prev_cycle_title)
     if Cycle.objects.filter(title=prev_cycle_title).exists():
         prev_cycle = Cycle.objects.get(title=prev_cycle_title)
         other_report = other_report.build_form_db(prev_cycle)
-    formulation_scores.extend(CLOSINGBALANCEMATCHESOPENINGBALANCECheck(report, other_report).score())
-    # formulation_scores.extend(DIFFERENTORDERSOVERTIMECheck(report, other_report).score())
-    # formulation_scores.extend(STABLECONSUMPTIONCheck(report, other_report).score())
-    # formulation_scores.extend(WAREHOUSEFULFILMENTCheck(report, other_report).score())
-    # formulation_scores.extend(STABLEPATIENTVOLUMESCheck(report, other_report).score())
-    CycleFormulationScore.objects.filter(cycle=report.cycle).delete()
-    CycleFormulationScore.objects.bulk_create(formulation_scores)
+    return other_report
 
+
+def persist_scores(report):
     scores = list()
     for facility in report.locs:
-        s = Score(name=facility['name'], ip=facility['IP'], district=facility['District'],
-                  warehouse=facility['Warehouse'], cycle=report.cycle, fail_count=0, pass_count=0)
+        s = Score(
+                name=facility.get('name', None),
+                ip=facility.get('IP', None),
+                district=facility.get('District', None),
+                warehouse=facility.get('Warehouse', None),
+                cycle=report.cycle,
+                fail_count=0,
+                pass_count=0)
         for key, value in facility['scores'].items():
             setattr(s, key, value)
             for f, result in value.items():

@@ -3,8 +3,9 @@ from collections import defaultdict
 
 import pydash
 from openpyxl import load_workbook
+
+from dashboard.data.utils import NEW, EXISTING, FORMULATION, LOCATION, CONSUMPTION
 from dashboard.helpers import PATIENTS_PAED, PATIENTS_ADULT
-from dashboard.data.utils import timeit, NEW, EXISTING, FORMULATION, LOCATION, CONSUMPTION
 from dashboard.models import Cycle
 
 logger = logging.getLogger(__name__)
@@ -23,10 +24,10 @@ class FreeFormReport():
     def build_form_db(self, cycle):
         state = cycle.state
         self.cycle = cycle.title
-        self.locs = state['locs']
-        self.pds = state['pds']
-        self.ads = state['ads']
-        self.cs = state['cs']
+        self.locs = state.get('locs', None)
+        self.pds = state.get('pds', None)
+        self.ads = state.get('ads', None)
+        self.cs = state.get('cs', None)
         return self
 
     def save(self):
@@ -130,7 +131,7 @@ class FreeFormReport():
         if facility_name:
             if facility_name not in self.name_cache:
                 locations = pydash.chain(self.locs).reject(lambda x: x['name'] is None).select(
-                    lambda x: facility_name in x['name']).value()
+                        lambda x: facility_name in x['name']).value()
                 if len(locations) > 0:
                     facility_key = locations[0]['name']
                 else:

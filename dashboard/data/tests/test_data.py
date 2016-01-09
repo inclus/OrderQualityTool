@@ -92,7 +92,7 @@ class DataTestCase(TestCase):
             result = case['test'](report).run()['DEFAULT']
             self.assertEquals(result[YES], case['expected'])
 
-    def x_test_calculate_score(self):
+    def xtest_calculate_score(self):
         file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', 'tests', 'fixtures',
                                  "new_format.xlsx")
         report = FreeFormReport(file_path, "May Jun").load()
