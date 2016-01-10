@@ -61,7 +61,6 @@ class DIFFERENTORDERSOVERTIMECheck(TwoCycleQCheck):
         all_current_values_zero = pydash.every(current_values, lambda x: x == 0)
         all_prev_values_zero = pydash.every(prev_values, lambda x: x == 0)
         all_zero = all_current_values_zero and all_prev_values_zero
-        print current_records, prev_records
         if len(current_records) == 0 or len(prev_records) == 0:
             result = NOT_REPORTING
             not_reporting += 1
