@@ -1,5 +1,6 @@
 import os
 
+import pydash
 from celery import shared_task
 
 from dashboard.data.adherence import GuidelineAdherenceCheckAdult1L, GuidelineAdherenceCheckPaed1L
@@ -11,8 +12,9 @@ from dashboard.data.free_form_report import FreeFormReport
 from dashboard.data.negatives import NegativeNumbersQualityCheck
 from dashboard.data.nn import NNRTICURRENTADULTSCheck, NNRTINewAdultsCheck, NNRTINEWPAEDCheck
 from dashboard.data.nn import NNRTICURRENTPAEDCheck
+from dashboard.data.utils import facility_has_single_order
 from dashboard.helpers import YES, to_date, format_range
-from dashboard.models import CycleFormulationScore, Score, Cycle, Consumption, AdultPatientsRecord, PAEDPatientsRecord
+from dashboard.models import CycleFormulationScore, Score, Cycle, Consumption, AdultPatientsRecord, PAEDPatientsRecord, MultipleOrderFacility
 
 
 def get_prev_cycle(cycle):
@@ -57,6 +59,29 @@ def persist_records(locs, model, collection, cycle):
     model.objects.bulk_create(adult_records)
 
 
+def build_mof(report):
+    def func(facility):
+        facility_name = facility.get('name', None)
+        ip = facility.get('IP', None)
+        district = facility.get('District', None)
+        warehouse = facility.get('Warehouse', None)
+        return MultipleOrderFacility(
+                cycle=report.cycle,
+                name=facility_name,
+                ip=ip,
+                district=district,
+                warehouse=warehouse)
+
+    return func
+
+
+def persist_multiple_order_records(report):
+    facilities_with_multiple_orders = pydash.reject(report.locs, lambda f: facility_has_single_order(f))
+    all = pydash.collect(facilities_with_multiple_orders, build_mof(report))
+    MultipleOrderFacility.objects.filter(cycle=report.cycle).delete()
+    MultipleOrderFacility.objects.bulk_create(all)
+
+
 @shared_task
 def calculate_scores_for_checks_in_cycle(report):
     run_checks_and_persist_formulation_scores(report)
@@ -64,6 +89,7 @@ def calculate_scores_for_checks_in_cycle(report):
     persist_consumption(report)
     persist_adult_records(report)
     persist_paed_records(report)
+    persist_multiple_order_records(report)
 
 
 def run_checks_and_persist_formulation_scores(report):

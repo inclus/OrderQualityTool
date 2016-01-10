@@ -1,15 +1,16 @@
 import json
 import os
 from json import loads
+
 import arrow
 from arrow import now
 from django.core.urlresolvers import reverse
-from django.test import TestCase
 from django_webtest import WebTest
 from mock import patch, ANY
 from webtest import Upload
-from dashboard.helpers import WEB_BASED, REPORTING, MULTIPLE_ORDERS
-from dashboard.models import Cycle, Score, DashboardUser, CycleFormulationScore
+
+from dashboard.helpers import REPORTING
+from dashboard.models import Cycle, Score, DashboardUser, CycleFormulationScore, MultipleOrderFacility
 
 
 class HomeViewTestCase(WebTest):
@@ -85,7 +86,7 @@ class WebBasedReportingViewTestCase(WebTest):
 class FacilitiesMultipleReportingViewTestCase(WebTest):
     def test_shows_all_facilities_that_report_multiple_times(self):
         cycle = 'Jan - Feb %s' % now().format("YYYY")
-        Cycle.objects.create(title=cycle)
+        MultipleOrderFacility.objects.create(cycle=cycle, name="one")
         url = "/api/test/facilitiesMultiple"
         json_response = self.app.get(url, user="testuser").content.decode('utf8')
         data = loads(json_response)['values']

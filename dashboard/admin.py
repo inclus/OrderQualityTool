@@ -8,7 +8,7 @@ from django.utils.translation import ugettext_lazy as _
 
 from dashboard.data.free_form_report import FreeFormReport
 from dashboard.models import DashboardUser, Consumption, Cycle, AdultPatientsRecord, PAEDPatientsRecord, \
-    CycleFormulationScore, Score
+    CycleFormulationScore, Score, MultipleOrderFacility
 from dashboard.tasks import calculate_scores_for_checks_in_cycle
 
 
@@ -146,3 +146,4 @@ admin_site.register(AdultPatientsRecord, PatientAdmin)
 admin_site.register(PAEDPatientsRecord, PatientAdmin)
 admin_site.register(Consumption, ConsumptionAdmin)
 admin_site.register(Cycle, CycleAdmin)
+admin_site.register(MultipleOrderFacility)

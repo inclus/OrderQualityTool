@@ -120,3 +120,8 @@ class QCheck:
 
 def facility_not_reporting(facility):
     return facility['status'].strip() != 'Reporting'
+
+
+def facility_has_single_order(facility):
+    not_multiple = facility['Multiple'].strip() != 'Multiple orders'
+    return not_multiple

@@ -1,17 +1,19 @@
 import csv
+
 from arrow import now
 from braces.views import LoginRequiredMixin
-from django.db.models import Count, Case, When, Avg, Sum
+from django.db.models import Count, Avg, Sum
 from django.http import HttpResponse
 from rest_framework import filters
 from rest_framework.generics import ListAPIView
 from rest_framework.response import Response
 from rest_framework.views import APIView
+
 from dashboard.helpers import generate_cycles, to_date, GUIDELINE_ADHERENCE, ORDER_FORM_FREE_OF_GAPS, \
     ORDER_FORM_FREE_OF_NEGATIVE_NUMBERS, DIFFERENT_ORDERS_OVER_TIME, CLOSING_BALANCE_MATCHES_OPENING_BALANCE, \
     CONSUMPTION_AND_PATIENTS, STABLE_CONSUMPTION, WAREHOUSE_FULFILMENT, STABLE_PATIENT_VOLUMES, NNRTI_CURRENT_ADULTS, \
     NNRTI_CURRENT_PAED, NNRTI_NEW_ADULTS, NNRTI_NEW_PAED, sort_cycle, WEB_BASED, REPORTING
-from dashboard.models import Cycle, CycleFormulationScore, Score, WAREHOUSE, DISTRICT
+from dashboard.models import CycleFormulationScore, Score, WAREHOUSE, DISTRICT, MultipleOrderFacility
 from dashboard.serializers import ScoreSerializer
 
 
@@ -62,9 +64,11 @@ class WebBasedReportingView(APIView):
 
 class FacilitiesMultipleReportingView(APIView):
     def get(self, request):
-        records = [cycle['title'] for cycle in Cycle.objects.values('title').distinct()]
-        most_recent_cycle, = sorted(records, sort_cycle, reverse=True)[:1]
+        cycles = [cycle['cycle'] for cycle in MultipleOrderFacility.objects.values('cycle').distinct()]
+        sorted_cycles = sorted(cycles, sort_cycle, reverse=True)
+        most_recent_cycle = sorted_cycles[0]
         cycle = request.GET.get('cycle', most_recent_cycle)
+        records = MultipleOrderFacility.objects.filter(cycle=cycle).order_by('name').values('name', 'district', 'ip', 'warehouse')
         return Response({"values": records})
 
 
@@ -138,7 +142,7 @@ class ReportMetrics(APIView):
         adscore = CycleFormulationScore.objects.filter(cycle=most_recent_cycle,
                                                        test__icontains=GUIDELINE_ADHERENCE,
                                                        combination='DEFAULT').aggregate(
-            adherence=Avg('yes')).get("adherence", 0)
+                adherence=Avg('yes')).get("adherence", 0)
         web_rate = "{0:.1f}".format(web_score.yes)
         report_rate = "{0:.1f}".format(report_score.yes)
         adherence = "{0:.1f}".format(report_score.yes)

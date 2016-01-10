@@ -1,9 +1,11 @@
 import logging
+
 from custom_user.models import AbstractEmailUser
 from django.db import models
 from django.db.models import CharField
 from jsonfield import JSONField
 from picklefield import PickledObjectField
+
 from dashboard.helpers import NOT_REPORTING, YES, NO
 
 MOH_CENTRAL = "MOH CENTRAL"
@@ -21,7 +23,7 @@ LOCATION = "Facility Index"
 
 class DashboardUser(AbstractEmailUser):
     access_level = CharField(
-        choices=((WAREHOUSE, WAREHOUSE), (DISTRICT, DISTRICT), (IIP, IIP), (MOH_CENTRAL, MOH_CENTRAL)), max_length=50)
+            choices=((WAREHOUSE, WAREHOUSE), (DISTRICT, DISTRICT), (IIP, IIP), (MOH_CENTRAL, MOH_CENTRAL)), max_length=50)
 
     def get_full_name(self):
         return self.email
@@ -112,7 +114,7 @@ class Consumption(models.Model):
     formulation = models.CharField(max_length=256, null=True, blank=True, db_index=True)
 
     def __unicode__(self):
-        return "%s %s" % (self.facility_cycle, self.formulation)
+        return "%s %s" % (self.cycle, self.formulation)
 
 
 class AdultPatientsRecord(models.Model):
@@ -126,7 +128,7 @@ class AdultPatientsRecord(models.Model):
     formulation = models.CharField(max_length=256, null=True, blank=True)
 
     def __unicode__(self):
-        return "%s %s" % (self.facility_cycle, self.formulation)
+        return "%s %s" % (self.cycle, self.formulation)
 
 
 class PAEDPatientsRecord(models.Model):
@@ -140,4 +142,15 @@ class PAEDPatientsRecord(models.Model):
     formulation = models.CharField(max_length=256, null=True, blank=True)
 
     def __unicode__(self):
-        return "%s %s" % (self.facility_cycle, self.formulation)
+        return "%s %s" % (self.cycle, self.formulation)
+
+
+class MultipleOrderFacility(models.Model):
+    name = models.CharField(max_length=256, db_index=True)
+    cycle = models.CharField(max_length=256, db_index=True)
+    district = models.CharField(max_length=256, db_index=True)
+    ip = models.CharField(max_length=256, db_index=True)
+    warehouse = models.CharField(max_length=256, db_index=True)
+
+    def __unicode__(self):
+        return "%s %s" % (self.cycle, self.name)

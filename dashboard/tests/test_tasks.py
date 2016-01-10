@@ -4,8 +4,8 @@ from django.test import TestCase
 from mock import patch, call
 
 from dashboard.data.tests.test_data import FakeReport
-from dashboard.models import Score, CycleFormulationScore, Consumption, AdultPatientsRecord, PAEDPatientsRecord, Cycle
-from dashboard.tasks import persist_scores, run_checks_and_persist_formulation_scores, persist_consumption, persist_adult_records, persist_paed_records, get_report_for_other_cycle, calculate_scores_for_checks_in_cycle
+from dashboard.models import Score, CycleFormulationScore, Consumption, AdultPatientsRecord, PAEDPatientsRecord, Cycle, MultipleOrderFacility
+from dashboard.tasks import persist_scores, run_checks_and_persist_formulation_scores, persist_consumption, persist_adult_records, persist_paed_records, get_report_for_other_cycle, calculate_scores_for_checks_in_cycle, persist_multiple_order_records
 
 
 class TaskTestCase(TestCase):
@@ -176,10 +176,39 @@ class TaskTestCase(TestCase):
     @patch('dashboard.tasks.persist_consumption')
     @patch('dashboard.tasks.persist_adult_records')
     @patch('dashboard.tasks.persist_paed_records')
-    def test_calculate_scores_for_checks_in_cycle(self, mock1, mock2, mock3, mock4, mock5):
+    @patch('dashboard.tasks.persist_multiple_order_records')
+    def test_calculate_scores_for_checks_in_cycle(self, mock1, mock2, mock3, mock4, mock5, mock6):
         report = FakeReport()
         calculate_scores_for_checks_in_cycle(report)
         exepected_call = call(report)
-        mock_methods = [mock1, mock2, mock3, mock4, mock5]
+        mock_methods = [mock1, mock2, mock3, mock4, mock5, mock6]
         for m in mock_methods:
             m.assert_has_calls([exepected_call])
+
+    def test_should_record_facilities_with_multiple_orders(self):
+        report = FakeReport()
+        report.ads = defaultdict(list)
+        report.pds = defaultdict(list)
+        report.cycle = "May - Jun 2015"
+        report.locs = [{
+            'name': 'location_one',
+            'IP': 'ip_one',
+            'District': 'district_one',
+            'Warehouse': 'warehouse_one',
+            'Multiple': '',
+            'status': '',
+            'Web/Paper': '',
+            'scores': defaultdict(dict)
+        }, {
+            'name': 'location_two',
+            'IP': 'ip_one',
+            'District': 'district_one',
+            'Warehouse': 'warehouse_one',
+            'Multiple': 'Multiple orders',
+            'status': '',
+            'Web/Paper': '',
+            'scores': defaultdict(dict)
+        }]
+        self.assertEqual(MultipleOrderFacility.objects.count(), 0)
+        persist_multiple_order_records(report)
+        self.assertEqual(MultipleOrderFacility.objects.count(), 1)

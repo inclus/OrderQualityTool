@@ -1,19 +1,19 @@
 import pydash
 
 from dashboard.data.utils import QCheck, values_for_records
-from dashboard.helpers import NOT_REPORTING, YES, NO, NAME, FORMULATION, DF2, DF1, RATIO, FIELDS
+from dashboard.helpers import *
 
 
 class GuidelineAdherenceCheckAdult1L(QCheck):
-    test = "guidelineAdherenceAdult1L"
+    test = GUIDELINE_ADHERENCE_ADULT_1L
     combinations = [{
-        NAME: 'DEFAULT',
+        NAME: DEFAULT,
         DF2: ["Zidovudine/Lamivudine (AZT/3TC) 300mg/150mg [Pack 60]",
               "Zidovudine/Lamivudine/Nevirapine (AZT/3TC/NVP) 300mg/150mg/200mg [Pack 60]"],
         DF1: ["Tenofovir/Lamivudine (TDF/3TC) 300mg/300mg [Pack 30]",
               "Tenofovir/Lamivudine/Efavirenz (TDF/3TC/EFV) 300mg/300mg/600mg[Pack 30]"],
         RATIO: 0.80,
-        FIELDS: ["estimated_number_of_new_patients", "estimated_number_of_new_pregnant_women"]
+        FIELDS: [ESTIMATED_NUMBER_OF_NEW_PATIENTS, ESTIMATED_NUMBER_OF_NEW_PREGNANT_WOMEN]
     }]
 
     def filter_records(self, facility_name, formulation_names):
@@ -46,25 +46,25 @@ class GuidelineAdherenceCheckAdult1L(QCheck):
 
 
 class GuidelineAdherenceCheckAdult2L(GuidelineAdherenceCheckAdult1L):
-    test = "guidelineAdherenceAdult2L"
+    test = GUIDELINE_ADHERENCE_ADULT_2L
     combinations = [{
-        NAME: 'DEFAULT',
+        NAME: DEFAULT,
         DF2: ["Lopinavir/Ritonavir (LPV/r) 200mg/50mg [Pack 120]"],
         DF1: ["Atazanavir/Ritonavir (ATV/r) 300mg/100mg [Pack 30]"],
         RATIO: 0.73,
-        FIELDS: ["estimated_number_of_new_patients", "estimated_number_of_new_pregnant_women"]
+        FIELDS: [ESTIMATED_NUMBER_OF_NEW_PATIENTS, ESTIMATED_NUMBER_OF_NEW_PREGNANT_WOMEN]
     }]
 
 
 class GuidelineAdherenceCheckPaed1L(GuidelineAdherenceCheckAdult1L):
-    test = "guidelineAdherencePaed1L"
+    test = GUIDELINE_ADHERENCE_PAED_1L
     combinations = [{
         NAME: 'DEFAULT',
         DF2: ["Zidovudine/Lamivudine/Nevirapine (AZT/3TC/NVP) 60mg/30mg/50mg [Pack 60]",
               "Zidovudine/Lamivudine (AZT/3TC) 60mg/30mg [Pack 60]"],
         DF1: ["Abacavir/Lamivudine (ABC/3TC) 60mg/30mg [Pack 60]"],
         RATIO: 0.80,
-        FIELDS: ["estimated_number_of_new_patients"]
+        FIELDS: [ESTIMATED_NUMBER_OF_NEW_PATIENTS]
     }]
 
 

@@ -1,6 +1,6 @@
 import pydash
 
-from dashboard.data.utils import values_for_records, QCheck, facility_not_reporting
+from dashboard.data.utils import values_for_records, QCheck, facility_not_reporting, facility_has_single_order
 from dashboard.helpers import *
 
 
@@ -86,7 +86,7 @@ class MultipleCheck(QCheck):
 
     def for_each_facility(self, facility, no, not_reporting, yes, combination):
         not_reporting += 0
-        result = NO if facility['Multiple'].strip() != 'Multiple orders' else YES
+        result = NO if facility_has_single_order(facility) else YES
         if result == NO:
             no += 1
         else:

@@ -1,49 +1,59 @@
 from django.db.models import Q
 from django_datatables_view.base_datatable_view import BaseDatatableView
 
-from dashboard.helpers import F1, NOT_REPORTING, NO, YES
+from dashboard.helpers import *
 from dashboard.models import Score
-
-DEFAULT = 'DEFAULT'
-
-DEFAULT = 'DEFAULT'
 
 
 class ScoresTableView(BaseDatatableView):
     model = Score
     columns = [
-        'name',
-        'district',
-        'warehouse',
-        'ip',
-        'REPORTING',
-        'WEB_BASED',
-        'MULTIPLE_ORDERS',
-        'OrderFormFreeOfGaps',
-        'guidelineAdherenceAdult1L',
-        'guidelineAdherenceAdult2L',
-        'guidelineAdherencePaed1L',
-        'nnrtiNewPaed',
-        'nnrtiCurrentPaed',
-        'nnrtiNewAdults',
-        'nnrtiCurrentAdults',
-        'stablePatientVolumes',
-        'consumptionAndPatients',
-        'warehouseFulfilment',
-        'differentOrdersOverTime',
-        'closingBalanceMatchesOpeningBalance',
-        'orderFormFreeOfNegativeNumbers',
-        'stableConsumption',
+        NAME,
+        DISTRICT.lower(),
+        WAREHOUSE.lower(),
+        IP.lower(),
+        REPORTING,
+        WEB_BASED,
+        MULTIPLE_ORDERS,
+        ORDER_FORM_FREE_OF_GAPS,
+        GUIDELINE_ADHERENCE_ADULT_1L,
+        GUIDELINE_ADHERENCE_ADULT_2L,
+        GUIDELINE_ADHERENCE_PAED_1L,
+        NNRTI_NEW_PAED,
+        NNRTI_CURRENT_PAED,
+        NNRTI_NEW_ADULTS,
+        NNRTI_CURRENT_ADULTS,
+        STABLE_PATIENT_VOLUMES,
+        CONSUMPTION_AND_PATIENTS,
+        WAREHOUSE_FULFILMENT,
+        DIFFERENT_ORDERS_OVER_TIME,
+        CLOSING_BALANCE_MATCHES_OPENING_BALANCE,
+        ORDER_FORM_FREE_OF_NEGATIVE_NUMBERS,
+        STABLE_CONSUMPTION,
     ]
     order_columns = columns
 
     def render_column(self, row, column):
-        display_text = {YES: 'PASS', NO: 'FAIL', NOT_REPORTING: 'N/A'}
-        default_columns = ['REPORTING', 'WEB_BASED', 'MULTIPLE_ORDERS', 'OrderFormFreeOfGaps', 'guidelineAdherenceAdult1L', 'guidelineAdherenceAdult2L', 'guidelineAdherencePaed1L', 'nnrtiNewPaed', 'nnrtiCurrentPaed',
-                           'nnrtiNewAdults',
-                           'nnrtiCurrentAdults', ]
-        formulation_columns = ['stablePatientVolumes', 'consumptionAndPatients', 'warehouseFulfilment', 'differentOrdersOverTime', 'closingBalanceMatchesOpeningBalance', 'orderFormFreeOfNegativeNumbers', 'stableConsumption', ]
-        formulation = self.request.POST.get(u'formulation', F1)
+        display_text = {YES: PASS, NO: FAIL, NOT_REPORTING: N_A}
+        default_columns = [REPORTING,
+                           WEB_BASED,
+                           MULTIPLE_ORDERS,
+                           ORDER_FORM_FREE_OF_GAPS,
+                           GUIDELINE_ADHERENCE_ADULT_1L,
+                           GUIDELINE_ADHERENCE_ADULT_2L,
+                           GUIDELINE_ADHERENCE_PAED_1L,
+                           NNRTI_NEW_PAED,
+                           NNRTI_CURRENT_PAED,
+                           NNRTI_NEW_ADULTS,
+                           NNRTI_CURRENT_ADULTS, ]
+        formulation_columns = [STABLE_PATIENT_VOLUMES,
+                               CONSUMPTION_AND_PATIENTS,
+                               WAREHOUSE_FULFILMENT,
+                               DIFFERENT_ORDERS_OVER_TIME,
+                               CLOSING_BALANCE_MATCHES_OPENING_BALANCE,
+                               ORDER_FORM_FREE_OF_NEGATIVE_NUMBERS,
+                               STABLE_CONSUMPTION]
+        formulation = self.request.POST.get(FORMULATION, F1)
         if column in default_columns:
             value_for_column = getattr(row, column)
             if type(value_for_column) == dict and DEFAULT in value_for_column:
