@@ -1,12 +1,7 @@
 import pydash
 
-from dashboard.data.utils import NAME, values_for_records, NEW, EXISTING, QCheck, facility_not_reporting
-from dashboard.helpers import NOT_REPORTING, YES, NO, REPORTING, WEB_BASED, MULTIPLE_ORDERS, \
-    ORDER_FORM_FREE_OF_GAPS
-
-F1_QUERY = "Efavirenz (TDF/3TC/EFV)"
-F2_QUERY = "Lamivudine (ABC/3TC) 60mg/30mg [Pack 60]"
-F3_QUERY = "EFV) 200mg [Pack 90]"
+from dashboard.data.utils import values_for_records, QCheck, facility_not_reporting
+from dashboard.helpers import *
 
 
 def has_blank_in_fields(fields):
@@ -19,13 +14,13 @@ def has_blank_in_fields(fields):
 
 class BlanksQualityCheck(QCheck):
     test = ORDER_FORM_FREE_OF_GAPS
-    combinations = [{NAME: 'DEFAULT'}]
+    combinations = [{NAME: DEFAULT}]
 
-    fields = ["opening_balance",
-              "quantity_received",
-              "art_consumption",
-              "loses_adjustments",
-              "estimated_number_of_new_patients"]
+    fields = [OPENING_BALANCE,
+              QUANTITY_RECEIVED,
+              ART_CONSUMPTION,
+              LOSES_ADJUSTMENTS,
+              ESTIMATED_NUMBER_OF_NEW_PATIENTS]
 
     def for_each_facility(self, facility, no, not_reporting, yes, combination):
         result = NOT_REPORTING
@@ -38,13 +33,13 @@ class BlanksQualityCheck(QCheck):
         pr_count = len(p_records)
 
         number_of_consumption_record_blanks = len(pydash.select(
-            values_for_records(self.fields, c_records), lambda v: v is None))
+                values_for_records(self.fields, c_records), lambda v: v is None))
         number_of_adult_records_with_blanks = len(
-            pydash.select(values_for_records([NEW, EXISTING], a_records),
-                          lambda v: v is None))
+                pydash.select(values_for_records([NEW, EXISTING], a_records),
+                              lambda v: v is None))
         number_of_paed_records_with_blanks = len(
-            pydash.select(values_for_records([NEW, EXISTING], p_records),
-                          lambda v: v is None))
+                pydash.select(values_for_records([NEW, EXISTING], p_records),
+                              lambda v: v is None))
 
         number_of_blanks = number_of_adult_records_with_blanks + number_of_consumption_record_blanks + number_of_paed_records_with_blanks
 
@@ -61,10 +56,10 @@ class BlanksQualityCheck(QCheck):
 
 class WebBasedCheck(QCheck):
     test = WEB_BASED
-    combinations = [{NAME: 'DEFAULT'}]
+    combinations = [{NAME: DEFAULT}]
 
     def for_each_facility(self, facility, no, not_reporting, yes, combination):
-        result = NO if facility['Web/Paper'].strip() != 'Web' else YES
+        result = NO if facility[WEB_PAPER].strip() != 'Web' else YES
         if result == NO:
             no += 1
         else:
@@ -74,7 +69,7 @@ class WebBasedCheck(QCheck):
 
 class IsReportingCheck(QCheck):
     test = REPORTING
-    combinations = [{NAME: 'DEFAULT'}]
+    combinations = [{NAME: DEFAULT}]
 
     def for_each_facility(self, facility, no, not_reporting, yes, combination):
         result = NO if facility_not_reporting(facility) else YES
@@ -87,7 +82,7 @@ class IsReportingCheck(QCheck):
 
 class MultipleCheck(QCheck):
     test = MULTIPLE_ORDERS
-    combinations = [{NAME: 'DEFAULT'}]
+    combinations = [{NAME: DEFAULT}]
 
     def for_each_facility(self, facility, no, not_reporting, yes, combination):
         not_reporting += 0

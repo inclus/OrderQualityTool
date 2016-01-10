@@ -1,15 +1,17 @@
 import os
 from collections import defaultdict
-from unittest import TestCase
 
-from dashboard.data.adherence import GuidelineAdherenceCheckAdult1L, calculate_score, GuidelineAdherenceCheckAdult2L
+from django.test import TestCase
+
+from dashboard.data.adherence import GuidelineAdherenceCheckAdult1L, calculate_score
 from dashboard.data.blanks import BlanksQualityCheck, IsReportingCheck, MultipleCheck, WebBasedCheck
 from dashboard.data.consumption_patients import ConsumptionAndPatientsQualityCheck
+from dashboard.data.cycles import DIFFERENTORDERSOVERTIMECheck
 from dashboard.data.free_form_report import FreeFormReport
 from dashboard.data.negatives import NegativeNumbersQualityCheck
-from dashboard.data.utils import clean_name, FORMULATION, NEW, get_patient_total, EXISTING, get_consumption_totals, \
+from dashboard.data.utils import clean_name, get_patient_total, get_consumption_totals, \
     values_for_records
-from dashboard.helpers import YES, NOT_REPORTING, NO
+from dashboard.helpers import *
 
 
 class FakeReport():
@@ -37,6 +39,7 @@ class DataTestCase(TestCase):
 
     def test_patient_records(self):
         report = FakeReport()
+        report.cycle = "Jul - Aug 2015"
         report.pds = {"PLACE1": [{FORMULATION: "A1", NEW: 3},
                                  {FORMULATION: "B", NEW: 3},
                                  {FORMULATION: "A2", NEW: 12}]}
@@ -46,6 +49,7 @@ class DataTestCase(TestCase):
 
     def test_adult_records(self):
         report = FakeReport()
+        report.cycle = "Jul - Aug 2015"
         report.ads = {"PLACE1": [{FORMULATION: "A", NEW: 3},
                                  {FORMULATION: "B", NEW: 3},
                                  {FORMULATION: "A", NEW: 12}]}
@@ -70,6 +74,7 @@ class DataTestCase(TestCase):
         file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', 'tests', 'fixtures',
                                  "new_format.xlsx")
         report = FreeFormReport(file_path, "May Jun").load()
+        report.cycle = "Jul - Aug 2015"
         cases = [{'test': BlanksQualityCheck, 'expected': 8.0},
                  {'test': MultipleCheck, 'expected': 20.0},
                  {'test': IsReportingCheck, 'expected': 96.0},
@@ -193,3 +198,133 @@ class GuidelineAdherenceAdult1LTestCase(TestCase):
             {FORMULATION: "A", "openingBalance": 12}]}
         check = GuidelineAdherenceCheckAdult1L(report)
         assert check.run()['DEFAULT']['YES'] == 100
+
+
+class TestDIFFERENTORDERSOVERTIMECheck(TestCase):
+    def test_same_values_scores_no(self):
+        report = FakeReport()
+        report.cycle = 'Jul - Aug 2015'
+        report.locs = [{"name": "PLACE1", "scores": defaultdict(dict)}]
+        report.cs = {
+            'PLACE1': [
+                {
+                    FORMULATION: F1_QUERY,
+                    OPENING_BALANCE: 12,
+                    ESTIMATED_NUMBER_OF_NEW_PATIENTS: 3,
+                    ART_CONSUMPTION: 4
+                }
+            ]
+        }
+
+        other_report = FakeReport()
+        other_report.cycle = 'May - Jun 2015'
+        other_report.locs = [{"name": "PLACE1", "scores": defaultdict(dict)}]
+        other_report.cs = {
+            'PLACE1': [
+                {
+                    FORMULATION: F1_QUERY,
+                    OPENING_BALANCE: 12,
+                    ESTIMATED_NUMBER_OF_NEW_PATIENTS: 3,
+                    ART_CONSUMPTION: 4
+                }
+            ]
+        }
+        scores = DIFFERENTORDERSOVERTIMECheck(report, other_report).run()
+        self.assertTrue(F1 in scores)
+        self.assertEqual(scores[F1], {NO: 100.0, YES: 0, NOT_REPORTING: 0})
+
+    def test_all_zeros_scores_yes(self):
+        report = FakeReport()
+        report.cycle = 'Jul - Aug 2015'
+        report.locs = [{"name": "PLACE1", "scores": defaultdict(dict)}]
+        report.cs = {
+            'PLACE1': [
+                {
+                    FORMULATION: F1_QUERY,
+                    OPENING_BALANCE: 0,
+                    ESTIMATED_NUMBER_OF_NEW_PATIENTS: 0,
+                    ART_CONSUMPTION: 0
+                }
+            ]
+        }
+
+        other_report = FakeReport()
+        other_report.cycle = 'May - Jun 2015'
+        other_report.locs = [{"name": "PLACE1", "scores": defaultdict(dict)}]
+        other_report.cs = {
+            'PLACE1': [
+                {
+                    FORMULATION: F1_QUERY,
+                    OPENING_BALANCE: 0,
+                    ESTIMATED_NUMBER_OF_NEW_PATIENTS: 0,
+                    ART_CONSUMPTION: 0
+                }
+            ]
+        }
+        scores = DIFFERENTORDERSOVERTIMECheck(report, other_report).run()
+        self.assertTrue(F1 in scores)
+        self.assertEqual(scores[F1], {NO: 0.0, YES: 100.0, NOT_REPORTING: 0})
+
+    def test_diff_scores_yes(self):
+        report = FakeReport()
+        report.cycle = 'Jul - Aug 2015'
+        report.locs = [{"name": "PLACE1", "scores": defaultdict(dict)}]
+        report.cs = {
+            'PLACE1': [
+                {
+                    FORMULATION: F1_QUERY,
+                    OPENING_BALANCE: 12,
+                    ESTIMATED_NUMBER_OF_NEW_PATIENTS: 2,
+                    ART_CONSUMPTION: 4
+                }
+            ]
+        }
+
+        other_report = FakeReport()
+        other_report.cycle = 'May - Jun 2015'
+        other_report.locs = [{"name": "PLACE1", "scores": defaultdict(dict)}]
+        other_report.cs = {
+            'PLACE1': [
+                {
+                    FORMULATION: F1_QUERY,
+                    OPENING_BALANCE: 12,
+                    ESTIMATED_NUMBER_OF_NEW_PATIENTS: 0,
+                    ART_CONSUMPTION: 4
+                }
+            ]
+        }
+        scores = DIFFERENTORDERSOVERTIMECheck(report, other_report).run()
+        self.assertTrue(F1 in scores)
+        self.assertEqual(scores[F1], {NO: 0.0, YES: 100.0, NOT_REPORTING: 0})
+
+    def test_missing_scores_na(self):
+        report = FakeReport()
+        report.cycle = 'Jul - Aug 2015'
+        report.locs = [{"name": "PLACE1", "scores": defaultdict(dict)}]
+        report.cs = {
+            'PLACE1': [
+                {
+                    FORMULATION: "the",
+                    OPENING_BALANCE: 12,
+                    ESTIMATED_NUMBER_OF_NEW_PATIENTS: 3,
+                    ART_CONSUMPTION: 4
+                }
+            ]
+        }
+
+        other_report = FakeReport()
+        other_report.cycle = 'May - Jun 2015'
+        other_report.locs = [{"name": "PLACE1", "scores": defaultdict(dict)}]
+        other_report.cs = {
+            'PLACE1': [
+                {
+                    FORMULATION: F1_QUERY,
+                    OPENING_BALANCE: 12,
+                    ESTIMATED_NUMBER_OF_NEW_PATIENTS: 3,
+                    ART_CONSUMPTION: 4
+                }
+            ]
+        }
+        scores = DIFFERENTORDERSOVERTIMECheck(report, other_report).run()
+        self.assertTrue(F1 in scores)
+        self.assertEqual(scores[F1], {NO: 0.0, YES: 0, NOT_REPORTING: 100.0})

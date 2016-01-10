@@ -1,18 +1,13 @@
 import pydash
 
-from dashboard.data.utils import QCheck, NAME, RATIO, FIELDS, FORMULATION, values_for_records
-from dashboard.helpers import NNRTI_CURRENT_ADULTS, NNRTI_CURRENT_PAED, NNRTI_NEW_PAED, NNRTI_NEW_ADULTS, NOT_REPORTING, \
-    YES, NO
-
-DF2 = "data_field_2"
-
-DF1 = "data_field_1"
+from dashboard.data.utils import QCheck, values_for_records
+from dashboard.helpers import *
 
 
 class NNRTICURRENTADULTSCheck(QCheck):
     test = NNRTI_CURRENT_ADULTS
     combinations = [{
-        NAME: 'DEFAULT',
+        NAME: DEFAULT,
         DF2: [
             "Efavirenz (EFV) 600mg [Pack 30]",
             "Nevirapine (NVP) 200mg [Pack 60]",
@@ -25,8 +20,8 @@ class NNRTICURRENTADULTSCheck(QCheck):
             "Abacavir/Lamivudine (ABC/3TC) 600mg/300mg [Pack 30]"
         ],
         FIELDS: [
-            "pmtct_consumption",
-            "art_consumption"
+            PMTCT_CONSUMPTION,
+            ART_CONSUMPTION
         ]
     }]
 
@@ -77,7 +72,7 @@ class NNRTICURRENTADULTSCheck(QCheck):
 class NNRTICURRENTPAEDCheck(NNRTICURRENTADULTSCheck):
     test = NNRTI_CURRENT_PAED
     combinations = [{
-        NAME: 'DEFAULT',
+        NAME: DEFAULT,
 
         DF2: [
             "Nevirapine (NVP) 50mg [Pack 60]",
@@ -89,7 +84,7 @@ class NNRTICURRENTPAEDCheck(NNRTICURRENTADULTSCheck):
             "Zidovudine/Lamivudine (AZT/3TC) 60mg/30mg [Pack 60]"
         ],
         FIELDS: [
-            "art_consumption"
+            ART_CONSUMPTION
         ]}]
 
     def for_each_facility(self, facility, no, not_reporting, yes, combination):
@@ -135,7 +130,7 @@ class NNRTICURRENTPAEDCheck(NNRTICURRENTADULTSCheck):
 class NNRTINEWPAEDCheck(NNRTICURRENTADULTSCheck):
     test = NNRTI_NEW_PAED
     combinations = [{
-        NAME: 'DEFAULT',
+        NAME: DEFAULT,
         DF2: [
             "Efavirenz (EFV) 200mg [Pack 90]",
             "Nevirapine (NVP) 50mg [Pack 60]",
@@ -146,15 +141,15 @@ class NNRTINEWPAEDCheck(NNRTICURRENTADULTSCheck):
             "Zidovudine/Lamivudine (AZT/3TC) 60mg/30mg [Pack 60]"
         ],
         FIELDS: [
-            "estimated_number_of_new_patients",
-            "estimated_number_of_new_pregnant_women"
+            ESTIMATED_NUMBER_OF_NEW_PATIENTS,
+            ESTIMATED_NUMBER_OF_NEW_PREGNANT_WOMEN
         ]}]
 
 
 class NNRTINewAdultsCheck(NNRTICURRENTADULTSCheck):
     test = NNRTI_NEW_ADULTS
     combinations = [{
-        NAME: 'DEFAULT',
+        NAME: DEFAULT,
         DF2: [
             "Efavirenz (EFV) 600mg [Pack 30]",
             "Nevirapine (NVP) 200mg [Pack 60]",
@@ -167,6 +162,6 @@ class NNRTINewAdultsCheck(NNRTICURRENTADULTSCheck):
             "Abacavir/Lamivudine (ABC/3TC) 600mg/300mg [Pack 30]"
         ],
         FIELDS: [
-            "estimated_number_of_new_patients",
-            "estimated_number_of_new_pregnant_women"
+            ESTIMATED_NUMBER_OF_NEW_PATIENTS,
+            ESTIMATED_NUMBER_OF_NEW_PREGNANT_WOMEN
         ]}]

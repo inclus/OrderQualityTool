@@ -1,9 +1,10 @@
 import json
 import logging
 import time
-from abc import abstractmethod
+
 import pydash
-from dashboard.helpers import NO, NOT_REPORTING, YES
+
+from dashboard.helpers import NO, NOT_REPORTING, YES, NAME, EXISTING, NEW
 from dashboard.models import CycleFormulationScore
 
 logger = logging.getLogger(__name__)
@@ -41,7 +42,7 @@ def values_for_records(fields, records):
 
 def get_consumption_totals(fields, records):
     return pydash.chain(values_for_records(fields, records)).reject(
-        lambda x: x is None).sum().value()
+            lambda x: x is None).sum().value()
 
 
 def get_patient_total(records):
@@ -77,26 +78,6 @@ def write_to_disk(report, file_out):
     return report
 
 
-NEW = "new"
-IS_ADULT = "IS_ADULT"
-EXISTING = 'existing'
-FORMULATION = 'formulation'
-LOCATION = "Facility Index"
-CONSUMPTION = "CONSUMPTION"
-FIELDS = "fields"
-PMTCT_CONSUMPTION = "pmtct_consumption"
-NAME = "name"
-MODEL = 'model'
-RATIO = "ratio"
-ART_CONSUMPTION = 'art_consumption'
-PATIENT_QUERY = "patient_query"
-CONSUMPTION_QUERY = "consumption_query"
-SUM = 'sum'
-F1_QUERY = "Tenofovir/Lamivudine/Efavirenz (TDF/3TC/EFV) 300mg/300mg/600mg[Pack 30]"
-F3_QUERY = "Efavirenz (EFV) 200mg [Pack 90]"
-F2_QUERY = "Abacavir/Lamivudine (ABC/3TC) 60mg/30mg [Pack 60]"
-
-
 class QCheck:
     combinations = []
     test = ""
@@ -110,8 +91,8 @@ class QCheck:
         print (self.test, scores)
         for key, value in scores.items():
             formulation_scores.append(
-                CycleFormulationScore(cycle=self.report.cycle, combination=key, yes=value[YES], no=value[NO],
-                                      not_reporting=value[NOT_REPORTING], test=self.test))
+                    CycleFormulationScore(cycle=self.report.cycle, combination=key, yes=value[YES], no=value[NO],
+                                          not_reporting=value[NOT_REPORTING], test=self.test))
         return formulation_scores
 
     def run(self):

@@ -28,7 +28,7 @@ class TaskTestCase(TestCase):
         self.assertEqual(CycleFormulationScore.objects.count(), 0)
         run_checks_and_persist_formulation_scores(report)
         run_checks_and_persist_formulation_scores(report)
-        self.assertEqual(CycleFormulationScore.objects.count(), 24)
+        self.assertEqual(CycleFormulationScore.objects.count(), 32)
 
     def test_should_record_scores_for_each_facility(self):
         report = FakeReport()

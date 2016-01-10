@@ -1,9 +1,9 @@
+from collections import defaultdict
+
 import pydash
 
-from dashboard.data.utils import NAME, PATIENT_QUERY, CONSUMPTION_QUERY, F1_QUERY, RATIO, FIELDS, ART_CONSUMPTION, \
-    PMTCT_CONSUMPTION, IS_ADULT, F2_QUERY, F3_QUERY, timeit, get_patient_total, get_consumption_totals, has_all_blanks, \
-    NEW, EXISTING, build_cycle_formulation_score, FORMULATION, QCheck
-from dashboard.helpers import CONSUMPTION_AND_PATIENTS, F1, F2, F3, NOT_REPORTING, YES, NO
+from dashboard.data.utils import get_patient_total, get_consumption_totals, has_all_blanks, QCheck
+from dashboard.helpers import *
 
 
 class ConsumptionAndPatientsQualityCheck(QCheck):
@@ -14,6 +14,7 @@ class ConsumptionAndPatientsQualityCheck(QCheck):
                      FIELDS: [ART_CONSUMPTION], IS_ADULT: False},
                     {NAME: F3, PATIENT_QUERY: "EFV", CONSUMPTION_QUERY: F3_QUERY, RATIO: 1, FIELDS: [ART_CONSUMPTION],
                      IS_ADULT: False}]
+    key_cache = defaultdict(dict)
 
     def for_each_facility(self, facility, no, not_reporting, yes, combination):
         result = NOT_REPORTING
@@ -60,13 +61,27 @@ class ConsumptionAndPatientsQualityCheck(QCheck):
         return no, not_reporting, result, yes
 
     def get_patient_records(self, facility_name, formulation_name, is_adult=True):
-        records = self.report.ads[facility_name] if is_adult else self.report.pds[facility_name]
+        collection = self.report.ads if is_adult else self.report.pds
+        records = self.get_records_from_collection(collection, facility_name, self.report.cycle)
         return pydash.chain(records).reject(
-            lambda x: formulation_name not in x[FORMULATION]
+                lambda x: formulation_name not in x[FORMULATION]
         ).value()
+
+    def get_records_from_collection(self, collection, facility_name, cycle):
+        if facility_name in self.key_cache[cycle]:
+            key = self.key_cache[cycle][facility_name]
+        else:
+            matches = [k for k in collection.keys() if k.lower() in facility_name.lower()]
+            if len(matches) > 0:
+                key = matches[0]
+            else:
+                key = facility_name
+            self.key_cache[cycle][facility_name] = key
+        records = collection[key]
+        return records
 
     def get_consumption_records(self, facility_name, formulation_name):
         records = self.report.cs[facility_name]
-        return pydash.chain(records).reject(
-            lambda x: formulation_name not in x[FORMULATION]
+        return pydash.chain(records).select(
+                lambda x: formulation_name in x[FORMULATION]
         ).value()

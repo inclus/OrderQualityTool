@@ -1,31 +1,7 @@
 import pydash
 
-from dashboard.data.utils import QCheck, NAME, FORMULATION, values_for_records
-from dashboard.helpers import NOT_REPORTING, YES, NO
-
-ADULT_2L = "Adult 2L"
-
-PAED_1L = "Paed 1L"
-
-ADULT_1L = "Adult 1L"
-
-FIELDS = "fields"
-
-MODEL = 'model'
-
-RATIO = "ratio"
-
-ART_CONSUMPTION = 'art_consumption'
-
-DF2 = "data_field_2"
-
-DF1 = "data_field_1"
-
-SUM = 'sum'
-
-NEW = 'new'
-
-EXISTING = 'existing'
+from dashboard.data.utils import QCheck, values_for_records
+from dashboard.helpers import NOT_REPORTING, YES, NO, NAME, FORMULATION, DF2, DF1, RATIO, FIELDS
 
 
 class GuidelineAdherenceCheckAdult1L(QCheck):
