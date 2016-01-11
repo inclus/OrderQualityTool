@@ -103,10 +103,6 @@ angular.module('dashboard').controller('HomeController', ['$scope', 'ReportServi
             $scope.rankingLevels = data.values;
             $scope.bestPerforming = $scope.rankingLevels[0];
             $scope.worstPerforming = $scope.rankingLevels[0];
-
-
-
-
         });
     }
 ])

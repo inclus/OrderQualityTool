@@ -10,6 +10,18 @@ angular.module('dashboard').controller('WebBasedRateController', ['$scope', 'Rep
                 var values = data.values;
                 $scope.options = {
                     data: values,
+                    chart: {
+                        axis: {
+                            y: {
+                                max: 100,
+                                min: 0,
+                                padding: {
+                                    top: 0,
+                                    bottom: 0
+                                }
+                            }
+                        }
+                    },
                     dimensions: {
                         cycle: {
                             axis: 'x',

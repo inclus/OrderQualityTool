@@ -14,6 +14,7 @@ h1, h2, h3, h4, h5, h6 {
   letter-spacing: 1.5px;
 }
 .quality_test {
+  .make-sm-column(3);
   .make-md-column(3);
   padding-top: 15px;
   padding-bottom: 15px;
@@ -48,9 +49,12 @@ h1, h2, h3, h4, h5, h6 {
         color: @chai-word-green;
       }
     }
-    @media (max-width:@screen-md) {
+    @media (max-width:@screen-sm) {
       border: none
     }
+  }
+  a {
+    text-decoration: none;
   }
   a:hover {
     color: darken(@chai-word-green, 10%);
@@ -69,7 +73,7 @@ h1, h2, h3, h4, h5, h6 {
   border-right: 1px solid @chai-green;
   border-bottom: 1px solid @chai-green;
 
-  @media (max-width:@screen-md) {
+  @media (max-width:@screen-sm) {
     border: none
   }
 }
@@ -77,12 +81,9 @@ h1, h2, h3, h4, h5, h6 {
   .make-md-column(12);
 }
 .page_graph {
-  .make-sm-column(6);
-  .make-sm-column-offset(3);
-  .make-md-column(8);
-  .make-md-column-offset(2);
-  .make-lg-column(10);
-  .make-lg-column-offset(1);
+  .make-sm-column(12);
+  .make-md-column(12);
+  .make-lg-column(12);
 }
 .ranking_lists {
   margin-top: 20px;
@@ -110,8 +111,8 @@ a.label-qdb {
   background: #FFF url("/static/images/car.png") no-repeat 98% 50%;
 }
 .cycle-select {
-  .make-sm-column(4);
-  .make-md-column(3);
+  .make-sm-column(3);
+  .make-md-column(2);
   .select-drop;
 }
 .select2-container--default {
@@ -120,9 +121,9 @@ a.label-qdb {
   // .select-drop;
 }
 .spacer {
-  .make-md-column(0.5);
+  .make-md-column(0.3);
 
-  @media (max-width:@screen-md) {
+  @media (max-width:@screen-sm) {
     display: none
   }
 }
@@ -176,4 +177,13 @@ td.score_FAIL {
   line-height: 30px;
   margin-bottom: 10px;
   margin-left: 4px;
+}
+.navbar-inverse {
+  .navbar-nav {
+    > .active > a {
+      &, &:hover, &:focus {
+        font-weight: 800;
+      }
+    }
+  }
 }

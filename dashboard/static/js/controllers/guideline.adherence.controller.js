@@ -10,6 +10,18 @@ angular.module('dashboard').controller('GuidelineAdherenceController', ['$scope'
                 var values = data.values;
                 $scope.options = {
                     data: values,
+                    chart: {
+                        axis: {
+                            y: {
+                                max: 100,
+                                min: 0,
+                                padding: {
+                                    top: 0,
+                                    bottom: 0
+                                }
+                            }
+                        }
+                    },
                     dimensions: {
                         cycle: {
                             axis: 'x',
@@ -18,21 +30,24 @@ angular.module('dashboard').controller('GuidelineAdherenceController', ['$scope'
                         no: {
                             axis: 'y',
                             type: 'line',
-                            name: 'No',
+                            name: 'Fail',
+                            color: 'red',
                             dataType: 'numeric',
                             displayFormat: d3.format(".1f")
                         },
                         yes: {
                             axis: 'y',
                             type: 'line',
-                            name: 'Yes',
+                            name: 'Pass',
+                            color: '#27ae60',
                             dataType: 'numeric',
                             displayFormat: d3.format(".1f")
                         },
                         not_reporting: {
                             axis: 'y',
                             type: 'line',
-                            name: 'Not Reporting',
+                            color: 'gray',
+                            name: 'Insufficient Data',
                             dataType: 'numeric',
                             displayFormat: d3.format(".1f")
                         }

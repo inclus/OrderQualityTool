@@ -35,7 +35,7 @@ class FacilitiesReportingView(APIView):
             if len(scores) > 0:
                 results.append({"cycle": cycle, "reporting": scores[0].yes, "not_reporting": scores[0].no})
             else:
-                results.append({"cycle": cycle, "reporting": 0, "not_reporting": 100})
+                results.append({"cycle": cycle, "reporting": None, "not_reporting": None})
         return Response({"values": results})
 
 
@@ -58,7 +58,7 @@ class WebBasedReportingView(APIView):
             if len(scores) > 0:
                 results.append({"cycle": cycle, "web": scores[0].yes, "paper": scores[0].no})
             else:
-                results.append({"cycle": cycle, "web": 0, "paper": 0})
+                results.append({"cycle": cycle, "web": None, "paper": None})
         return Response({"values": results})
 
 
@@ -172,7 +172,7 @@ class OrderFormFreeOfGapsView(APIView):
                 item = data.get(cycle)
                 results.append({"cycle": cycle, "yes": item.yes, "no": item.no, "not_reporting": item.not_reporting})
             else:
-                results.append({"cycle": cycle, "rate": 0, "yes": 0, "no": 0, "not_reporting": 0})
+                results.append({"cycle": cycle, "rate": None, "yes": None, "no": None, "not_reporting": None})
         return Response({'values': results})
 
 
@@ -199,7 +199,7 @@ class OrderFormFreeOfNegativeNumbersView(APIView):
                 item = data.get(cycle)
                 results.append({"cycle": cycle, "yes": item.yes, "no": item.no, "not_reporting": item.not_reporting})
             else:
-                results.append({"cycle": cycle, "rate": 0, "yes": 0, "no": 0, "not_reporting": 0})
+                results.append({"cycle": cycle, "rate": None, "yes": None, "no": None, "not_reporting": None})
         return Response({'values': results})
 
 
@@ -252,7 +252,7 @@ class GuideLineAdherenceView(DifferentOrdersOverTimeView):
                 item = data.get(cycle)
                 results.append({"cycle": cycle, "yes": item.yes, "no": item.no, "not_reporting": item.not_reporting})
             else:
-                results.append({"cycle": cycle, "rate": 0, "yes": 0, "no": 0, "not_reporting": 0})
+                results.append({"cycle": cycle, "rate": None, "yes": None, "no": None, "not_reporting": None})
         return Response({'values': results})
 
 
