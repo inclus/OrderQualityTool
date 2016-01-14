@@ -73,7 +73,8 @@ class ConsumptionAndPatientsQualityCheck(QCheck):
         if facility_name in self.key_cache[cycle]:
             key = self.key_cache[cycle][facility_name]
         else:
-            matches = [k for k in collection.keys() if k.lower() in facility_name.lower()]
+            names_in_collection = collection.keys()
+            matches = [k for k in names_in_collection if k.lower() in facility_name.lower() or facility_name.lower() in k.lower()]
             if len(matches) > 0:
                 key = matches[0]
             else:

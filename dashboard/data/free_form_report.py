@@ -65,7 +65,7 @@ class FreeFormReport():
                 patient_record[FORMULATION] = row[2].value
                 patient_record[EXISTING] = self.get_value(row, 4)
                 patient_record[NEW] = self.get_value(row, 5)
-                records[facility_name].append(patient_record)
+                records[facility_key].append(patient_record)
             else:
                 logger.debug("%s not found" % facility_name)
         return records
@@ -81,7 +81,7 @@ class FreeFormReport():
                 patient_record[FORMULATION] = row[2].value
                 patient_record[EXISTING] = self.get_value(row, 4)
                 patient_record[NEW] = self.get_value(row, 5)
-                records[facility_name].append(patient_record)
+                records[facility_key].append(patient_record)
             else:
                 logger.debug("%s not found" % facility_name)
         return records
@@ -130,7 +130,7 @@ class FreeFormReport():
         if facility_name:
             if facility_name not in self.name_cache:
                 locations = pydash.chain(self.locs).reject(lambda x: x['name'] is None).select(
-                        lambda x: facility_name in x['name']).value()
+                        lambda x: facility_name in x['name'] or x['name'] in facility_name).value()
                 if len(locations) > 0:
                     facility_key = locations[0]['name']
                 else:
