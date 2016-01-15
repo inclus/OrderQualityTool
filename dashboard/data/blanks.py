@@ -43,7 +43,7 @@ class BlanksQualityCheck(QCheck):
 
         number_of_blanks = number_of_adult_records_with_blanks + number_of_consumption_record_blanks + number_of_paed_records_with_blanks
 
-        if cr_count >= 24 and ar_count >= 22 and pr_count >= 7 and number_of_blanks <= 2:
+        if cr_count >= 25 and ar_count >= 22 and pr_count >= 7 and number_of_blanks <= 2:
             yes += 1
             result = YES
         elif cr_count > 0 or ar_count > 0 or pr_count > 0 or number_of_blanks > 3:

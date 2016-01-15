@@ -52,6 +52,8 @@ class DIFFERENTORDERSOVERTIMECheck(TwoCycleQCheck):
     def for_each_facility(self, facility, no, not_reporting, yes, combination):
         fields = [OPENING_BALANCE, ART_CONSUMPTION, ESTIMATED_NUMBER_OF_NEW_PATIENTS]
 
+        #ESTIMATED_NUMBER_OF_NEW_PATIENTS ART paitents change that from the ESTIMATED_NUMBER_OF_NEW_PATIENTS
+
         prev_records = self.get_consumption_records(self.other_cycle_report, facility[NAME], combination[CONSUMPTION_QUERY])
         prev_values = values_for_records(fields, prev_records)
 

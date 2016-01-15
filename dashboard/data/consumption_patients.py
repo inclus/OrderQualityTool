@@ -19,6 +19,7 @@ class ConsumptionAndPatientsQualityCheck(QCheck):
     def for_each_facility(self, facility, no, not_reporting, yes, combination):
         result = NOT_REPORTING
 
+ #the df1 and df2  need to pick the correct data for the different formulations.CHECK EXAMPLE ON Bugaya
         facility_name = facility[NAME]
         df1_records = self.get_consumption_records(facility_name, combination[CONSUMPTION_QUERY])
         df2_records = self.get_patient_records(facility_name, combination[PATIENT_QUERY],
@@ -60,6 +61,7 @@ class ConsumptionAndPatientsQualityCheck(QCheck):
             result = NO
         return no, not_reporting, result, yes
 
+#Check to see the order limit
     def get_patient_records(self, facility_name, formulation_name, is_adult=True):
         collection = self.report.ads if is_adult else self.report.pds
         records = self.get_records_from_collection(collection, facility_name, self.report.cycle)
