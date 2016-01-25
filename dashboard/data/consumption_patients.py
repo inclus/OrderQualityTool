@@ -6,19 +6,21 @@ from dashboard.data.utils import get_patient_total, get_consumption_totals, has_
 from dashboard.helpers import *
 
 
+
+
 class ConsumptionAndPatientsQualityCheck(QCheck):
     test = CONSUMPTION_AND_PATIENTS
     combinations = [
         {
-            NAME: F1, PATIENT_QUERY: "TDF/3TC/EFV", CONSUMPTION_QUERY: F1_QUERY, RATIO: 2.0,
+            NAME: F1, PATIENT_QUERY: F1_PATIENT_QUERY, CONSUMPTION_QUERY: F1_QUERY, RATIO: 2.0,
             FIELDS: [ART_CONSUMPTION, PMTCT_CONSUMPTION], IS_ADULT: True
         },
         {
-            NAME: F2, PATIENT_QUERY: "ABC/3TC", CONSUMPTION_QUERY: F2_QUERY, RATIO: 4.6,
+            NAME: F2, PATIENT_QUERY: F2_PATIENT_QUERY, CONSUMPTION_QUERY: F2_QUERY, RATIO: 4.6,
             FIELDS: [ART_CONSUMPTION], IS_ADULT: False
         },
         {
-            NAME: F3, PATIENT_QUERY: "EFV", CONSUMPTION_QUERY: F3_QUERY, RATIO: 1, FIELDS: [ART_CONSUMPTION],
+            NAME: F3, PATIENT_QUERY: F3_PATIENT_QUERY, CONSUMPTION_QUERY: F3_QUERY, RATIO: 1, FIELDS: [ART_CONSUMPTION],
             IS_ADULT: False
         }]
     key_cache = defaultdict(dict)
@@ -26,7 +28,6 @@ class ConsumptionAndPatientsQualityCheck(QCheck):
     def for_each_facility(self, facility, no, not_reporting, yes, combination):
         result = NOT_REPORTING
 
-        # the df1 and df2  need to pick the correct data for the different formulations.CHECK EXAMPLE ON Bugaya
         facility_name = facility[NAME]
         df1_records = self.get_consumption_records(facility_name, combination[CONSUMPTION_QUERY])
         df2_records = self.get_patient_records(facility_name, combination[PATIENT_QUERY],
@@ -68,12 +69,11 @@ class ConsumptionAndPatientsQualityCheck(QCheck):
             result = NO
         return no, not_reporting, result, yes
 
-    # Check to see the order limit
-    def get_patient_records(self, facility_name, formulation_name, is_adult=True):
+    def get_patient_records(self, facility_name, combinations, is_adult=True):
         collection = self.report.ads if is_adult else self.report.pds
         records = self.get_records_from_collection(collection, facility_name)
-        return pydash.chain(records).reject(
-                lambda x: formulation_name not in x[FORMULATION]
+        return pydash.chain(records).select(
+                lambda x: x[FORMULATION].strip() in combinations
         ).value()
 
     def get_records_from_collection(self, collection, facility_name):

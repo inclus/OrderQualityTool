@@ -20,7 +20,7 @@ class BlanksQualityCheck(QCheck):
               QUANTITY_RECEIVED,
               ART_CONSUMPTION,
               LOSES_ADJUSTMENTS,
-              ESTIMATED_NUMBER_OF_NEW_PATIENTS]
+              ESTIMATED_NUMBER_OF_NEW_ART_PATIENTS]
 
     def for_each_facility(self, facility, no, not_reporting, yes, combination):
         result = NOT_REPORTING
@@ -46,7 +46,10 @@ class BlanksQualityCheck(QCheck):
         if cr_count >= 25 and ar_count >= 22 and pr_count >= 7 and number_of_blanks <= 2:
             yes += 1
             result = YES
-        elif cr_count > 0 or ar_count > 0 or pr_count > 0 or number_of_blanks > 3:
+        elif 0 > cr_count > 25 and 0 > ar_count > 22 and 0 > pr_count > 7:
+            no += 1
+            result = NO
+        elif cr_count >= 25 and ar_count >= 22 and pr_count >= 7 and number_of_blanks > 2:
             no += 1
             result = NO
         elif cr_count == 0 and ar_count == 0 and pr_count == 0:

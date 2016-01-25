@@ -126,7 +126,7 @@ class FreeFormReport():
                 consumption_record[CLOSING_BALANCE] = self.get_value(row, 9)
                 consumption_record[MONTHS_OF_STOCK_OF_HAND] = self.get_value(row, 10)
                 consumption_record[QUANTITY_REQUIRED_FOR_CURRENT_PATIENTS] = self.get_value(row, 11)
-                consumption_record[ESTIMATED_NUMBER_OF_NEW_PATIENTS] = self.get_value(row, 12)
+                consumption_record[ESTIMATED_NUMBER_OF_NEW_ART_PATIENTS] = self.get_value(row, 12)
                 consumption_record[ESTIMATED_NUMBER_OF_NEW_PREGNANT_WOMEN] = self.get_value(row, 13)
                 consumption_record[PACKS_ORDERED] = self.get_value(row, 14)
                 records[facility_key].append(consumption_record)

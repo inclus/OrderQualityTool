@@ -24,3 +24,4 @@ django-datatables-view==1.13.0
 pydash==3.4.1
 django-picklefield==0.3.2
 enum34==1.1.2
+robber==0.1.0

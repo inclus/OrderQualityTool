@@ -13,7 +13,7 @@ class GuidelineAdherenceCheckAdult1L(QCheck):
         DF1: ["Tenofovir/Lamivudine (TDF/3TC) 300mg/300mg [Pack 30]",
               "Tenofovir/Lamivudine/Efavirenz (TDF/3TC/EFV) 300mg/300mg/600mg[Pack 30]"],
         RATIO: 0.80,
-        FIELDS: [ESTIMATED_NUMBER_OF_NEW_PATIENTS, ESTIMATED_NUMBER_OF_NEW_PREGNANT_WOMEN]
+        FIELDS: [ESTIMATED_NUMBER_OF_NEW_ART_PATIENTS, ESTIMATED_NUMBER_OF_NEW_PREGNANT_WOMEN]
     }]
 
     def filter_records(self, facility_name, formulation_names):
@@ -52,7 +52,7 @@ class GuidelineAdherenceCheckAdult2L(GuidelineAdherenceCheckAdult1L):
         DF2: ["Lopinavir/Ritonavir (LPV/r) 200mg/50mg [Pack 120]"],
         DF1: ["Atazanavir/Ritonavir (ATV/r) 300mg/100mg [Pack 30]"],
         RATIO: 0.73,
-        FIELDS: [ESTIMATED_NUMBER_OF_NEW_PATIENTS, ESTIMATED_NUMBER_OF_NEW_PREGNANT_WOMEN]
+        FIELDS: [ESTIMATED_NUMBER_OF_NEW_ART_PATIENTS, ESTIMATED_NUMBER_OF_NEW_PREGNANT_WOMEN]
     }]
 
 
@@ -64,7 +64,7 @@ class GuidelineAdherenceCheckPaed1L(GuidelineAdherenceCheckAdult1L):
               "Zidovudine/Lamivudine (AZT/3TC) 60mg/30mg [Pack 60]"],
         DF1: ["Abacavir/Lamivudine (ABC/3TC) 60mg/30mg [Pack 60]"],
         RATIO: 0.80,
-        FIELDS: [ESTIMATED_NUMBER_OF_NEW_PATIENTS]
+        FIELDS: [ESTIMATED_NUMBER_OF_NEW_ART_PATIENTS]
     }]
 
 

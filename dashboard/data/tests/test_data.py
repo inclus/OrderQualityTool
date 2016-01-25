@@ -37,16 +37,6 @@ class DataTestCase(TestCase):
         records = check.get_consumption_records("PLACE1", "A")
         assert records == [{FORMULATION: "A", "openingBalance": 3}, {FORMULATION: "A", "openingBalance": 12}]
 
-    def test_patient_records(self):
-        report = FakeReport()
-        report.cycle = "Jul - Aug 2015"
-        report.pds = {"PLACE1": [{FORMULATION: "A1", NEW: 3},
-                                 {FORMULATION: "B", NEW: 3},
-                                 {FORMULATION: "A2", NEW: 12}]}
-        check = ConsumptionAndPatientsQualityCheck(report)
-        records = check.get_patient_records("PLACE1", "A", False)
-        assert records == [{FORMULATION: "A1", NEW: 3}, {FORMULATION: "A2", NEW: 12}]
-
     def test_adult_records(self):
         report = FakeReport()
         report.cycle = "Jul - Aug 2015"
@@ -210,7 +200,7 @@ class TestDIFFERENTORDERSOVERTIMECheck(TestCase):
                 {
                     FORMULATION: F1_QUERY,
                     OPENING_BALANCE: 12,
-                    ESTIMATED_NUMBER_OF_NEW_PATIENTS: 3,
+                    ESTIMATED_NUMBER_OF_NEW_ART_PATIENTS: 3,
                     ART_CONSUMPTION: 4
                 }
             ]
@@ -224,7 +214,7 @@ class TestDIFFERENTORDERSOVERTIMECheck(TestCase):
                 {
                     FORMULATION: F1_QUERY,
                     OPENING_BALANCE: 12,
-                    ESTIMATED_NUMBER_OF_NEW_PATIENTS: 3,
+                    ESTIMATED_NUMBER_OF_NEW_ART_PATIENTS: 3,
                     ART_CONSUMPTION: 4
                 }
             ]
@@ -242,7 +232,7 @@ class TestDIFFERENTORDERSOVERTIMECheck(TestCase):
                 {
                     FORMULATION: F1_QUERY,
                     OPENING_BALANCE: 0,
-                    ESTIMATED_NUMBER_OF_NEW_PATIENTS: 0,
+                    ESTIMATED_NUMBER_OF_NEW_ART_PATIENTS: 0,
                     ART_CONSUMPTION: 0
                 }
             ]
@@ -256,7 +246,7 @@ class TestDIFFERENTORDERSOVERTIMECheck(TestCase):
                 {
                     FORMULATION: F1_QUERY,
                     OPENING_BALANCE: 0,
-                    ESTIMATED_NUMBER_OF_NEW_PATIENTS: 0,
+                    ESTIMATED_NUMBER_OF_NEW_ART_PATIENTS: 0,
                     ART_CONSUMPTION: 0
                 }
             ]
@@ -274,7 +264,7 @@ class TestDIFFERENTORDERSOVERTIMECheck(TestCase):
                 {
                     FORMULATION: F1_QUERY,
                     OPENING_BALANCE: 12,
-                    ESTIMATED_NUMBER_OF_NEW_PATIENTS: 2,
+                    ESTIMATED_NUMBER_OF_NEW_ART_PATIENTS: 2,
                     ART_CONSUMPTION: 4
                 }
             ]
@@ -288,7 +278,7 @@ class TestDIFFERENTORDERSOVERTIMECheck(TestCase):
                 {
                     FORMULATION: F1_QUERY,
                     OPENING_BALANCE: 12,
-                    ESTIMATED_NUMBER_OF_NEW_PATIENTS: 0,
+                    ESTIMATED_NUMBER_OF_NEW_ART_PATIENTS: 0,
                     ART_CONSUMPTION: 4
                 }
             ]
@@ -306,7 +296,7 @@ class TestDIFFERENTORDERSOVERTIMECheck(TestCase):
                 {
                     FORMULATION: "the",
                     OPENING_BALANCE: 12,
-                    ESTIMATED_NUMBER_OF_NEW_PATIENTS: 3,
+                    ESTIMATED_NUMBER_OF_NEW_ART_PATIENTS: 3,
                     ART_CONSUMPTION: 4
                 }
             ]
@@ -320,7 +310,7 @@ class TestDIFFERENTORDERSOVERTIMECheck(TestCase):
                 {
                     FORMULATION: F1_QUERY,
                     OPENING_BALANCE: 12,
-                    ESTIMATED_NUMBER_OF_NEW_PATIENTS: 3,
+                    ESTIMATED_NUMBER_OF_NEW_ART_PATIENTS: 3,
                     ART_CONSUMPTION: 4
                 }
             ]

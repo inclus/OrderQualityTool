@@ -141,7 +141,7 @@ class NNRTINEWPAEDCheck(NNRTICURRENTADULTSCheck):
             "Zidovudine/Lamivudine (AZT/3TC) 60mg/30mg [Pack 60]"
         ],
         FIELDS: [
-            ESTIMATED_NUMBER_OF_NEW_PATIENTS,
+            ESTIMATED_NUMBER_OF_NEW_ART_PATIENTS,
             ESTIMATED_NUMBER_OF_NEW_PREGNANT_WOMEN
         ]}]
 
@@ -162,6 +162,6 @@ class NNRTINewAdultsCheck(NNRTICURRENTADULTSCheck):
             "Abacavir/Lamivudine (ABC/3TC) 600mg/300mg [Pack 30]"
         ],
         FIELDS: [
-            ESTIMATED_NUMBER_OF_NEW_PATIENTS,
+            ESTIMATED_NUMBER_OF_NEW_ART_PATIENTS,
             ESTIMATED_NUMBER_OF_NEW_PREGNANT_WOMEN
         ]}]
