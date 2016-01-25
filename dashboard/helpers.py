@@ -99,6 +99,7 @@ F2 = "ABC/3TC (Paed)"
 F1 = "TDF/3TC/EFV (Adult)"
 
 MULTIPLE = 'Multiple'
+CLEANED_NAME = 'cleaned_name'
 WEB_PAPER = 'Web/Paper'
 DISTRICT = 'District'
 WAREHOUSE = 'Warehouse'
