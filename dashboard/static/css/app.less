@@ -2,7 +2,7 @@
 @import "../less/variables.less";
 
 body {
-  padding-top: 70px;
+  padding-top: 90px;
   padding-bottom: 30px;
   letter-spacing: 1.5px;
 
@@ -168,7 +168,7 @@ td.score_FAIL {
   .make-sm-column(0.7);
   .make-md-column(0.7);
   padding-left: 0px;
-  min-width: 20%;
+  min-width: 18%;
   border: 1px solid @chai-green;
   color: white;
   background-color: @chai-green;
@@ -178,6 +178,10 @@ td.score_FAIL {
   margin-bottom: 10px;
   margin-left: 4px;
 }
+.reset-tag {
+  .make-sm-column(0.7);
+  .make-md-column(0.7);
+}
 .navbar-inverse {
   .navbar-nav {
     > .active > a {
@@ -186,4 +190,18 @@ td.score_FAIL {
       }
     }
   }
+}
+nav.with-flag {
+  background-repeat: no-repeat;
+  padding-top: 20px;
+  background-image: url("/static/images/flag.png")
+}
+.panel-title {
+  span {
+    font-weight: bold;
+    font-size: 19px;
+  }
+}
+.DTFC_LeftBodyWrapper, .DTFC_LeftHeadWrapper > table {
+  border-right: 2px solid #D5D5D5;
 }

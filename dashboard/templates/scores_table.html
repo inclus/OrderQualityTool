@@ -4,34 +4,33 @@
     <div class="container">
         <div class="row">
             <div class="col-md-1 filter-title">
-                <h3>FILTERS</h3>
+                <h5>FILTERS</h5>
             </div>
-            <div class="col-md-10">
-              <div id="tags"></div>
-               <a href="#" id="resetFilter" class="btn btn-sm">Reset</a>
+            <div class="col-md-12">
+              <div id="tags">
+              </div>
             </div>
                 
         </div>
         <div class="row">
 
-            <select name="district" id="district_select" class="filter">
-                <option value="">ALL DISTRICTS</option>
+            <select name="district" id="district_select" class="filter" multiple="multiple">
                 {% for district in districts %}
-                    <option value="{{ district.name }}">{{ district.name }}</option>
+                    <option value="{{ district.district }}">{{ district.district }}</option>
                 {% endfor %}
             </select>
 
             <select name="warehouse" id="warehouse_select" class="filter">
                 <option value="">ALL WAREHOUSES</option>
                 {% for warehouse in warehouses %}
-                    <option value="{{ warehouse.name }}">{{ warehouse.name }}</option>
+                    <option value="{{ warehouse.warehouse }}">{{ warehouse.warehouse }}</option>
                 {% endfor %}
             </select>
 
             <select name="ip" id="ip_select" class="filter">
                 <option value="">ALL IPS</option>
                 {% for ip in ips %}
-                    <option value="{{ ip.name }}">{{ ip.name }}</option>
+                    <option value="{{ ip.ip }}">{{ ip.ip }}</option>
                 {% endfor %}
             </select>
 

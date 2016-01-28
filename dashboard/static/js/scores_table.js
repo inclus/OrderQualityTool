@@ -3,13 +3,17 @@ $(document).ready(function() {
     var oTable = $(tableId).DataTable({
         "processing": true,
         "serverSide": true,
-        "ordering": false,
+        "ordering": true,
         "fixedColumns": {
             leftColumns: 4
         },
+        "aoColumnDefs": [{
+            'bSortable': false,
+            'aTargets': [0, 1, 2, 3,4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21]
+        }],
         "scrollX": '100%',
         "scrollCollapse": true,
-        "bLengthChange": false,
+        "bLengthChange": true,
         "ajax": {
             "url": "/api/table/scores",
             "type": "POST",
@@ -18,7 +22,12 @@ $(document).ready(function() {
                 d.warehouse = $('#warehouse_select').val();
                 d.ip = $('#ip_select').val();
                 d.formulation = $('#formulation_select').val();
-                d.district = $('#district_select').val();
+                var list_of_districts = $('#district_select').val();
+                if (list_of_districts) {
+                    var districts_text = list_of_districts.join(",");
+                    d.district = districts_text;
+                }
+
             }
         }
     });
@@ -38,26 +47,45 @@ $(document).ready(function() {
         var tagsToDisplay = [];
         _.forIn(tags, function(value, key) {
             if (value) {
-                tagsToDisplay.push({
-                    'value': value
-                })
+                if (key == "district") {
+                    for (var i = 0; i < value.length; i++) {
+                        tagsToDisplay.push({
+                            'value': value[i]
+                        })
+                    };
+                } else {
+                    tagsToDisplay.push({
+                        'value': value
+                    });
+                }
+
             }
         });
-        var template = $.templates("{{for tags}}<span class='filter-tag'>{{:value}}</span>{{/for}}");
+        var template = $.templates("{{for tags}}<span class='filter-tag'>{{:value}}</span>{{/for}}<a href='#' id='resetFilter' class='btn btn-sm reset-tag'>Reset</a>");
         var html = template.render({
             tags: tagsToDisplay
         });
         $('#tags').html(html);
-    };
-    $('#resetFilter').click(function() {
-        _.forEach(selectIds, function(id) {
-            var firstValue = $(id + " option:first").val();
-            $(id).select2('val', firstValue);
+        $('#resetFilter').click(function() {
+            _.forEach(selectIds, function(id) {
+                var firstValue = $(id + " option:first").val();
+                $(id).select2('val', firstValue);
+            });
         });
-    });
+
+    };
+    
     _.forEach(selectIds, function(id) {
         var name = $(id).attr('name');
-        $(id).select2();
+        if (id == '#district_select') {
+            $(id).select2({
+                placeholder: "ALL DISTRICTS"
+            });
+        } else {
+            $(id).select2();
+        }
+
+
         $(id).on('change', function(ev) {
             oTable.draw();
             var selectedValue = $(ev.target).val();
@@ -71,5 +99,7 @@ $(document).ready(function() {
         var firstValue = $(id + " option:first").val();
         $(id).select2('val', firstValue);
     });
+
+    $("[name='score-tables_length']").removeClass();
 
 });

@@ -32,6 +32,13 @@ gulp.task('less', function() {
         .pipe(gulp.dest(lessDest));
 });
 
+gulp.task('karma', function(done) {
+    new Server({
+        configFile: __dirname + '/karma.conf.js',
+        singleRun: true
+    }, done).start();
+});
+
 gulp.task('test', ['djangotest'], function(done) {
     new Server({
         configFile: __dirname + '/karma.conf.js',

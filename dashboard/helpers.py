@@ -159,3 +159,5 @@ GUIDELINE_ADHERENCE_ADULT_1L = "guidelineAdherenceAdult1L"
 N_A = 'N/A'
 FAIL = 'FAIL'
 PASS = 'PASS'
+FAIL_COUNT = "fail_count"
+PASS_COUNT = "pass_count"

@@ -21,7 +21,7 @@
 </head>
 <body>
 
-<nav class="navbar navbar-inverse navbar-fixed-top">
+<nav class="navbar navbar-inverse navbar-fixed-top with-flag">
     <div class="container">
         <div class="navbar-header">
             <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
@@ -36,14 +36,17 @@
             <ul class="nav navbar-nav">
                 {% with menu=menus.main %}{% include "bootstrap-navbar.html" %}{% endwith %}
             </ul>
-
-            <ul class="pull-right nav navbar-nav">
+            <ul class="nav navbar-nav navbar-right">
+                <li><span style="font-size: 30px;vertical-align: middle;margin-right:25px;"> <img src="/static/images/ug.png" height="35" width="35"> </span></li>
+            </ul>
+            <ul class=" nav navbar-nav">
                 {% if user.is_authenticated %}
                 <li><a href="{% url 'logout' %}">LOGOUT</a></li>
                 {% else %}
                 <li><a href="{% url 'login' %}">LOGIN</a></li>
                 {% endif %}
             </ul>
+            
         </div><!--/.nav-collapse -->
     </div>
 </nav>

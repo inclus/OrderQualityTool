@@ -2,6 +2,7 @@ from django.db.models import Q
 from django_datatables_view.base_datatable_view import BaseDatatableView
 
 from dashboard.helpers import *
+from dashboard.helpers import FAIL_COUNT
 from dashboard.models import Score
 
 
@@ -74,14 +75,15 @@ class ScoresTableView(BaseDatatableView):
     def get_initial_queryset(self):
         qs = super(ScoresTableView, self).get_initial_queryset()
         cycle = self.request.POST.get(u'cycle', None)
-        district = self.request.POST.get(u'district', None)
+        district_filter = self.request.POST.get(u'district', None)
         ip = self.request.POST.get(u'ip', None)
         warehouse = self.request.POST.get(u'warehouse', None)
         filters = {}
         if cycle:
             filters['cycle'] = cycle
-        if district:
-            filters['district'] = district
+        if district_filter:
+            districts = district_filter.split(',')
+            filters['district__in'] = districts
         if ip:
             filters['ip'] = ip
         if warehouse:

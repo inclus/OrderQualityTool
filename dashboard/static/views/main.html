@@ -59,7 +59,7 @@
     <div class="col-md-6">
         <div class="panel panel-default">
             <div class="panel-heading">
-                <h3 class="panel-title">Worst Performing
+                <h3 class="panel-title"><span>Worst Performing</span>
                 <div class="dropdown ranking-dropdown">
                     <a class="dropdown-toggle " data-toggle="dropdown"> {{worstPerforming}} <b class="caret"></b></a>
                     <ul class="dropdown-menu">
@@ -88,7 +88,7 @@
     <div class="col-md-6">
         <div class="panel panel-default">
             <div class="panel-heading">
-                <h3 class="panel-title">Best Performing
+                <h3 class="panel-title"><span>Best Performing</span>
                 <div class="dropdown ranking-dropdown">
                     <a class="dropdown-toggle " data-toggle="dropdown"> {{bestPerforming}} <b class="caret"></b></a>
                     <ul class="dropdown-menu">
@@ -104,7 +104,7 @@
         <table class="table table-bordered" ng-table="bestTableParams">
             <tr>
                 <th> {{bestPerforming}} </th>
-                <th>Rate</th>
+                <th>Percentage of</th>
             </tr>
             <tr ng-repeat="district in $data">
                 <td>{{district.name}}</td>
