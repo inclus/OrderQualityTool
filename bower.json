@@ -36,6 +36,7 @@
     "jsrender": "~0.9.71"
   },
   "resolutions": {
-    "jquery": "1.9"
+    "jquery": "1.9",
+    "angular": "1.4.8"
   }
 }
