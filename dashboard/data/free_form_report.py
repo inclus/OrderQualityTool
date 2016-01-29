@@ -1,13 +1,20 @@
 import logging
 from collections import defaultdict
 
-import pydash
 from openpyxl import load_workbook
 
 from dashboard.helpers import *
 from dashboard.models import Cycle
 
 logger = logging.getLogger(__name__)
+
+
+def get_real_facility_name(facility_name, district_name):
+    if facility_name:
+        template = "_%s" % district_name
+        return facility_name.replace(template, "")
+    else:
+        return facility_name
 
 
 class FreeFormReport():
@@ -59,15 +66,15 @@ class FreeFormReport():
         records = defaultdict(list)
         for row in paed_patients_sheet.iter_rows(
                         'A%s:M%s' % (paed_patients_sheet.min_row + 1, paed_patients_sheet.max_row)):
-            facility_key, facility_name = self.get_facility_name(row)
-            if facility_name:
+            facility_key = get_real_facility_name(row[1].value, row[8].value)
+            if facility_key:
                 patient_record = dict()
                 patient_record[FORMULATION] = row[2].value
                 patient_record[EXISTING] = self.get_value(row, 4)
                 patient_record[NEW] = self.get_value(row, 5)
-                records[facility_name].append(patient_record)
+                records[facility_key].append(patient_record)
             else:
-                logger.debug("%s not found" % facility_name)
+                logger.debug("%s not found" % facility_key)
         return records
 
     def adult_patients(self):
@@ -75,15 +82,15 @@ class FreeFormReport():
         records = defaultdict(list)
         for row in adult_patients_sheet.iter_rows(
                         'A%s:M%s' % (adult_patients_sheet.min_row + 1, adult_patients_sheet.max_row)):
-            facility_key, facility_name = self.get_facility_name(row)
-            if facility_name:
+            facility_key = get_real_facility_name(row[1].value, row[8].value)
+            if facility_key:
                 patient_record = dict()
                 patient_record[FORMULATION] = row[2].value
                 patient_record[EXISTING] = self.get_value(row, 4)
                 patient_record[NEW] = self.get_value(row, 5)
-                records[facility_name].append(patient_record)
+                records[facility_key].append(patient_record)
             else:
-                logger.debug("%s not found" % facility_name)
+                logger.debug("%s not found" % facility_key)
         return records
 
     def locations(self):
@@ -93,13 +100,13 @@ class FreeFormReport():
             if row[0].value:
                 facility = dict()
                 facility[SCORES] = defaultdict(dict)
-                facility[NAME] = row[0].value
                 facility[STATUS] = row[2].value
                 facility[IP] = row[3].value
                 facility[WAREHOUSE] = row[4].value
                 facility[DISTRICT] = row[5].value
                 facility[WEB_PAPER] = row[7].value
                 facility[MULTIPLE] = row[8].value
+                facility[NAME] = get_real_facility_name(row[0].value, row[5].value)
                 facility_data.append(facility)
         return facility_data
 
@@ -107,8 +114,8 @@ class FreeFormReport():
         consumption_sheet = self.workbook.get_sheet_by_name(CONSUMPTION_SHEET)
         records = defaultdict(list)
         for row in consumption_sheet.iter_rows('A%s:X%s' % (consumption_sheet.min_row + 1, consumption_sheet.max_row)):
-            facility_key, facility_name = self.get_facility_name(row)
-            if facility_name:
+            facility_key = get_real_facility_name(row[1].value, row[17].value)
+            if facility_key:
                 consumption_record = dict()
                 consumption_record[FORMULATION] = row[2].value
                 consumption_record[OPENING_BALANCE] = self.get_value(row, 4)
@@ -119,26 +126,8 @@ class FreeFormReport():
                 consumption_record[CLOSING_BALANCE] = self.get_value(row, 9)
                 consumption_record[MONTHS_OF_STOCK_OF_HAND] = self.get_value(row, 10)
                 consumption_record[QUANTITY_REQUIRED_FOR_CURRENT_PATIENTS] = self.get_value(row, 11)
-                consumption_record[ESTIMATED_NUMBER_OF_NEW_PATIENTS] = self.get_value(row, 12)
+                consumption_record[ESTIMATED_NUMBER_OF_NEW_ART_PATIENTS] = self.get_value(row, 12)
                 consumption_record[ESTIMATED_NUMBER_OF_NEW_PREGNANT_WOMEN] = self.get_value(row, 13)
                 consumption_record[PACKS_ORDERED] = self.get_value(row, 14)
                 records[facility_key].append(consumption_record)
         return records
-
-    def get_facility_name(self, row):
-        facility_name = row[1].value
-        if facility_name:
-            if facility_name not in self.name_cache:
-                locations = pydash.chain(self.locs).reject(lambda x: x['name'] is None).select(
-                        lambda x: facility_name in x['name']).value()
-                if len(locations) > 0:
-                    facility_key = locations[0]['name']
-                else:
-                    facility_key = facility_name
-
-                self.name_cache[facility_name] = facility_key
-            else:
-                facility_key = self.name_cache[facility_name]
-        else:
-            facility_key = facility_name
-        return facility_key, facility_name

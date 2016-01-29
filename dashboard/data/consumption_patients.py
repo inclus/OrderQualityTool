@@ -8,18 +8,24 @@ from dashboard.helpers import *
 
 class ConsumptionAndPatientsQualityCheck(QCheck):
     test = CONSUMPTION_AND_PATIENTS
-    combinations = [{NAME: F1, PATIENT_QUERY: "TDF/3TC/EFV", CONSUMPTION_QUERY: F1_QUERY, RATIO: 2.0,
-                     FIELDS: [ART_CONSUMPTION, PMTCT_CONSUMPTION], IS_ADULT: True},
-                    {NAME: F2, PATIENT_QUERY: "ABC/3TC", CONSUMPTION_QUERY: F2_QUERY, RATIO: 4.6,
-                     FIELDS: [ART_CONSUMPTION], IS_ADULT: False},
-                    {NAME: F3, PATIENT_QUERY: "EFV", CONSUMPTION_QUERY: F3_QUERY, RATIO: 1, FIELDS: [ART_CONSUMPTION],
-                     IS_ADULT: False}]
+    combinations = [
+        {
+            NAME: F1, PATIENT_QUERY: F1_PATIENT_QUERY, CONSUMPTION_QUERY: F1_QUERY, RATIO: 2.0,
+            FIELDS: [ART_CONSUMPTION, PMTCT_CONSUMPTION], IS_ADULT: True
+        },
+        {
+            NAME: F2, PATIENT_QUERY: F2_PATIENT_QUERY, CONSUMPTION_QUERY: F2_QUERY, RATIO: 4.6,
+            FIELDS: [ART_CONSUMPTION], IS_ADULT: False
+        },
+        {
+            NAME: F3, PATIENT_QUERY: F3_PATIENT_QUERY, CONSUMPTION_QUERY: F3_QUERY, RATIO: 1, FIELDS: [ART_CONSUMPTION],
+            IS_ADULT: False
+        }]
     key_cache = defaultdict(dict)
 
     def for_each_facility(self, facility, no, not_reporting, yes, combination):
         result = NOT_REPORTING
 
- #the df1 and df2  need to pick the correct data for the different formulations.CHECK EXAMPLE ON Bugaya
         facility_name = facility[NAME]
         df1_records = self.get_consumption_records(facility_name, combination[CONSUMPTION_QUERY])
         df2_records = self.get_patient_records(facility_name, combination[PATIENT_QUERY],
@@ -43,11 +49,11 @@ class ConsumptionAndPatientsQualityCheck(QCheck):
     def calculate_score(self, df1_sum, df2_sum, number_of_consumption_records,
                         number_of_patient_records, yes, no, not_reporting, result, all_df1_blank,
                         all_df2_blank):
-        numerator = df1_sum
-        denominator = df2_sum
+        numerator = float(df1_sum)
+        denominator = float(df2_sum)
         if df2_sum > df1_sum:
-            numerator = df2_sum
-            denominator = df1_sum
+            numerator = float(df2_sum)
+            denominator = float(df1_sum)
         no_blanks = not all_df1_blank and not all_df2_blank
         both_are_zero = (df1_sum == 0 and df2_sum == 0)
         divisible = denominator != 0
@@ -61,29 +67,19 @@ class ConsumptionAndPatientsQualityCheck(QCheck):
             result = NO
         return no, not_reporting, result, yes
 
-#Check to see the order limit
-    def get_patient_records(self, facility_name, formulation_name, is_adult=True):
+    def get_patient_records(self, facility_name, combinations, is_adult=True):
         collection = self.report.ads if is_adult else self.report.pds
-        records = self.get_records_from_collection(collection, facility_name, self.report.cycle)
-        return pydash.chain(records).reject(
-                lambda x: formulation_name not in x[FORMULATION]
+        records = self.get_records_from_collection(collection, facility_name)
+        return pydash.chain(records).select(
+            lambda x: x[FORMULATION].strip() in combinations
         ).value()
 
-    def get_records_from_collection(self, collection, facility_name, cycle):
-        if facility_name in self.key_cache[cycle]:
-            key = self.key_cache[cycle][facility_name]
-        else:
-            matches = [k for k in collection.keys() if k.lower() in facility_name.lower()]
-            if len(matches) > 0:
-                key = matches[0]
-            else:
-                key = facility_name
-            self.key_cache[cycle][facility_name] = key
-        records = collection[key]
+    def get_records_from_collection(self, collection, facility_name):
+        records = collection.get(facility_name, [])
         return records
 
     def get_consumption_records(self, facility_name, formulation_name):
         records = self.report.cs[facility_name]
         return pydash.chain(records).select(
-                lambda x: formulation_name in x[FORMULATION]
+            lambda x: formulation_name in x[FORMULATION]
         ).value()

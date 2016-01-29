@@ -1,6 +1,6 @@
 import pydash
 
-from dashboard.data.utils import QCheck, values_for_records
+from dashboard.data.utils import QCheck, values_for_records, facility_not_reporting
 from dashboard.helpers import *
 
 
@@ -13,7 +13,7 @@ class GuidelineAdherenceCheckAdult1L(QCheck):
         DF1: ["Tenofovir/Lamivudine (TDF/3TC) 300mg/300mg [Pack 30]",
               "Tenofovir/Lamivudine/Efavirenz (TDF/3TC/EFV) 300mg/300mg/600mg[Pack 30]"],
         RATIO: 0.80,
-        FIELDS: [ESTIMATED_NUMBER_OF_NEW_PATIENTS, ESTIMATED_NUMBER_OF_NEW_PREGNANT_WOMEN]
+        FIELDS: [ESTIMATED_NUMBER_OF_NEW_ART_PATIENTS, ESTIMATED_NUMBER_OF_NEW_PREGNANT_WOMEN]
     }]
 
     def filter_records(self, facility_name, formulation_names):
@@ -42,7 +42,7 @@ class GuidelineAdherenceCheckAdult1L(QCheck):
         all_df2_fields_are_blank = pydash.every(df2_values, lambda x: x is None)
         return calculate_score(df1_count, df2_count, sum_df1, sum_df2, ratio, yes, no,
                                not_reporting, all_df1_fields_are_blank,
-                               all_df2_fields_are_blank)
+                               all_df2_fields_are_blank, facility_not_reporting(facility))
 
 
 class GuidelineAdherenceCheckAdult2L(GuidelineAdherenceCheckAdult1L):
@@ -52,7 +52,7 @@ class GuidelineAdherenceCheckAdult2L(GuidelineAdherenceCheckAdult1L):
         DF2: ["Lopinavir/Ritonavir (LPV/r) 200mg/50mg [Pack 120]"],
         DF1: ["Atazanavir/Ritonavir (ATV/r) 300mg/100mg [Pack 30]"],
         RATIO: 0.73,
-        FIELDS: [ESTIMATED_NUMBER_OF_NEW_PATIENTS, ESTIMATED_NUMBER_OF_NEW_PREGNANT_WOMEN]
+        FIELDS: [ESTIMATED_NUMBER_OF_NEW_ART_PATIENTS, ESTIMATED_NUMBER_OF_NEW_PREGNANT_WOMEN]
     }]
 
 
@@ -64,20 +64,20 @@ class GuidelineAdherenceCheckPaed1L(GuidelineAdherenceCheckAdult1L):
               "Zidovudine/Lamivudine (AZT/3TC) 60mg/30mg [Pack 60]"],
         DF1: ["Abacavir/Lamivudine (ABC/3TC) 60mg/30mg [Pack 60]"],
         RATIO: 0.80,
-        FIELDS: [ESTIMATED_NUMBER_OF_NEW_PATIENTS]
+        FIELDS: [ESTIMATED_NUMBER_OF_NEW_ART_PATIENTS]
     }]
 
 
 def calculate_score(df1_count, df2_count, sum_df1, sum_df2, ratio, yes, no, not_reporting,
-                    all_df1_fields_are_blank=False, all_df2_fields_are_blank=False):
-    total = sum_df1 + sum_df2
+                    all_df1_fields_are_blank=False, all_df2_fields_are_blank=False, facility_is_not_reporting=False):
+    total = float(sum_df1 + sum_df2)
     has_blanks = (all_df2_fields_are_blank or all_df1_fields_are_blank)
     has_no_blanks = not has_blanks
     has_no_records = df1_count == 0 or df2_count == 0
     adjusted_total = (ratio * total)
     df1_is_at_least_adjusted_total = sum_df1 >= adjusted_total
     result = NOT_REPORTING
-    if has_no_records:
+    if has_no_records or facility_is_not_reporting:
         not_reporting += 1
     elif has_no_blanks and ((sum_df1 == 0 and sum_df2 == 0) or df1_is_at_least_adjusted_total):
         yes += 1

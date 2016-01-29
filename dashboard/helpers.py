@@ -99,6 +99,7 @@ F2 = "ABC/3TC (Paed)"
 F1 = "TDF/3TC/EFV (Adult)"
 
 MULTIPLE = 'Multiple'
+CLEANED_NAME = 'cleaned_name'
 WEB_PAPER = 'Web/Paper'
 DISTRICT = 'District'
 WAREHOUSE = 'Warehouse'
@@ -139,7 +140,7 @@ EXISTING = 'existing'
 NEW = 'new'
 PACKS_ORDERED = 'packs_ordered'
 ESTIMATED_NUMBER_OF_NEW_PREGNANT_WOMEN = 'estimated_number_of_new_pregnant_women'
-ESTIMATED_NUMBER_OF_NEW_PATIENTS = 'estimated_number_of_new_patients'
+ESTIMATED_NUMBER_OF_NEW_ART_PATIENTS = 'estimated_number_of_new_patients'
 QUANTITY_REQUIRED_FOR_CURRENT_PATIENTS = 'quantity_required_for_current_patients'
 MONTHS_OF_STOCK_OF_HAND = 'months_of_stock_of_hand'
 CLOSING_BALANCE = 'closing_balance'
@@ -161,3 +162,9 @@ FAIL = 'FAIL'
 PASS = 'PASS'
 FAIL_COUNT = "fail_count"
 PASS_COUNT = "pass_count"
+
+F3_PATIENT_QUERY = ["ABC/3TC/EFV", "AZT/3TC/EFV"]
+
+F2_PATIENT_QUERY = ["ABC/3TC/LPV/r", "ABC/3TC/EFV", "ABC/3TC/NVP"]
+
+F1_PATIENT_QUERY = ["TDF/3TC/EFV (PMTCT)", "TDF/3TC/EFV (ADULT)"]

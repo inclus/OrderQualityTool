@@ -44,27 +44,32 @@ class NNRTICURRENTADULTSCheck(QCheck):
         df2_count = len(df2_records)
         df1_values = values_for_records(combination[FIELDS], df1_records)
         df2_values = values_for_records(combination[FIELDS], df2_records)
+        all_df1_fields_are_blank = pydash.every(df1_values, lambda x: x is None)
+        all_df2_fields_are_blank = pydash.every(df2_values, lambda x: x is None)
         sum_df1 = pydash.chain(df1_values).reject(lambda x: x is None).sum().value()
         sum_df2 = pydash.chain(df2_values).reject(lambda x: x is None).sum().value()
         total = sum_df2 + sum_df1
-        numerator = sum_df1
-        denominator = sum_df2
+        numerator = float(sum_df1)
+        denominator = float(sum_df2)
         result = None
         if abs(sum_df1) > abs(sum_df2):
-            numerator = sum_df2
-            denominator = sum_df1
+            numerator = float(sum_df2)
+            denominator = float(sum_df1)
 
         if df1_count == 0 or df2_count == 0:
             not_reporting += 1
             result = NOT_REPORTING
-        elif total == 0 or (denominator != 0 and 0.7 <= abs(numerator / denominator) <= 1.429):
+        elif (sum_df2 == 0 and sum_df1 == 0) or (denominator != 0 and 0.7 <= abs(numerator / denominator) <= 1.429):
             yes += 1
             result = YES
         elif denominator != 0 and (abs(numerator / denominator) < 1.0 or abs(numerator / denominator) > 1.429):
             no += 1
             result = NO
-        else:
-            pass
+        elif all_df1_fields_are_blank or all_df2_fields_are_blank:
+            print "------------------------------------------>", facility_name
+            no += 1
+            result = NO
+
 
         return result, no, not_reporting, yes
 
@@ -85,7 +90,8 @@ class NNRTICURRENTPAEDCheck(NNRTICURRENTADULTSCheck):
         ],
         FIELDS: [
             ART_CONSUMPTION
-        ]}]
+        ]
+    }]
 
     def for_each_facility(self, facility, no, not_reporting, yes, combination):
         facility_name = facility[NAME]
@@ -102,8 +108,8 @@ class NNRTICURRENTPAEDCheck(NNRTICURRENTADULTSCheck):
         sum_df1 = pydash.chain(df1_values).reject(lambda x: x is None).sum().value()
         sum_df2 = pydash.chain(df2_values).reject(lambda x: x is None).sum().value()
         other_sum = pydash.chain(other_values).reject(lambda x: x is None).sum().value()
-        adjusted_sum_df1 = (sum_df1 / ratio)
-        adjusted_sum_df2 = (sum_df2 / ratio) + other_sum
+        adjusted_sum_df1 = (float(sum_df1) / ratio)
+        adjusted_sum_df2 = (float(sum_df2) / ratio) + other_sum
         total = sum_df2 + sum_df1
         numerator = adjusted_sum_df1
         denominator = adjusted_sum_df2
@@ -141,9 +147,10 @@ class NNRTINEWPAEDCheck(NNRTICURRENTADULTSCheck):
             "Zidovudine/Lamivudine (AZT/3TC) 60mg/30mg [Pack 60]"
         ],
         FIELDS: [
-            ESTIMATED_NUMBER_OF_NEW_PATIENTS,
+            ESTIMATED_NUMBER_OF_NEW_ART_PATIENTS,
             ESTIMATED_NUMBER_OF_NEW_PREGNANT_WOMEN
-        ]}]
+        ]
+    }]
 
 
 class NNRTINewAdultsCheck(NNRTICURRENTADULTSCheck):
@@ -162,6 +169,7 @@ class NNRTINewAdultsCheck(NNRTICURRENTADULTSCheck):
             "Abacavir/Lamivudine (ABC/3TC) 600mg/300mg [Pack 30]"
         ],
         FIELDS: [
-            ESTIMATED_NUMBER_OF_NEW_PATIENTS,
+            ESTIMATED_NUMBER_OF_NEW_ART_PATIENTS,
             ESTIMATED_NUMBER_OF_NEW_PREGNANT_WOMEN
-        ]}]
+        ]
+    }]

@@ -15,7 +15,7 @@ class NegativeNumbersQualityCheck(QCheck):
               PMTCT_CONSUMPTION,
               ART_CONSUMPTION,
               ESTIMATED_NUMBER_OF_NEW_PREGNANT_WOMEN,
-              ESTIMATED_NUMBER_OF_NEW_PATIENTS]
+              ESTIMATED_NUMBER_OF_NEW_ART_PATIENTS]
 
     def for_each_facility(self, facility, no, not_reporting, yes, combination):
         result = NOT_REPORTING
