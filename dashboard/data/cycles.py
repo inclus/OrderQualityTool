@@ -22,14 +22,14 @@ class TwoCycleQCheck(QCheck):
     def get_consumption_records(self, report, facility_name, formulation_name):
         records = report.cs[facility_name]
         return pydash.chain(records).reject(
-                lambda x: formulation_name not in x[FORMULATION]
+            lambda x: formulation_name not in x[FORMULATION]
         ).value()
 
     def get_patient_records(self, report, facility_name, combinations, is_adult=True):
         collection = report.ads if is_adult else report.pds
         records = get_records_from_collection(collection, facility_name)
         return pydash.chain(records).select(
-                lambda x: x[FORMULATION].strip() in combinations
+            lambda x: x[FORMULATION].strip() in combinations
         ).value()
 
 
@@ -155,6 +155,7 @@ class STABLECONSUMPTIONCheck(TwoCycleQCheck):
 
         return result, no, not_reporting, yes
 
+
 class WAREHOUSEFULFILMENTCheck(TwoCycleQCheck):
     test = WAREHOUSE_FULFILMENT
     combinations = [
@@ -208,11 +209,11 @@ class STABLEPATIENTVOLUMESCheck(STABLECONSUMPTIONCheck):
         include_record = current_population >= threshold or prev_population >= threshold
         result = NOT_REPORTING
         if include_record:
-            numerator = current_population
-            denominator = prev_population
+            numerator = float(current_population)
+            denominator = float(prev_population)
             if prev_population > current_population:
-                numerator = prev_population
-                denominator = current_population
+                numerator = float(prev_population)
+                denominator = float(current_population)
             total = current_population + prev_population
             if pre_count == 0 or current_count == 0:
                 not_reporting += 1

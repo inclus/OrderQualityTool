@@ -42,7 +42,7 @@ def values_for_records(fields, records):
 
 def get_consumption_totals(fields, records):
     return pydash.chain(values_for_records(fields, records)).reject(
-            lambda x: x is None).sum().value()
+        lambda x: x is None).sum().value()
 
 
 def get_patient_total(records):
@@ -91,8 +91,8 @@ class QCheck:
         print (self.test, scores)
         for key, value in scores.items():
             formulation_scores.append(
-                    CycleFormulationScore(cycle=self.report.cycle, combination=key, yes=value[YES], no=value[NO],
-                                          not_reporting=value[NOT_REPORTING], test=self.test))
+                CycleFormulationScore(cycle=self.report.cycle, combination=key, yes=value[YES], no=value[NO],
+                                      not_reporting=value[NOT_REPORTING], test=self.test))
         return formulation_scores
 
     def run(self):
@@ -119,7 +119,7 @@ class QCheck:
 
 
 def facility_not_reporting(facility):
-    return facility['status'].strip() != 'Reporting'
+    return facility.get('status', '').strip() != 'Reporting'
 
 
 def facility_has_single_order(facility):

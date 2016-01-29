@@ -30,9 +30,11 @@ class DataTestCase(TestCase):
 
     def test_consumption_records(self):
         report = FakeReport()
-        report.cs = {"PLACE1": [{FORMULATION: "A", "openingBalance": 3},
-                                {FORMULATION: "B", "openingBalance": 3},
-                                {FORMULATION: "A", "openingBalance": 12}]}
+        report.cs = {
+            "PLACE1": [{FORMULATION: "A", "openingBalance": 3},
+                       {FORMULATION: "B", "openingBalance": 3},
+                       {FORMULATION: "A", "openingBalance": 12}]
+        }
         check = ConsumptionAndPatientsQualityCheck(report)
         records = check.get_consumption_records("PLACE1", "A")
         assert records == [{FORMULATION: "A", "openingBalance": 3}, {FORMULATION: "A", "openingBalance": 12}]
@@ -40,9 +42,11 @@ class DataTestCase(TestCase):
     def test_adult_records(self):
         report = FakeReport()
         report.cycle = "Jul - Aug 2015"
-        report.ads = {"PLACE1": [{FORMULATION: "A", NEW: 3},
-                                 {FORMULATION: "B", NEW: 3},
-                                 {FORMULATION: "A", NEW: 12}]}
+        report.ads = {
+            "PLACE1": [{FORMULATION: "A", NEW: 3},
+                       {FORMULATION: "B", NEW: 3},
+                       {FORMULATION: "A", NEW: 12}]
+        }
         check = ConsumptionAndPatientsQualityCheck(report)
         records = check.get_patient_records("PLACE1", "A", True)
         assert records == [{FORMULATION: "A", NEW: 3}, {FORMULATION: "A", NEW: 12}]
@@ -157,37 +161,45 @@ class GuidelineAdherenceAdult1LTestCase(TestCase):
 
     def test_run(self):
         report = FakeReport()
-        report.cs = {"PLACE1": [{FORMULATION: "A", "openingBalance": 1},
-                                {FORMULATION: "B", "openingBalance": 2},
-                                {FORMULATION: "C", "openingBalance": 3},
-                                {FORMULATION: "E", "openingBalance": 4},
-                                {FORMULATION: "A", "openingBalance": 12}]}
+        report.cs = {
+            "PLACE1": [{FORMULATION: "A", "openingBalance": 1},
+                       {FORMULATION: "B", "openingBalance": 2},
+                       {FORMULATION: "C", "openingBalance": 3},
+                       {FORMULATION: "E", "openingBalance": 4},
+                       {FORMULATION: "A", "openingBalance": 12}]
+        }
         check = GuidelineAdherenceCheckAdult1L(report)
 
     def test_adherence_filter(self):
         report = FakeReport()
-        report.locs = [{"name": "PLACE1", "scores": defaultdict(dict)}]
-        report.cs = {"PLACE1": [
-            {
-                FORMULATION: "Tenofovir/Lamivudine (TDF/3TC) 300mg/300mg [Pack 30]",
-                "estimated_number_of_new_pregnant_women": 4,
-                "estimated_number_of_new_patients": 4
-            },
-            {
-                FORMULATION: "Tenofovir/Lamivudine/Efavirenz (TDF/3TC/EFV) 300mg/300mg/600mg[Pack 30]",
-                "estimated_number_of_new_pregnant_women": 4,
-                "estimated_number_of_new_patients": 4},
-            {
-                FORMULATION: "Zidovudine/Lamivudine (AZT/3TC) 300mg/150mg [Pack 60]",
-                "estimated_number_of_new_pregnant_women": 1,
-                "estimated_number_of_new_patients": 1},
-            {
-                FORMULATION: "Zidovudine/Lamivudine/Nevirapine (AZT/3TC/NVP) 300mg/150mg/200mg [Pack 60]",
-                "estimated_number_of_new_pregnant_women": 1,
-                "estimated_number_of_new_patients": 1},
-            {FORMULATION: "A", "openingBalance": 12}]}
+        report.locs = [{"name": "PLACE1", "scores": defaultdict(dict), 'status': 'Reporting'}]
+        report.cs = {
+            "PLACE1": [
+                {
+                    FORMULATION: "Tenofovir/Lamivudine (TDF/3TC) 300mg/300mg [Pack 30]",
+                    "estimated_number_of_new_pregnant_women": 4,
+                    "estimated_number_of_new_patients": 4
+                },
+                {
+                    FORMULATION: "Tenofovir/Lamivudine/Efavirenz (TDF/3TC/EFV) 300mg/300mg/600mg[Pack 30]",
+                    "estimated_number_of_new_pregnant_women": 4,
+                    "estimated_number_of_new_patients": 4
+                },
+                {
+                    FORMULATION: "Zidovudine/Lamivudine (AZT/3TC) 300mg/150mg [Pack 60]",
+                    "estimated_number_of_new_pregnant_women": 1,
+                    "estimated_number_of_new_patients": 1
+                },
+                {
+                    FORMULATION: "Zidovudine/Lamivudine/Nevirapine (AZT/3TC/NVP) 300mg/150mg/200mg [Pack 60]",
+                    "estimated_number_of_new_pregnant_women": 1,
+                    "estimated_number_of_new_patients": 1
+                },
+                {FORMULATION: "A", "openingBalance": 12}]
+        }
         check = GuidelineAdherenceCheckAdult1L(report)
         assert check.run()['DEFAULT']['YES'] == 100
+
 
 
 class TestDIFFERENTORDERSOVERTIMECheck(TestCase):

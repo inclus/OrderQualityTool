@@ -6,8 +6,6 @@ from dashboard.data.utils import get_patient_total, get_consumption_totals, has_
 from dashboard.helpers import *
 
 
-
-
 class ConsumptionAndPatientsQualityCheck(QCheck):
     test = CONSUMPTION_AND_PATIENTS
     combinations = [
@@ -51,11 +49,11 @@ class ConsumptionAndPatientsQualityCheck(QCheck):
     def calculate_score(self, df1_sum, df2_sum, number_of_consumption_records,
                         number_of_patient_records, yes, no, not_reporting, result, all_df1_blank,
                         all_df2_blank):
-        numerator = df1_sum
-        denominator = df2_sum
+        numerator = float(df1_sum)
+        denominator = float(df2_sum)
         if df2_sum > df1_sum:
-            numerator = df2_sum
-            denominator = df1_sum
+            numerator = float(df2_sum)
+            denominator = float(df1_sum)
         no_blanks = not all_df1_blank and not all_df2_blank
         both_are_zero = (df1_sum == 0 and df2_sum == 0)
         divisible = denominator != 0
@@ -73,7 +71,7 @@ class ConsumptionAndPatientsQualityCheck(QCheck):
         collection = self.report.ads if is_adult else self.report.pds
         records = self.get_records_from_collection(collection, facility_name)
         return pydash.chain(records).select(
-                lambda x: x[FORMULATION].strip() in combinations
+            lambda x: x[FORMULATION].strip() in combinations
         ).value()
 
     def get_records_from_collection(self, collection, facility_name):
@@ -83,5 +81,5 @@ class ConsumptionAndPatientsQualityCheck(QCheck):
     def get_consumption_records(self, facility_name, formulation_name):
         records = self.report.cs[facility_name]
         return pydash.chain(records).select(
-                lambda x: formulation_name in x[FORMULATION]
+            lambda x: formulation_name in x[FORMULATION]
         ).value()
