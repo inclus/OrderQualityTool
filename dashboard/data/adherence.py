@@ -72,17 +72,25 @@ def calculate_score(df1_count, df2_count, sum_df1, sum_df2, ratio, yes, no, not_
                     all_df1_fields_are_blank=False, all_df2_fields_are_blank=False, facility_is_not_reporting=False):
     total = float(sum_df1 + sum_df2)
     has_blanks = (all_df2_fields_are_blank or all_df1_fields_are_blank)
-    has_no_blanks = not has_blanks
     has_no_records = df1_count == 0 or df2_count == 0
     adjusted_total = (ratio * total)
     df1_is_at_least_adjusted_total = sum_df1 >= adjusted_total
     result = NOT_REPORTING
     if has_no_records or facility_is_not_reporting:
         not_reporting += 1
-    elif has_no_blanks and ((sum_df1 == 0 and sum_df2 == 0) or df1_is_at_least_adjusted_total):
+    elif df1_is_at_least_adjusted_total:
         yes += 1
         result = YES
-    else:
+    elif not df1_is_at_least_adjusted_total:
         no += 1
         result = NO
+    elif not has_blanks and (sum_df1 == 0 and sum_df2 == 0):
+        yes += 1
+        result = YES
+    elif has_blanks:
+        no += 1
+        result = NO
+
+    else:
+        print "what is your case ?", sum_df1, sum_df2, ratio
     return result, no, not_reporting, yes
