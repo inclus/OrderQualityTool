@@ -90,7 +90,5 @@ def calculate_score(df1_count, df2_count, sum_df1, sum_df2, ratio, yes, no, not_
     elif has_blanks:
         no += 1
         result = NO
-
-    else:
-        print "what is your case ?", sum_df1, sum_df2, ratio
+    print facility_is_not_reporting, all_df2_fields_are_blank, all_df1_fields_are_blank
     return result, no, not_reporting, yes

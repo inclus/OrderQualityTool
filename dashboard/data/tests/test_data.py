@@ -138,7 +138,7 @@ class GuidelineAdherenceAdult1LTestCase(TestCase):
     def test_score_is_no_if_azt_cells_are_blank(self):
         df1_count = df2_count = 1
         sum_df1 = 0
-        sum_df2 = 0
+        sum_df2 = 20
         ratio = 0.8
         result, no, not_reporting, yes = calculate_score(df1_count, df2_count, sum_df1, sum_df2, ratio, 0, 0, 0, False,
                                                          True)
