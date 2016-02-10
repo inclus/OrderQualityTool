@@ -1,8 +1,6 @@
-from collections import defaultdict
-
 import pydash
 
-from dashboard.data.utils import QCheck, values_for_records, build_cycle_formulation_score
+from dashboard.data.utils import QCheck, values_for_records, build_cycle_formulation_score, facility_not_reporting
 from dashboard.helpers import *
 
 THRESHOLD = "threshold"
@@ -17,7 +15,6 @@ class TwoCycleQCheck(QCheck):
     def __init__(self, report, other_cycle_report):
         QCheck.__init__(self, report)
         self.other_cycle_report = other_cycle_report
-        self.key_cache = defaultdict(dict)
 
     def get_consumption_records(self, report, facility_name, formulation_name):
         records = report.cs[facility_name]
@@ -115,15 +112,17 @@ class STABLECONSUMPTIONCheck(TwoCycleQCheck):
         yes = 0
         no = 0
         not_reporting = 0
-        total_count = len(facilities)
+        total_count = 0
         formulation_name = combination[NAME]
         for facility in facilities:
-            result, no, not_reporting, yes = self.for_each_facility_with_count(facility, no, not_reporting, yes, combination)
+            result, no, not_reporting, yes, total_count = self.for_each_facility_with_count(facility, no, not_reporting, yes, combination, total_count)
             facility['scores'][self.test][formulation_name] = result
+        if combination[NAME] == F3:
+            print yes, no, not_reporting, total_count
         out = build_cycle_formulation_score(formulation_name, yes, no, not_reporting, total_count)
         scores[formulation_name] = out
 
-    def for_each_facility_with_count(self, facility, no, not_reporting, yes, combination):
+    def for_each_facility_with_count(self, facility, no, not_reporting, yes, combination, total_count):
         facility_name = facility[NAME]
         prev_records = self.get_consumption_records(self.other_cycle_report, facility_name,
                                                     combination[CONSUMPTION_QUERY])
@@ -132,28 +131,27 @@ class STABLECONSUMPTIONCheck(TwoCycleQCheck):
         number_of_consumption_records_prev_cycle = len(prev_records)
         number_of_consumption_records_current_cycle = len(current_records)
         fields = [PMTCT_CONSUMPTION, ART_CONSUMPTION]
-        current_consumption = pydash.chain(values_for_records(fields, current_records)).reject(lambda x: x is None).sum().value()
-        prev_consumption = pydash.chain(values_for_records(fields, prev_records)).reject(lambda x: x is None).sum().value()
+        current_values = values_for_records(fields, current_records)
+        current_consumption = pydash.chain(current_values).reject(lambda x: x is None).sum().value()
+        prev_values = values_for_records(fields, prev_records)
+        prev_consumption = pydash.chain(prev_values).reject(lambda x: x is None).sum().value()
         include_record = current_consumption > threshold or prev_consumption > threshold
         result = NOT_REPORTING
         if include_record:
-            numerator = current_consumption
-            denominator = prev_consumption
-            if prev_consumption > current_consumption:
-                numerator = prev_consumption
-                denominator = current_consumption
+            total_count += 1
+            numerator = float(current_consumption)
+            denominator = float(prev_consumption)
             if number_of_consumption_records_prev_cycle == 0 or number_of_consumption_records_current_cycle == 0:
                 not_reporting += 1
-            elif denominator != 0 and (0.5 <= (numerator / denominator) <= 1.5):
+            elif denominator != 0 and (0.5 < abs(numerator / denominator) < 1.5):
                 yes += 1
                 result = YES
             else:
                 no += 1
                 result = NO
         else:
-            not_reporting += 1
-
-        return result, no, not_reporting, yes
+            pass
+        return result, no, not_reporting, yes, total_count
 
 
 class WAREHOUSEFULFILMENTCheck(TwoCycleQCheck):
@@ -171,12 +169,21 @@ class WAREHOUSEFULFILMENTCheck(TwoCycleQCheck):
         current_records = self.get_consumption_records(self.report, facility_name, combination[CONSUMPTION_QUERY])
         count_prev = len(prev_records)
         count_current = len(current_records)
-        amount_ordered = pydash.chain(values_for_records([PACKS_ORDERED, ], prev_records)).reject(lambda x: x is None).sum().value()
-        amount_received = pydash.chain(values_for_records([QUANTITY_RECEIVED], current_records)).reject(lambda x: x is None).sum().value()
+        prev_values = values_for_records([PACKS_ORDERED, ], prev_records)
+        current_values = values_for_records([QUANTITY_RECEIVED], current_records)
+        current_values_have_blanks = pydash.some(current_values, lambda x: x is None)
+        amount_ordered = pydash.chain(prev_values).reject(lambda x: x is None).sum().value()
+        amount_received = pydash.chain(current_values).reject(lambda x: x is None).sum().value()
+        facility_is_not_reporting = facility_not_reporting(facility)
         result = NOT_REPORTING
-        if count_prev == 0 or count_current == 0:
+        data_is_insufficient = count_prev < 1 or count_current < 1 or facility_is_not_reporting
+
+        if data_is_insufficient:
             not_reporting += 1
-        elif amount_ordered == amount_received:
+        elif current_values_have_blanks:
+            no += 1
+            result = NO
+        elif prev_values == current_values:
             yes += 1
             result = YES
         else:
@@ -193,7 +200,7 @@ class STABLEPATIENTVOLUMESCheck(STABLECONSUMPTIONCheck):
         {NAME: F3, PATIENT_QUERY: ["ABC/3TC/EFV", "AZT/3TC/EFV"], ADULT: False, THRESHOLD: 5}
     ]
 
-    def for_each_facility_with_count(self, facility, no, not_reporting, yes, combination):
+    def for_each_facility_with_count(self, facility, no, not_reporting, yes, combination, total_count):
         facility_name = facility[NAME]
         is_adult = combination[ADULT]
         prev_records = self.get_patient_records(self.other_cycle_report, facility_name,
@@ -206,27 +213,32 @@ class STABLEPATIENTVOLUMESCheck(STABLECONSUMPTIONCheck):
         current_population = pydash.chain(current_values).reject(lambda x: x is None).sum().value()
         prev_values = values_for_records([NEW, EXISTING], prev_records)
         prev_population = pydash.chain(prev_values).reject(lambda x: x is None).sum().value()
-        include_record = current_population >= threshold or prev_population >= threshold
+        include_record = current_population > threshold or prev_population > threshold
         result = NOT_REPORTING
+        data_is_sufficient = pre_count > 0 and current_count > 0 and not facility_not_reporting(facility)
+
         if include_record:
+            total_count += 1
             numerator = float(current_population)
             denominator = float(prev_population)
-            if prev_population > current_population:
+            if abs(numerator) > abs(denominator):
                 numerator = float(prev_population)
                 denominator = float(current_population)
             total = current_population + prev_population
-            if pre_count == 0 or current_count == 0:
+            quotient = abs(numerator / denominator)
+            if not data_is_sufficient:
                 not_reporting += 1
-            elif (current_population == 0 or prev_population == 0) and total <= 5:
+            elif 0.5 < quotient < 1.0:
                 yes += 1
                 result = YES
-            elif denominator > 0 and 0.5 < numerator / denominator < 1.5:
-                yes += 1
-                result = YES
-            else:
+            elif quotient <= 0.5 or quotient >= 1.0:
                 no += 1
                 result = NO
+            else:
+                not_reporting += 1
+                print facility_name
+                if combination[NAME] == F3:
+                    print "||", facility_name, current_population, prev_population
         else:
-            not_reporting += 1
-
-        return result, no, not_reporting, yes
+            pass
+        return result, no, not_reporting, yes, total_count

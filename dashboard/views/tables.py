@@ -1,9 +1,13 @@
+import pydash
 from django.db.models import Q
 from django_datatables_view.base_datatable_view import BaseDatatableView
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
+from dashboard.data.consumption_patients import ConsumptionAndPatientsQualityCheck
+from dashboard.data.negatives import NegativeNumbersQualityCheck
 from dashboard.helpers import *
-from dashboard.helpers import FAIL_COUNT
-from dashboard.models import Score
+from dashboard.models import Score, Consumption, PAEDPatientsRecord, AdultPatientsRecord
 
 
 class ScoresTableView(BaseDatatableView):
@@ -33,6 +37,12 @@ class ScoresTableView(BaseDatatableView):
         STABLE_CONSUMPTION,
     ]
     order_columns = columns
+
+    def prepare_results(self, qs):
+        data = []
+        for item in qs:
+            data.append([self.render_column(item, column) for column in self.get_columns()])
+        return data
 
     def render_column(self, row, column):
         display_text = {YES: PASS, NO: FAIL, NOT_REPORTING: N_A}
@@ -96,3 +106,101 @@ class ScoresTableView(BaseDatatableView):
         if search:
             qs = qs.filter(Q(name__icontains=search) | Q(district__icontains=search) | Q(ip__icontains=search) | Q(warehouse__icontains=search))
         return qs
+
+    def prepare_results(self, qs):
+        data = []
+        for item in qs:
+            row = [self.render_column(item, column) for column in self.get_columns()]
+            row.append(item.id)
+            data.append(row)
+        return data
+
+
+query_map = {F1: F1_QUERY, F2: F2_QUERY, F3: F3_QUERY}
+
+
+def get_negatives_data(score, test, combination):
+    check = NegativeNumbersQualityCheck({})
+    formulation_query = query_map.get(combination)
+    consumption_records = Consumption.objects.filter(name=score.name, district=score.district, cycle=score.cycle, formulation__icontains=formulation_query)
+    tables = []
+    for consumption in consumption_records:
+        formulation_data = {"name": consumption.formulation}
+        records = []
+        for field in check.fields:
+            records.append({"column": FIELD_NAMES.get(field), "value": getattr(consumption, field)})
+        formulation_data['records'] = records
+        tables.append(formulation_data)
+    return {"main_title": "RAW ORDER DATA", "template": "#%s" % test, "formulations": tables}
+
+
+def get_combination(combinations, name):
+    return pydash.select(combinations, lambda x: x[NAME] == name)[0]
+
+
+def get_consumption_and_patients(score, test, combination_name):
+    check = ConsumptionAndPatientsQualityCheck({})
+    check_combination = get_combination(check.combinations, combination_name)
+    formulation_query = check_combination.get(CONSUMPTION_QUERY)
+    consumption_records = Consumption.objects.filter(name=score.name, district=score.district, cycle=score.cycle, formulation__icontains=formulation_query)
+    tables = []
+    for consumption in consumption_records:
+        formulation_data = {"name": consumption.formulation}
+        records = []
+        sum = 0
+        for field in check_combination.get(FIELDS, []):
+            value = getattr(consumption, field)
+            sum += value
+            records.append({"column": FIELD_NAMES.get(field), "value": value})
+        records.append({"column": "Total", "value": sum})
+
+        formulation_data['records'] = records
+        tables.append(formulation_data)
+    model = AdultPatientsRecord if check_combination.get(IS_ADULT, False) else PAEDPatientsRecord
+    patient_records = model.objects.filter(name=score.name, district=score.district, cycle=score.cycle, formulation__in=check_combination.get(PATIENT_QUERY))
+    patient_tables = []
+    for pr in patient_records:
+        formulation_data = {"name": pr.formulation}
+        records = []
+        sum = 0
+        for field in [NEW, EXISTING]:
+            value = getattr(pr, field)
+            sum += value
+            records.append({"column": FIELD_NAMES.get(field), "value": value})
+        records.append({"column": "Total", "value": sum})
+        formulation_data['records'] = records
+        patient_tables.append(formulation_data)
+    return {"main_title": "RAW ORDER DATA", "template": "#%s" % test, "consumption": tables, "patients": patient_tables}
+
+
+class ScoreDetailsView(APIView):
+    def get(self, request, id, column):
+        TEST_DATA = {
+            ORDER_FORM_FREE_OF_NEGATIVE_NUMBERS: get_negatives_data,
+            CONSUMPTION_AND_PATIENTS: get_consumption_and_patients
+        }
+        scores = {YES: "Pass", NO: "Fail", NOT_REPORTING: "N/A"}
+        combination = request.GET.get('combination', DEFAULT)
+        column = int(column)
+        score = Score.objects.get(id=id)
+        score_data = {'ip': score.ip, 'district': score.district, 'warehouse': score.warehouse, 'name': score.name, 'cycle': score.cycle}
+        has_result = column > 3
+        response_data = {'score': score_data, 'has_result': has_result}
+        if has_result:
+            view = ScoresTableView()
+            test = view.columns[column]
+            if test in TEST_DATA:
+                data_method = TEST_DATA[test]
+                response_data['data'] = data_method(score, test, combination)
+            result = getattr(score, test, None)
+
+            def combination_yes():
+                return result.get(combination) if type(result) == dict else result
+
+            def combination_no():
+                return result.get(DEFAULT, None) if type(result) == dict else result
+
+            actual_result = combination_yes() if combination in result else combination_no
+            result_data = {'test': TEST_NAMES.get(test, None), 'result': scores.get(actual_result), 'has_combination': len(result) > 1}
+            response_data['result'] = result_data
+        return Response(response_data)

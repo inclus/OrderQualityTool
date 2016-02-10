@@ -34,5 +34,6 @@ urlpatterns = [
     url(r'^api/scores', dashboard.views.api.FacilityTestCycleScoresListView.as_view(), name='scores'),
     url(r'^api/filters', dashboard.views.api.FilterValuesView.as_view(), name='filters'),
     url(r'^api/rankingsAccess', dashboard.views.api.RankingsAccessView.as_view(), name='rankings-access'),
-    url(r'^api/table/scores', csrf_exempt(dashboard.views.tables.ScoresTableView.as_view()), name='scores-table'),
+    url(r'^api/table/scores$', csrf_exempt(dashboard.views.tables.ScoresTableView.as_view()), name='scores-table'),
+    url(r'^api/table/scores/detail/(?P<id>\d+)/(?P<column>\d+)', csrf_exempt(dashboard.views.tables.ScoreDetailsView.as_view()), name='scores-detail'),
 ]

@@ -1,47 +1,57 @@
+import json
+
 import djclick as click
 from termcolor import colored
 
 from dashboard.helpers import *
-from dashboard.models import CycleFormulationScore, MultipleOrderFacility
+from dashboard.models import Score
+
+
+def make_cond(cond):
+    cond = json.dumps(cond)[1:-1]  # remove '{' and '}'
+    return (cond).replace(": ", ":")  # avoid '\"'
 
 
 @click.command()
 def command():
-    cycle = "May - Jun 2015"
-    cycle2 = "Jul - Aug 2015"
+    perform_checks()
+
+
+def perform_checks():
+    cycle = "Jul - Aug 2015"
+    cycle2 = cycle
     checks = [
-        {'combination': DEFAULT, 'test': REPORTING, 'cycle': cycle, 'expected': 60.2},
-        {'combination': DEFAULT, 'test': WEB_BASED, 'cycle': cycle, 'expected': 60.2},
-        {'combination': DEFAULT, 'test': ORDER_FORM_FREE_OF_GAPS, 'cycle': cycle, 'expected': 31.9},
-        {'combination': F1, 'test': ORDER_FORM_FREE_OF_NEGATIVE_NUMBERS, 'cycle': cycle, 'expected': 57.3},
-        {'combination': F1, 'test': CONSUMPTION_AND_PATIENTS, 'cycle': cycle, 'expected': 18.7},
-        {'combination': F1, 'test': DIFFERENT_ORDERS_OVER_TIME, 'cycle': cycle2, 'expected': 52.5},
-        {'combination': F1, 'test': CLOSING_BALANCE_MATCHES_OPENING_BALANCE, 'cycle': cycle2, 'expected': 21.3},
-        {'combination': F1, 'test': STABLE_CONSUMPTION, 'cycle': cycle2, 'expected': 29.3},
-        {'combination': F1, 'test': WAREHOUSE_FULFILMENT, 'cycle': cycle2, 'expected': 29.1},
-        {'combination': F1, 'test': STABLE_PATIENT_VOLUMES, 'cycle': cycle2, 'expected': 33.8},
-        {'combination': DEFAULT, 'test': GUIDELINE_ADHERENCE_ADULT_1L, 'cycle': cycle, 'expected': 27.5},
-        {'combination': DEFAULT, 'test': GUIDELINE_ADHERENCE_ADULT_2L, 'cycle': cycle, 'expected': 41.5},
-        {'combination': DEFAULT, 'test': GUIDELINE_ADHERENCE_PAED_1L, 'cycle': cycle, 'expected': 26.8},
-        {'combination': DEFAULT, 'test': NNRTI_CURRENT_ADULTS, 'cycle': cycle, 'expected': 38.1},
-        {'combination': DEFAULT, 'test': NNRTI_NEW_ADULTS, 'cycle': cycle, 'expected': 32.5},
-        {'combination': DEFAULT, 'test': NNRTI_CURRENT_PAED, 'cycle': cycle, 'expected': 22.5},
-        {'combination': DEFAULT, 'test': NNRTI_NEW_PAED, 'cycle': cycle, 'expected': 29.8},
+        {'combination': DEFAULT, 'test': ORDER_FORM_FREE_OF_GAPS, 'cycle': cycle, 'expected': 46.2, YES: 820, NO: 615, NOT_REPORTING: 365},
+        # {'combination': F3, 'test': ORDER_FORM_FREE_OF_NEGATIVE_NUMBERS, 'cycle': cycle, 'expected': 70.9, YES: 1000, NO: 100, NOT_REPORTING: 1000},
+        # {'combination': F3, 'test': CONSUMPTION_AND_PATIENTS, 'cycle': cycle, 'expected': 9.8},
+        # {'combination': F3, 'test': DIFFERENT_ORDERS_OVER_TIME, 'cycle': cycle2, 'expected': 47.7, YES: 1000, NO: 1000, NOT_REPORTING: 100},
+        {'combination': F3, 'test': STABLE_CONSUMPTION, 'cycle': cycle2, 'expected': 8.8, YES: 114, NO: 252, NOT_REPORTING: 1454},
+        {'combination': F3, 'test': WAREHOUSE_FULFILMENT, 'cycle': cycle2, 'expected': 32.4, YES: 345, NO: 366, NOT_REPORTING: 1109},
+        {'combination': F3, 'test': STABLE_PATIENT_VOLUMES, 'cycle': cycle2, 'expected': 15.6, YES: 213, NO: 156, NOT_REPORTING: 1451},
+        {'combination': DEFAULT, 'test': GUIDELINE_ADHERENCE_ADULT_1L, 'cycle': cycle, 'expected': 35.3, YES: 643, NO: 737, NOT_REPORTING: 440},
+        {'combination': DEFAULT, 'test': GUIDELINE_ADHERENCE_ADULT_2L, 'cycle': cycle, 'expected': 50.5, YES: 920, NO: 274, NOT_REPORTING: 626},
+        {'combination': DEFAULT, 'test': GUIDELINE_ADHERENCE_PAED_1L, 'cycle': cycle, 'expected': 28.9, YES: 526, NO: 752, NOT_REPORTING: 542},
     ]
-
     for check in checks:
-        score = CycleFormulationScore.objects.get(combination=check['combination'], test=check['test'], cycle=check['cycle'])
-        expected = "{0:.1f}".format(check['expected'])
-        actual = "{0:.1f}".format(score.yes)
-        if expected == actual:
-            print colored(check['test'] + " Passed", "green")
+        if check.get('combination') == DEFAULT:
+            yes_condition = {DEFAULT: YES}
+            no_condition = {DEFAULT: NO}
+            not_reporting_condition = {(DEFAULT): NOT_REPORTING}
         else:
-            c = "yellow" if abs(float(expected) - float(actual)) < 1 else "red"
-            print colored(check['test'] + " Failed", c), colored("Got %s instead of %s " % (actual, expected), c)
-
-    count = MultipleOrderFacility.objects.filter(cycle=cycle).count()
-    expected = 33
-    if count == expected:
-        print colored(MULTIPLE_ORDERS + " Passed", "green")
-    else:
-        print colored(MULTIPLE_ORDERS + " Failed", 'red'), colored("Got %s instead of %s " % (count, expected), 'red')
+            yes_condition = {check.get('combination'): YES}
+            no_condition = {check.get('combination'): NO}
+            not_reporting_condition = {check.get('combination'): NOT_REPORTING}
+        for key, condition in {YES: yes_condition, NO: no_condition, NOT_REPORTING: not_reporting_condition}.items():
+            test_description = "%s %s" % (check['test'], key)
+            filter_key = "%s__icontains" % check.get('test')
+            filter_by = {filter_key: make_cond(condition)}
+            count = Score.objects.filter(cycle=check['cycle'], **filter_by).count()
+            expected = check[key]
+            actual = count
+            if expected == actual:
+                print colored(test_description + " Passed", "green")
+            else:
+                tolerance = 10
+                diff = abs(float(expected) - float(actual))
+                c = "yellow" if diff <= tolerance else "red"
+                print colored(test_description + " Failed", c), colored("Got %s instead of %s " % (actual, expected), c), colored("diff: %s" % diff, "blue")

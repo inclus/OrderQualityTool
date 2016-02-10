@@ -9,7 +9,7 @@ from django_webtest import WebTest
 from mock import patch, ANY
 from webtest import Upload
 
-from dashboard.helpers import REPORTING
+from dashboard.helpers import REPORTING, YES, MULTIPLE_ORDERS, TEST_NAMES, DEFAULT
 from dashboard.models import Cycle, Score, DashboardUser, CycleFormulationScore, MultipleOrderFacility
 
 
@@ -225,3 +225,42 @@ class FacilityTestCycleScoresListViewTestCase(WebTest):
             self.assertEqual(data['results'][0]['district'], 'dis1')
             self.assertEqual(data['results'][0]['ip'], 'ip')
             self.assertEqual(data['results'][0]['REPORTING'], {'formulation1': 'YES', 'formulation2': 'NO'})
+
+
+class ScoreDetailsViewTestCase(WebTest):
+    url_name = "scores-detail"
+
+    def test_can_route_url(self):
+        score = Score.objects.create()
+        url = reverse(self.url_name, kwargs={"id": score.id, "column": 12})
+        response = self.app.get(url)
+        self.assertEqual(200, response.status_code)
+
+    def test_can_get_location_data(self):
+        score = Score.objects.create(name="Name 1", ip="IP 1", district="District 1", warehouse="Warehouse 1")
+        url = reverse(self.url_name, kwargs={"id": score.id, "column": 12})
+        response = self.app.get(url)
+        self.assertEqual(200, response.status_code)
+        response_data = json.loads(response.content.decode('utf8'))
+        self.assertEqual("Warehouse 1", response_data["score"]["warehouse"])
+        self.assertEqual("IP 1", response_data["score"]["ip"])
+        self.assertEqual("District 1", response_data["score"]["district"])
+        self.assertEqual("Name 1", response_data["score"]["name"])
+
+    def test_can_get_score(self):
+        score = Score.objects.create(name="Name 1", ip="IP 1", district="District 1", warehouse="Warehouse 1", MULTIPLE_ORDERS={DEFAULT: YES})
+        url = reverse(self.url_name, kwargs={"id": score.id, "column": 6})
+        response = self.app.get(url)
+        self.assertEqual(200, response.status_code)
+        response_data = json.loads(response.content.decode('utf8'))
+        self.assertEqual(True, response_data["has_result"])
+        self.assertEqual(TEST_NAMES[MULTIPLE_ORDERS], response_data["result"]["test"])
+        self.assertEqual('Pass', response_data["result"]["result"])
+
+    def test_has_no_result_if_column_is_less_than_4(self):
+        score = Score.objects.create(name="Name 1", ip="IP 1", district="District 1", warehouse="Warehouse 1")
+        url = reverse(self.url_name, kwargs={"id": score.id, "column": 3})
+        response = self.app.get(url)
+        self.assertEqual(200, response.status_code)
+        response_data = json.loads(response.content.decode('utf8'))
+        self.assertEqual(False, response_data["has_result"])

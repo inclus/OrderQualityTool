@@ -2306,7 +2306,7 @@ th {
   border-bottom-width: 2px;
 }
 .table-striped > tbody > tr:nth-of-type(odd) {
-  background-color: #f9f9f9;
+  background-color: #fafefc;
 }
 .table-hover > tbody > tr:hover {
   background-color: #f5f5f5;
@@ -6000,7 +6000,7 @@ button.close {
 }
 @media (min-width: 992px) {
   .modal-lg {
-    width: 900px;
+    width: 90%;
   }
 }
 .tooltip {
@@ -6766,8 +6766,10 @@ button.close {
 }
 body {
   padding-top: 90px;
+  font-size: 15px;
   padding-bottom: 30px;
   letter-spacing: 1.5px;
+  font-weight: 400;
 }
 body input,
 body textarea,
@@ -7061,9 +7063,90 @@ nav.with-flag {
 }
 .panel-title span {
   font-weight: bold;
-  font-size: 19px;
+  font-size: 1.26666667em;
 }
 .DTFC_LeftBodyWrapper,
 .DTFC_LeftHeadWrapper > table {
   border-right: 2px solid #D5D5D5;
+}
+.score-location-item {
+  text-align: center;
+  min-height: 1px;
+  padding-left: 15px;
+  padding-right: 15px;
+  padding: 0.66666667em;
+  position: relative;
+}
+@media (min-width: 992px) {
+  .score-location-item {
+    float: left;
+    width: 14.08450704%;
+  }
+}
+.score-location-item .text-up {
+  display: block;
+  font-size: 1em;
+  color: #000000;
+  letter-spacing: 1px;
+}
+.score-location-item .text-down {
+  display: block;
+  font-weight: 400;
+  font-size: 0.8em;
+  color: #9B9B9B;
+  letter-spacing: 1px;
+}
+.score_detail_title {
+  font-weight: bold;
+  font-size: 1.33333333em;
+  color: #000000;
+  letter-spacing: 1.5px;
+}
+.section-seperator {
+  border-bottom: 1.5px solid black;
+  padding-bottom: 1.33333333em;
+  margin-bottom: 1.66666667em;
+}
+.score-header {
+  border-bottom: 1.5px solid black;
+  padding-bottom: 1.33333333em;
+  margin-bottom: 1.33333333em;
+}
+.omega.score-Fail {
+  background-color: red;
+}
+.omega.score-Fail .text-up {
+  font-weight: bold;
+  color: white;
+}
+.omega.score-Fail .text-down {
+  color: white;
+  font-weight: 300;
+}
+.omega.score-Pass {
+  background-color: #27ae60;
+}
+.omega.score-Pass .text-up {
+  font-weight: bold;
+  color: white;
+}
+.omega.score-Pass .text-down {
+  color: white;
+}
+.modal-body {
+  position: relative;
+  padding: 2.66666667em;
+}
+.score_detail_data_title {
+  font-weight: bold;
+  font-size: 1.33333333em;
+  color: #000000;
+  letter-spacing: 1px;
+  margin-bottom: 1em;
+}
+.inner-title {
+  font-weight: 400;
+  font-size: 1em;
+  color: #9B9B9B;
+  letter-spacing: 1px;
 }

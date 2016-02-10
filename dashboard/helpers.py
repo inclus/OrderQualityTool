@@ -134,6 +134,7 @@ DF1 = "data_field_1"
 YES = "YES"
 NO = "NO"
 NOT_REPORTING = "NOT_REPORTING"
+NOT_REPORTING_EXCLUDED = "NOT_REPORTING_EX"
 
 # Field Names
 EXISTING = 'existing'
@@ -149,6 +150,22 @@ ART_CONSUMPTION = 'art_consumption'
 PMTCT_CONSUMPTION = 'pmtct_consumption'
 QUANTITY_RECEIVED = 'quantity_received'
 OPENING_BALANCE = 'opening_balance'
+
+FIELD_NAMES = {
+    EXISTING: 'Existing',
+    NEW: 'New',
+    PACKS_ORDERED: 'Packs Ordered',
+    ESTIMATED_NUMBER_OF_NEW_PREGNANT_WOMEN: 'Estimated Number of New Pregnant Women',
+    ESTIMATED_NUMBER_OF_NEW_ART_PATIENTS: 'Estimated Number of New Patients',
+    QUANTITY_REQUIRED_FOR_CURRENT_PATIENTS: 'Quantity Required for current Patients',
+    MONTHS_OF_STOCK_OF_HAND: 'Months of Stock of Hand',
+    CLOSING_BALANCE: 'Closing Balance',
+    LOSES_ADJUSTMENTS: 'Loses Adjustments',
+    ART_CONSUMPTION: 'Art Consumption',
+    PMTCT_CONSUMPTION: 'Pmtct Consumption',
+    QUANTITY_RECEIVED: 'Quantity Received',
+    OPENING_BALANCE: 'Opening Balance'
+}
 
 # Sheet Names
 CONSUMPTION_SHEET = 'CONSUMPTION'
@@ -168,3 +185,25 @@ F3_PATIENT_QUERY = ["ABC/3TC/EFV", "AZT/3TC/EFV"]
 F2_PATIENT_QUERY = ["ABC/3TC/LPV/r", "ABC/3TC/EFV", "ABC/3TC/NVP"]
 
 F1_PATIENT_QUERY = ["TDF/3TC/EFV (PMTCT)", "TDF/3TC/EFV (ADULT)"]
+## test_names
+
+TEST_NAMES = {
+    ORDER_FORM_FREE_OF_GAPS: "NO BLANKS: If the facility reported, is the whole order form free of blanks?",
+    ORDER_FORM_FREE_OF_NEGATIVE_NUMBERS: "NO NEGATIVES: Order free of negative inputs?",
+    DIFFERENT_ORDERS_OVER_TIME: "NON-REPEATING ORDERS: Does the facility avoid repeating the same orders in consecutive cycles?",
+    CLOSING_BALANCE_MATCHES_OPENING_BALANCE: "Does Opening  balance of the cycle = Closing balance from the previous one?",
+    CONSUMPTION_AND_PATIENTS: "CONSUMPTION AND PATIENTS: Do consumption volumes tally with corresponding patient regimen volumes (i.e. they are within 30% of each other)?",
+    STABLE_CONSUMPTION: "STABLE CONSUMPTION: Is total consumption stable from one cycle to the next (i.e. less than 50% growth or decline from one cycle to the next)?",
+    WAREHOUSE_FULFILMENT: "WAREHOUSE FULFILMENT: Does volume ordered = volume delivered in following cycle?",
+    STABLE_PATIENT_VOLUMES: "STABLE PATIENT VOLUMES: Are total patient numbers stable from one cycle to the next?",
+    GUIDELINE_ADHERENCE_PAED_1L: "guidelineAdherencePaed1L",
+    GUIDELINE_ADHERENCE_ADULT_2L: "guidelineAdherenceAdult2L",
+    GUIDELINE_ADHERENCE_ADULT_1L: "guidelineAdherenceAdult1L",
+    REPORTING: "REPORTING",
+    WEB_BASED: "WEB_BASED",
+    MULTIPLE_ORDERS: "DUPLICATE ORDERS: Facilities that submitted more than one order over the cycle",
+    NNRTI_NEW_PAED: "NRTI vs NNRTI/PI VOLUMES (ESTIMATED NEW PAED): Do total Estimated New Paed NRTI patient volumes tally with total NNRTI & PI patient volumes?",
+    NNRTI_NEW_ADULTS: "NRTI vs NNRTI/PI VOLUMES (ESTIMATED NEW ADULTS): Do total Estimated New Adult NRTI patient volumes tally with total NNRTI & PI patient volumes?",
+    NNRTI_CURRENT_PAED: "NRTI vs NNRTI/PI VOLUMES (CURRENT PAED): Do total current Paed NRTI patient volumes tally with total NNRTI & PI patient volumes?",
+    NNRTI_CURRENT_ADULTS: "NRTI vs NNRTI/PI VOLUMES (CURRENT ADULTS): Do total current Adult NRTI patient volumes tally with total NNRTI & PI patient volumes?"
+}

@@ -23,7 +23,7 @@ LOCATION = "Facility Index"
 
 class DashboardUser(AbstractEmailUser):
     access_level = CharField(
-            choices=((WAREHOUSE, WAREHOUSE), (DISTRICT, DISTRICT), (IIP, IIP), (MOH_CENTRAL, MOH_CENTRAL)), max_length=50)
+        choices=((WAREHOUSE, WAREHOUSE), (DISTRICT, DISTRICT), (IIP, IIP), (MOH_CENTRAL, MOH_CENTRAL)), max_length=50)
 
     def get_full_name(self):
         return self.email
@@ -48,7 +48,7 @@ class CycleFormulationScore(models.Model):
 
     def __unicode__(self):
         return "%s %s YES:%s NO:%s NOT_REPORTING:%s FORMULATION:%s" % (
-            self.cycle, self.test, self.yes, self.no, self.not_reporting, self.formulation)
+            self.cycle, self.test, self.yes, self.no, self.not_reporting, self.combination)
 
 
 class Cycle(models.Model):

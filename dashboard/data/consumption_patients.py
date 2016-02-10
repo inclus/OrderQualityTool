@@ -37,7 +37,7 @@ class ConsumptionAndPatientsQualityCheck(QCheck):
         df1_sum = get_consumption_totals(combination[FIELDS], df1_records)
         all_df1_blank = has_all_blanks(df1_records, combination[FIELDS])
         all_df2_blank = has_all_blanks(df2_records, [NEW, EXISTING])
-        adjusted_df1_sum = df1_sum / combination[RATIO]
+        adjusted_df1_sum = float(df1_sum) / combination[RATIO]
         no, not_reporting, result, yes = self.calculate_score(adjusted_df1_sum, df2_sum,
                                                               df1_count,
                                                               df2_count, yes,

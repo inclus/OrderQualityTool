@@ -15,8 +15,10 @@ from dashboard.tasks import calculate_scores_for_checks_in_cycle
 class EmailUserAdmin(UserAdmin):
     fieldsets = (
         (None, {'fields': ('email', 'password')}),
-        (_('Permissions'), {'fields': ('is_active', 'is_staff', 'is_superuser',
-                                       'groups', 'user_permissions')}),
+        (_('Permissions'), {
+            'fields': ('is_active', 'is_staff', 'is_superuser',
+                       'groups', 'user_permissions')
+            }),
         (_('Important dates'), {'fields': ('last_login', 'date_joined')}),
     )
     add_fieldsets = ((
@@ -73,6 +75,8 @@ class ConsumptionAdmin(ModelAdmin):
 
 
 class PatientAdmin(ModelAdmin):
+    search_fields = ('name', 'district')
+    list_filter = ('cycle', 'formulation', 'ip', 'warehouse')
     list_display = ('name',
                     'cycle',
                     'district',

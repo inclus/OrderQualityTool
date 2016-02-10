@@ -88,7 +88,6 @@ class QCheck:
     def score(self):
         formulation_scores = list()
         scores = self.run()
-        print (self.test, scores)
         for key, value in scores.items():
             formulation_scores.append(
                 CycleFormulationScore(cycle=self.report.cycle, combination=key, yes=value[YES], no=value[NO],
