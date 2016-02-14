@@ -1,0 +1,2162 @@
+{
+	"auto_complete":
+	{
+		"selected_items":
+		[
+			[
+				"ma",
+				"margin-bottom"
+			],
+			[
+				"font",
+				"font-weight"
+			],
+			[
+				"pos",
+				"position"
+			],
+			[
+				"bor",
+				"border"
+			],
+			[
+				"mar",
+				"margin-left"
+			],
+			[
+				"bac",
+				"background-color"
+			],
+			[
+				"padd",
+				"padding-bottom"
+			],
+			[
+				"po",
+				"position"
+			],
+			[
+				"log",
+				"log	console"
+			],
+			[
+				"di",
+				"districts"
+			],
+			[
+				"co",
+				"log	console"
+			],
+			[
+				"for",
+				"for	for (…) {…}"
+			],
+			[
+				"pa",
+				"padding-top"
+			],
+			[
+				"back",
+				"background-image"
+			],
+			[
+				"scores",
+				"scoresForTest"
+			],
+			[
+				"u",
+				"updateTable"
+			],
+			[
+				"margin",
+				"margin-top"
+			],
+			[
+				"wi",
+				"width"
+			],
+			[
+				"Report",
+				"ReportService"
+			],
+			[
+				"a",
+				"normal"
+			],
+			[
+				"gui",
+				"guidelineType"
+			],
+			[
+				"mut",
+				"multiple"
+			],
+			[
+				"add",
+				"addTests"
+			],
+			[
+				"regi",
+				"regimen"
+			],
+			[
+				"in",
+				"inline-block"
+			],
+			[
+				"best",
+				"bestPerforming"
+			],
+			[
+				"upd",
+				"updateWorstList"
+			],
+			[
+				"$w",
+				"$watch"
+			],
+			[
+				"up",
+				"updateBestList"
+			],
+			[
+				"border",
+				"border-radius"
+			],
+			[
+				"bar",
+				"bar_data"
+			],
+			[
+				"selecte",
+				"selectedCycle"
+			],
+			[
+				"z-",
+				"z-index"
+			],
+			[
+				"margi",
+				"margin-bottom"
+			],
+			[
+				"$sc",
+				"$scope	AngularJS"
+			],
+			[
+				"text",
+				"text-decoration"
+			],
+			[
+				"fa",
+				"facility_name"
+			],
+			[
+				"dime",
+				"dimensionData"
+			],
+			[
+				"use",
+				"userModuleIds"
+			],
+			[
+				"data",
+				"datasetNames"
+			],
+			[
+				"piv",
+				"pivotTable"
+			],
+			[
+				"pivotT",
+				"pivotTableRespository	AngularJS"
+			],
+			[
+				"s",
+				"src/"
+			],
+			[
+				"noti",
+				"notifySpy"
+			],
+			[
+				"auth",
+				"authenticate"
+			],
+			[
+				"authe",
+				"authenticateDeferred"
+			],
+			[
+				"http",
+				"$httpBackend	AngularJS"
+			],
+			[
+				"notfi",
+				"notifySpy"
+			],
+			[
+				"con",
+				"controller	AngularJS"
+			],
+			[
+				"def",
+				"deferred"
+			],
+			[
+				"e",
+				"eydsng"
+			],
+			[
+				"name",
+				"namespace"
+			],
+			[
+				"jam",
+				"jam_song"
+			],
+			[
+				"re",
+				"request"
+			],
+			[
+				"$stat",
+				"$stateParams"
+			],
+			[
+				"mtn",
+				"mtn-instructions"
+			],
+			[
+				"Tr",
+				"Transaction"
+			],
+			[
+				"y",
+				"yo_reference"
+			],
+			[
+				"tr",
+				"transaction"
+			],
+			[
+				"ms",
+				"msi_sdn"
+			],
+			[
+				"vali",
+				"valid"
+			],
+			[
+				"MTN",
+				"MTNMobileMoneyTransaction"
+			],
+			[
+				"S",
+				"STATUS"
+			],
+			[
+				"st",
+				"status"
+			],
+			[
+				"cou",
+				"count_before"
+			],
+			[
+				"coun",
+				"count_before"
+			],
+			[
+				"tra",
+				"transaction"
+			],
+			[
+				"star",
+				"start"
+			],
+			[
+				"nu",
+				"number"
+			],
+			[
+				"va",
+				"valid_numbers"
+			],
+			[
+				"p",
+				"phone_number_errors"
+			],
+			[
+				"tem",
+				"template_name"
+			],
+			[
+				"consta",
+				"constants"
+			],
+			[
+				"cont",
+				"contains"
+			],
+			[
+				"ge",
+				"geojson"
+			],
+			[
+				"c",
+				"currentWidget"
+			],
+			[
+				"sele",
+				"selectedBand"
+			],
+			[
+				"are",
+				"areaDataMapping"
+			],
+			[
+				"ar",
+				"areaDataMapping"
+			],
+			[
+				"m",
+				"mapData"
+			],
+			[
+				"filte",
+				"filterValues"
+			],
+			[
+				"get",
+				"getText"
+			],
+			[
+				"sc",
+				"scope"
+			],
+			[
+				"sh",
+				"showScatterColorSelector"
+			],
+			[
+				"selec",
+				"selectedChart"
+			],
+			[
+				"ch",
+				"charts"
+			],
+			[
+				"fi",
+				"filter"
+			],
+			[
+				"C",
+				"CHARTS"
+			],
+			[
+				"is",
+				"isPresent"
+			],
+			[
+				"t",
+				"target"
+			],
+			[
+				"toB",
+				"toBeTruthy"
+			],
+			[
+				"ex",
+				"expectedTargets"
+			],
+			[
+				"req",
+				"request_data"
+			],
+			[
+				"sel",
+				"selectedBand"
+			],
+			[
+				"selected",
+				"selectedBand"
+			],
+			[
+				"ind",
+				"indicatorValues"
+			],
+			[
+				"cs",
+				"csvData"
+			],
+			[
+				"si",
+				"sizeValue"
+			],
+			[
+				"x",
+				"xValue"
+			],
+			[
+				"color",
+				"colorRangePositions"
+			],
+			[
+				"col",
+				"colour"
+			],
+			[
+				"fun",
+				"func (*StationController)	func (...) {...} ʂ"
+			],
+			[
+				"f",
+				"func (*StationController)	func (...) {...} ʂ"
+			],
+			[
+				"and",
+				"andCallThrough"
+			],
+			[
+				"li",
+				"lineChartService"
+			],
+			[
+				"mo",
+				"mockLineChartService"
+			],
+			[
+				"sa",
+				"stateParams"
+			],
+			[
+				"sta",
+				"stateParams"
+			],
+			[
+				"to",
+				"toBeFalsy"
+			],
+			[
+				"fo",
+				"forEach"
+			],
+			[
+				"das",
+				"dashboard"
+			],
+			[
+				"d",
+				"dashboard"
+			],
+			[
+				"me",
+				"message"
+			],
+			[
+				"da",
+				"dashBoardService"
+			],
+			[
+				"te",
+				"templateUrl"
+			],
+			[
+				"dev",
+				"devAdminKey"
+			],
+			[
+				"ke",
+				"adminKey"
+			],
+			[
+				"de",
+				"devApiRootUrl"
+			],
+			[
+				"api",
+				"apiRootUrl"
+			],
+			[
+				"v",
+				"value"
+			],
+			[
+				"csv",
+				"csvTextArea"
+			],
+			[
+				"reg",
+				"registration"
+			],
+			[
+				"moc",
+				"mockRegistation"
+			],
+			[
+				"registe",
+				"registerForm"
+			],
+			[
+				"css",
+				"cssContainingText"
+			],
+			[
+				"fu",
+				"function"
+			],
+			[
+				"fir",
+				"first_name"
+			],
+			[
+				"js",
+				"jsonify"
+			]
+		]
+	},
+	"buffers":
+	[
+		{
+			"file": "scores.entry.js",
+			"settings":
+			{
+				"buffer_size": 175,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "charts.entry.js",
+			"settings":
+			{
+				"buffer_size": 39,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "dashboard/static/js/app.js",
+			"settings":
+			{
+				"buffer_size": 1212,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "dashboard/static/js/appSpec.js",
+			"settings":
+			{
+				"buffer_size": 956,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "dashboard/static/js/reports.js",
+			"settings":
+			{
+				"buffer_size": 299,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "dashboard/static/js/scores_table.js",
+			"settings":
+			{
+				"buffer_size": 4942,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "/Users/jamesmuranga/Library/Application Support/Sublime Text 3/Packages/User/JavascriptBeautify.sublime-settings",
+			"settings":
+			{
+				"buffer_size": 172,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": ".eslintrc",
+			"settings":
+			{
+				"buffer_size": 390,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "dashboard/data/cycles.py",
+			"settings":
+			{
+				"buffer_size": 11192,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "dashboard/templates/scores_table.html",
+			"settings":
+			{
+				"buffer_size": 8730,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "webpack.config.js",
+			"settings":
+			{
+				"buffer_size": 1503,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "bower.json",
+			"settings":
+			{
+				"buffer_size": 1118,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "dashboard/templates/layout.html",
+			"settings":
+			{
+				"buffer_size": 5120,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "gulpfile.js",
+			"settings":
+			{
+				"buffer_size": 1709,
+				"line_ending": "Unix"
+			}
+		}
+	],
+	"build_system": "",
+	"build_system_choices":
+	[
+	],
+	"build_varint": "",
+	"command_palette":
+	{
+		"height": 392.0,
+		"last_filter": "rp",
+		"selected_items":
+		[
+			[
+				"rp",
+				"Package Control: Remove Package"
+			],
+			[
+				"introduc",
+				"Text Refactor: Introduce Variable"
+			],
+			[
+				"ip",
+				"Package Control: Install Package"
+			],
+			[
+				"join",
+				"JoinLinesEnhanced: join"
+			],
+			[
+				"java",
+				"Format: Javascript"
+			],
+			[
+				"find",
+				"FindKeyConflicts: All Conflicts"
+			],
+			[
+				"html",
+				"HTMLBeautify"
+			],
+			[
+				"ht",
+				"HTMLBeautify"
+			],
+			[
+				"wrap",
+				"Emmet: Wrap With Abbreviation"
+			],
+			[
+				"css",
+				"Format CSS: Expanded"
+			],
+			[
+				"reind",
+				"Indentation: Reindent Lines"
+			],
+			[
+				"be",
+				"HTMLBeautify"
+			],
+			[
+				"bea",
+				"HTMLBeautify"
+			],
+			[
+				"i",
+				"Package Control: Install Package"
+			],
+			[
+				"format",
+				"User: Python PEP8 Autoformat"
+			],
+			[
+				"update",
+				"Package Control: Upgrade/Overwrite All Packages"
+			],
+			[
+				"jshint",
+				"JSHint"
+			],
+			[
+				"jav",
+				"Javascript Beautify"
+			],
+			[
+				"JAVA",
+				"Javascript Beautify"
+			],
+			[
+				"re",
+				"Indentation: Reindent Lines"
+			],
+			[
+				"jshi",
+				"JSHint"
+			],
+			[
+				"line",
+				"JoinLinesEnhanced: join"
+			],
+			[
+				"aut",
+				"User: Python PEP8 Autoformat"
+			],
+			[
+				"joi",
+				"JoinLinesEnhanced: join"
+			],
+			[
+				"auto",
+				"User: Python PEP8 Autoformat"
+			],
+			[
+				"rein",
+				"Indentation: Reindent Lines"
+			],
+			[
+				"htlm",
+				"HTMLBeautify"
+			],
+			[
+				"editoc",
+				"Set Syntax: EditorConfig"
+			],
+			[
+				"reindex",
+				"AngularJS: Rebuild Search Index"
+			],
+			[
+				"ins",
+				"Package Control: Install Package"
+			],
+			[
+				"rei",
+				"Indentation: Reindent Lines"
+			],
+			[
+				"goto",
+				"GoSublime: Goto Definition"
+			],
+			[
+				"emmet w",
+				"Emmet: Wrap With Abbreviation"
+			],
+			[
+				"form",
+				"Format: Javascript"
+			],
+			[
+				"beati",
+				"HTMLBeautify"
+			],
+			[
+				"insta",
+				"Package Control: Install Package"
+			],
+			[
+				"beau",
+				"HTMLBeautify"
+			],
+			[
+				"in",
+				"Package Control: Install Package"
+			],
+			[
+				"colo",
+				"Colorsublime: Install Theme"
+			],
+			[
+				"inst",
+				"Package Control: Install Package"
+			]
+		],
+		"width": 530.0
+	},
+	"console":
+	{
+		"height": 126.0,
+		"history":
+		[
+			"import urllib.request,os,hashlib; h = '2deb499853c4371624f5a07e27c334aa' + 'bf8c4e67d14fb0525ba4f89698a6d7e1'; pf = 'Package Control.sublime-package'; ipp = sublime.installed_packages_path(); urllib.request.install_opener( urllib.request.build_opener( urllib.request.ProxyHandler()) ); by = urllib.request.urlopen( 'http://packagecontrol.io/' + pf.replace(' ', '%20')).read(); dh = hashlib.sha256(by).hexdigest(); print('Error validating download (got %s instead of %s), please try manual install' % (dh, h)) if dh != h else open(os.path.join( ipp, pf), 'wb' ).write(by)"
+		]
+	},
+	"distraction_free":
+	{
+		"menu_visible": true,
+		"show_minimap": false,
+		"show_open_files": false,
+		"show_tabs": false,
+		"side_bar_visible": false,
+		"status_bar_visible": false
+	},
+	"expanded_folders":
+	[
+		"/Users/jamesmuranga/code/space/chai/OrderQualityTool",
+		"/Users/jamesmuranga/code/space/chai/OrderQualityTool/dashboard"
+	],
+	"file_history":
+	[
+		"/Users/jamesmuranga/code/space/chai/OrderQualityTool/yes.csv",
+		"/Users/jamesmuranga/code/space/chai/OrderQualityTool/dashboard/static/js/scores_table.js",
+		"/Users/jamesmuranga/Library/Application Support/Sublime Text 3/Packages/User/Default (OSX).sublime-keymap",
+		"/Users/jamesmuranga/code/space/chai/OrderQualityTool/dashboard/helpers.py",
+		"/Users/jamesmuranga/code/space/chai/OrderQualityTool/dashboard/templates/scores_table.html",
+		"/Users/jamesmuranga/code/space/chai/OrderQualityTool/dashboard/static/less/variables.less",
+		"/Users/jamesmuranga/code/space/chai/OrderQualityTool/dashboard/static/css/app.less",
+		"/Users/jamesmuranga/Library/Application Support/Sublime Text 3/Packages/Emmet/Default (OSX).sublime-keymap",
+		"/Users/jamesmuranga/code/space/chai/OrderQualityTool/chai.sublime-project",
+		"/Users/jamesmuranga/code/space/chai/OrderQualityTool/dashboard/templates/layout.html",
+		"/Users/jamesmuranga/code/space/chai/OrderQualityTool/scores.entry.js",
+		"/Users/jamesmuranga/code/space/chai/OrderQualityTool/charts.entry.js",
+		"/Users/jamesmuranga/code/space/chai/OrderQualityTool/gulpfile.js",
+		"/Users/jamesmuranga/code/space/chai/OrderQualityTool/webpack.config.js",
+		"/Users/jamesmuranga/Desktop/links.txt",
+		"/Users/jamesmuranga/Library/Application Support/Sublime Text 3/Packages/GoSublime/CHANGELOG.md",
+		"/Users/jamesmuranga/Desktop/email to raj",
+		"/Users/jamesmuranga/code/space/chai/OrderQualityTool/dashboard/templates/reports.html",
+		"/Users/jamesmuranga/code/space/go/src/robot/LICENSE",
+		"/Users/jamesmuranga/code/space/chai/OrderQualityTool/dashboard/static/views/addTests.html",
+		"/Users/jamesmuranga/code/space/chai/OrderQualityTool/dashboard/static/views/reports.html",
+		"/Users/jamesmuranga/code/space/chai/OrderQualityTool/bower.json",
+		"/Users/jamesmuranga/code/space/chai/OrderQualityTool/dashboard/static/js/app.js",
+		"/Users/jamesmuranga/code/space/chai/OrderQualityTool/dashboard/static/js/controllers/reports.controller.js",
+		"/Users/jamesmuranga/code/space/chai/OrderQualityTool/dashboard/static/js/services/report.service.js",
+		"/Users/jamesmuranga/code/space/chai/OrderQualityTool/dashboard/templates/dashboard/dashboarduser_list.html",
+		"/Users/jamesmuranga/code/space/chai/OrderQualityTool/dashboard/static/js/reports.js",
+		"/Users/jamesmuranga/code/space/chai/OrderQualityTool/dashboard/static/css/app.css",
+		"/Users/jamesmuranga/Library/Application Support/Sublime Text 3/Packages/User/CSS Format.sublime-settings",
+		"/Users/jamesmuranga/code/space/chai/OrderQualityTool/dashboard/static/css/datatables.css",
+		"/Users/jamesmuranga/code/space/chai/OrderQualityTool/dashboard/static/js/controllers/main.check.controller.js",
+		"/Users/jamesmuranga/code/space/chai/OrderQualityTool/dashboard/static/js/controllers/report.rate.controller.js",
+		"/Users/jamesmuranga/code/space/chai/OrderQualityTool/dashboard/static/js/controllers/web.based.rate.controller.js",
+		"/Users/jamesmuranga/code/space/chai/OrderQualityTool/dashboard/static/views/guidlineAdherenceRate.html",
+		"/Users/jamesmuranga/code/space/chai/OrderQualityTool/dashboard/static/views/reporting_rate.html",
+		"/Users/jamesmuranga/code/space/chai/OrderQualityTool/dashboard/static/views/web_vs_paper.html",
+		"/Users/jamesmuranga/code/space/chai/OrderQualityTool/dashboard/static/js/controllers/guideline.adherence.controller.js",
+		"/Users/jamesmuranga/code/space/chai/OrderQualityTool/karma.conf.js",
+		"/Users/jamesmuranga/code/space/chai/OrderQualityTool/ru.sh",
+		"/Users/jamesmuranga/code/space/chai/OrderQualityTool/tox.ini",
+		"/Users/jamesmuranga/code/space/chai/OrderQualityTool/requirements/tox.txt",
+		"/Users/jamesmuranga/code/space/chai/OrderQualityTool/dashboard/admin.py",
+		"/Users/jamesmuranga/code/space/chai/OrderQualityTool/dashboard/tests/test_order_form_free_of_gaps.py",
+		"/Users/jamesmuranga/code/space/chai/OrderQualityTool/requirements/dev.txt",
+		"/Users/jamesmuranga/code/space/chai/OrderQualityTool/dashboard/menus.py",
+		"/Users/jamesmuranga/code/space/chai/OrderQualityTool/dashboard/static/views/main.html",
+		"/Users/jamesmuranga/code/space/chai/OrderQualityTool/run_unit_tests.sh",
+		"/Users/jamesmuranga/code/space/chai/OrderQualityTool/.noserc",
+		"/Users/jamesmuranga/code/space/chai/OrderQualityTool/dashboard/urls.py",
+		"/Users/jamesmuranga/code/space/chai/OrderQualityTool/dashboard/static/views/table.html",
+		"/Users/jamesmuranga/code/space/chai/OrderQualityTool/pytest.ini",
+		"/Users/jamesmuranga/code/space/chai/OrderQualityTool/orderqualitytool/settings.py",
+		"/Users/jamesmuranga/code/space/chai/OrderQualityTool/dashboard/views.py",
+		"/Users/jamesmuranga/code/space/chai/OrderQualityTool/dashboard/static/views/chart.html",
+		"/Users/jamesmuranga/code/space/chai/OrderQualityTool/requirements/common.txt",
+		"/Users/jamesmuranga/code/space/chai/OrderQualityTool/dashboard/static/js/controllers/home.controller.js",
+		"/Users/jamesmuranga/code/space/chai/OrderQualityTool/dashboard/templates/home.html",
+		"/Users/jamesmuranga/code/space/chai/OrderQualityTool/qdbauth/models.py",
+		"/Users/jamesmuranga/code/space/chai/OrderQualityTool/dashboard/models.py",
+		"/Users/jamesmuranga/code/space/vibz-ios/Vibz/VBTopicCell.xib",
+		"/Users/jamesmuranga/code/space/vibz-ios/Podfile",
+		"/Users/jamesmuranga/code/space/momo/momo-project/dashboard/build/resources/main/templates/reports/daily_recovery_history.html",
+		"/Users/jamesmuranga/code/space/chai/OrderQualityTool/dashboard/tests/test_models.py",
+		"/Users/jamesmuranga/code/space/chai/OrderQualityTool/dashboard/static/views/test.html",
+		"/Users/jamesmuranga/code/space/chai/OrderQualityTool/dashboard/static/less:variables.less",
+		"/Users/jamesmuranga/code/space/chai/OrderQualityTool/dashboard/tests/fixtures/new_format.xlsx",
+		"/Users/jamesmuranga/code/space/chai/OrderQualityTool/locations/tests.py",
+		"/Users/jamesmuranga/code/space/chai/OrderQualityTool/locations/management/commands/import_locations.py",
+		"/Users/jamesmuranga/code/space/chai/OrderQualityTool/locations/admin.py",
+		"/Users/jamesmuranga/code/space/chai/OrderQualityTool/locations/models.py",
+		"/Users/jamesmuranga/Library/Application Support/Sublime Text 3/Packages/User/Preferences.sublime-settings",
+		"/Users/jamesmuranga/Desktop/organisationUnits.json",
+		"/private/var/folders/cw/hcggh9996jv3kbhz0vsmsr_w0000gn/T/fz3temp-1/.htaccess",
+		"/Users/jamesmuranga/Downloads/htaccess",
+		"/Users/jamesmuranga/Desktop/assignment/app.html",
+		"/Users/jamesmuranga/Desktop/lab.cs",
+		"/Users/jamesmuranga/code/work/msf/dhis2-chrome/src/main/js/app/consumer/download.charts.consumer.js",
+		"/Users/jamesmuranga/code/work/msf/dhis2-chrome/src/main/js/app/consumer/download.pivot.table.consumer.js",
+		"/Users/jamesmuranga/code/work/msf/dhis2-chrome/src/main/js/app/repository/userpreference.repository.js",
+		"/Users/jamesmuranga/code/work/msf/dhis2-chrome/src/main/js/app/repository/orgunit.repository.js",
+		"/Users/jamesmuranga/code/work/msf/dhis2-chrome/src/main/js/app/consumer/download.data.consumer.js",
+		"/Users/jamesmuranga/code/work/msf/dhis2-chrome/src/main/js/app/repository/pivot.table.repository.js",
+		"/Users/jamesmuranga/code/work/msf/dhis2-chrome/src/main/js/app/consumer/consumers.js",
+		"/Users/jamesmuranga/code/work/msf/dhis2-chrome/src/main/js/app/service/chart.service.js",
+		"/Users/jamesmuranga/code/work/msf/dhis2-chrome/src/test/unit/js/app/consumers/download.pivot.table.consumer.spec.js",
+		"/Users/jamesmuranga/code/work/msf/todo.txt",
+		"/Users/jamesmuranga/code/work/msf/dhis2-chrome/src/test/unit/js/app/service/pivot.table.service.spec.js",
+		"/Users/jamesmuranga/code/work/msf/dhis2-chrome/src/main/templates/partials/download-data.html",
+		"/Users/jamesmuranga/code/work/msf/dhis2-chrome/src/main/js/app/controller/download.data.controller.js",
+		"/Users/jamesmuranga/code/work/msf/dhis2-chrome/src/main/js/app/consumer/dispatcher.js",
+		"/Users/jamesmuranga/code/work/msf/dhis2-chrome/src/main/js/app/bg.app.js",
+		"/Users/jamesmuranga/code/work/msf/dhis2-chrome/src/main/js/app/service/bg.services.js",
+		"/Users/jamesmuranga/code/work/msf/dhis2-chrome/src/main/js/app/repository/repositories.js",
+		"/Users/jamesmuranga/code/work/msf/dhis2-chrome/src/test/unit/js/app/controller/download.data.controller.spec.js",
+		"/Users/jamesmuranga/code/work/msf/dhis2-chrome/src/main/js/app/service/pivot.table.service.js",
+		"/Users/jamesmuranga/code/work/msf/dhis2-chrome/src/main/js/app/service/approval.service.js",
+		"/Users/jamesmuranga/code/work/msf/dhis2-chrome/src/main/js/app/consumer/download.approval.consumer.js",
+		"/Users/jamesmuranga/code/work/msf/dhis2-chrome/src/main/js/app/interceptors/configure.request.interceptor.js",
+		"/Users/jamesmuranga/code/work/msf/dhis2-chrome/src/main/js/app/controller/login.controller.js",
+		"/Users/jamesmuranga/code/work/msf/dhis2-chrome/src/main/js/app/migrator/migrations.js",
+		"/Users/jamesmuranga/code/work/msf/dhis2-chrome/src/main/js/app/consumer/update.user.consumer.js",
+		"/Users/jamesmuranga/code/work/msf/dhis2-chrome/src/main/js/app/service/user.service.js",
+		"/Users/jamesmuranga/code/work/msf/dhis2-chrome/src/main/js/app/repository/metadata.repository.js",
+		"/Users/jamesmuranga/code/work/msf/dhis2-chrome/src/main/js/app/utils/dhis.url.js",
+		"/Users/jamesmuranga/code/work/msf/dhis2-chrome/src/main/js/app/helpers/session.helper.js",
+		"/Users/jamesmuranga/code/work/msf/dhis2-chrome/src/main/index.html",
+		"/Users/jamesmuranga/code/work/msf/dhis2-chrome/src/main/js/app/app.js",
+		"/Users/jamesmuranga/code/work/msf/dhis2-chrome/src/main/js/app/service/services.js",
+		"/Users/jamesmuranga/code/work/msf/dhis2-chrome/src/main/js/app/consumer/download.event.data.consumer.js",
+		"/Users/jamesmuranga/code/work/msf/dhis2-chrome/src/main/js/app/controller/aggregate.data.entry.controller.js",
+		"/Users/jamesmuranga/code/work/msf/dhis2-chrome/src/main/templates/aggregate-data-entry.html",
+		"/Users/jamesmuranga/code/work/msf/dhis2-chrome/src/main/js/app/controller/project.controller.js",
+		"/Users/jamesmuranga/code/work/msf/dhis2-chrome/gulpfile.js",
+		"/etc/hosts",
+		"/Users/jamesmuranga/code/work/msf/msf-import/run.sh",
+		"/Users/jamesmuranga/code/work/msf/dhis2-chrome/src/main/templates/dashboard.html",
+		"/Users/jamesmuranga/code/work/msf/dhis2-chrome/src/main/templates/partials/data-entry-approval-dashboard.html",
+		"/Users/jamesmuranga/code/work/msf/dhis2-chrome/src/main/templates/orgunits.html",
+		"/Users/jamesmuranga/code/work/msf/dhis2-chrome/src/main/templates/login.html",
+		"/Users/jamesmuranga/code/work/msf/dhis2-chrome/src/main/js/app/controller/main.controller.js",
+		"/Users/jamesmuranga/code/work/msf/fieldapp.sublime-project",
+		"/Users/jamesmuranga/code/work/msf/dhis2-chrome/src/test/unit/js/app/repository/chart.repository.spec.js",
+		"/Users/jamesmuranga/code/work/msf/dhis2-chrome/src/main/js/app/repository/chart.repository.js",
+		"/Users/jamesmuranga/code/work/msf/dhis2-chrome/src/main/js/app/controller/reports.controller.js",
+		"/Users/jamesmuranga/code/space/myziki-django/docker-compose.yml",
+		"/Users/jamesmuranga/code/space/myziki-django/myziki/reqs/common.txt",
+		"/Users/jamesmuranga/code/space/myziki-django/myziki/metrics/urls.py",
+		"/Users/jamesmuranga/code/space/myziki-django/myziki/music/urls.py"
+	],
+	"find":
+	{
+		"height": 35.0
+	},
+	"find_in_files":
+	{
+		"height": 96.0,
+		"where_history":
+		[
+			"/Users/jamesmuranga/code/work/msf/dhis2-chrome/src/main",
+			"/Users/jamesmuranga/code/work/msf/dhis2-chrome",
+			"/Users/jamesmuranga/code/work/devinfo/builder/src/javascripts/src",
+			"./"
+		]
+	},
+	"find_state":
+	{
+		"case_sensitive": false,
+		"find_history":
+		[
+			"__newVar__20160208213718668888",
+			"'",
+			"jsRender",
+			"templates",
+			"$",
+			"app",
+			"stripped",
+			"'\n",
+			" = ",
+			"th",
+			"@modal-sm",
+			"row",
+			"selectIds",
+			" = ",
+			"\"\n",
+			" = ",
+			"className",
+			"vendor/",
+			"dashboard/static/",
+			"tr/tv",
+			"/tr/tv/",
+			">\n",
+			"@link-hover-color",
+			"@pagination-hover-border",
+			"@link-hover-color",
+			"districts",
+			"h3",
+			"nav",
+			"active",
+			",\n",
+			",\n                            max: 50",
+			"%;",
+			");\n",
+			"'\n",
+			"'",
+			"guidelineAdherence",
+			"stableConsumption",
+			"nnrtiCurrentAdults",
+			"orderFormFreeOfNegativeNumbers",
+			"nnrtiNewAdults",
+			"MULTIPLE_ORDERS",
+			"OrderFormFreeOfGaps",
+			"WEB_BASED",
+			"closingBalanceMatchesOpeningBalance",
+			"},",
+			"': ",
+			"{'",
+			"'}",
+			"                  '",
+			"'",
+			"',",
+			"choices, db_index=True,",
+			"|",
+			"}}\n",
+			")\n",
+			"MetaService.Check",
+			")\n",
+			"artists",
+			"\",\n",
+			"]\",\n",
+			"newScore",
+			" }, {",
+			")\n",
+			"\n        }, {",
+			",\n",
+			"value",
+			"name",
+			",\n",
+			": u ",
+			"id",
+			"name",
+			"warehouse",
+			"district",
+			"ip",
+			",\n",
+			");\n",
+			"cycle",
+			"CYCLE",
+			"cycle",
+			"warehouse",
+			"WAREHOUSE",
+			"warehouse",
+			"district",
+			"DISTRICT",
+			"district",
+			"ip",
+			",\n",
+			">\n",
+			",\n",
+			");",
+			">\n",
+			"%</",
+			"open",
+			"utils",
+			">\n",
+			"{\n",
+			"true",
+			"%}'>\n",
+			"/>\n",
+			"media",
+			"filter-drop",
+			"-drop",
+			"form-control",
+			">\n",
+			"md",
+			"@screen-md",
+			"h5",
+			"h3",
+			",\n                \"desc\":",
+			",\n                \"hasRegimen\":",
+			"\"hasChart\": true,",
+			"tests = [{\n            \"url\": \"orderFormFreeOfGaps\",\n            \"desc\": \"NO BLANKS: If the facility reported, is the whole order form free of blanks?\",\n            \"hasRegimen\": false,\n            \"hasChart\": true,\n            \"testNumber\": 3,\n            \"template\": \"/static/views/chart.html\"\n        }, {\n            \"url\": \"facilitiesMultiple\",\n            \"desc\": \"DUPLICATE ORDERS: Facilities that submitted more than one order over the cycle\",\n            \"hasRegimen\": false,\n            \"hasChart\": false,\n            \"testNumber\": 4,\n            \"template\": \"/static/views/table.html\"\n        }, {\n            \"url\": \"orderFormFreeOfNegativeNumbers\",\n            \"desc\": \"NO NEGATIVES: Is the order free of negative numbers?\",\n            \"hasRegimen\": true,\n            \"hasChart\": true,\n            \"testNumber\": 5,\n            \"template\": \"/static/views/chart.html\"\n        }, {\n            \"url\": \"consumptionAndPatients\",\n            \"desc\": \"CONSUMPTION AND PATIENTS: Do consumption volumes tally with corresponding patient regimen volumes (i.e. they are within 30% of each other)?\",\n            \"hasRegimen\": true,\n            \"hasChart\": true,\n            \"testNumber\": 6,\n            \"template\": \"/static/views/chart.html\"\n        }, {\n            \"url\": \"differentOrdersOverTime\",\n            \"desc\": \"NON-REPEATING ORDERS: Does the facility avoid repeating the same orders in consecutive cycles?\",\n            \"hasRegimen\": true,\n            \"hasChart\": true,\n            \"testNumber\": 7,\n            \"template\": \"/static/views/chart.html\"\n        }, {\n            \"url\": \"closingBalance\",\n            \"desc\": \"Does Opening  balance of the cycle = Closing balance from the previous one?\",\n            \"hasRegimen\": true,\n            \"hasChart\": true,\n            \"testNumber\": 8,\n            \"template\": \"/static/views/chart.html\"\n        }, {\n            \"url\": \"stableConsumption\",\n            \"desc\": \"STABLE CONSUMPTION: Is total consumption stable from one cycle to the next (i.e. less than 50% growth or decline from one cycle to the next)?\",\n            \"hasRegimen\": true,\n            \"hasChart\": true,\n            \"testNumber\": 9,\n            \"template\": \"/static/views/chart.html\"\n        }, {\n            \"url\": \"warehouseFulfilment\",\n            \"desc\": \"WAREHOUSE FULFILMENT: Does volume ordered = volume delivered in following cycle?\",\n            \"hasRegimen\": true,\n            \"hasChart\": true,\n            \"testNumber\": 10,\n            \"template\": \"/static/views/chart.html\"\n        }, {\n            \"url\": \"stablePatientVolumes\",\n            \"desc\": \"STABLE PATIENT VOLUMES: Are total patient numbers stable from one cycle to the next?\",\n            \"hasRegimen\": true,\n            \"hasChart\": true,\n            \"testNumber\": 11,\n            \"template\": \"/static/views/chart.html\"\n        }, {\n            \"url\": \"nnrtiCurrentAdults\",\n            \"desc\": \"NRTI vs NNRTI/PI VOLUMES (CURRENT ADULTS): Do total current Adult NRTI patient volumes tally with total NNRTI & PI patient volumes?\",\n            \"hasRegimen\": false,\n            \"hasChart\": true,\n            \"testNumber\": 15,\n            \"template\": \"/static/views/chart.html\"\n        }, {\n            \"url\": \"nnrtiCurrentPaed\",\n            \"desc\": \"NRTI vs NNRTI/PI VOLUMES (CURRENT PAED): Do total current Paed NRTI patient volumes tally with total NNRTI & PI patient volumes?\",\n            \"hasRegimen\": false,\n            \"hasChart\": true,\n            \"testNumber\": 16,\n            \"template\": \"/static/views/chart.html\"\n        }, {\n            \"url\": \"nnrtiNewAdults\",\n            \"desc\": \"NRTI vs NNRTI/PI VOLUMES (ESTIMATED NEW ADULTS): Do total Estimated New Adult NRTI patient volumes tally with total NNRTI & PI patient volumes?\",\n            \"hasRegimen\": false,\n            \"hasChart\": true,\n            \"testNumber\": 17,\n            \"template\": \"/static/views/chart.html\"\n        }, {\n            \"url\": \"nnrtiNewPaed\",\n            \"desc\": \"NRTI vs NNRTI/PI VOLUMES (ESTIMATED NEW PAED): Do total Estimated New Paed NRTI patient volumes tally with total NNRTI & PI patient volumes?\",\n            \"hasRegimen\": false,\n            \"hasChart\": true,\n            \"testNumber\": 18,\n            \"template\": \"/static/views/chart.html\"\n        }];",
+			"$stateParams",
+			"var ",
+			"ng-class=\"{'quality_test_active': test.name == currentTest}\"",
+			"ng-repeat=\"test in tests\"",
+			"$http",
+			"http",
+			"bestPerforming",
+			"worstPerforming",
+			"bestPerforming",
+			"getBestRankings",
+			",\n",
+			"response.data",
+			"getCycles",
+			",\n",
+			"WebTest, Or",
+			"\",\n"
+		],
+		"highlight": true,
+		"in_selection": false,
+		"preserve_case": false,
+		"regex": false,
+		"replace_history":
+		[
+			"$scope.areaDataMapping",
+			"self.mapData",
+			"self.areaDataMapping",
+			"CHARTS.BAR.name",
+			"CHARTS.LINE.name",
+			"CHARTS.COLUMN.name",
+			"CHARTS.SCATTER.name",
+			"CHARTS.PIE.name"
+		],
+		"reverse": false,
+		"show_context": true,
+		"use_buffer2": true,
+		"whole_word": false,
+		"wrap": true
+	},
+	"groups":
+	[
+		{
+			"selected": 5,
+			"sheets":
+			[
+				{
+					"buffer": 0,
+					"file": "scores.entry.js",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 175,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								20,
+								20
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 2,
+					"type": "text"
+				},
+				{
+					"buffer": 1,
+					"file": "charts.entry.js",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 39,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								39,
+								39
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 4,
+					"type": "text"
+				},
+				{
+					"buffer": 2,
+					"file": "dashboard/static/js/app.js",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 1212,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								442,
+								442
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 5,
+					"type": "text"
+				},
+				{
+					"buffer": 3,
+					"file": "dashboard/static/js/appSpec.js",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 956,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								302,
+								302
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 6,
+					"type": "text"
+				},
+				{
+					"buffer": 4,
+					"file": "dashboard/static/js/reports.js",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 299,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								299,
+								299
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 8,
+					"type": "text"
+				},
+				{
+					"buffer": 5,
+					"file": "dashboard/static/js/scores_table.js",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 4942,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"nodePath": "node",
+							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 1399.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 0,
+					"type": "text"
+				},
+				{
+					"buffer": 6,
+					"file": "/Users/jamesmuranga/Library/Application Support/Sublime Text 3/Packages/User/JavascriptBeautify.sublime-settings",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 172,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								118,
+								118
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JSON.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 3,
+					"type": "text"
+				},
+				{
+					"buffer": 7,
+					"file": ".eslintrc",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 390,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								195,
+								195
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JSON.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 1,
+					"type": "text"
+				},
+				{
+					"buffer": 8,
+					"file": "dashboard/data/cycles.py",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 11192,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								10343,
+								10343
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Djaneiro/Syntaxes/Python Django.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 28.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 9,
+					"type": "text"
+				},
+				{
+					"buffer": 9,
+					"file": "dashboard/templates/scores_table.html",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 8730,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Djaneiro/Syntaxes/HTML (Django).tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 10,
+					"type": "text"
+				},
+				{
+					"buffer": 10,
+					"file": "webpack.config.js",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 1503,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								1002,
+								1002
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 210.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 7,
+					"type": "text"
+				},
+				{
+					"buffer": 11,
+					"file": "bower.json",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 1118,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JSON.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 12,
+					"type": "text"
+				},
+				{
+					"buffer": 12,
+					"file": "dashboard/templates/layout.html",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 5120,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Djaneiro/Syntaxes/HTML (Django).tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 11,
+					"type": "text"
+				},
+				{
+					"buffer": 13,
+					"file": "gulpfile.js",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 1709,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								793,
+								793
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 13,
+					"type": "text"
+				}
+			]
+		}
+	],
+	"incremental_find":
+	{
+		"height": 27.0
+	},
+	"input":
+	{
+		"height": 36.0
+	},
+	"layout":
+	{
+		"cells":
+		[
+			[
+				0,
+				0,
+				1,
+				1
+			]
+		],
+		"cols":
+		[
+			0.0,
+			1.0
+		],
+		"rows":
+		[
+			0.0,
+			1.0
+		]
+	},
+	"menu_visible": true,
+	"output.GoSublime-main-output":
+	{
+		"height": 124.0
+	},
+	"output.GsDoc-output-output":
+	{
+		"height": 130.0
+	},
+	"output.exec":
+	{
+		"height": 140.0
+	},
+	"output.find_results":
+	{
+		"height": 0.0
+	},
+	"pinned_build_system": "",
+	"project": "chai.sublime-project",
+	"replace":
+	{
+		"height": 50.0
+	},
+	"save_all_on_build": true,
+	"select_file":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+			[
+				"cyc",
+				"dashboard/data/cycles.py"
+			],
+			[
+				"score",
+				"dashboard/templates/scores_table.html"
+			],
+			[
+				"app.le",
+				"dashboard/static/css/app.less"
+			],
+			[
+				"hel",
+				"dashboard/helpers.py"
+			],
+			[
+				"scores",
+				"dashboard/templates/scores_table.html"
+			],
+			[
+				"sco",
+				"dashboard/static/js/scores_table.js"
+			],
+			[
+				"lay",
+				"dashboard/templates/layout.html"
+			],
+			[
+				"app.less",
+				"dashboard/static/css/app.less"
+			],
+			[
+				"helper",
+				"dashboard/helpers.py"
+			],
+			[
+				"app.el",
+				"dashboard/static/css/app.less"
+			],
+			[
+				"layout",
+				"dashboard/templates/layout.html"
+			],
+			[
+				"gul",
+				"gulpfile.js"
+			],
+			[
+				"app.les",
+				"dashboard/static/css/app.less"
+			],
+			[
+				"admin",
+				"dashboard/admin.py"
+			],
+			[
+				"gulp",
+				"gulpfile.js"
+			],
+			[
+				"report",
+				"dashboard/static/views/reports.html"
+			],
+			[
+				"api",
+				"dashboard/views/api.py"
+			],
+			[
+				"models",
+				"dashboard/models.py"
+			],
+			[
+				"layou",
+				"dashboard/templates/layout.html"
+			],
+			[
+				"app.js",
+				"dashboard/static/js/app.js"
+			],
+			[
+				"repot",
+				"dashboard/templates/reports.html"
+			],
+			[
+				"reports",
+				"dashboard/templates/reports.html"
+			],
+			[
+				"repots.co",
+				"dashboard/static/js/controllers/reports.controller.js"
+			],
+			[
+				"reports.co",
+				"dashboard/static/js/controllers/reports.controller.js"
+			],
+			[
+				"read",
+				"readme.md"
+			],
+			[
+				"home.co",
+				"dashboard/static/js/controllers/home.controller.js"
+			],
+			[
+				"main.con",
+				"dashboard/static/js/controllers/main.check.controller.js"
+			],
+			[
+				"report.ser",
+				"dashboard/static/js/services/report.service.js"
+			],
+			[
+				"main",
+				"dashboard/static/views/main.html"
+			],
+			[
+				"bowe",
+				"bower.json"
+			],
+			[
+				"list.html",
+				"dashboard/templates/dashboard/dashboarduser_list.html"
+			],
+			[
+				"repor",
+				"dashboard/static/js/reports.js"
+			],
+			[
+				"test_mom",
+				"lugelo/tests/views/test_moment_forms.py"
+			],
+			[
+				"com",
+				"requirements/common.txt"
+			],
+			[
+				"setti",
+				"vibzsocial/settings.py"
+			],
+			[
+				"home",
+				"dashboard/static/js/controllers/home.controller.js"
+			],
+			[
+				"app.l",
+				"dashboard/static/css/app.less"
+			],
+			[
+				"add",
+				"dashboard/static/views/addTests.html"
+			],
+			[
+				"hom",
+				"dashboard/static/js/controllers/home.controller.js"
+			],
+			[
+				"repor.se",
+				"dashboard/static/js/services/report.service.js"
+			],
+			[
+				"main.c",
+				"dashboard/static/js/controllers/main.check.controller.js"
+			],
+			[
+				"repo",
+				"dashboard/static/js/services/report.service.js"
+			],
+			[
+				"karm",
+				"karma.conf.js"
+			],
+			[
+				"test_or",
+				"dashboard/tests/test_order_form_free_of_gaps.py"
+			],
+			[
+				"test_order",
+				"dashboard/tests/test_order_form_free_of_gaps.py"
+			],
+			[
+				"addte",
+				"dashboard/static/views/addTests.html"
+			],
+			[
+				"main.",
+				"dashboard/static/js/controllers/main.check.controller.js"
+			],
+			[
+				"home.c",
+				"dashboard/static/js/controllers/home.controller.js"
+			],
+			[
+				"main.ch",
+				"dashboard/static/js/controllers/main.check.controller.js"
+			],
+			[
+				"setting",
+				"orderqualitytool/settings.py"
+			],
+			[
+				"url",
+				"dashboard/urls.py"
+			],
+			[
+				"ly",
+				"dashboard/templates/layout.html"
+			],
+			[
+				"test_vi",
+				"dashboard/tests/test_views.py"
+			],
+			[
+				"app.",
+				"dashboard/static/css/app.less"
+			],
+			[
+				"mai",
+				"dashboard/static/views/main.html"
+			],
+			[
+				"bow",
+				"bower.json"
+			],
+			[
+				"app.s",
+				"dashboard/static/js/app.js"
+			],
+			[
+				"varia",
+				"dashboard/static/less/variables.less"
+			],
+			[
+				"app",
+				"dashboard/static/css/app.less"
+			],
+			[
+				"kamr",
+				"karma.conf.js"
+			],
+			[
+				"la",
+				"dashboard/templates/layout.html"
+			],
+			[
+				"kar",
+				"karma.conf.js"
+			],
+			[
+				"gu",
+				"gulpfile.js"
+			],
+			[
+				"vari",
+				"dashboard/static/less/variables.less"
+			],
+			[
+				"app.sl",
+				"dashboard/static/css/app.less"
+			],
+			[
+				"hour",
+				"dashboard/src/main/resources/static/js/hourlyLending.js"
+			],
+			[
+				"sub",
+				"dashboard/src/main/resources/static/js/subscribers.js"
+			],
+			[
+				"lending",
+				"dashboard/src/main/resources/static/js/lendingHistory.js"
+			],
+			[
+				"recove",
+				"dashboard/build/resources/main/templates/reports/daily_recovery_history.html"
+			],
+			[
+				"webv",
+				"dashboard/static/views/web_vs_paper.html"
+			],
+			[
+				"test_mode",
+				"dashboard/tests/test_models.py"
+			],
+			[
+				"admi",
+				"locations/admin.py"
+			],
+			[
+				"comm",
+				"requirements/common.txt"
+			],
+			[
+				"pivot",
+				"src/test/unit/js/app/service/pivot.table.service.spec.js"
+			],
+			[
+				"chart.ser",
+				"src/main/js/app/service/chart.service.js"
+			],
+			[
+				"charts.con",
+				"src/main/js/app/consumer/download.charts.consumer.js"
+			],
+			[
+				"reports.contr",
+				"src/main/js/app/controller/reports.controller.js"
+			],
+			[
+				"pivot.table.sj",
+				"src/main/js/app/directives/pivot.table.js"
+			],
+			[
+				"pivot.table.cons",
+				"src/test/unit/js/app/consumers/download.pivot.table.consumer.spec.js"
+			],
+			[
+				"chart.serv",
+				"src/test/unit/js/app/service/chart.service.spec.js"
+			],
+			[
+				"pivot.table.serv",
+				"src/test/unit/js/app/service/pivot.table.service.spec.js"
+			],
+			[
+				"pivot.",
+				"src/main/js/app/service/pivot.table.service.js"
+			],
+			[
+				"orguni.re",
+				"src/main/js/app/repository/orgunit.repository.js"
+			],
+			[
+				"user.pre",
+				"src/main/js/app/repository/userpreference.repository.js"
+			],
+			[
+				"consume",
+				"src/main/js/app/consumer/consumers.js"
+			],
+			[
+				"",
+				"src/main/js/app/consumer/download.pivot.table.consumer.js"
+			],
+			[
+				"pivottbal",
+				"src/main/js/app/repository/pivot.table.repository.js"
+			],
+			[
+				"download.pivot.tab",
+				"src/test/unit/js/app/consumers/download.pivot.table.consumer.spec.js"
+			],
+			[
+				"consu",
+				"src/main/js/app/consumer/consumers.js"
+			],
+			[
+				"downlod.pivo",
+				"src/main/js/app/consumer/download.pivot.table.consumer.js"
+			],
+			[
+				"chs",
+				"src/main/js/app/service/chart.service.js"
+			],
+			[
+				"download.chart.",
+				"src/main/js/app/consumer/download.charts.consumer.js"
+			],
+			[
+				"login.co",
+				"src/main/js/app/controller/login.controller.js"
+			],
+			[
+				"logi",
+				"src/main/templates/login.html"
+			],
+			[
+				"login",
+				"src/main/js/app/controller/login.controller.js"
+			],
+			[
+				"login.contr",
+				"src/main/js/app/controller/login.controller.js"
+			],
+			[
+				"session",
+				"src/main/js/app/helpers/session.helper.js"
+			],
+			[
+				"login.c",
+				"src/main/js/app/controller/login.controller.js"
+			],
+			[
+				"user.pr",
+				"src/main/js/app/repository/userpreference.repository.js"
+			],
+			[
+				"charts.co",
+				"src/main/js/app/consumer/download.charts.consumer.js"
+			],
+			[
+				"charts",
+				"src/test/unit/js/app/consumers/download.charts.consumer.spec.js"
+			],
+			[
+				"report.",
+				"src/main/js/app/controller/reports.controller.js"
+			],
+			[
+				"app.co",
+				"src/main/js/app/app.config.js"
+			],
+			[
+				"servi",
+				"src/main/js/app/service/services.js"
+			],
+			[
+				"data-entry",
+				"src/main/templates/partials/data-entry-approval-dashboard.html"
+			],
+			[
+				"lo",
+				"src/main/templates/login.html"
+			],
+			[
+				"dash",
+				"src/main/templates/dashboard.html"
+			],
+			[
+				"index",
+				"src/main/index.html"
+			],
+			[
+				"consum",
+				"src/main/js/app/consumer/consumers.js"
+			],
+			[
+				"repos",
+				"src/main/js/app/repository/repositories.js"
+			],
+			[
+				"bg.serv",
+				"src/main/js/app/service/bg.services.js"
+			],
+			[
+				"download.data.",
+				"src/test/unit/js/app/controller/download.data.controller.spec.js"
+			],
+			[
+				"bg.app",
+				"src/main/js/app/bg.app.js"
+			],
+			[
+				"download.pivot",
+				"src/main/js/app/consumer/download.pivot.table.consumer.js"
+			],
+			[
+				"dis",
+				"src/main/js/app/consumer/dispatcher.js"
+			],
+			[
+				"download.contr",
+				"src/main/js/app/controller/download.data.controller.js"
+			],
+			[
+				"down",
+				"src/main/templates/partials/download-data.html"
+			],
+			[
+				"inde",
+				"src/main/index.html"
+			],
+			[
+				"appro",
+				"src/main/js/app/service/approval.service.js"
+			],
+			[
+				"metadata",
+				"src/main/js/app/repository/metadata.repository.js"
+			],
+			[
+				"user.s",
+				"src/main/js/app/service/user.service.js"
+			],
+			[
+				"user.co",
+				"src/main/js/app/consumer/update.user.consumer.js"
+			],
+			[
+				"mig",
+				"src/main/js/app/migrator/migrations.js"
+			],
+			[
+				"conf",
+				"src/main/js/app/interceptors/configure.request.interceptor.js"
+			],
+			[
+				"bg.ap",
+				"src/main/js/app/bg.app.js"
+			],
+			[
+				"seriv",
+				"src/main/js/app/service/services.js"
+			],
+			[
+				"project",
+				"src/main/js/app/controller/project.controller.js"
+			],
+			[
+				"ag",
+				"src/main/templates/aggregate-data-entry.html"
+			]
+		],
+		"width": 0.0
+	},
+	"select_project":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"select_symbol":
+	{
+		"height": 392.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 404.0
+	},
+	"selected_group": 0,
+	"settings":
+	{
+	},
+	"show_minimap": true,
+	"show_open_files": false,
+	"show_tabs": true,
+	"side_bar_visible": true,
+	"side_bar_width": 292.0,
+	"status_bar_visible": true,
+	"template_settings":
+	{
+	}
+}
