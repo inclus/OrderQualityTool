@@ -43,30 +43,30 @@
         <div class="row">
             <table class="table table-striped table-bordered" cellspacing="0" width="100%" id="score-tables">
                 <thead>
-                    <tr>
-                        <th>FACILITY</th>
-                        <th>DISTRICT</th>
-                        <th>WAREHOUSE</th>
-                        <th>IP</th>
-                        <th>REPORTING</th>
-                        <th>WEB/PAPER</th>
-                        <th>>1 Order</th>
-                        <th>Blanks</th>
-                        <th>Adult 1L</th>
-                        <th>Adult 2L</th>
-                        <th>Paed 1L</th>
-                        <th>N. PAED NRTI</th>
-                        <th>PAED NRTI</th>
-                        <th>N. Adult NRTI</th>
-                        <th>Adult NRTI</th>
-                        <th>Patient Stability</th>
-                        <th>Cons. & Patients</th>
-                        <th>Fulfillment</th>
-                        <th>Repeat Ord.</th>
-                        <th>Open/ Close</th>
-                        <th>Negatives</th>
-                        <th>Cons. Stable</th>
-                    </tr>
+                <tr>
+                    <th>FACILITY</th>
+                    <th>DISTRICT</th>
+                    <th>WAREHOUSE</th>
+                    <th>IP</th>
+                    <th>REPORTING</th>
+                    <th>WEB/PAPER</th>
+                    <th>>1 Order</th>
+                    <th>Blanks</th>
+                    <th>Adult 1L</th>
+                    <th>Adult 2L</th>
+                    <th>Paed 1L</th>
+                    <th>N. PAED NRTI</th>
+                    <th>PAED NRTI</th>
+                    <th>N. Adult NRTI</th>
+                    <th>Adult NRTI</th>
+                    <th>Patient Stability</th>
+                    <th>Cons. & Patients</th>
+                    <th>Fulfillment</th>
+                    <th>Repeat Ord.</th>
+                    <th>Open/ Close</th>
+                    <th>Negatives</th>
+                    <th>Cons. Stable</th>
+                </tr>
                 </thead>
             </table>
         </div>
@@ -128,6 +128,8 @@
             </div>
         </div>
     </div>
+
+
     </script>
     <script id="orderFormFreeOfNegativeNumbers" type="text/x-jsrender">
     <span class="score_detail_data_title col-md-12">{{:main_title}}</span>
@@ -151,14 +153,15 @@
         </table>
     </div>
     {{/for}}
+
+
     </script>
     <script id="consumptionAndPatients" type="text/x-jsrender">
     <span class="score_detail_data_title col-md-12">{{:main_title}}</span>
-    
     <div class="col-md-6 text-left">
     <span class="inner-title">CONSUMPTION</span>
     {{for consumption}}
-    
+
         <table class="table table-striped table-bordered">
             <thead>
                 <tr>
@@ -180,7 +183,7 @@
     <div class="col-md-6 text-left">
     <span class="inner-title">PATIENTS</span>
     {{for patients}}
-    
+
         <table class="table table-striped table-bordered">
             <thead>
                 <tr>
@@ -212,15 +215,64 @@
             </tbody>
         </table>
     </div>
+    <div class="row">
+    <div class="col-md-12 text-left"> <span class="inner-title">ESTIMATED CURRENT PATIENTS</span></div>
     <div class="col-md-6">
+
+    <table class="table table-striped table-bordered">
+        <thead>
+            <tr>
+                <td>From Consumption Data</td>
+                <td></td>
+            </tr>
+        </thead>
+        <tbody>
+        {{for consumption_totals}}
+            <tr>
+               {{if isHeader}}
+                <th>{{:column}}</th>
+                <th>{{:value}}</th>
+                {{else}}
+                <td>{{:column}}</td>
+                <td>{{:value}}</td>
+             {{/if}}
+            </tr>
+            {{/for}}
+        </tbody>
+    </table>
     </div>
     <div class="col-md-6">
+    <table class="table table-striped table-bordered">
+        <thead>
+            <tr>
+                <td>From Patient Data</td>
+                <td></td>
+            </tr>
+        </thead>
+        <tbody>
+            {{for patient_totals}}
+            <tr>
+              {{if isHeader}}
+                <th>{{:column}}</th>
+                <th>{{:value}}</th>
+                {{else}}
+                <td>{{:column}}</td>
+                <td>{{:value}}</td>
+             {{/if}}
+            </tr>
+            {{/for}}
+        </tbody>
+    </table>
     </div>
+    </div>
+
+
+
     </script>
-{% endverbatim %}
+    {% endverbatim %}
 {% endblock content %}
 {% block js %}
-<script type="text/javascript" src='{% static "vendor/select2/dist/js/select2.full.min.js" %}'></script>
+    <script type="text/javascript" src='{% static "vendor/select2/dist/js/select2.full.min.js" %}'></script>
     <script type="text/javascript" src='{% static "vendor/jsrender/jsrender.min.js" %}'></script>
     <script type="text/javascript" src='{% static "js/scores_table.js" %}'></script>
 

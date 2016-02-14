@@ -7150,3 +7150,7 @@ nav.with-flag {
   color: #9B9B9B;
   letter-spacing: 1px;
 }
+.raw-data {
+  overflow: auto;
+  max-height: 50vh;
+}
