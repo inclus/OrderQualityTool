@@ -13,16 +13,8 @@ from dashboard.data.negatives import NegativeNumbersQualityCheck
 from dashboard.data.nn import NNRTICURRENTADULTSCheck, NNRTINewAdultsCheck, NNRTINEWPAEDCheck
 from dashboard.data.nn import NNRTICURRENTPAEDCheck
 from dashboard.data.utils import facility_has_single_order
-from dashboard.helpers import YES, to_date, format_range
+from dashboard.helpers import YES, get_prev_cycle
 from dashboard.models import CycleFormulationScore, Score, Cycle, Consumption, AdultPatientsRecord, PAEDPatientsRecord, MultipleOrderFacility
-
-
-def get_prev_cycle(cycle):
-    current_cycle_date = to_date(cycle)
-    start_month = current_cycle_date.replace(months=-3)
-    end_month = current_cycle_date.replace(months=-2)
-    prev_cycle = format_range(start_month, end_month)
-    return prev_cycle
 
 
 def persist_consumption(report):

@@ -2,9 +2,10 @@ from django.db.models import Q
 from django_datatables_view.base_datatable_view import BaseDatatableView
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from data_sources import NegativesCheckDataSource, ConsumptionAndPatientsDataSource
+
 from dashboard.helpers import *
 from dashboard.models import Score
+from data_sources import NegativesCheckDataSource, ConsumptionAndPatientsDataSource, TwoCycleDataSource, ClosingBalanceMatchesOpeningBalanceDataSource, STABLECONSUMPTIONDataSource, STABLEPATIENTVOLUMESDataSource, WAREHOUSE_FULFILMENTDataSource
 
 
 class ScoresTableView(BaseDatatableView):
@@ -117,7 +118,12 @@ class ScoreDetailsView(APIView):
     def get(self, request, id, column):
         TEST_DATA = {
             ORDER_FORM_FREE_OF_NEGATIVE_NUMBERS: NegativesCheckDataSource,
-            CONSUMPTION_AND_PATIENTS: ConsumptionAndPatientsDataSource
+            CONSUMPTION_AND_PATIENTS: ConsumptionAndPatientsDataSource,
+            DIFFERENT_ORDERS_OVER_TIME: TwoCycleDataSource,
+            CLOSING_BALANCE_MATCHES_OPENING_BALANCE: ClosingBalanceMatchesOpeningBalanceDataSource,
+            STABLE_CONSUMPTION: STABLECONSUMPTIONDataSource,
+            STABLE_PATIENT_VOLUMES: STABLEPATIENTVOLUMESDataSource,
+            WAREHOUSE_FULFILMENT: WAREHOUSE_FULFILMENTDataSource
         }
         scores = {YES: "Pass", NO: "Fail", NOT_REPORTING: "N/A"}
         combination = request.GET.get('combination', DEFAULT)

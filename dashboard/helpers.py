@@ -207,3 +207,11 @@ TEST_NAMES = {
     NNRTI_CURRENT_PAED: "NRTI vs NNRTI/PI VOLUMES (CURRENT PAED): Do total current Paed NRTI patient volumes tally with total NNRTI & PI patient volumes?",
     NNRTI_CURRENT_ADULTS: "NRTI vs NNRTI/PI VOLUMES (CURRENT ADULTS): Do total current Adult NRTI patient volumes tally with total NNRTI & PI patient volumes?"
 }
+
+
+def get_prev_cycle(cycle):
+    current_cycle_date = to_date(cycle)
+    start_month = current_cycle_date.replace(months=-3)
+    end_month = current_cycle_date.replace(months=-2)
+    prev_cycle = format_range(start_month, end_month)
+    return prev_cycle

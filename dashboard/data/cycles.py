@@ -19,14 +19,15 @@ class TwoCycleQCheck(QCheck):
     def get_consumption_records(self, report, facility_name, formulation_name):
         records = report.cs[facility_name]
         return pydash.chain(records).reject(
-            lambda x: formulation_name not in x[FORMULATION]
+            lambda x: formulation_name.strip().lower() not in x[FORMULATION].lower()
         ).value()
 
     def get_patient_records(self, report, facility_name, combinations, is_adult=True):
+        lower_case_combinations = pydash.collect(combinations, lambda x: x.lower())
         collection = report.ads if is_adult else report.pds
         records = get_records_from_collection(collection, facility_name)
         return pydash.chain(records).select(
-            lambda x: x[FORMULATION].strip() in combinations
+            lambda x: x[FORMULATION].strip().lower() in lower_case_combinations
         ).value()
 
 
@@ -37,9 +38,10 @@ class DIFFERENTORDERSOVERTIMECheck(TwoCycleQCheck):
         {NAME: F2, CONSUMPTION_QUERY: F2_QUERY},
         {NAME: F3, CONSUMPTION_QUERY: F3_QUERY}
     ]
+    fields = [OPENING_BALANCE, ART_CONSUMPTION, ESTIMATED_NUMBER_OF_NEW_ART_PATIENTS]
 
     def for_each_facility(self, facility, no, not_reporting, yes, combination):
-        fields = [OPENING_BALANCE, ART_CONSUMPTION, ESTIMATED_NUMBER_OF_NEW_ART_PATIENTS]
+        fields = self.fields
 
         prev_records = self.get_consumption_records(self.other_cycle_report, facility[NAME], combination[CONSUMPTION_QUERY])
         prev_values = values_for_records(fields, prev_records)
@@ -101,6 +103,7 @@ class CLOSINGBALANCEMATCHESOPENINGBALANCECheck(TwoCycleQCheck):
 
 class STABLECONSUMPTIONCheck(TwoCycleQCheck):
     test = STABLE_CONSUMPTION
+    fields = [ART_CONSUMPTION, PMTCT_CONSUMPTION]
     combinations = [
         {NAME: F1, CONSUMPTION_QUERY: F1_QUERY, THRESHOLD: 20},
         {NAME: F2, CONSUMPTION_QUERY: F2_QUERY, THRESHOLD: 10},
@@ -130,7 +133,7 @@ class STABLECONSUMPTIONCheck(TwoCycleQCheck):
         threshold = combination[THRESHOLD]
         number_of_consumption_records_prev_cycle = len(prev_records)
         number_of_consumption_records_current_cycle = len(current_records)
-        fields = [PMTCT_CONSUMPTION, ART_CONSUMPTION]
+        fields = self.fields
         current_values = values_for_records(fields, current_records)
         current_consumption = pydash.chain(current_values).reject(lambda x: x is None).sum().value()
         prev_values = values_for_records(fields, prev_records)
@@ -199,6 +202,7 @@ class STABLEPATIENTVOLUMESCheck(STABLECONSUMPTIONCheck):
         {NAME: F2, PATIENT_QUERY: ["ABC/3TC/EFV", "ABC/3TC/NVP"], ADULT: False, THRESHOLD: 5},
         {NAME: F3, PATIENT_QUERY: ["ABC/3TC/EFV", "AZT/3TC/EFV"], ADULT: False, THRESHOLD: 5}
     ]
+    fields = [NEW, EXISTING]
 
     def for_each_facility_with_count(self, facility, no, not_reporting, yes, combination, total_count):
         facility_name = facility[NAME]
@@ -209,9 +213,9 @@ class STABLEPATIENTVOLUMESCheck(STABLECONSUMPTIONCheck):
         threshold = combination[THRESHOLD]
         pre_count = len(prev_records)
         current_count = len(current_records)
-        current_values = values_for_records([NEW, EXISTING], current_records)
+        current_values = values_for_records(self.fields, current_records)
         current_population = pydash.chain(current_values).reject(lambda x: x is None).sum().value()
-        prev_values = values_for_records([NEW, EXISTING], prev_records)
+        prev_values = values_for_records(self.fields, prev_records)
         prev_population = pydash.chain(prev_values).reject(lambda x: x is None).sum().value()
         include_record = current_population > threshold or prev_population > threshold
         result = NOT_REPORTING

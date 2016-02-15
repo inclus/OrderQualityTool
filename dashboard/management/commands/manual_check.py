@@ -15,8 +15,8 @@ def make_cond(cond):
 
 @click.command()
 def command():
-    # perform_checks()
-    export_results()
+    perform_checks()
+    # export_results()
 
 
 def export_results():
