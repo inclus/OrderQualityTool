@@ -1,9 +1,12 @@
+from collections import defaultdict
+
 import pydash
 
+from dashboard.data.adherence import GuidelineAdherenceCheckAdult1L, GuidelineAdherenceCheckAdult2L, GuidelineAdherenceCheckPaed1L
 from dashboard.data.consumption_patients import ConsumptionAndPatientsQualityCheck
-from dashboard.data.cycles import DIFFERENTORDERSOVERTIMECheck, CLOSINGBALANCEMATCHESOPENINGBALANCECheck, STABLECONSUMPTIONCheck, STABLEPATIENTVOLUMESCheck
+from dashboard.data.cycles import OrdersOverTimeCheck, BalancesMatchCheck, StableConsumptionCheck, StablePatientVolumesCheck
 from dashboard.data.negatives import NegativeNumbersQualityCheck
-from dashboard.helpers import FIELD_NAMES, CONSUMPTION_QUERY, FIELDS, NEW, EXISTING, F1, F2, F3, F1_QUERY, F2_QUERY, F3_QUERY, NAME, IS_ADULT, PATIENT_QUERY, RATIO, get_prev_cycle, CLOSING_BALANCE, OPENING_BALANCE, ADULT, PACKS_ORDERED, QUANTITY_RECEIVED
+from dashboard.helpers import FIELD_NAMES, CONSUMPTION_QUERY, FIELDS, NEW, EXISTING, F1, F2, F3, F1_QUERY, F2_QUERY, F3_QUERY, NAME, IS_ADULT, PATIENT_QUERY, RATIO, get_prev_cycle, CLOSING_BALANCE, OPENING_BALANCE, ADULT, PACKS_ORDERED, QUANTITY_RECEIVED, GUIDELINE_ADHERENCE_ADULT_1L, GUIDELINE_ADHERENCE_ADULT_2L, GUIDELINE_ADHERENCE_PAED_1L, DF1, DF2
 from dashboard.models import Consumption, AdultPatientsRecord, PAEDPatientsRecord
 
 query_map = {F1: F1_QUERY, F2: F2_QUERY, F3: F3_QUERY}
@@ -141,7 +144,7 @@ class ConsumptionAndPatientsDataSource(CheckDataSource):
 
 
 class TwoCycleDataSource(CheckDataSource):
-    check = DIFFERENTORDERSOVERTIMECheck({}, {})
+    check = OrdersOverTimeCheck({}, {})
 
     def get_context(self, score, test, combination):
 
@@ -178,7 +181,7 @@ class TwoCycleDataSource(CheckDataSource):
 
 
 class ClosingBalanceMatchesOpeningBalanceDataSource(CheckDataSource):
-    check = CLOSINGBALANCEMATCHESOPENINGBALANCECheck({}, {})
+    check = BalancesMatchCheck({}, {})
 
     def get_template(self, test):
         return "#differentOrdersOverTime"
@@ -208,8 +211,8 @@ class ClosingBalanceMatchesOpeningBalanceDataSource(CheckDataSource):
         return tables
 
 
-class STABLECONSUMPTIONDataSource(TwoCycleDataSource):
-    check = STABLECONSUMPTIONCheck({}, {})
+class StableConsumptionDataSource(TwoCycleDataSource):
+    check = StableConsumptionCheck({}, {})
 
     def get_template(self, test):
         return "#differentOrdersOverTime"
@@ -226,11 +229,11 @@ class STABLECONSUMPTIONDataSource(TwoCycleDataSource):
         return rows
 
 
-class STABLEPATIENTVOLUMESDataSource(TwoCycleDataSource):
+class StablePatientVolumesDataSource(TwoCycleDataSource):
     def get_template(self, test):
         return "#differentOrdersOverTime"
 
-    check = STABLEPATIENTVOLUMESCheck({}, {})
+    check = StablePatientVolumesCheck({}, {})
 
     def build_rows(self, check, records):
         rows = []
@@ -248,12 +251,11 @@ class STABLEPATIENTVOLUMESDataSource(TwoCycleDataSource):
         query = check_combination.get(PATIENT_QUERY)
         model = AdultPatientsRecord if check_combination.get(ADULT, False) else PAEDPatientsRecord
         records = model.objects.filter(name=score.name, district=score.district, cycle=cycle, formulation__in=query)
-        print records, query, cycle, score.name, model
         return records
 
 
-class WAREHOUSE_FULFILMENTDataSource(ClosingBalanceMatchesOpeningBalanceDataSource):
-    check = CLOSINGBALANCEMATCHESOPENINGBALANCECheck({}, {})
+class WarehouseFulfillmentDataSource(ClosingBalanceMatchesOpeningBalanceDataSource):
+    check = BalancesMatchCheck({}, {})
 
     def get_template(self, test):
         return "#differentOrdersOverTime"
@@ -266,3 +268,33 @@ class WAREHOUSE_FULFILMENTDataSource(ClosingBalanceMatchesOpeningBalanceDataSour
             "previous_cycle": self.get_table_for_cycle(prev_cycle, self.check, combination, score, [PACKS_ORDERED]),
             "current_cycle": self.get_table_for_cycle(current_cycle, self.check, combination, score, [QUANTITY_RECEIVED]),
         }
+
+
+class GuidelineAdherenceDataSource(CheckDataSource):
+    def get_template(self, test):
+        return "#guidelineAdherence"
+
+    checks = {
+        GUIDELINE_ADHERENCE_ADULT_1L: {DF1: "TDF-based regimens", DF2: "AZT-based regimens", "check": GuidelineAdherenceCheckAdult1L},
+        GUIDELINE_ADHERENCE_ADULT_2L: {DF1: "ATV/r-based regimens", DF2: "LPV/r-based regimens", "check": GuidelineAdherenceCheckAdult2L},
+        GUIDELINE_ADHERENCE_PAED_1L: {DF1: "ABC-based regimens", DF2: "AZT-based regimens", "check": GuidelineAdherenceCheckPaed1L},
+    }
+
+    def get_context(self, score, test, combination):
+        check_data = self.checks.get(test)
+        check = check_data.get("check")({})
+        check_combination = check.combinations[0]
+        data = {DF1: defaultdict(list), DF2: defaultdict(list), "main_title": "RAW ORDER DATA",}
+        for field in check_combination.get(FIELDS):
+            for part in [DF1, DF2]:
+                table = [{"column": check_data.get(part), "isHeader": True}]
+                formulation_query = check_combination.get(part)
+                consumption_records = Consumption.objects.filter(name=score.name, district=score.district, cycle=score.cycle, formulation__in=formulation_query)
+                total = 0
+                for record in consumption_records:
+                    value = getattr(record, field)
+                    total += int(value)
+                    table.append({"column": record.formulation, "value": value})
+                table.append({"column": "Total", "value": total, "isHeader": True})
+                data[part][FIELD_NAMES.get(field)].append(table)
+        return data

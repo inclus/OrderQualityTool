@@ -24,6 +24,7 @@ class TwoCycleQCheck(QCheck):
 
     def get_patient_records(self, report, facility_name, combinations, is_adult=True):
         lower_case_combinations = pydash.collect(combinations, lambda x: x.lower())
+        print lower_case_combinations
         collection = report.ads if is_adult else report.pds
         records = get_records_from_collection(collection, facility_name)
         return pydash.chain(records).select(
@@ -31,7 +32,7 @@ class TwoCycleQCheck(QCheck):
         ).value()
 
 
-class DIFFERENTORDERSOVERTIMECheck(TwoCycleQCheck):
+class OrdersOverTimeCheck(TwoCycleQCheck):
     test = DIFFERENT_ORDERS_OVER_TIME
     combinations = [
         {NAME: F1, CONSUMPTION_QUERY: F1_QUERY},
@@ -64,7 +65,7 @@ class DIFFERENTORDERSOVERTIMECheck(TwoCycleQCheck):
         return result, no, not_reporting, yes
 
 
-class CLOSINGBALANCEMATCHESOPENINGBALANCECheck(TwoCycleQCheck):
+class BalancesMatchCheck(TwoCycleQCheck):
     test = CLOSING_BALANCE_MATCHES_OPENING_BALANCE
     combinations = [
         {NAME: F1, CONSUMPTION_QUERY: F1_QUERY},
@@ -101,7 +102,7 @@ class CLOSINGBALANCEMATCHESOPENINGBALANCECheck(TwoCycleQCheck):
         return len(closing_balance_values) == 0 or len(opening_balance_values) == 0
 
 
-class STABLECONSUMPTIONCheck(TwoCycleQCheck):
+class StableConsumptionCheck(TwoCycleQCheck):
     test = STABLE_CONSUMPTION
     fields = [ART_CONSUMPTION, PMTCT_CONSUMPTION]
     combinations = [
@@ -157,7 +158,7 @@ class STABLECONSUMPTIONCheck(TwoCycleQCheck):
         return result, no, not_reporting, yes, total_count
 
 
-class WAREHOUSEFULFILMENTCheck(TwoCycleQCheck):
+class WarehouseFulfillmentCheck(TwoCycleQCheck):
     test = WAREHOUSE_FULFILMENT
     combinations = [
         {NAME: F1, CONSUMPTION_QUERY: F1_QUERY},
@@ -195,7 +196,7 @@ class WAREHOUSEFULFILMENTCheck(TwoCycleQCheck):
         return result, no, not_reporting, yes
 
 
-class STABLEPATIENTVOLUMESCheck(STABLECONSUMPTIONCheck):
+class StablePatientVolumesCheck(StableConsumptionCheck):
     test = STABLE_PATIENT_VOLUMES
     combinations = [
         {NAME: F1, PATIENT_QUERY: F1_PATIENT_QUERY, ADULT: True, THRESHOLD: 10},

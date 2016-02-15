@@ -6,7 +6,7 @@ from django.test import TestCase
 from dashboard.data.adherence import GuidelineAdherenceCheckAdult1L, calculate_score
 from dashboard.data.blanks import BlanksQualityCheck, IsReportingCheck, MultipleCheck, WebBasedCheck
 from dashboard.data.consumption_patients import ConsumptionAndPatientsQualityCheck
-from dashboard.data.cycles import DIFFERENTORDERSOVERTIMECheck
+from dashboard.data.cycles import OrdersOverTimeCheck
 from dashboard.data.free_form_report import FreeFormReport
 from dashboard.data.negatives import NegativeNumbersQualityCheck
 from dashboard.data.utils import clean_name, get_patient_total, get_consumption_totals, \
@@ -231,7 +231,7 @@ class TestDIFFERENTORDERSOVERTIMECheck(TestCase):
                 }
             ]
         }
-        scores = DIFFERENTORDERSOVERTIMECheck(report, other_report).run()
+        scores = OrdersOverTimeCheck(report, other_report).run()
         self.assertTrue(F1 in scores)
         self.assertEqual(scores[F1], {NO: 100.0, YES: 0, NOT_REPORTING: 0})
 
@@ -263,7 +263,7 @@ class TestDIFFERENTORDERSOVERTIMECheck(TestCase):
                 }
             ]
         }
-        scores = DIFFERENTORDERSOVERTIMECheck(report, other_report).run()
+        scores = OrdersOverTimeCheck(report, other_report).run()
         self.assertTrue(F1 in scores)
         self.assertEqual(scores[F1], {NO: 0.0, YES: 100.0, NOT_REPORTING: 0})
 
@@ -295,7 +295,7 @@ class TestDIFFERENTORDERSOVERTIMECheck(TestCase):
                 }
             ]
         }
-        scores = DIFFERENTORDERSOVERTIMECheck(report, other_report).run()
+        scores = OrdersOverTimeCheck(report, other_report).run()
         self.assertTrue(F1 in scores)
         self.assertEqual(scores[F1], {NO: 0.0, YES: 100.0, NOT_REPORTING: 0})
 
@@ -327,6 +327,6 @@ class TestDIFFERENTORDERSOVERTIMECheck(TestCase):
                 }
             ]
         }
-        scores = DIFFERENTORDERSOVERTIMECheck(report, other_report).run()
+        scores = OrdersOverTimeCheck(report, other_report).run()
         self.assertTrue(F1 in scores)
         self.assertEqual(scores[F1], {NO: 0.0, YES: 0, NOT_REPORTING: 100.0})

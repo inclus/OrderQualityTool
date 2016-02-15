@@ -131,6 +131,8 @@
 
 
 
+
+
     </script>
     <script id="orderFormFreeOfNegativeNumbers" type="text/x-jsrender">
     <span class="score_detail_data_title col-md-12">{{:main_title}}</span>
@@ -154,6 +156,8 @@
         </table>
     </div>
     {{/for}}
+
+
 
 
 
@@ -271,6 +275,8 @@
 
 
 
+
+
     </script>
 
     <script id="differentOrdersOverTime" type="text/x-jsrender">
@@ -325,6 +331,44 @@
         </table>
     </div>
     {{/for}}
+
+
+    </script>
+    <script id="guidelineAdherence" type="text/x-jsrender">
+    <span class="score_detail_data_title col-md-12">{{:main_title}}</span>
+    <div class="col-md-6">
+    {{props data_field_1}}
+        <span class="inner-title">{{:key}}</span>
+        <table class="table table-striped table-bordered">
+            <tbody>
+            {{for prop}}
+                <tr>
+                    <td>{{:column}}</td>
+                    <td>{{:value}}</td>
+                </tr>
+            {{/for}}
+            </tbody>
+        </table>
+
+    {{/props}}
+    </div>
+    <div class="col-md-6">
+    {{props data_field_2}}
+           <span class="inner-title">{{:key}}</span>
+        <table class="table table-striped table-bordered">
+            <tbody>
+            {{for prop}}
+                <tr>
+                    <td>{{:column}}</td>
+                    <td>{{:value}}</td>
+                </tr>
+            {{/for}}
+            </tbody>
+        </table>
+
+    {{/props}}
+    </div>
+
     </script>
     {% endverbatim %}
 {% endblock content %}

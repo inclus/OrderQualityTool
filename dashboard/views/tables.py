@@ -5,7 +5,7 @@ from rest_framework.views import APIView
 
 from dashboard.helpers import *
 from dashboard.models import Score
-from data_sources import NegativesCheckDataSource, ConsumptionAndPatientsDataSource, TwoCycleDataSource, ClosingBalanceMatchesOpeningBalanceDataSource, STABLECONSUMPTIONDataSource, STABLEPATIENTVOLUMESDataSource, WAREHOUSE_FULFILMENTDataSource
+from data_sources import NegativesCheckDataSource, ConsumptionAndPatientsDataSource, TwoCycleDataSource, ClosingBalanceMatchesOpeningBalanceDataSource, StableConsumptionDataSource, StablePatientVolumesDataSource, WarehouseFulfillmentDataSource, GuidelineAdherenceDataSource
 
 
 class ScoresTableView(BaseDatatableView):
@@ -121,9 +121,12 @@ class ScoreDetailsView(APIView):
             CONSUMPTION_AND_PATIENTS: ConsumptionAndPatientsDataSource,
             DIFFERENT_ORDERS_OVER_TIME: TwoCycleDataSource,
             CLOSING_BALANCE_MATCHES_OPENING_BALANCE: ClosingBalanceMatchesOpeningBalanceDataSource,
-            STABLE_CONSUMPTION: STABLECONSUMPTIONDataSource,
-            STABLE_PATIENT_VOLUMES: STABLEPATIENTVOLUMESDataSource,
-            WAREHOUSE_FULFILMENT: WAREHOUSE_FULFILMENTDataSource
+            STABLE_CONSUMPTION: StableConsumptionDataSource,
+            STABLE_PATIENT_VOLUMES: StablePatientVolumesDataSource,
+            WAREHOUSE_FULFILMENT: WarehouseFulfillmentDataSource,
+            GUIDELINE_ADHERENCE_PAED_1L: GuidelineAdherenceDataSource,
+            GUIDELINE_ADHERENCE_ADULT_2L: GuidelineAdherenceDataSource,
+            GUIDELINE_ADHERENCE_ADULT_1L: GuidelineAdherenceDataSource,
         }
         scores = {YES: "Pass", NO: "Fail", NOT_REPORTING: "N/A"}
         combination = request.GET.get('combination', DEFAULT)
@@ -135,6 +138,7 @@ class ScoreDetailsView(APIView):
         if has_result:
             view = ScoresTableView()
             test = view.columns[column]
+            print "the test ==>", test
             if test in TEST_DATA:
                 data_source_class = TEST_DATA.get(test)
                 data_source = data_source_class()
@@ -147,7 +151,7 @@ class ScoreDetailsView(APIView):
             def combination_no():
                 return result.get(DEFAULT, None) if type(result) == dict else result
 
-            actual_result = combination_yes() if combination in result else combination_no
+            actual_result = combination_yes() if combination in result else combination_no()
             result_data = {'test': TEST_NAMES.get(test, None), 'result': scores.get(actual_result), 'has_combination': len(result) > 1}
             response_data['result'] = result_data
         return Response(response_data)

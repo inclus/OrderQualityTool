@@ -7,7 +7,7 @@ from dashboard.data.adherence import GuidelineAdherenceCheckAdult1L, GuidelineAd
 from dashboard.data.adherence import GuidelineAdherenceCheckAdult2L
 from dashboard.data.blanks import BlanksQualityCheck, MultipleCheck, WebBasedCheck, IsReportingCheck
 from dashboard.data.consumption_patients import ConsumptionAndPatientsQualityCheck
-from dashboard.data.cycles import CLOSINGBALANCEMATCHESOPENINGBALANCECheck, STABLEPATIENTVOLUMESCheck, WAREHOUSEFULFILMENTCheck, STABLECONSUMPTIONCheck, DIFFERENTORDERSOVERTIMECheck
+from dashboard.data.cycles import BalancesMatchCheck, StablePatientVolumesCheck, WarehouseFulfillmentCheck, StableConsumptionCheck, OrdersOverTimeCheck
 from dashboard.data.free_form_report import FreeFormReport
 from dashboard.data.negatives import NegativeNumbersQualityCheck
 from dashboard.data.nn import NNRTICURRENTADULTSCheck, NNRTINewAdultsCheck, NNRTINEWPAEDCheck
@@ -105,11 +105,11 @@ def run_checks_and_persist_formulation_scores(report):
         score = check(report).score()
         formulation_scores.extend(score)
     other_report = get_report_for_other_cycle(report)
-    two_cycle_checks = [CLOSINGBALANCEMATCHESOPENINGBALANCECheck,
-                        DIFFERENTORDERSOVERTIMECheck,
-                        STABLECONSUMPTIONCheck,
-                        WAREHOUSEFULFILMENTCheck,
-                        STABLEPATIENTVOLUMESCheck
+    two_cycle_checks = [BalancesMatchCheck,
+                        OrdersOverTimeCheck,
+                        StableConsumptionCheck,
+                        WarehouseFulfillmentCheck,
+                        StablePatientVolumesCheck
                         ]
     for check in two_cycle_checks:
         score = check(report, other_report).score()
