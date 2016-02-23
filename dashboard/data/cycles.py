@@ -98,8 +98,6 @@ class StableConsumptionCheck(TwoCycleQCheck):
         for facility in facilities:
             result, no, not_reporting, yes, total_count = self.for_each_facility_with_count(facility, no, not_reporting, yes, combination, total_count)
             facility['scores'][self.test][formulation_name] = result
-        if combination[NAME] == F3:
-            print yes, no, not_reporting, total_count
         out = build_cycle_formulation_score(formulation_name, yes, no, not_reporting, total_count)
         scores[formulation_name] = out
 
@@ -220,9 +218,6 @@ class StablePatientVolumesCheck(StableConsumptionCheck):
                 result = NO
             else:
                 not_reporting += 1
-                print facility_name
-                if combination[NAME] == F3:
-                    print "||", facility_name, current_population, prev_population
         else:
             pass
         return result, no, not_reporting, yes, total_count

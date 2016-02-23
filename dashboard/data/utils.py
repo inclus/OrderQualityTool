@@ -166,7 +166,6 @@ class TwoCycleQCheck(QCheck):
 
     def get_patient_records(self, report, facility_name, combinations, is_adult=True):
         lower_case_combinations = pydash.collect(combinations, lambda x: x.lower())
-        print lower_case_combinations
         collection = report.ads if is_adult else report.pds
         records = get_records_from_collection(collection, facility_name)
         return pydash.chain(records).select(

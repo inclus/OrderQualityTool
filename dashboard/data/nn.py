@@ -66,7 +66,6 @@ class NNRTICURRENTADULTSCheck(QCheck):
             no += 1
             result = NO
         elif all_df1_fields_are_blank or all_df2_fields_are_blank:
-            print "------------------------------------------>", facility_name
             no += 1
             result = NO
 

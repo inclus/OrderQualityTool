@@ -54,8 +54,6 @@ class BlanksQualityCheck(QCheck):
             result = NO
         elif cr_count == 0 and ar_count == 0 and pr_count == 0:
             not_reporting += 1
-        else:
-            print cr_count, ar_count, pr_count
         return result, no, not_reporting, yes
 
 
