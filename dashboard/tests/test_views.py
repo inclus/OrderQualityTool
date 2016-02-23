@@ -241,7 +241,8 @@ class ScoreDetailsViewTestCase(WebTest):
         url = reverse(self.url_name, kwargs={"id": score.id, "column": 12})
         response = self.app.get(url)
         self.assertEqual(200, response.status_code)
-        response_data = json.loads(response.content.decode('utf8'))
+        self.assertTemplateUsed(response, "check/base.html")
+        response_data = response.context
         self.assertEqual("Warehouse 1", response_data["score"]["warehouse"])
         self.assertEqual("IP 1", response_data["score"]["ip"])
         self.assertEqual("District 1", response_data["score"]["district"])
@@ -252,7 +253,7 @@ class ScoreDetailsViewTestCase(WebTest):
         url = reverse(self.url_name, kwargs={"id": score.id, "column": 6})
         response = self.app.get(url)
         self.assertEqual(200, response.status_code)
-        response_data = json.loads(response.content.decode('utf8'))
+        response_data = response.context
         self.assertEqual(True, response_data["has_result"])
         self.assertEqual(TEST_NAMES[MULTIPLE_ORDERS], response_data["result"]["test"])
         self.assertEqual('Pass', response_data["result"]["result"])
@@ -262,5 +263,5 @@ class ScoreDetailsViewTestCase(WebTest):
         url = reverse(self.url_name, kwargs={"id": score.id, "column": 3})
         response = self.app.get(url)
         self.assertEqual(200, response.status_code)
-        response_data = json.loads(response.content.decode('utf8'))
+        response_data = response.context
         self.assertEqual(False, response_data["has_result"])

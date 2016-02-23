@@ -122,23 +122,10 @@ $(document).ready(function() {
         if (col > 3) {
             var url = "/api/table/scores/detail/" + id + "/" +
                 col;
-            var success = function(data) {
-                if (data.has_result) {
-                    console.log(data);
-                    var tmpl = $.templates(
-                        document.getElementById(
-                            "score_detail_template"));
-                    var html = tmpl.render({
-                        result: data.result,
-                        score: data.score,
-                        combination: combination,
-                        data: data.data
-                    });
+            var success = function(html) {
                     var detailPageId = "#score_detail";
                     $(detailPageId).html(html);
                     $("#score_detail").modal();
-                }
-
             };
             $.ajax({
                 url: url,

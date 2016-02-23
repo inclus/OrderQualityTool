@@ -1,38 +1,13 @@
 import pydash
 
-from dashboard.data.utils import QCheck, values_for_records, build_cycle_formulation_score, facility_not_reporting
+from dashboard.data.utils import values_for_records, build_cycle_formulation_score, facility_not_reporting, TwoCycleQCheck
 from dashboard.helpers import *
 
 THRESHOLD = "threshold"
 
 
-def get_records_from_collection(collection, facility_name):
-    records = collection.get(facility_name, [])
-    return records
-
-
-class TwoCycleQCheck(QCheck):
-    def __init__(self, report, other_cycle_report):
-        QCheck.__init__(self, report)
-        self.other_cycle_report = other_cycle_report
-
-    def get_consumption_records(self, report, facility_name, formulation_name):
-        records = report.cs[facility_name]
-        return pydash.chain(records).reject(
-            lambda x: formulation_name.strip().lower() not in x[FORMULATION].lower()
-        ).value()
-
-    def get_patient_records(self, report, facility_name, combinations, is_adult=True):
-        lower_case_combinations = pydash.collect(combinations, lambda x: x.lower())
-        print lower_case_combinations
-        collection = report.ads if is_adult else report.pds
-        records = get_records_from_collection(collection, facility_name)
-        return pydash.chain(records).select(
-            lambda x: x[FORMULATION].strip().lower() in lower_case_combinations
-        ).value()
-
-
 class OrdersOverTimeCheck(TwoCycleQCheck):
+    two_cycle = True
     test = DIFFERENT_ORDERS_OVER_TIME
     combinations = [
         {NAME: F1, CONSUMPTION_QUERY: F1_QUERY},
@@ -66,6 +41,7 @@ class OrdersOverTimeCheck(TwoCycleQCheck):
 
 
 class BalancesMatchCheck(TwoCycleQCheck):
+    two_cycle = True
     test = CLOSING_BALANCE_MATCHES_OPENING_BALANCE
     combinations = [
         {NAME: F1, CONSUMPTION_QUERY: F1_QUERY},
@@ -103,6 +79,7 @@ class BalancesMatchCheck(TwoCycleQCheck):
 
 
 class StableConsumptionCheck(TwoCycleQCheck):
+    two_cycle = True
     test = STABLE_CONSUMPTION
     fields = [ART_CONSUMPTION, PMTCT_CONSUMPTION]
     combinations = [
@@ -159,6 +136,7 @@ class StableConsumptionCheck(TwoCycleQCheck):
 
 
 class WarehouseFulfillmentCheck(TwoCycleQCheck):
+    two_cycle = True
     test = WAREHOUSE_FULFILMENT
     combinations = [
         {NAME: F1, CONSUMPTION_QUERY: F1_QUERY},
@@ -197,6 +175,7 @@ class WarehouseFulfillmentCheck(TwoCycleQCheck):
 
 
 class StablePatientVolumesCheck(StableConsumptionCheck):
+    two_cycle = True
     test = STABLE_PATIENT_VOLUMES
     combinations = [
         {NAME: F1, PATIENT_QUERY: F1_PATIENT_QUERY, ADULT: True, THRESHOLD: 10},

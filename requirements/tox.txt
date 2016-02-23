@@ -21,3 +21,11 @@ django-webtest
 mock
 django-nose
 nose-timer
+jsonfield==1.0.3
+django-click==1.0.0
+assertlib==0.3.1
+django-datatables-view==1.13.0
+pydash==3.4.1
+django-picklefield==0.3.2
+enum34==1.1.2
+robber==0.1.0

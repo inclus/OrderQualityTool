@@ -9,6 +9,10 @@ from dashboard.data.negatives import NegativeNumbersQualityCheck
 from dashboard.helpers import FIELD_NAMES, CONSUMPTION_QUERY, FIELDS, NEW, EXISTING, F1, F2, F3, F1_QUERY, F2_QUERY, F3_QUERY, NAME, IS_ADULT, PATIENT_QUERY, RATIO, get_prev_cycle, CLOSING_BALANCE, OPENING_BALANCE, ADULT, PACKS_ORDERED, QUANTITY_RECEIVED, GUIDELINE_ADHERENCE_ADULT_1L, GUIDELINE_ADHERENCE_ADULT_2L, GUIDELINE_ADHERENCE_PAED_1L, DF1, DF2
 from dashboard.models import Consumption, AdultPatientsRecord, PAEDPatientsRecord
 
+COLUMN = "column"
+
+TOTAL = "TOTAL"
+
 query_map = {F1: F1_QUERY, F2: F2_QUERY, F3: F3_QUERY}
 
 
@@ -26,7 +30,7 @@ class CheckDataSource():
         return data
 
     def get_template(self, test):
-        return "#%s" % test
+        return "check/%s.html" % test
 
     def get_context(self, score, test, combination):
         raise NotImplementedError()
@@ -89,13 +93,13 @@ class ConsumptionAndPatientsDataSource(CheckDataSource):
         totals = []
         total = 0
         for consumption in consumption_records:
-            entry = {"column": consumption.formulation}
+            entry = {COLUMN: consumption.formulation}
             values = values_for_models(check_combination.get(FIELDS, []), [consumption])
             sum = pydash.chain(values).reject(lambda x: x is None).sum().value()
             entry["value"] = sum
             total += sum
             totals.append(entry)
-        totals.append({"column": "TOTAL", "value": total, "isHeader": True})
+        totals.append({COLUMN: TOTAL, "value": total, "isHeader": True})
         return totals
 
     def calculate_consumption_tables(self, check_combination, consumption_records):
@@ -106,9 +110,9 @@ class ConsumptionAndPatientsDataSource(CheckDataSource):
             sum = 0
             for field in check_combination.get(FIELDS, []):
                 value = getattr(consumption, field)
-                sum += value
-                records.append({"column": FIELD_NAMES.get(field), "value": value})
-            records.append({"column": "Total", "value": sum})
+                sum += int(value)
+                records.append({COLUMN: FIELD_NAMES.get(field), "value": value})
+            records.append({COLUMN: TOTAL, "value": sum, "isHeader": True})
 
             formulation_data['records'] = records
             tables.append(formulation_data)
@@ -122,9 +126,9 @@ class ConsumptionAndPatientsDataSource(CheckDataSource):
             sum = 0
             for field in [NEW, EXISTING]:
                 value = getattr(pr, field)
-                sum += value
-                records.append({"column": FIELD_NAMES.get(field), "value": value})
-            records.append({"column": "Total", "value": sum})
+                sum += int(value)
+                records.append({COLUMN: FIELD_NAMES.get(field), "value": value})
+            records.append({COLUMN: TOTAL, "value": sum, "isHeader": True})
             formulation_data['records'] = records
             patient_tables.append(formulation_data)
         return patient_tables
@@ -137,9 +141,9 @@ class ConsumptionAndPatientsDataSource(CheckDataSource):
             values = values_for_models([NEW, EXISTING], [pr])
             sum = pydash.chain(values).reject(lambda x: x is None).sum().value()
             entry["value"] = sum
-            total += sum
+            total += int(sum)
             patient_totals.append(entry)
-        patient_totals.append({"column": "TOTAL", "value": total, "isHeader": True})
+        patient_totals.append({"column": TOTAL, "value": total, "isHeader": True})
         return patient_totals
 
 
@@ -184,7 +188,7 @@ class ClosingBalanceMatchesOpeningBalanceDataSource(CheckDataSource):
     check = BalancesMatchCheck({}, {})
 
     def get_template(self, test):
-        return "#differentOrdersOverTime"
+        return "check/differentOrdersOverTime.html"
 
     def get_context(self, score, test, combination):
         current_cycle = score.cycle
@@ -215,36 +219,37 @@ class StableConsumptionDataSource(TwoCycleDataSource):
     check = StableConsumptionCheck({}, {})
 
     def get_template(self, test):
-        return "#differentOrdersOverTime"
+        return "check/differentOrdersOverTime.html"
 
     def build_rows(self, check, consumption_records):
         rows = []
-        total = 0
+
         for consumption in consumption_records:
+            tot = 0
             for field in check.fields:
                 value = getattr(consumption, field)
-                total += int(value)
+                tot += int(value)
                 rows.append({"column": FIELD_NAMES.get(field), "value": value})
-        rows.append({"column": "Total", "value": total, "isHeader": True})
+            rows.append({"column": TOTAL, "value": tot, "isHeader": True})
         return rows
 
 
 class StablePatientVolumesDataSource(TwoCycleDataSource):
     def get_template(self, test):
-        return "#differentOrdersOverTime"
+        return "check/differentOrdersOverTime.html"
 
     check = StablePatientVolumesCheck({}, {})
 
     def build_rows(self, check, records):
         rows = []
-        total = 0
         for consumption in records:
             rows.append({"column": consumption.formulation, "isHeader": True})
+            tot = 0
             for field in check.fields:
                 value = getattr(consumption, field)
-                total += int(value)
+                tot = int(value)
                 rows.append({"column": FIELD_NAMES.get(field), "value": value})
-        rows.append({"column": "Total", "value": total, "isHeader": True})
+            rows.append({"column": TOTAL, "value": tot, "isHeader": True})
         return rows
 
     def get_queryset(self, check_combination, cycle, score):
@@ -258,7 +263,7 @@ class WarehouseFulfillmentDataSource(ClosingBalanceMatchesOpeningBalanceDataSour
     check = BalancesMatchCheck({}, {})
 
     def get_template(self, test):
-        return "#differentOrdersOverTime"
+        return "check/differentOrdersOverTime.html"
 
     def get_context(self, score, test, combination):
         current_cycle = score.cycle
@@ -272,7 +277,7 @@ class WarehouseFulfillmentDataSource(ClosingBalanceMatchesOpeningBalanceDataSour
 
 class GuidelineAdherenceDataSource(CheckDataSource):
     def get_template(self, test):
-        return "#guidelineAdherence"
+        return "check/adherence.html"
 
     checks = {
         GUIDELINE_ADHERENCE_ADULT_1L: {DF1: "TDF-based regimens", DF2: "AZT-based regimens", "check": GuidelineAdherenceCheckAdult1L},
@@ -284,17 +289,25 @@ class GuidelineAdherenceDataSource(CheckDataSource):
         check_data = self.checks.get(test)
         check = check_data.get("check")({})
         check_combination = check.combinations[0]
-        data = {DF1: defaultdict(list), DF2: defaultdict(list), "main_title": "RAW ORDER DATA",}
-        for field in check_combination.get(FIELDS):
-            for part in [DF1, DF2]:
-                table = [{"column": check_data.get(part), "isHeader": True}]
-                formulation_query = check_combination.get(part)
-                consumption_records = Consumption.objects.filter(name=score.name, district=score.district, cycle=score.cycle, formulation__in=formulation_query)
-                total = 0
-                for record in consumption_records:
+        data = {"main_title": "RAW ORDER DATA", "tables": []}
+        for part in [DF1, DF2]:
+            field_names = [FIELD_NAMES.get(f) for f in check_combination.get(FIELDS)]
+            table = {"name": check_data.get(part), "rows": [], "headers": field_names}
+            formulation_query = check_combination.get(part)
+            consumption_records = Consumption.objects.filter(name=score.name, district=score.district, cycle=score.cycle, formulation__in=formulation_query)
+            totals = defaultdict(int)
+            for record in consumption_records:
+                row = {"column": record.formulation}
+                sum = 0
+                for field in check_combination.get(FIELDS):
                     value = getattr(record, field)
-                    total += int(value)
-                    table.append({"column": record.formulation, "value": value})
-                table.append({"column": "Total", "value": total, "isHeader": True})
-                data[part][FIELD_NAMES.get(field)].append(table)
+                    sum += int(value)
+                    header = FIELD_NAMES.get(field)
+                    row[header] = value
+                    totals[header] += int(value)
+                row["sum"] = sum
+                totals["sum"] += sum
+                table["rows"].append(row)
+            table["totals"] = totals
+            data["tables"].append(table)
         return data

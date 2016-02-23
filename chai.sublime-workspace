@@ -4,6 +4,14 @@
 		"selected_items":
 		[
 			[
+				"te",
+				"text-transform"
+			],
+			[
+				"cy",
+				"cycles"
+			],
+			[
 				"ma",
 				"margin-bottom"
 			],
@@ -460,10 +468,6 @@
 				"dashBoardService"
 			],
 			[
-				"te",
-				"templateUrl"
-			],
-			[
 				"dev",
 				"devAdminKey"
 			],
@@ -510,10 +514,6 @@
 			[
 				"fir",
 				"first_name"
-			],
-			[
-				"js",
-				"jsonify"
 			]
 		]
 	},
@@ -528,66 +528,18 @@
 			}
 		},
 		{
-			"file": "charts.entry.js",
+			"file": "dashboard/templates/check/consumptionAndPatients.html",
 			"settings":
 			{
-				"buffer_size": 39,
+				"buffer_size": 4575,
 				"line_ending": "Unix"
 			}
 		},
 		{
-			"file": "dashboard/static/js/app.js",
+			"file": "dashboard/static/css/app.less",
 			"settings":
 			{
-				"buffer_size": 1212,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "dashboard/static/js/appSpec.js",
-			"settings":
-			{
-				"buffer_size": 956,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "dashboard/static/js/reports.js",
-			"settings":
-			{
-				"buffer_size": 299,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "dashboard/static/js/scores_table.js",
-			"settings":
-			{
-				"buffer_size": 4942,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "/Users/jamesmuranga/Library/Application Support/Sublime Text 3/Packages/User/JavascriptBeautify.sublime-settings",
-			"settings":
-			{
-				"buffer_size": 172,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": ".eslintrc",
-			"settings":
-			{
-				"buffer_size": 390,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "dashboard/data/cycles.py",
-			"settings":
-			{
-				"buffer_size": 11192,
+				"buffer_size": 5156,
 				"line_ending": "Unix"
 			}
 		},
@@ -595,39 +547,24 @@
 			"file": "dashboard/templates/scores_table.html",
 			"settings":
 			{
-				"buffer_size": 8730,
+				"buffer_size": 3439,
 				"line_ending": "Unix"
 			}
 		},
 		{
-			"file": "webpack.config.js",
+			"file": "dashboard/templates/check/differentOrdersOverTime.html",
 			"settings":
 			{
-				"buffer_size": 1503,
-				"line_ending": "Unix"
+				"buffer_size": 1826,
+				"line_ending": "Unix",
+				"name": "differentOrdersOverTime.html"
 			}
 		},
 		{
-			"file": "bower.json",
+			"file": "dashboard/management/commands/manual_check.py",
 			"settings":
 			{
-				"buffer_size": 1118,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "dashboard/templates/layout.html",
-			"settings":
-			{
-				"buffer_size": 5120,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "gulpfile.js",
-			"settings":
-			{
-				"buffer_size": 1709,
+				"buffer_size": 6545,
 				"line_ending": "Unix"
 			}
 		}
@@ -640,9 +577,13 @@
 	"command_palette":
 	{
 		"height": 392.0,
-		"last_filter": "rp",
+		"last_filter": "up",
 		"selected_items":
 		[
+			[
+				"up",
+				"Package Control: Upgrade/Overwrite All Packages"
+			],
 			[
 				"rp",
 				"Package Control: Remove Package"
@@ -826,24 +767,35 @@
 	"expanded_folders":
 	[
 		"/Users/jamesmuranga/code/space/chai/OrderQualityTool",
-		"/Users/jamesmuranga/code/space/chai/OrderQualityTool/dashboard"
+		"/Users/jamesmuranga/code/space/chai/OrderQualityTool/dashboard",
+		"/Users/jamesmuranga/code/space/chai/OrderQualityTool/dashboard/templates",
+		"/Users/jamesmuranga/code/space/chai/OrderQualityTool/dashboard/templates/check"
 	],
 	"file_history":
 	[
-		"/Users/jamesmuranga/code/space/chai/OrderQualityTool/yes.csv",
+		"/Users/jamesmuranga/code/space/chai/OrderQualityTool/out.csv",
+		"/Users/jamesmuranga/code/space/chai/OrderQualityTool/charts.entry.js",
+		"/Users/jamesmuranga/code/space/chai/OrderQualityTool/dashboard/static/js/app.js",
+		"/Users/jamesmuranga/code/space/chai/OrderQualityTool/dashboard/static/js/appSpec.js",
+		"/Users/jamesmuranga/code/space/chai/OrderQualityTool/dashboard/static/js/reports.js",
 		"/Users/jamesmuranga/code/space/chai/OrderQualityTool/dashboard/static/js/scores_table.js",
+		"/Users/jamesmuranga/code/space/chai/OrderQualityTool/dashboard/management/commands/manual_check.py",
+		"/Users/jamesmuranga/Library/Application Support/Sublime Text 3/Packages/User/JavascriptBeautify.sublime-settings",
+		"/Users/jamesmuranga/code/space/chai/OrderQualityTool/.eslintrc",
+		"/Users/jamesmuranga/code/space/chai/OrderQualityTool/dashboard/data/cycles.py",
+		"/Users/jamesmuranga/code/space/chai/OrderQualityTool/dashboard/templates/scores_table.html",
+		"/Users/jamesmuranga/code/space/chai/OrderQualityTool/webpack.config.js",
+		"/Users/jamesmuranga/code/space/chai/OrderQualityTool/bower.json",
+		"/Users/jamesmuranga/code/space/chai/OrderQualityTool/dashboard/templates/layout.html",
+		"/Users/jamesmuranga/code/space/chai/OrderQualityTool/gulpfile.js",
+		"/Users/jamesmuranga/code/space/chai/OrderQualityTool/yes.csv",
 		"/Users/jamesmuranga/Library/Application Support/Sublime Text 3/Packages/User/Default (OSX).sublime-keymap",
 		"/Users/jamesmuranga/code/space/chai/OrderQualityTool/dashboard/helpers.py",
-		"/Users/jamesmuranga/code/space/chai/OrderQualityTool/dashboard/templates/scores_table.html",
 		"/Users/jamesmuranga/code/space/chai/OrderQualityTool/dashboard/static/less/variables.less",
 		"/Users/jamesmuranga/code/space/chai/OrderQualityTool/dashboard/static/css/app.less",
 		"/Users/jamesmuranga/Library/Application Support/Sublime Text 3/Packages/Emmet/Default (OSX).sublime-keymap",
 		"/Users/jamesmuranga/code/space/chai/OrderQualityTool/chai.sublime-project",
-		"/Users/jamesmuranga/code/space/chai/OrderQualityTool/dashboard/templates/layout.html",
 		"/Users/jamesmuranga/code/space/chai/OrderQualityTool/scores.entry.js",
-		"/Users/jamesmuranga/code/space/chai/OrderQualityTool/charts.entry.js",
-		"/Users/jamesmuranga/code/space/chai/OrderQualityTool/gulpfile.js",
-		"/Users/jamesmuranga/code/space/chai/OrderQualityTool/webpack.config.js",
 		"/Users/jamesmuranga/Desktop/links.txt",
 		"/Users/jamesmuranga/Library/Application Support/Sublime Text 3/Packages/GoSublime/CHANGELOG.md",
 		"/Users/jamesmuranga/Desktop/email to raj",
@@ -851,12 +803,9 @@
 		"/Users/jamesmuranga/code/space/go/src/robot/LICENSE",
 		"/Users/jamesmuranga/code/space/chai/OrderQualityTool/dashboard/static/views/addTests.html",
 		"/Users/jamesmuranga/code/space/chai/OrderQualityTool/dashboard/static/views/reports.html",
-		"/Users/jamesmuranga/code/space/chai/OrderQualityTool/bower.json",
-		"/Users/jamesmuranga/code/space/chai/OrderQualityTool/dashboard/static/js/app.js",
 		"/Users/jamesmuranga/code/space/chai/OrderQualityTool/dashboard/static/js/controllers/reports.controller.js",
 		"/Users/jamesmuranga/code/space/chai/OrderQualityTool/dashboard/static/js/services/report.service.js",
 		"/Users/jamesmuranga/code/space/chai/OrderQualityTool/dashboard/templates/dashboard/dashboarduser_list.html",
-		"/Users/jamesmuranga/code/space/chai/OrderQualityTool/dashboard/static/js/reports.js",
 		"/Users/jamesmuranga/code/space/chai/OrderQualityTool/dashboard/static/css/app.css",
 		"/Users/jamesmuranga/Library/Application Support/Sublime Text 3/Packages/User/CSS Format.sublime-settings",
 		"/Users/jamesmuranga/code/space/chai/OrderQualityTool/dashboard/static/css/datatables.css",
@@ -951,13 +900,7 @@
 		"/Users/jamesmuranga/code/work/msf/dhis2-chrome/src/main/templates/login.html",
 		"/Users/jamesmuranga/code/work/msf/dhis2-chrome/src/main/js/app/controller/main.controller.js",
 		"/Users/jamesmuranga/code/work/msf/fieldapp.sublime-project",
-		"/Users/jamesmuranga/code/work/msf/dhis2-chrome/src/test/unit/js/app/repository/chart.repository.spec.js",
-		"/Users/jamesmuranga/code/work/msf/dhis2-chrome/src/main/js/app/repository/chart.repository.js",
-		"/Users/jamesmuranga/code/work/msf/dhis2-chrome/src/main/js/app/controller/reports.controller.js",
-		"/Users/jamesmuranga/code/space/myziki-django/docker-compose.yml",
-		"/Users/jamesmuranga/code/space/myziki-django/myziki/reqs/common.txt",
-		"/Users/jamesmuranga/code/space/myziki-django/myziki/metrics/urls.py",
-		"/Users/jamesmuranga/code/space/myziki-django/myziki/music/urls.py"
+		"/Users/jamesmuranga/code/work/msf/dhis2-chrome/src/test/unit/js/app/repository/chart.repository.spec.js"
 	],
 	"find":
 	{
@@ -979,6 +922,20 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"td",
+			"th",
+			"td",
+			":",
+			"{{/if}}",
+			"{if",
+			"{{/for}}",
+			"{for",
+			"td",
+			"th",
+			"td",
+			"th",
+			"td",
+			":",
 			"__newVar__20160208213718668888",
 			"'",
 			"jsRender",
@@ -1092,21 +1049,7 @@
 			"\"hasChart\": true,",
 			"tests = [{\n            \"url\": \"orderFormFreeOfGaps\",\n            \"desc\": \"NO BLANKS: If the facility reported, is the whole order form free of blanks?\",\n            \"hasRegimen\": false,\n            \"hasChart\": true,\n            \"testNumber\": 3,\n            \"template\": \"/static/views/chart.html\"\n        }, {\n            \"url\": \"facilitiesMultiple\",\n            \"desc\": \"DUPLICATE ORDERS: Facilities that submitted more than one order over the cycle\",\n            \"hasRegimen\": false,\n            \"hasChart\": false,\n            \"testNumber\": 4,\n            \"template\": \"/static/views/table.html\"\n        }, {\n            \"url\": \"orderFormFreeOfNegativeNumbers\",\n            \"desc\": \"NO NEGATIVES: Is the order free of negative numbers?\",\n            \"hasRegimen\": true,\n            \"hasChart\": true,\n            \"testNumber\": 5,\n            \"template\": \"/static/views/chart.html\"\n        }, {\n            \"url\": \"consumptionAndPatients\",\n            \"desc\": \"CONSUMPTION AND PATIENTS: Do consumption volumes tally with corresponding patient regimen volumes (i.e. they are within 30% of each other)?\",\n            \"hasRegimen\": true,\n            \"hasChart\": true,\n            \"testNumber\": 6,\n            \"template\": \"/static/views/chart.html\"\n        }, {\n            \"url\": \"differentOrdersOverTime\",\n            \"desc\": \"NON-REPEATING ORDERS: Does the facility avoid repeating the same orders in consecutive cycles?\",\n            \"hasRegimen\": true,\n            \"hasChart\": true,\n            \"testNumber\": 7,\n            \"template\": \"/static/views/chart.html\"\n        }, {\n            \"url\": \"closingBalance\",\n            \"desc\": \"Does Opening  balance of the cycle = Closing balance from the previous one?\",\n            \"hasRegimen\": true,\n            \"hasChart\": true,\n            \"testNumber\": 8,\n            \"template\": \"/static/views/chart.html\"\n        }, {\n            \"url\": \"stableConsumption\",\n            \"desc\": \"STABLE CONSUMPTION: Is total consumption stable from one cycle to the next (i.e. less than 50% growth or decline from one cycle to the next)?\",\n            \"hasRegimen\": true,\n            \"hasChart\": true,\n            \"testNumber\": 9,\n            \"template\": \"/static/views/chart.html\"\n        }, {\n            \"url\": \"warehouseFulfilment\",\n            \"desc\": \"WAREHOUSE FULFILMENT: Does volume ordered = volume delivered in following cycle?\",\n            \"hasRegimen\": true,\n            \"hasChart\": true,\n            \"testNumber\": 10,\n            \"template\": \"/static/views/chart.html\"\n        }, {\n            \"url\": \"stablePatientVolumes\",\n            \"desc\": \"STABLE PATIENT VOLUMES: Are total patient numbers stable from one cycle to the next?\",\n            \"hasRegimen\": true,\n            \"hasChart\": true,\n            \"testNumber\": 11,\n            \"template\": \"/static/views/chart.html\"\n        }, {\n            \"url\": \"nnrtiCurrentAdults\",\n            \"desc\": \"NRTI vs NNRTI/PI VOLUMES (CURRENT ADULTS): Do total current Adult NRTI patient volumes tally with total NNRTI & PI patient volumes?\",\n            \"hasRegimen\": false,\n            \"hasChart\": true,\n            \"testNumber\": 15,\n            \"template\": \"/static/views/chart.html\"\n        }, {\n            \"url\": \"nnrtiCurrentPaed\",\n            \"desc\": \"NRTI vs NNRTI/PI VOLUMES (CURRENT PAED): Do total current Paed NRTI patient volumes tally with total NNRTI & PI patient volumes?\",\n            \"hasRegimen\": false,\n            \"hasChart\": true,\n            \"testNumber\": 16,\n            \"template\": \"/static/views/chart.html\"\n        }, {\n            \"url\": \"nnrtiNewAdults\",\n            \"desc\": \"NRTI vs NNRTI/PI VOLUMES (ESTIMATED NEW ADULTS): Do total Estimated New Adult NRTI patient volumes tally with total NNRTI & PI patient volumes?\",\n            \"hasRegimen\": false,\n            \"hasChart\": true,\n            \"testNumber\": 17,\n            \"template\": \"/static/views/chart.html\"\n        }, {\n            \"url\": \"nnrtiNewPaed\",\n            \"desc\": \"NRTI vs NNRTI/PI VOLUMES (ESTIMATED NEW PAED): Do total Estimated New Paed NRTI patient volumes tally with total NNRTI & PI patient volumes?\",\n            \"hasRegimen\": false,\n            \"hasChart\": true,\n            \"testNumber\": 18,\n            \"template\": \"/static/views/chart.html\"\n        }];",
 			"$stateParams",
-			"var ",
-			"ng-class=\"{'quality_test_active': test.name == currentTest}\"",
-			"ng-repeat=\"test in tests\"",
-			"$http",
-			"http",
-			"bestPerforming",
-			"worstPerforming",
-			"bestPerforming",
-			"getBestRankings",
-			",\n",
-			"response.data",
-			"getCycles",
-			",\n",
-			"WebTest, Or",
-			"\",\n"
+			"var "
 		],
 		"highlight": true,
 		"in_selection": false,
@@ -1132,7 +1075,7 @@
 	"groups":
 	[
 		{
-			"selected": 5,
+			"selected": 3,
 			"sheets":
 			[
 				{
@@ -1161,179 +1104,31 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 2,
-					"type": "text"
-				},
-				{
-					"buffer": 1,
-					"file": "charts.entry.js",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 39,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								39,
-								39
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
 					"stack_index": 4,
 					"type": "text"
 				},
 				{
-					"buffer": 2,
-					"file": "dashboard/static/js/app.js",
+					"buffer": 1,
+					"file": "dashboard/templates/check/consumptionAndPatients.html",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 1212,
+						"buffer_size": 4575,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								442,
-								442
+								470,
+								470
 							]
 						],
 						"settings":
 						{
-							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
+							"syntax": "Packages/Djaneiro/Syntaxes/HTML (Django).tmLanguage",
 							"tab_size": 4,
 							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 5,
-					"type": "text"
-				},
-				{
-					"buffer": 3,
-					"file": "dashboard/static/js/appSpec.js",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 956,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								302,
-								302
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
-							"tab_size": 4,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 6,
-					"type": "text"
-				},
-				{
-					"buffer": 4,
-					"file": "dashboard/static/js/reports.js",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 299,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								299,
-								299
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
-							"tab_size": 4,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 8,
-					"type": "text"
-				},
-				{
-					"buffer": 5,
-					"file": "dashboard/static/js/scores_table.js",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 4942,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								0,
-								0
-							]
-						],
-						"settings":
-						{
-							"nodePath": "node",
-							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
-							"tab_size": 4,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 1399.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 0,
-					"type": "text"
-				},
-				{
-					"buffer": 6,
-					"file": "/Users/jamesmuranga/Library/Application Support/Sublime Text 3/Packages/User/JavascriptBeautify.sublime-settings",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 172,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								118,
-								118
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/JavaScript/JSON.tmLanguage"
 						},
 						"translation.x": 0.0,
 						"translation.y": 0.0,
@@ -1343,25 +1138,88 @@
 					"type": "text"
 				},
 				{
-					"buffer": 7,
-					"file": ".eslintrc",
+					"buffer": 2,
+					"file": "dashboard/static/css/app.less",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 390,
+						"buffer_size": 5156,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								195,
-								195
+								4949,
+								4949
 							]
 						],
 						"settings":
 						{
-							"syntax": "Packages/JavaScript/JSON.tmLanguage"
+							"syntax": "Packages/LESS/LESS.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 4773.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 2,
+					"type": "text"
+				},
+				{
+					"buffer": 3,
+					"file": "dashboard/templates/scores_table.html",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 3439,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								2710,
+								2710
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Djaneiro/Syntaxes/HTML (Django).tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 878.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 0,
+					"type": "text"
+				},
+				{
+					"buffer": 4,
+					"file": "dashboard/templates/check/differentOrdersOverTime.html",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 1826,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								384,
+								384
+							]
+						],
+						"settings":
+						{
+							"auto_name": "differentOrdersOverTime.html",
+							"syntax": "Packages/Djaneiro/Syntaxes/HTML (Django).tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
 						"translation.y": 0.0,
@@ -1371,20 +1229,20 @@
 					"type": "text"
 				},
 				{
-					"buffer": 8,
-					"file": "dashboard/data/cycles.py",
+					"buffer": 5,
+					"file": "dashboard/management/commands/manual_check.py",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 11192,
+						"buffer_size": 6545,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								10343,
-								10343
+								0,
+								0
 							]
 						],
 						"settings":
@@ -1393,161 +1251,11 @@
 							"tab_size": 4,
 							"translate_tabs_to_spaces": true
 						},
-						"translation.x": 28.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 9,
-					"type": "text"
-				},
-				{
-					"buffer": 9,
-					"file": "dashboard/templates/scores_table.html",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 8730,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								0,
-								0
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/Djaneiro/Syntaxes/HTML (Django).tmLanguage",
-							"tab_size": 4,
-							"translate_tabs_to_spaces": true
-						},
 						"translation.x": 0.0,
-						"translation.y": 0.0,
+						"translation.y": 513.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 10,
-					"type": "text"
-				},
-				{
-					"buffer": 10,
-					"file": "webpack.config.js",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 1503,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								1002,
-								1002
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
-							"tab_size": 4,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 210.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 7,
-					"type": "text"
-				},
-				{
-					"buffer": 11,
-					"file": "bower.json",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 1118,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								0,
-								0
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/JavaScript/JSON.tmLanguage",
-							"tab_size": 2,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 12,
-					"type": "text"
-				},
-				{
-					"buffer": 12,
-					"file": "dashboard/templates/layout.html",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 5120,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								0,
-								0
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/Djaneiro/Syntaxes/HTML (Django).tmLanguage",
-							"tab_size": 4,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 11,
-					"type": "text"
-				},
-				{
-					"buffer": 13,
-					"file": "gulpfile.js",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 1709,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								793,
-								793
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
-							"tab_size": 4,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 13,
+					"stack_index": 5,
 					"type": "text"
 				}
 			]
@@ -1614,6 +1322,22 @@
 		"selected_items":
 		[
 			[
+				"scores",
+				"dashboard/templates/scores_table.html"
+			],
+			[
+				"app.l",
+				"dashboard/static/css/app.less"
+			],
+			[
+				"consum",
+				"dashboard/templates/check/consumptionAndPatients.html"
+			],
+			[
+				"manu",
+				"dashboard/management/commands/manual_check.py"
+			],
+			[
 				"cyc",
 				"dashboard/data/cycles.py"
 			],
@@ -1628,10 +1352,6 @@
 			[
 				"hel",
 				"dashboard/helpers.py"
-			],
-			[
-				"scores",
-				"dashboard/templates/scores_table.html"
 			],
 			[
 				"sco",
@@ -1756,10 +1476,6 @@
 			[
 				"home",
 				"dashboard/static/js/controllers/home.controller.js"
-			],
-			[
-				"app.l",
-				"dashboard/static/css/app.less"
 			],
 			[
 				"add",
@@ -2046,10 +1762,6 @@
 				"src/main/index.html"
 			],
 			[
-				"consum",
-				"src/main/js/app/consumer/consumers.js"
-			],
-			[
 				"repos",
 				"src/main/js/app/repository/repositories.js"
 			],
@@ -2120,10 +1832,6 @@
 			[
 				"project",
 				"src/main/js/app/controller/project.controller.js"
-			],
-			[
-				"ag",
-				"src/main/templates/aggregate-data-entry.html"
 			]
 		],
 		"width": 0.0

@@ -7143,6 +7143,7 @@ nav.with-flag {
   color: #000000;
   letter-spacing: 1px;
   margin-bottom: 1em;
+  text-transform: uppercase;
 }
 .inner-title {
   font-weight: 400;
@@ -7153,4 +7154,7 @@ nav.with-flag {
 .raw-data {
   overflow: auto;
   max-height: 50vh;
+}
+.modal-content .table {
+  font-size: 0.9em;
 }

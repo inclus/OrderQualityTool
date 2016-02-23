@@ -155,14 +155,14 @@ FIELD_NAMES = {
     EXISTING: 'Existing',
     NEW: 'New',
     PACKS_ORDERED: 'Packs Ordered',
-    ESTIMATED_NUMBER_OF_NEW_PREGNANT_WOMEN: 'Estimated Number of New Pregnant Women',
-    ESTIMATED_NUMBER_OF_NEW_ART_PATIENTS: 'Estimated Number of New Patients',
+    ESTIMATED_NUMBER_OF_NEW_PREGNANT_WOMEN: 'Pregnant Women',
+    ESTIMATED_NUMBER_OF_NEW_ART_PATIENTS: 'ART',
     QUANTITY_REQUIRED_FOR_CURRENT_PATIENTS: 'Quantity Required for current Patients',
     MONTHS_OF_STOCK_OF_HAND: 'Months of Stock of Hand',
     CLOSING_BALANCE: 'Closing Balance',
     LOSES_ADJUSTMENTS: 'Loses Adjustments',
-    ART_CONSUMPTION: 'Art Consumption',
-    PMTCT_CONSUMPTION: 'Pmtct Consumption',
+    ART_CONSUMPTION: 'ART Consumption',
+    PMTCT_CONSUMPTION: 'eMTCT Consumption',
     QUANTITY_RECEIVED: 'Quantity Received',
     OPENING_BALANCE: 'Opening Balance'
 }

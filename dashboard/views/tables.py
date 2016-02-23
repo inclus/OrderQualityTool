@@ -1,7 +1,7 @@
 from django.db.models import Q
+from django.shortcuts import render_to_response
+from django.views.generic import View
 from django_datatables_view.base_datatable_view import BaseDatatableView
-from rest_framework.response import Response
-from rest_framework.views import APIView
 
 from dashboard.helpers import *
 from dashboard.models import Score
@@ -114,7 +114,7 @@ class ScoresTableView(BaseDatatableView):
         return data
 
 
-class ScoreDetailsView(APIView):
+class ScoreDetailsView(View):
     def get(self, request, id, column):
         TEST_DATA = {
             ORDER_FORM_FREE_OF_NEGATIVE_NUMBERS: NegativesCheckDataSource,
@@ -135,13 +135,14 @@ class ScoreDetailsView(APIView):
         score_data = {'ip': score.ip, 'district': score.district, 'warehouse': score.warehouse, 'name': score.name, 'cycle': score.cycle}
         has_result = column > 3
         response_data = {'score': score_data, 'has_result': has_result}
+        template_name = "check/base.html"
         if has_result:
             view = ScoresTableView()
             test = view.columns[column]
-            print "the test ==>", test
             if test in TEST_DATA:
                 data_source_class = TEST_DATA.get(test)
                 data_source = data_source_class()
+                template_name = data_source.get_template(test)
                 response_data['data'] = data_source.load(score, test, combination)
             result = getattr(score, test, None)
 
@@ -154,4 +155,4 @@ class ScoreDetailsView(APIView):
             actual_result = combination_yes() if combination in result else combination_no()
             result_data = {'test': TEST_NAMES.get(test, None), 'result': scores.get(actual_result), 'has_combination': len(result) > 1}
             response_data['result'] = result_data
-        return Response(response_data)
+        return render_to_response(template_name, context=response_data)

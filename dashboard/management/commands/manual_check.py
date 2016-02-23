@@ -15,7 +15,10 @@ def make_cond(cond):
 
 @click.command()
 def command():
-    perform_checks()
+    pass
+    # for k in CheckRegistryHolder.ONE_CYCLE_CHECKS_REGISTRY:
+    #     print k
+    # perform_checks()
     # export_results()
 
 
