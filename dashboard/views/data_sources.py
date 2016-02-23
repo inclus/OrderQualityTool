@@ -310,4 +310,12 @@ class GuidelineAdherenceDataSource(CheckDataSource):
                 table["rows"].append(row)
             table["totals"] = totals
             data["tables"].append(table)
+        df1_sum = data["tables"][0]["totals"]["sum"]
+        df2_sum = data["tables"][1]["totals"]["sum"]
+        table_total = (df1_sum + df2_sum)
+        if table_total == 0:
+            score = 0
+        else:
+            score = float(df1_sum) / float(table_total)
+        data["score"] = score
         return data
