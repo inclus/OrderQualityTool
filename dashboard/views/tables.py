@@ -5,7 +5,7 @@ from django_datatables_view.base_datatable_view import BaseDatatableView
 
 from dashboard.helpers import *
 from dashboard.models import Score
-from data_sources import NegativesCheckDataSource, ConsumptionAndPatientsDataSource, TwoCycleDataSource, ClosingBalanceMatchesOpeningBalanceDataSource, StableConsumptionDataSource, StablePatientVolumesDataSource, WarehouseFulfillmentDataSource, GuidelineAdherenceDataSource
+from data_sources import NegativesCheckDataSource, ConsumptionAndPatientsDataSource, TwoCycleDataSource, ClosingBalanceMatchesOpeningBalanceDataSource, StableConsumptionDataSource, StablePatientVolumesDataSource, WarehouseFulfillmentDataSource, GuidelineAdherenceDataSource, NNRTIDataSource
 
 
 class ScoresTableView(BaseDatatableView):
@@ -127,6 +127,10 @@ class ScoreDetailsView(View):
             GUIDELINE_ADHERENCE_PAED_1L: GuidelineAdherenceDataSource,
             GUIDELINE_ADHERENCE_ADULT_2L: GuidelineAdherenceDataSource,
             GUIDELINE_ADHERENCE_ADULT_1L: GuidelineAdherenceDataSource,
+            NNRTI_NEW_PAED: NNRTIDataSource,
+            NNRTI_NEW_ADULTS: NNRTIDataSource,
+            NNRTI_CURRENT_ADULTS: NNRTIDataSource,
+            NNRTI_CURRENT_PAED: NNRTIDataSource
         }
         scores = {YES: "Pass", NO: "Fail", NOT_REPORTING: "N/A"}
         combination = request.GET.get('combination', DEFAULT)

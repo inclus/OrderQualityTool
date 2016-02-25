@@ -319,3 +319,18 @@ class GuidelineAdherenceDataSource(CheckDataSource):
             score = float(df1_sum) / float(table_total)
         data["score"] = score
         return data
+
+class NNRTIDataSource(CheckDataSource):
+    def get_template(self, test):
+        return "check/nnrti.html"
+
+    checks = {
+        GUIDELINE_ADHERENCE_ADULT_1L: {DF1: "TDF-based regimens", DF2: "AZT-based regimens", "check": GuidelineAdherenceCheckAdult1L},
+        GUIDELINE_ADHERENCE_ADULT_2L: {DF1: "ATV/r-based regimens", DF2: "LPV/r-based regimens", "check": GuidelineAdherenceCheckAdult2L},
+        GUIDELINE_ADHERENCE_PAED_1L: {DF1: "ABC-based regimens", DF2: "AZT-based regimens", "check": GuidelineAdherenceCheckPaed1L},
+    }
+
+    def get_context(self, score, test, combination):
+        return {}
+
+
