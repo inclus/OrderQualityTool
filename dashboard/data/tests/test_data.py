@@ -70,7 +70,7 @@ class DataTestCase(TestCase):
         report = FreeFormReport(file_path, "May Jun").load()
         report.cycle = "Jul - Aug 2015"
         cases = [{'test': BlanksQualityCheck, 'expected': 8.0},
-                 {'test': MultipleCheck, 'expected': 20.0},
+                 {'test': MultipleCheck, 'expected': 80.0},
                  {'test': IsReportingCheck, 'expected': 96.0},
                  {'test': WebBasedCheck, 'expected': 96.0}
                  ]
@@ -83,7 +83,7 @@ class DataTestCase(TestCase):
                                  "new_format.xlsx")
         report = FreeFormReport(file_path, "May Jun").load()
         cases = [{'test': BlanksQualityCheck, 'expected': 8.0},
-                 {'test': MultipleCheck, 'expected': 20.0},
+                 {'test': MultipleCheck, 'expected': 80.0},
                  {'test': IsReportingCheck, 'expected': 96.0},
                  {'test': WebBasedCheck, 'expected': 96.0}
                  ]

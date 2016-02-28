@@ -89,7 +89,7 @@ class MultipleCheck(QCheck):
 
     def for_each_facility(self, facility, no, not_reporting, yes, combination):
         not_reporting += 0
-        result = NO if facility_has_single_order(facility) else YES
+        result = YES if facility_has_single_order(facility) else NO
         if result == NO:
             no += 1
         else:
