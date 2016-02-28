@@ -3,7 +3,7 @@
 {% block content %}
     <span class="score_detail_data_title col-md-12">{{ data.main_title }}</span>
     <div class="row">
-        <div class="col-md-6 text-left">
+        <div class="col-md-6">
         <h5>CONSUMPTION</h5>
         {% for c in data.consumption %}
 
@@ -31,7 +31,7 @@
             </table>
         {% endfor %}
     </div>
-    <div class="col-md-6 text-left">
+    <div class="col-md-6">
         <h5>PATIENTS</h5>
         {% for pat in  data.patients %}
 
