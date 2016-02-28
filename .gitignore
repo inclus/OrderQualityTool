@@ -148,3 +148,4 @@ dashboard/static/vendor/
 ~$*.xlsx
 node_modules/
 .ropeproject
+*.sublime-workspace
