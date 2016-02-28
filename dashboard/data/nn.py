@@ -24,8 +24,10 @@ class NNRTICURRENTADULTSCheck(QCheck):
             ART_CONSUMPTION,
             PMTCT_CONSUMPTION
         ],
-        RATIO: 2.0
+        RATIO: 2.0,
+        SHOW_CONVERSION: True
     }]
+
     def filter_records(self, facility_name, formulation_names):
         records = self.report.cs[facility_name]
 
@@ -70,7 +72,6 @@ class NNRTICURRENTADULTSCheck(QCheck):
             no += 1
             result = NO
 
-
         return result, no, not_reporting, yes
 
 
@@ -85,19 +86,21 @@ class NNRTICURRENTPAEDCheck(NNRTICURRENTADULTSCheck):
             "Lopinavir/Ritonavir (LPV/r) 100mg/25mg",
         ],
         DF1: [
-            "Zidovudine/Lamivudine (AZT/3TC) 60mg/30mg [Pack 60]",
+            "Abacavir/Lamivudine (ABC/3TC) 60mg/30mg [Pack 60]",
             "Zidovudine/Lamivudine (AZT/3TC) 60mg/30mg [Pack 60]"
         ],
+        OTHER: ["Efavirenz (EFV) 200mg [Pack 90]"],
         FIELDS: [
             ART_CONSUMPTION
         ],
-        RATIO: 4.6
+        RATIO: 4.6,
+        SHOW_CONVERSION: True
     }]
 
     def for_each_facility(self, facility, no, not_reporting, yes, combination):
         facility_name = facility[NAME]
         ratio = combination.get(RATIO)
-        non_normalized_field = "Efavirenz (EFV) 200mg [Pack 90]"
+        non_normalized_field = combination.get(OTHER)[0]
         df1_records = self.filter_records(facility_name, combination[DF1])
         df2_records = self.filter_records(facility_name, combination[DF2])
         other_records = self.filter_records(facility_name, [non_normalized_field])
@@ -151,7 +154,8 @@ class NNRTINEWPAEDCheck(NNRTICURRENTADULTSCheck):
             ESTIMATED_NUMBER_OF_NEW_ART_PATIENTS,
             ESTIMATED_NUMBER_OF_NEW_PREGNANT_WOMEN
         ],
-        RATIO: 2.0
+        RATIO: 1.0,
+        SHOW_CONVERSION: False
     }]
 
 
@@ -174,5 +178,6 @@ class NNRTINewAdultsCheck(NNRTICURRENTADULTSCheck):
             ESTIMATED_NUMBER_OF_NEW_ART_PATIENTS,
             ESTIMATED_NUMBER_OF_NEW_PREGNANT_WOMEN
         ],
-        RATIO: 2.0
+        RATIO: 1.0,
+        SHOW_CONVERSION: False
     }]

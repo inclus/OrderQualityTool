@@ -52,92 +52,94 @@
         </div>
     </div>
 
-    <span class="score_detail_data_title col-md-12">Conversion Ratio (estimated average packs per patient, bimonthly)</span>
-    <div class="row">
-        <div class="col-md-6">
-            <table class="table table-striped table-bordered table-condensed">
-                <thead>
-                <tr>
-                    <th>{{ data.data_field_1.table_header }}</th>
-                    <th></th>
-                </tr>
-                </thead>
-                <tbody>
-                {% for item in data.data_field_1_ratios.rows %}
+    {% if data.show_conversion %}
+        <span class="score_detail_data_title col-md-12">Conversion Ratio (estimated average packs per patient, bimonthly)</span>
+        <div class="row">
+            <div class="col-md-6">
+                <table class="table table-striped table-bordered table-condensed">
+                    <thead>
                     <tr>
-                        <td>{{ item.column }}</td>
-                        <th>{{ item.value }}</th>
+                        <th>{{ data.data_field_1.table_header }}</th>
+                        <th></th>
                     </tr>
-                {% endfor %}
+                    </thead>
+                    <tbody>
+                    {% for item in data.data_field_1_ratios.rows %}
+                        <tr>
+                            <td>{{ item.column }}</td>
+                            <th>{{ item.value|floatformat:-2 }}</th>
+                        </tr>
+                    {% endfor %}
 
-                </tbody>
-            </table>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="col-md-6">
+                <table class="table table-striped table-bordered table-condensed">
+                    <thead>
+                    <tr>
+                        <th>{{ data.data_field_2.table_header }}</th>
+                        <th></th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for item in data.data_field_2_ratios.rows %}
+                        <tr>
+                            <td>{{ item.column }}</td>
+                            <th>{{ item.value|floatformat:-2 }}</th>
+                        </tr>
+                    {% endfor %}
+
+                    </tbody>
+                </table>
+            </div>
         </div>
 
-        <div class="col-md-6">
-            <table class="table table-striped table-bordered table-condensed">
-                <thead>
-                <tr>
-                    <th>{{ data.data_field_2.table_header }}</th>
-                    <th></th>
-                </tr>
-                </thead>
-                <tbody>
-                {% for item in data.data_field_2_ratios.rows %}
+        <span class="score_detail_data_title col-md-12">ESTIMATED CURRENT PATIENTS</span>
+
+        <div class="row">
+            <div class="col-md-6">
+                <table class="table table-striped table-bordered table-condensed">
+                    <thead>
                     <tr>
-                        <td>{{ item.column }}</td>
-                        <th>{{ item.value }}</th>
+                        <th>{{ data.data_field_1.table_header }}</th>
+                        <th></th>
                     </tr>
-                {% endfor %}
+                    </thead>
+                    <tbody>
+                    {% for item in data.data_field_1_calculated.rows %}
+                        <tr>
+                            <td>{{ item.column }}</td>
+                            <th>{{ item.value|floatformat:-2 }}</th>
+                        </tr>
+                    {% endfor %}
 
-                </tbody>
-            </table>
-        </div>
-    </div>
+                    </tbody>
+                </table>
+            </div>
 
-    <span class="score_detail_data_title col-md-12">ESTIMATED CURRENT PATIENTS</span>
-
-    <div class="row">
-        <div class="col-md-6">
-            <table class="table table-striped table-bordered table-condensed">
-                <thead>
-                <tr>
-                    <th>{{ data.data_field_1.table_header }}</th>
-                    <th></th>
-                </tr>
-                </thead>
-                <tbody>
-                {% for item in data.data_field_1_calculated.rows %}
+            <div class="col-md-6">
+                <table class="table table-striped table-bordered table-condensed">
+                    <thead>
                     <tr>
-                        <td>{{ item.column }}</td>
-                        <th>{{ item.value }}</th>
+                        <th>{{ data.data_field_2.table_header }}</th>
+                        <th></th>
                     </tr>
-                {% endfor %}
+                    </thead>
+                    <tbody>
+                    {% for item in data.data_field_2_calculated.rows %}
+                        <tr>
+                            <td>{{ item.column }}</td>
+                            <th>{{ item.value|floatformat:-2 }}</th>
+                        </tr>
+                    {% endfor %}
 
-                </tbody>
-            </table>
+                    </tbody>
+                </table>
+            </div>
         </div>
-
-        <div class="col-md-6">
-            <table class="table table-striped table-bordered table-condensed">
-                <thead>
-                <tr>
-                    <th>{{ data.data_field_2.table_header }}</th>
-                    <th></th>
-                </tr>
-                </thead>
-                <tbody>
-                {% for item in data.data_field_2_calculated.rows %}
-                    <tr>
-                        <td>{{ item.column }}</td>
-                        <th>{{ item.value }}</th>
-                    </tr>
-                {% endfor %}
-
-                </tbody>
-            </table>
-        </div>
-    </div>
+    {% endif %}
     <div class="row">
         <hr>
         <div class="final-score col-md-offset-3 col-md-2">

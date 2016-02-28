@@ -7,7 +7,7 @@ from dashboard.data.consumption_patients import ConsumptionAndPatientsQualityChe
 from dashboard.data.cycles import OrdersOverTimeCheck, BalancesMatchCheck, StableConsumptionCheck, StablePatientVolumesCheck
 from dashboard.data.negatives import NegativeNumbersQualityCheck
 from dashboard.data.nn import NNRTINEWPAEDCheck, NNRTINewAdultsCheck, NNRTICURRENTADULTSCheck, NNRTICURRENTPAEDCheck
-from dashboard.helpers import FIELD_NAMES, CONSUMPTION_QUERY, FIELDS, NEW, EXISTING, F1, F2, F3, F1_QUERY, F2_QUERY, F3_QUERY, NAME, IS_ADULT, PATIENT_QUERY, RATIO, get_prev_cycle, CLOSING_BALANCE, OPENING_BALANCE, ADULT, PACKS_ORDERED, QUANTITY_RECEIVED, GUIDELINE_ADHERENCE_ADULT_1L, GUIDELINE_ADHERENCE_ADULT_2L, GUIDELINE_ADHERENCE_PAED_1L, DF1, DF2, NNRTI_NEW_PAED, NNRTI_NEW_ADULTS, NNRTI_CURRENT_ADULTS, NNRTI_CURRENT_PAED, ROWS, VALUE, COLUMN, TOTAL
+from dashboard.helpers import FIELD_NAMES, CONSUMPTION_QUERY, FIELDS, NEW, EXISTING, F1, F2, F3, F1_QUERY, F2_QUERY, F3_QUERY, NAME, IS_ADULT, PATIENT_QUERY, RATIO, get_prev_cycle, CLOSING_BALANCE, OPENING_BALANCE, ADULT, PACKS_ORDERED, QUANTITY_RECEIVED, GUIDELINE_ADHERENCE_ADULT_1L, GUIDELINE_ADHERENCE_ADULT_2L, GUIDELINE_ADHERENCE_PAED_1L, DF1, DF2, NNRTI_NEW_PAED, NNRTI_NEW_ADULTS, NNRTI_CURRENT_ADULTS, NNRTI_CURRENT_PAED, ROWS, VALUE, COLUMN, TOTAL, OTHER, SHOW_CONVERSION
 from dashboard.models import Consumption, AdultPatientsRecord, PAEDPatientsRecord
 
 CHECK = "check"
@@ -342,7 +342,8 @@ class NNRTIDataSource(CheckDataSource):
         context = defaultdict(dict)
         context["main_title"] = "RAW ORDER DATA"
         check_config = self.checks.get(test).get(CHECK).combinations[0]
-        combination_ratio = check_config.get(RATIO)
+
+        has_other = OTHER in check_config
         for part in [DF1, DF2]:
             title = nnrti_titles.get(part)
             context[part][HEADERS] = []
@@ -357,6 +358,8 @@ class NNRTIDataSource(CheckDataSource):
                 context[part][HEADERS].append(get_field_name(field))
             context[part][HEADERS].append(TOTAL)
             formulation_query = check_config[part]
+            if has_other and part == DF2:
+                formulation_query = check_config.get(OTHER) + formulation_query
             consumption_records = Consumption.objects.filter(name=score.name, district=score.district, cycle=score.cycle, formulation__in=formulation_query)
             part_total = 0
             for record in consumption_records:
@@ -365,11 +368,15 @@ class NNRTIDataSource(CheckDataSource):
                 row_sum = 0
                 for field in check_fields:
                     value = getattr(record, field)
-                    row_sum += int(value)
+                    if value:
+                        row_sum += int(value)
                     header = get_field_name(field)
                     row[header] = value
                 row[TOTAL] = row_sum
                 context[part][ROWS].append(row)
+                combination_ratio = check_config.get(RATIO)
+                if has_other and record.formulation in check_config.get(OTHER):
+                    combination_ratio = 1.0
                 ratio_row = {COLUMN: record.formulation, VALUE: combination_ratio}
                 calculated_sum = row_sum / combination_ratio
                 calculated_row = {COLUMN: record.formulation, VALUE: calculated_sum}
@@ -385,4 +392,6 @@ class NNRTIDataSource(CheckDataSource):
         if df2_total > 0:
             final_score = abs(float((df2_total - df1_total) * 100) / df2_total)
         context['FINAL_SCORE'] = final_score
+        context[SHOW_CONVERSION] = check_config.get(SHOW_CONVERSION)
+
         return context
