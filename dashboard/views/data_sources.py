@@ -351,7 +351,7 @@ class NNRTIDataSource(CheckDataSource):
             ratio_key = "%s_ratios" % part
             calculated_key = "%s_calculated" % part
             context[ratio_key][ROWS] = []
-            context[calculated_key][ROWS] = [{COLUMN: title}]
+            context[calculated_key][ROWS] = []
             check_fields = check_config.get(FIELDS)
             for field in check_fields:
                 context[part][HEADERS].append(get_field_name(field))
@@ -383,6 +383,6 @@ class NNRTIDataSource(CheckDataSource):
         df2_total = context["%s_COUNT" % DF2]
         final_score = 0
         if df2_total > 0:
-            final_score = float((df2_total - df1_total) * 100) / df2_total
+            final_score = abs(float((df2_total - df1_total) * 100) / df2_total)
         context['FINAL_SCORE'] = final_score
         return context
