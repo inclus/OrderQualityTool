@@ -5,6 +5,7 @@ var bg = require("gulp-bg");
 var Server = require("karma").Server;
 var concat = require("gulp-concat");
 var webpack = require("gulp-webpack");
+var autoprefixer = require("gulp-autoprefixer");
 
 var lessSrc = "dashboard/static/css/app.less";
 var lessDest = "dashboard/static/css";
@@ -30,6 +31,10 @@ gulp.task("scripts", function () {
 gulp.task("less", function () {
     return gulp.src(lessSrc)
         .pipe(less())
+        .pipe(autoprefixer({
+            browsers: ["last 2 versions"],
+            cascade: false
+        }))
         .pipe(gulp.dest(lessDest));
 });
 
