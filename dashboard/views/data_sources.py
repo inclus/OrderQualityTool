@@ -97,8 +97,9 @@ class ConsumptionAndPatientsDataSource(CheckDataSource):
             entry = {COLUMN: consumption.formulation}
             values = values_for_models(check_combination.get(FIELDS, []), [consumption])
             sum = pydash.chain(values).reject(lambda x: x is None).sum().value()
-            entry[VALUE] = sum
-            total += sum
+            reduced_sum = sum / check_combination[RATIO]
+            entry[VALUE] = reduced_sum
+            total += reduced_sum
             totals.append(entry)
         totals.append({COLUMN: TOTAL, VALUE: total, IS_HEADER: True})
         return totals
