@@ -25,6 +25,7 @@
     "gulp-autoprefixer": "^3.1.0",
     "gulp-concat": "^2.6.0",
     "gulp-less": "^3.0.5",
+    "gulp-nightwatch": "^0.2.9",
     "gulp-watch-less": "^1.0.1",
     "gulp-webpack": "^1.5.0",
     "jasmine": "^2.3.2",
@@ -33,6 +34,7 @@
     "karma-jasmine": "^0.3.6",
     "less": "^2.5.3",
     "less-loader": "^2.2.2",
+    "selenium-server": "^2.52.0",
     "style-loader": "^0.13.0",
     "url-loader": "^0.5.7",
     "webpack": "^1.12.13"

@@ -6,7 +6,7 @@ var Server = require("karma").Server;
 var concat = require("gulp-concat");
 var webpack = require("gulp-webpack");
 var autoprefixer = require("gulp-autoprefixer");
-
+var nightwatch = require("gulp-nightwatch");
 var lessSrc = "dashboard/static/css/app.less";
 var lessDest = "dashboard/static/css";
 
@@ -63,4 +63,15 @@ gulp.task("pack", function() {
     return gulp.src("src/entry.js")
         .pipe(webpack(require("./webpack.config.js")))
         .pipe(gulp.dest("dashboard/static/dist"));
+});
+
+
+
+gulp.task("ft", function() {
+    return gulp.src("")
+        .pipe(
+            nightwatch({
+                configFile: "ft/nightwatch.json"
+            })
+        );
 });
