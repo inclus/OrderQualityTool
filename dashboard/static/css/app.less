@@ -239,8 +239,6 @@ nav.with-flag {
   margin-bottom: 25/@em;
 }
 .score-header {
-  border-bottom: 1.8px solid black;
-  padding-bottom: 20/@em;
   margin-bottom: 20/@em;
 }
 .omega.score- {
@@ -343,4 +341,26 @@ span.select2-container--default .select2-selection--multiple {
 }
 .final-score {
   flex: 1;
+}
+hr {
+  border-top: 1.4px solid #686868;
+}
+.final-score {
+  display: flex;
+  flex-direction: column;
+
+  .-up {
+    flex: 1;
+    font-weight: bold;
+    font-size: 20/@em;
+    color: #000000;
+    letter-spacing: 1px;
+  }
+  .-down {
+    flex: 1;
+    font-weight: 400;
+    font-size: 15/@em;
+    color: #9B9B9B;
+    letter-spacing: 1px;
+  }
 }
