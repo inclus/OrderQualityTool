@@ -215,3 +215,10 @@ def get_prev_cycle(cycle):
     end_month = current_cycle_date.replace(months=-2)
     prev_cycle = format_range(start_month, end_month)
     return prev_cycle
+
+
+VALUE = "value"
+COLUMN = "column"
+ROWS = "rows"
+FINAL_SCORE = "FINAL_SCORE"
+TOTAL = "TOTAL"

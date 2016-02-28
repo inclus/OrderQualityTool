@@ -5,7 +5,7 @@ from django_datatables_view.base_datatable_view import BaseDatatableView
 
 from dashboard.helpers import *
 from dashboard.models import Score
-from data_sources import NegativesCheckDataSource, ConsumptionAndPatientsDataSource, TwoCycleDataSource, ClosingBalanceMatchesOpeningBalanceDataSource, StableConsumptionDataSource, StablePatientVolumesDataSource, WarehouseFulfillmentDataSource, GuidelineAdherenceDataSource, NNRTIDataSource
+from dashboard.views.data_sources import NegativesCheckDataSource, ConsumptionAndPatientsDataSource, TwoCycleDataSource, ClosingBalanceMatchesOpeningBalanceDataSource, StableConsumptionDataSource, StablePatientVolumesDataSource, WarehouseFulfillmentDataSource, GuidelineAdherenceDataSource, NNRTIDataSource
 
 
 class ScoresTableView(BaseDatatableView):

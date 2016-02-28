@@ -143,7 +143,7 @@ class ReportMetrics(APIView):
         adscore = CycleFormulationScore.objects.filter(cycle=most_recent_cycle,
                                                        test__icontains=GUIDELINE_ADHERENCE,
                                                        combination='DEFAULT').aggregate(
-                adherence=Avg('yes')).get("adherence", 0)
+            adherence=Avg('yes')).get("adherence", 0)
         web_rate = "{0:.1f}".format(web_score.yes)
         report_rate = "{0:.1f}".format(report_score.yes)
         adherence = "{0:.1f}".format(report_score.yes)

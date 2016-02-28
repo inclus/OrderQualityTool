@@ -6,6 +6,7 @@ from dashboard.helpers import *
 
 class NNRTICURRENTADULTSCheck(QCheck):
     test = NNRTI_CURRENT_ADULTS
+
     combinations = [{
         NAME: DEFAULT,
         DF2: [
@@ -20,11 +21,11 @@ class NNRTICURRENTADULTSCheck(QCheck):
             "Abacavir/Lamivudine (ABC/3TC) 600mg/300mg [Pack 30]"
         ],
         FIELDS: [
-            PMTCT_CONSUMPTION,
-            ART_CONSUMPTION
-        ]
+            ART_CONSUMPTION,
+            PMTCT_CONSUMPTION
+        ],
+        RATIO: 2.0
     }]
-
     def filter_records(self, facility_name, formulation_names):
         records = self.report.cs[facility_name]
 
@@ -89,12 +90,13 @@ class NNRTICURRENTPAEDCheck(NNRTICURRENTADULTSCheck):
         ],
         FIELDS: [
             ART_CONSUMPTION
-        ]
+        ],
+        RATIO: 4.6
     }]
 
     def for_each_facility(self, facility, no, not_reporting, yes, combination):
         facility_name = facility[NAME]
-        ratio = 4.6
+        ratio = combination.get(RATIO)
         non_normalized_field = "Efavirenz (EFV) 200mg [Pack 90]"
         df1_records = self.filter_records(facility_name, combination[DF1])
         df2_records = self.filter_records(facility_name, combination[DF2])
@@ -148,7 +150,8 @@ class NNRTINEWPAEDCheck(NNRTICURRENTADULTSCheck):
         FIELDS: [
             ESTIMATED_NUMBER_OF_NEW_ART_PATIENTS,
             ESTIMATED_NUMBER_OF_NEW_PREGNANT_WOMEN
-        ]
+        ],
+        RATIO: 2.0
     }]
 
 
@@ -170,5 +173,6 @@ class NNRTINewAdultsCheck(NNRTICURRENTADULTSCheck):
         FIELDS: [
             ESTIMATED_NUMBER_OF_NEW_ART_PATIENTS,
             ESTIMATED_NUMBER_OF_NEW_PREGNANT_WOMEN
-        ]
+        ],
+        RATIO: 2.0
     }]

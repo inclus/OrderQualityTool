@@ -6,12 +6,13 @@ from dashboard.data.adherence import GuidelineAdherenceCheckAdult1L, GuidelineAd
 from dashboard.data.consumption_patients import ConsumptionAndPatientsQualityCheck
 from dashboard.data.cycles import OrdersOverTimeCheck, BalancesMatchCheck, StableConsumptionCheck, StablePatientVolumesCheck
 from dashboard.data.negatives import NegativeNumbersQualityCheck
-from dashboard.helpers import FIELD_NAMES, CONSUMPTION_QUERY, FIELDS, NEW, EXISTING, F1, F2, F3, F1_QUERY, F2_QUERY, F3_QUERY, NAME, IS_ADULT, PATIENT_QUERY, RATIO, get_prev_cycle, CLOSING_BALANCE, OPENING_BALANCE, ADULT, PACKS_ORDERED, QUANTITY_RECEIVED, GUIDELINE_ADHERENCE_ADULT_1L, GUIDELINE_ADHERENCE_ADULT_2L, GUIDELINE_ADHERENCE_PAED_1L, DF1, DF2
+from dashboard.data.nn import NNRTINEWPAEDCheck, NNRTINewAdultsCheck, NNRTICURRENTADULTSCheck, NNRTICURRENTPAEDCheck
+from dashboard.helpers import FIELD_NAMES, CONSUMPTION_QUERY, FIELDS, NEW, EXISTING, F1, F2, F3, F1_QUERY, F2_QUERY, F3_QUERY, NAME, IS_ADULT, PATIENT_QUERY, RATIO, get_prev_cycle, CLOSING_BALANCE, OPENING_BALANCE, ADULT, PACKS_ORDERED, QUANTITY_RECEIVED, GUIDELINE_ADHERENCE_ADULT_1L, GUIDELINE_ADHERENCE_ADULT_2L, GUIDELINE_ADHERENCE_PAED_1L, DF1, DF2, NNRTI_NEW_PAED, NNRTI_NEW_ADULTS, NNRTI_CURRENT_ADULTS, NNRTI_CURRENT_PAED, ROWS, VALUE, COLUMN, TOTAL
 from dashboard.models import Consumption, AdultPatientsRecord, PAEDPatientsRecord
 
-COLUMN = "column"
-
-TOTAL = "TOTAL"
+CHECK = "check"
+IS_HEADER = "isHeader"
+HEADERS = "headers"
 
 query_map = {F1: F1_QUERY, F2: F2_QUERY, F3: F3_QUERY}
 
@@ -46,10 +47,10 @@ class NegativesCheckDataSource(CheckDataSource):
         consumption_records = Consumption.objects.filter(name=score.name, district=score.district, cycle=score.cycle, formulation__icontains=formulation_query)
         tables = []
         for consumption in consumption_records:
-            formulation_data = {"name": consumption.formulation}
+            formulation_data = {NAME: consumption.formulation}
             records = []
             for field in check.fields:
-                records.append({"column": FIELD_NAMES.get(field), "value": getattr(consumption, field)})
+                records.append({COLUMN: FIELD_NAMES.get(field), VALUE: getattr(consumption, field)})
             formulation_data['records'] = records
             tables.append(formulation_data)
         return {"main_title": "RAW ORDER DATA", "formulations": tables}
@@ -86,7 +87,7 @@ class ConsumptionAndPatientsDataSource(CheckDataSource):
         }
 
     def calculate_packs(self, check_combination):
-        packs = [{"column": check_combination.get(CONSUMPTION_QUERY), "value": check_combination.get(RATIO)}]
+        packs = [{COLUMN: check_combination.get(CONSUMPTION_QUERY), VALUE: check_combination.get(RATIO)}]
         return packs
 
     def calculate_consumption_totals(self, check_combination, consumption_records):
@@ -96,23 +97,23 @@ class ConsumptionAndPatientsDataSource(CheckDataSource):
             entry = {COLUMN: consumption.formulation}
             values = values_for_models(check_combination.get(FIELDS, []), [consumption])
             sum = pydash.chain(values).reject(lambda x: x is None).sum().value()
-            entry["value"] = sum
+            entry[VALUE] = sum
             total += sum
             totals.append(entry)
-        totals.append({COLUMN: TOTAL, "value": total, "isHeader": True})
+        totals.append({COLUMN: TOTAL, VALUE: total, IS_HEADER: True})
         return totals
 
     def calculate_consumption_tables(self, check_combination, consumption_records):
         tables = []
         for consumption in consumption_records:
-            formulation_data = {"name": consumption.formulation}
+            formulation_data = {NAME: consumption.formulation}
             records = []
             sum = 0
             for field in check_combination.get(FIELDS, []):
                 value = getattr(consumption, field)
                 sum += int(value)
-                records.append({COLUMN: FIELD_NAMES.get(field), "value": value})
-            records.append({COLUMN: TOTAL, "value": sum, "isHeader": True})
+                records.append({COLUMN: FIELD_NAMES.get(field), VALUE: value})
+            records.append({COLUMN: TOTAL, VALUE: sum, IS_HEADER: True})
 
             formulation_data['records'] = records
             tables.append(formulation_data)
@@ -121,14 +122,14 @@ class ConsumptionAndPatientsDataSource(CheckDataSource):
     def calculate_patient_tables(self, patient_records):
         patient_tables = []
         for pr in patient_records:
-            formulation_data = {"name": pr.formulation}
+            formulation_data = {NAME: pr.formulation}
             records = []
             sum = 0
             for field in [NEW, EXISTING]:
                 value = getattr(pr, field)
                 sum += int(value)
-                records.append({COLUMN: FIELD_NAMES.get(field), "value": value})
-            records.append({COLUMN: TOTAL, "value": sum, "isHeader": True})
+                records.append({COLUMN: FIELD_NAMES.get(field), VALUE: value})
+            records.append({COLUMN: TOTAL, VALUE: sum, IS_HEADER: True})
             formulation_data['records'] = records
             patient_tables.append(formulation_data)
         return patient_tables
@@ -137,13 +138,13 @@ class ConsumptionAndPatientsDataSource(CheckDataSource):
         patient_totals = []
         total = 0
         for pr in patient_records:
-            entry = {"column": pr.formulation}
+            entry = {COLUMN: pr.formulation}
             values = values_for_models([NEW, EXISTING], [pr])
             sum = pydash.chain(values).reject(lambda x: x is None).sum().value()
-            entry["value"] = sum
+            entry[VALUE] = sum
             total += int(sum)
             patient_totals.append(entry)
-        patient_totals.append({"column": TOTAL, "value": total, "isHeader": True})
+        patient_totals.append({COLUMN: TOTAL, VALUE: total, IS_HEADER: True})
         return patient_totals
 
 
@@ -167,7 +168,7 @@ class TwoCycleDataSource(CheckDataSource):
         tables = [
             {"cycle": cycle}
         ]
-        tables[0]["rows"] = self.build_rows(check, records)
+        tables[0][ROWS] = self.build_rows(check, records)
         return tables
 
     def get_queryset(self, check_combination, cycle, score):
@@ -180,7 +181,7 @@ class TwoCycleDataSource(CheckDataSource):
         for consumption in consumption_records:
             for field in check.fields:
                 value = getattr(consumption, field)
-                rows.append({"column": FIELD_NAMES.get(field), "value": value})
+                rows.append({COLUMN: FIELD_NAMES.get(field), VALUE: value})
         return rows
 
 
@@ -210,8 +211,8 @@ class ClosingBalanceMatchesOpeningBalanceDataSource(CheckDataSource):
         for consumption in consumption_records:
             for field in fields:
                 value = getattr(consumption, field)
-                rows.append({"column": FIELD_NAMES.get(field), "value": value})
-        tables[0]["rows"] = rows
+                rows.append({COLUMN: FIELD_NAMES.get(field), VALUE: value})
+        tables[0][ROWS] = rows
         return tables
 
 
@@ -229,8 +230,8 @@ class StableConsumptionDataSource(TwoCycleDataSource):
             for field in check.fields:
                 value = getattr(consumption, field)
                 tot += int(value)
-                rows.append({"column": FIELD_NAMES.get(field), "value": value})
-            rows.append({"column": TOTAL, "value": tot, "isHeader": True})
+                rows.append({COLUMN: FIELD_NAMES.get(field), VALUE: value})
+            rows.append({COLUMN: TOTAL, VALUE: tot, IS_HEADER: True})
         return rows
 
 
@@ -243,13 +244,13 @@ class StablePatientVolumesDataSource(TwoCycleDataSource):
     def build_rows(self, check, records):
         rows = []
         for consumption in records:
-            rows.append({"column": consumption.formulation, "isHeader": True})
+            rows.append({COLUMN: consumption.formulation, IS_HEADER: True})
             tot = 0
             for field in check.fields:
                 value = getattr(consumption, field)
                 tot = int(value)
-                rows.append({"column": FIELD_NAMES.get(field), "value": value})
-            rows.append({"column": TOTAL, "value": tot, "isHeader": True})
+                rows.append({COLUMN: FIELD_NAMES.get(field), VALUE: value})
+            rows.append({COLUMN: TOTAL, VALUE: tot, IS_HEADER: True})
         return rows
 
     def get_queryset(self, check_combination, cycle, score):
@@ -280,34 +281,34 @@ class GuidelineAdherenceDataSource(CheckDataSource):
         return "check/adherence.html"
 
     checks = {
-        GUIDELINE_ADHERENCE_ADULT_1L: {DF1: "TDF-based regimens", DF2: "AZT-based regimens", "check": GuidelineAdherenceCheckAdult1L},
-        GUIDELINE_ADHERENCE_ADULT_2L: {DF1: "ATV/r-based regimens", DF2: "LPV/r-based regimens", "check": GuidelineAdherenceCheckAdult2L},
-        GUIDELINE_ADHERENCE_PAED_1L: {DF1: "ABC-based regimens", DF2: "AZT-based regimens", "check": GuidelineAdherenceCheckPaed1L},
+        GUIDELINE_ADHERENCE_ADULT_1L: {DF1: "TDF-based regimens", DF2: "AZT-based regimens", CHECK: GuidelineAdherenceCheckAdult1L},
+        GUIDELINE_ADHERENCE_ADULT_2L: {DF1: "ATV/r-based regimens", DF2: "LPV/r-based regimens", CHECK: GuidelineAdherenceCheckAdult2L},
+        GUIDELINE_ADHERENCE_PAED_1L: {DF1: "ABC-based regimens", DF2: "AZT-based regimens", CHECK: GuidelineAdherenceCheckPaed1L},
     }
 
     def get_context(self, score, test, combination):
         check_data = self.checks.get(test)
-        check = check_data.get("check")({})
+        check = check_data.get(CHECK)({})
         check_combination = check.combinations[0]
         data = {"main_title": "RAW ORDER DATA", "tables": []}
         for part in [DF1, DF2]:
             field_names = [FIELD_NAMES.get(f) for f in check_combination.get(FIELDS)]
-            table = {"name": check_data.get(part), "rows": [], "headers": field_names}
+            table = {NAME: check_data.get(part), ROWS: [], HEADERS: field_names}
             formulation_query = check_combination.get(part)
             consumption_records = Consumption.objects.filter(name=score.name, district=score.district, cycle=score.cycle, formulation__in=formulation_query)
             totals = defaultdict(int)
             for record in consumption_records:
-                row = {"column": record.formulation}
-                sum = 0
+                row = {COLUMN: record.formulation}
+                part_sum = 0
                 for field in check_combination.get(FIELDS):
                     value = getattr(record, field)
-                    sum += int(value)
+                    part_sum += int(value)
                     header = FIELD_NAMES.get(field)
                     row[header] = value
                     totals[header] += int(value)
-                row["sum"] = sum
-                totals["sum"] += sum
-                table["rows"].append(row)
+                row["sum"] = part_sum
+                totals["sum"] += part_sum
+                table[ROWS].append(row)
             table["totals"] = totals
             data["tables"].append(table)
         df1_sum = data["tables"][0]["totals"]["sum"]
@@ -320,17 +321,68 @@ class GuidelineAdherenceDataSource(CheckDataSource):
         data["score"] = score
         return data
 
+
+def get_field_name(field):
+    return FIELD_NAMES.get(field).replace("Consumption", "").strip()
+
+
 class NNRTIDataSource(CheckDataSource):
     def get_template(self, test):
         return "check/nnrti.html"
 
     checks = {
-        GUIDELINE_ADHERENCE_ADULT_1L: {DF1: "TDF-based regimens", DF2: "AZT-based regimens", "check": GuidelineAdherenceCheckAdult1L},
-        GUIDELINE_ADHERENCE_ADULT_2L: {DF1: "ATV/r-based regimens", DF2: "LPV/r-based regimens", "check": GuidelineAdherenceCheckAdult2L},
-        GUIDELINE_ADHERENCE_PAED_1L: {DF1: "ABC-based regimens", DF2: "AZT-based regimens", "check": GuidelineAdherenceCheckPaed1L},
+        NNRTI_NEW_PAED: {CHECK: NNRTINEWPAEDCheck},
+        NNRTI_NEW_ADULTS: {CHECK: NNRTINewAdultsCheck},
+        NNRTI_CURRENT_ADULTS: {CHECK: NNRTICURRENTADULTSCheck},
+        NNRTI_CURRENT_PAED: {CHECK: NNRTICURRENTPAEDCheck},
     }
 
     def get_context(self, score, test, combination):
-        return {}
+        nnrti_titles = {DF1: "NNRTI", DF2: "NNRTI/PI"}
+        context = defaultdict(dict)
+        context["main_title"] = "RAW ORDER DATA"
+        check_config = self.checks.get(test).get(CHECK).combinations[0]
+        combination_ratio = check_config.get(RATIO)
+        for part in [DF1, DF2]:
+            title = nnrti_titles.get(part)
+            context[part][HEADERS] = []
+            context[part]["table_header"] = title
+            context[part][ROWS] = []
+            ratio_key = "%s_ratios" % part
+            calculated_key = "%s_calculated" % part
+            context[ratio_key][ROWS] = []
+            context[calculated_key][ROWS] = [{COLUMN: title}]
+            check_fields = check_config.get(FIELDS)
+            for field in check_fields:
+                context[part][HEADERS].append(get_field_name(field))
+            context[part][HEADERS].append(TOTAL)
+            formulation_query = check_config[part]
+            consumption_records = Consumption.objects.filter(name=score.name, district=score.district, cycle=score.cycle, formulation__in=formulation_query)
+            part_total = 0
+            for record in consumption_records:
+                row = {COLUMN: record.formulation}
 
+                row_sum = 0
+                for field in check_fields:
+                    value = getattr(record, field)
+                    row_sum += int(value)
+                    header = get_field_name(field)
+                    row[header] = value
+                row[TOTAL] = row_sum
+                context[part][ROWS].append(row)
+                ratio_row = {COLUMN: record.formulation, VALUE: combination_ratio}
+                calculated_sum = row_sum / combination_ratio
+                calculated_row = {COLUMN: record.formulation, VALUE: calculated_sum}
+                context[ratio_key][ROWS].append(ratio_row)
+                context[calculated_key][ROWS].append(calculated_row)
+                part_total += calculated_sum
+            context[calculated_key][ROWS].append({COLUMN: TOTAL, VALUE: part_total, IS_HEADER: True})
 
+            context["%s_COUNT" % part] = part_total
+        df1_total = context["%s_COUNT" % DF1]
+        df2_total = context["%s_COUNT" % DF2]
+        final_score = 0
+        if df2_total > 0:
+            final_score = float((df2_total - df1_total) * 100) / df2_total
+        context['FINAL_SCORE'] = final_score
+        return context
