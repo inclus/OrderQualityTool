@@ -3,7 +3,7 @@
 	[
 		{
 			"path": ".",
-            "folder_exclude_patterns": ["media", ".cache","tmp", "node_modules"]
+            "folder_exclude_patterns": ["media", ".cache","tmp", "node_modules", ".idea", ".ropeproject", ".tox"]
 		}
 	]
 }
