@@ -15,20 +15,20 @@ gulp.task("worker", bg("celery", "-A", "orderqualitytool.celery", "worker", "--l
 gulp.task("monitor", bg("celery", "flower", "-A", "orderqualitytool.celery", "--address=127.0.0.1", "--port=5555"));
 gulp.task("djangotest", bg("python", "manage.py", "test"));
 
-gulp.task("default", ["server", "worker"], function () {
+gulp.task("default", ["server", "worker"], function() {
     return gulp.src(lessSrc)
-        .pipe(watchLess(lessSrc, function () {
-            gulp.start('less');
+        .pipe(watchLess(lessSrc, function() {
+            gulp.start("less");
         }));
 });
 
-gulp.task("scripts", function () {
+gulp.task("scripts", function() {
     return gulp.src("dashboard/static/js/**/*.js")
         .pipe(concat("app.js"))
         .pipe(gulp.dest("dashboard/static/dist/"));
 });
 
-gulp.task("less", function () {
+gulp.task("less", function() {
     return gulp.src(lessSrc)
         .pipe(less())
         .pipe(autoprefixer({
@@ -38,28 +38,28 @@ gulp.task("less", function () {
         .pipe(gulp.dest(lessDest));
 });
 
-gulp.task("karma", function (done) {
+gulp.task("karma", function(done) {
     new Server({
         configFile: __dirname + "/karma.conf.js",
         singleRun: true
     }, done).start();
 });
 
-gulp.task("test", ["djangotest"], function (done) {
+gulp.task("test", ["djangotest"], function(done) {
     new Server({
         configFile: __dirname + "/karma.conf.js",
         singleRun: true
     }, done).start();
 });
 
-gulp.task("tdd", function (done) {
+gulp.task("tdd", function(done) {
     new Server({
         configFile: __dirname + "/karma.conf.js",
         singleRun: false
     }, done).start();
 });
 
-gulp.task("pack", function () {
+gulp.task("pack", function() {
     return gulp.src("src/entry.js")
         .pipe(webpack(require("./webpack.config.js")))
         .pipe(gulp.dest("dashboard/static/dist"));
