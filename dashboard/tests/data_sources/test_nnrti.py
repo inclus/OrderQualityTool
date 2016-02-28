@@ -101,17 +101,16 @@ class NNRTIDataSourceTestCaseForCurrentAdults(TestCase):
         data_source = NNRTIDataSource()
         data = data_source.load(score, self.test_name, combination)
         ratios_key = "%s_calculated" % DF1
-        self.assertEqual(len(data[ratios_key][ROWS]), 5)
-        self.assertEqual(data[ratios_key][ROWS][0][COLUMN], "NNRTI")
+        self.assertEqual(len(data[ratios_key][ROWS]), 4)
+        self.assertEqual(data[ratios_key][ROWS][0][VALUE], 20.0)
+        self.assertEqual(data[ratios_key][ROWS][0][COLUMN], "Zidovudine/Lamivudine (AZT/3TC) 300mg/150mg [Pack 60]")
         self.assertEqual(data[ratios_key][ROWS][1][VALUE], 20.0)
-        self.assertEqual(data[ratios_key][ROWS][1][COLUMN], "Zidovudine/Lamivudine (AZT/3TC) 300mg/150mg [Pack 60]")
+        self.assertEqual(data[ratios_key][ROWS][1][COLUMN], "Tenofovir/Lamivudine (TDF/3TC) 300mg/300mg [Pack 30]")
         self.assertEqual(data[ratios_key][ROWS][2][VALUE], 20.0)
-        self.assertEqual(data[ratios_key][ROWS][2][COLUMN], "Tenofovir/Lamivudine (TDF/3TC) 300mg/300mg [Pack 30]")
-        self.assertEqual(data[ratios_key][ROWS][3][VALUE], 20.0)
-        self.assertEqual(data[ratios_key][ROWS][3][COLUMN], "Abacavir/Lamivudine (ABC/3TC) 600mg/300mg [Pack 30]")
-        self.assertEqual(data[ratios_key][ROWS][4][VALUE], 60.0)
-        self.assertEqual(data[ratios_key][ROWS][4][COLUMN], TOTAL)
-        self.assertEqual(data[ratios_key][ROWS][4]["isHeader"], True)
+        self.assertEqual(data[ratios_key][ROWS][2][COLUMN], "Abacavir/Lamivudine (ABC/3TC) 600mg/300mg [Pack 30]")
+        self.assertEqual(data[ratios_key][ROWS][3][VALUE], 60.0)
+        self.assertEqual(data[ratios_key][ROWS][3][COLUMN], TOTAL)
+        self.assertEqual(data[ratios_key][ROWS][3]["isHeader"], True)
 
     def test_that_table_for_df2_has_2_rows(self):
         formulations = self.check_class.combinations[0][DF2]
@@ -183,18 +182,17 @@ class NNRTIDataSourceTestCaseForCurrentAdults(TestCase):
         data_source = NNRTIDataSource()
         data = data_source.load(score, self.test_name, combination)
         ratios_key = "%s_calculated" % DF2
-        self.assertEqual(len(data[ratios_key][ROWS]), 6)
-        self.assertEqual(data[ratios_key][ROWS][0][COLUMN], "NNRTI/PI")
+        self.assertEqual(len(data[ratios_key][ROWS]), 5)
+        self.assertEqual(data[ratios_key][ROWS][0][VALUE], 20.0)
+        self.assertEqual(data[ratios_key][ROWS][0][COLUMN], "Efavirenz (EFV) 600mg [Pack 30]")
         self.assertEqual(data[ratios_key][ROWS][1][VALUE], 20.0)
-        self.assertEqual(data[ratios_key][ROWS][1][COLUMN], "Efavirenz (EFV) 600mg [Pack 30]")
+        self.assertEqual(data[ratios_key][ROWS][1][COLUMN], "Nevirapine (NVP) 200mg [Pack 60]")
         self.assertEqual(data[ratios_key][ROWS][2][VALUE], 20.0)
-        self.assertEqual(data[ratios_key][ROWS][2][COLUMN], "Nevirapine (NVP) 200mg [Pack 60]")
+        self.assertEqual(data[ratios_key][ROWS][2][COLUMN], "Atazanavir/Ritonavir (ATV/r) 300mg/100mg [Pack 30]")
         self.assertEqual(data[ratios_key][ROWS][3][VALUE], 20.0)
-        self.assertEqual(data[ratios_key][ROWS][3][COLUMN], "Atazanavir/Ritonavir (ATV/r) 300mg/100mg [Pack 30]")
-        self.assertEqual(data[ratios_key][ROWS][4][VALUE], 20.0)
-        self.assertEqual(data[ratios_key][ROWS][4][COLUMN], "Lopinavir/Ritonavir (LPV/r) 200mg/50mg [Pack 120]")
-        self.assertEqual(data[ratios_key][ROWS][5][VALUE], 80.0)
-        self.assertEqual(data[ratios_key][ROWS][5][COLUMN], TOTAL)
+        self.assertEqual(data[ratios_key][ROWS][3][COLUMN], "Lopinavir/Ritonavir (LPV/r) 200mg/50mg [Pack 120]")
+        self.assertEqual(data[ratios_key][ROWS][4][VALUE], 80.0)
+        self.assertEqual(data[ratios_key][ROWS][4][COLUMN], TOTAL)
 
     def test_calculates_nnrti_count(self):
 
