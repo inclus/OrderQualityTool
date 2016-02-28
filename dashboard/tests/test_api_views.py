@@ -16,7 +16,7 @@ class RankingsAccessViewTestCase(WebTest):
         for case in cases:
             user = mommy.make(DashboardUser, access_level=case['level'])
             response = self.app.get(url, user=user)
-            data = json.loads(response.content)
+            data = json.loads(response.content.decode('utf8'))
             self.assertEquals(data['values'], case['values'])
 
 
@@ -30,7 +30,7 @@ class FilterValuesViewTestCase(WebTest):
         expected_cycles = [{'cycle': 'Ja'}]
         url = reverse("filters")
         response = self.app.get(url)
-        data = json.loads(response.content)
+        data = json.loads(response.content.decode('utf8'))
         self.assertEquals(data['cycles'], expected_cycles)
         self.assertEquals(data['districts'], expected_districts)
         self.assertEquals(data['warehouses'], expected_warehouses)
@@ -42,5 +42,5 @@ class CyclesViewTestCase(WebTest):
         score = Score.objects.create(cycle="May - Jun 2015")
         url = reverse("cycles")
         response = self.app.get(url)
-        data = json.loads(response.content)
+        data = json.loads(response.content.decode('utf8'))
         self.assertTrue(score.cycle in data['values'])

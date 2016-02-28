@@ -52,7 +52,7 @@ class FacilitiesReportingView(WebTest):
 
     @patch("dashboard.views.api.now")
     def test_that_start_end_work(self, time_mock):
-        time_mock.return_value = arrow.Arrow(2015, 12, 01)
+        time_mock.return_value = arrow.Arrow(2015, 12, 1)
         cycle = 'Jan - Feb 2015'
         cycle_2 = 'Mar - Apr 2015'
         Cycle.objects.create(title=cycle)
@@ -73,7 +73,7 @@ class WebBasedReportingViewTestCase(WebTest):
 
     @patch("dashboard.views.api.now")
     def test_that_start_end_work(self, time_mock):
-        time_mock.return_value = arrow.Arrow(2015, 12, 01)
+        time_mock.return_value = arrow.Arrow(2015, 12, 1)
         cycle = 'Jan - Feb 2015'
         cycle_2 = 'Mar - Apr 2015'
         Cycle.objects.create(title=cycle)

@@ -1,4 +1,5 @@
 import csv
+from functools import cmp_to_key
 
 from arrow import now
 from braces.views import LoginRequiredMixin
@@ -65,7 +66,7 @@ class WebBasedReportingView(APIView):
 class FacilitiesMultipleReportingView(APIView):
     def get(self, request):
         cycles = [cycle['cycle'] for cycle in MultipleOrderFacility.objects.values('cycle').distinct()]
-        sorted_cycles = sorted(cycles, sort_cycle, reverse=True)
+        sorted_cycles = sorted(cycles, key=cmp_to_key(sort_cycle), reverse=True)
         most_recent_cycle = sorted_cycles[0]
         cycle = request.GET.get('cycle', most_recent_cycle)
         records = MultipleOrderFacility.objects.filter(cycle=cycle).order_by('name').values('name', 'district', 'ip', 'warehouse')
@@ -126,7 +127,7 @@ class WorstPerformingDistrictsCSVView(BestPerformingDistrictsCSVView):
 class CyclesView(APIView):
     def get(self, request):
         records = [cycle['cycle'] for cycle in Score.objects.values('cycle').distinct()]
-        most_recent_cycle, = sorted(records, sort_cycle, reverse=True)[:1]
+        most_recent_cycle, = sorted(records, key=cmp_to_key(sort_cycle), reverse=True)[:1]
         month = to_date(most_recent_cycle)
         cycles = generate_cycles(now().replace(years=-2), month)
         cycles.reverse()
