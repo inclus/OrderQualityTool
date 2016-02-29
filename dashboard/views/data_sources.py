@@ -244,14 +244,16 @@ class StablePatientVolumesDataSource(TwoCycleDataSource):
 
     def build_rows(self, check, records):
         rows = []
-        for consumption in records:
-            rows.append({COLUMN: consumption.formulation, IS_HEADER: True})
-            tot = 0
-            for field in check.fields:
+        total = 0
+        for field in check.fields:
+            value_total = 0
+            for consumption in records:
                 value = getattr(consumption, field)
-                tot = int(value)
-                rows.append({COLUMN: FIELD_NAMES.get(field), VALUE: value})
-            rows.append({COLUMN: TOTAL, VALUE: tot, IS_HEADER: True})
+                current_value = int(value)
+                value_total += current_value
+                total += current_value
+            rows.append({COLUMN: FIELD_NAMES.get(field), VALUE: value_total})
+        rows.append({COLUMN: TOTAL, VALUE: total, IS_HEADER: True})
         return rows
 
     def get_queryset(self, check_combination, cycle, score):
