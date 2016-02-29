@@ -13,7 +13,7 @@ from dashboard.data.negatives import NegativeNumbersQualityCheck
 from dashboard.data.nn import NNRTICURRENTADULTSCheck, NNRTINewAdultsCheck, NNRTINEWPAEDCheck
 from dashboard.data.nn import NNRTICURRENTPAEDCheck
 from dashboard.data.utils import facility_has_single_order
-from dashboard.helpers import YES, get_prev_cycle
+from dashboard.helpers import YES, get_prev_cycle, WEB
 from dashboard.models import CycleFormulationScore, Score, Cycle, Consumption, AdultPatientsRecord, PAEDPatientsRecord, MultipleOrderFacility
 
 
@@ -39,12 +39,12 @@ def persist_records(locs, model, collection, cycle):
         warehouse = facility.get('Warehouse', None)
         for r in records:
             c = model(
-                    name=facility_name,
-                    ip=ip,
-                    district=district,
-                    warehouse=warehouse,
-                    cycle=cycle,
-                    **r
+                name=facility_name,
+                ip=ip,
+                district=district,
+                warehouse=warehouse,
+                cycle=cycle,
+                **r
             )
             adult_records.append(c)
     model.objects.filter(cycle=cycle).delete()
@@ -58,11 +58,11 @@ def build_mof(report):
         district = facility.get('District', None)
         warehouse = facility.get('Warehouse', None)
         return MultipleOrderFacility(
-                cycle=report.cycle,
-                name=facility_name,
-                ip=ip,
-                district=district,
-                warehouse=warehouse)
+            cycle=report.cycle,
+            name=facility_name,
+            ip=ip,
+            district=district,
+            warehouse=warehouse)
 
     return func
 
@@ -131,17 +131,17 @@ def persist_scores(report):
     scores = list()
     for facility in report.locs:
         s = Score(
-                name=facility.get('name', None),
-                ip=facility.get('IP', None),
-                district=facility.get('District', None),
-                warehouse=facility.get('Warehouse', None),
-                cycle=report.cycle,
-                fail_count=0,
-                pass_count=0)
+            name=facility.get('name', None),
+            ip=facility.get('IP', None),
+            district=facility.get('District', None),
+            warehouse=facility.get('Warehouse', None),
+            cycle=report.cycle,
+            fail_count=0,
+            pass_count=0)
         for key, value in facility['scores'].items():
             setattr(s, key, value)
             for f, result in value.items():
-                if result == YES:
+                if result in [YES, WEB]:
                     s.pass_count += 1
                 else:
                     s.fail_count += 1

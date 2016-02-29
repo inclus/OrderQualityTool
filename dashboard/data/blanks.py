@@ -62,11 +62,17 @@ class WebBasedCheck(QCheck):
     combinations = [{NAME: DEFAULT}]
 
     def for_each_facility(self, facility, no, not_reporting, yes, combination):
-        result = NO if facility[WEB_PAPER].strip() != 'Web' else YES
-        if result == NO:
-            no += 1
+        value = facility[WEB_PAPER].strip()
+        if value and value in [WEB, PAPER]:
+            result = value
         else:
+            result = NOT_REPORTING
+        if result == PAPER:
+            no += 1
+        elif result == WEB:
             yes += 1
+        else:
+            not_reporting += 1
         return result, no, not_reporting, yes
 
 

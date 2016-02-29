@@ -43,7 +43,7 @@ class ScoresTableView(BaseDatatableView):
         return data
 
     def render_column(self, row, column):
-        display_text = {YES: PASS, NO: FAIL, NOT_REPORTING: N_A}
+        display_text = {YES: PASS, NO: FAIL, NOT_REPORTING: N_A, PAPER: PAPER.upper(), WEB: WEB.upper()}
         default_columns = [REPORTING,
                            WEB_BASED,
                            MULTIPLE_ORDERS,

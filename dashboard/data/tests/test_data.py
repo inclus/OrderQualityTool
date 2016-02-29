@@ -12,6 +12,8 @@ from dashboard.data.negatives import NegativeNumbersQualityCheck
 from dashboard.data.utils import clean_name, get_patient_total, get_consumption_totals, \
     values_for_records
 from dashboard.helpers import *
+from dashboard.models import Score
+from dashboard.tasks import persist_scores
 
 
 class FakeReport():
@@ -64,32 +66,35 @@ class DataTestCase(TestCase):
     def test_values_for_records(self):
         assert values_for_records([NEW], [{NEW: 10, EXISTING: 12}, {NEW: None, EXISTING: 12}]) == [10, None]
 
+    def test_web_based_results(self):
+        file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', 'tests', 'fixtures',
+                                 "new_format.xlsx")
+        report = FreeFormReport(file_path, "May - Jun").load()
+        report.cycle = "Jul - Aug 2015"
+        cases = [
+            {'test': WebBasedCheck, 'expected': 96.0, 'score': WEB}
+        ]
+        for case in cases:
+            result = case['test'](report).run()
+            persist_scores(report)
+            self.assertEquals(report.locs[0]['scores'][WEB_BASED][DEFAULT], WEB)
+            self.assertEquals(Score.objects.count(), 24)
+            self.assertEquals(Score.objects.all()[0].WEB_BASED[DEFAULT], WEB)
+
     def test_blanks(self):
         file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', 'tests', 'fixtures',
                                  "new_format.xlsx")
         report = FreeFormReport(file_path, "May Jun").load()
         report.cycle = "Jul - Aug 2015"
-        cases = [{'test': BlanksQualityCheck, 'expected': 8.0},
-                 {'test': MultipleCheck, 'expected': 80.0},
-                 {'test': IsReportingCheck, 'expected': 96.0},
-                 {'test': WebBasedCheck, 'expected': 96.0}
+        cases = [
+            {'test': BlanksQualityCheck, 'expected': 8.33, 'score': YES},
+                 {'test': MultipleCheck, 'expected': 79.17, 'score': YES},
+                 {'test': IsReportingCheck, 'expected': 100.0, 'score': YES},
+                 {'test': WebBasedCheck, 'expected': 100.0, 'score': YES}
                  ]
         for case in cases:
             result = case['test'](report).run()['DEFAULT']
-            self.assertEquals(result[YES], case['expected'])
-
-    def test_publishing_scores(self):
-        file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', 'tests', 'fixtures',
-                                 "new_format.xlsx")
-        report = FreeFormReport(file_path, "May Jun").load()
-        cases = [{'test': BlanksQualityCheck, 'expected': 8.0},
-                 {'test': MultipleCheck, 'expected': 80.0},
-                 {'test': IsReportingCheck, 'expected': 96.0},
-                 {'test': WebBasedCheck, 'expected': 96.0}
-                 ]
-        for case in cases:
-            result = case['test'](report).run()['DEFAULT']
-            self.assertEquals(result[YES], case['expected'])
+            self.assertAlmostEqual(result[case['score']], case['expected'], 2)
 
     def xtest_calculate_score(self):
         file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', 'tests', 'fixtures',
@@ -199,7 +204,6 @@ class GuidelineAdherenceAdult1LTestCase(TestCase):
         }
         check = GuidelineAdherenceCheckAdult1L(report)
         assert check.run()['DEFAULT']['YES'] == 100
-
 
 
 class TestDIFFERENTORDERSOVERTIMECheck(TestCase):
