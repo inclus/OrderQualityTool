@@ -44,7 +44,7 @@ class FreeFormReport():
         return cycle
 
     def get_workbook(self):
-        return load_workbook(self.path)
+        return load_workbook(self.path, read_only=True, use_iterators=True)
 
     def get_value(self, row, i):
         if i <= len(row):
