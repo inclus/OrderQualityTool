@@ -39,6 +39,8 @@ $(document).ready(function() {
     $(tableId).on("draw.dt", function() {
         $("td:contains('PASS')").addClass("score_PASS");
         $("td:contains('FAIL')").addClass("score_FAIL");
+        $("td:contains('WEB')").addClass("score_WEB");
+        $("td:contains('PAPER')").addClass("score_FAIL");
     });
     var selectIds = [
         "#district_select",
@@ -123,9 +125,9 @@ $(document).ready(function() {
             var url = "/api/table/scores/detail/" + id + "/" +
                 col;
             var success = function(html) {
-                    var detailPageId = "#score_detail";
-                    $(detailPageId).html(html);
-                    $("#score_detail").modal();
+                var detailPageId = "#score_detail";
+                $(detailPageId).html(html);
+                $("#score_detail").modal();
             };
             $.ajax({
                 url: url,
