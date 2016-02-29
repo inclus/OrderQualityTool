@@ -191,10 +191,10 @@ TEST_NAMES = {
     ORDER_FORM_FREE_OF_GAPS: "NO BLANKS: If the facility reported, is the whole order form free of blanks?",
     ORDER_FORM_FREE_OF_NEGATIVE_NUMBERS: "NO NEGATIVES: Order free of negative inputs?",
     DIFFERENT_ORDERS_OVER_TIME: "NON-REPEATING ORDERS: Does the facility avoid repeating the same orders in consecutive cycles?",
-    CLOSING_BALANCE_MATCHES_OPENING_BALANCE: "Does Opening  balance of the cycle = Closing balance from the previous one?",
-    CONSUMPTION_AND_PATIENTS: "CONSUMPTION AND PATIENTS: Do consumption volumes tally with corresponding patient regimen volumes (i.e. they are within 30% of each other)?",
-    STABLE_CONSUMPTION: "STABLE CONSUMPTION: Is total consumption stable from one cycle to the next (i.e. less than 50% growth or decline from one cycle to the next)?",
-    WAREHOUSE_FULFILMENT: "WAREHOUSE FULFILMENT: Does volume ordered = volume delivered in following cycle?",
+    CLOSING_BALANCE_MATCHES_OPENING_BALANCE: "OPENING = CLOSING: Opening balance = Closing balance from the previous cycle?",
+    CONSUMPTION_AND_PATIENTS: "VOLUME TALLY: Consumption and patient volumes within 30%?",
+    STABLE_CONSUMPTION: "STABLE CONSUMPTION: Consumption changes by less than 50% vs previous cycle?",
+    WAREHOUSE_FULFILMENT: "WAREHOUSE FULFILMENT: Volume delivered = Volume ordered in previous cycle?",
     STABLE_PATIENT_VOLUMES: "STABLE PATIENT VOLUMES: Are total patient numbers stable from one cycle to the next?",
     GUIDELINE_ADHERENCE_PAED_1L: "GUIDELINE ADHERENCE (PAED 1L): 80%+ estimated new patients on ABC formulations?",
     GUIDELINE_ADHERENCE_ADULT_2L: "GUIDELINE ADHERENCE (ADULT 2L): 73%+ estimated new patients on ATV/r formulations?",
@@ -202,11 +202,10 @@ TEST_NAMES = {
     REPORTING: "REPORTING",
     WEB_BASED: "WEB_BASED",
     MULTIPLE_ORDERS: "DUPLICATE ORDERS: Facilities that submitted more than one order over the cycle",
-    NNRTI_NEW_PAED: "NRTI vs NNRTI/PI VOLUMES (ESTIMATED NEW PAED): Do total Estimated New Paed NRTI patient volumes tally with total NNRTI & PI patient volumes?",
-    NNRTI_NEW_ADULTS: "NRTI vs NNRTI/PI VOLUMES (ESTIMATED NEW ADULTS): Do total Estimated New Adult NRTI patient volumes tally with total NNRTI & PI patient volumes?",
-    NNRTI_CURRENT_PAED: "NRTI vs NNRTI/PI VOLUMES (CURRENT PAED): Do total current Paed NRTI patient volumes tally with total NNRTI & PI patient volumes?",
-    NNRTI_CURRENT_ADULTS: "NRTI vs NNRTI/PI VOLUMES (CURRENT ADULTS): Do total current Adult NRTI patient volumes tally with total NNRTI & PI patient volumes?"
-}
+    NNRTI_NEW_PAED: "NRTI vs NNRTI/PI patient volumes(PAED - NEW):Differ by <30%?",
+    NNRTI_NEW_ADULTS: "NRTI vs NNRTI/PI patient volumes(ADULT - NEW) Differ by <30%?",
+    NNRTI_CURRENT_PAED: "NRTI vs NNRTI/PI patient volumes (PAED - CURRENT): Differ by <30%?",
+    NNRTI_CURRENT_ADULTS: "NRTI and NNRTI/PI patient volumes(ADULT - CURRENT): Differ by <30%?"}
 
 
 def get_prev_cycle(cycle):
