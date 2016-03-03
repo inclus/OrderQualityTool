@@ -132,7 +132,7 @@ class ScoreDetailsView(View):
             NNRTI_CURRENT_ADULTS: NNRTIDataSource,
             NNRTI_CURRENT_PAED: NNRTIDataSource
         }
-        scores = {YES: "Pass", NO: "Fail", NOT_REPORTING: "N/A"}
+        scores = {YES: "Pass", NO: "Fail", NOT_REPORTING: "N/A", PAPER: PAPER, WEB: WEB}
         combination = request.GET.get('combination', DEFAULT)
         column = int(column)
         score = Score.objects.get(id=id)
