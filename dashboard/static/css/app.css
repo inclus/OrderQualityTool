@@ -7177,9 +7177,6 @@ hr {
   color: #9B9B9B;
   letter-spacing: 1px;
 }
-.limit-table {
-  overflow: scroll;
-}
 .modal-content .table-condensed tr td {
   font-size: 0.8em;
 }
