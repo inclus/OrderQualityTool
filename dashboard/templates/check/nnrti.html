@@ -18,7 +18,7 @@
                     <tr>
                         <td>{{ item.column }}</td>
                         {% for header in data.data_field_1.headers %}
-                            <th>{{ item|lookup:header }}</th>
+                            <th>{{ item|lookup:header}}</th>
                         {% endfor %}
                     </tr>
                 {% endfor %}
@@ -42,7 +42,7 @@
                     <tr>
                         <td>{{ item.column }}</td>
                         {% for header in data.data_field_2.headers %}
-                            <th>{{ item|lookup:header }}</th>
+                            <th>{{ item|lookup:header}}</th>
                         {% endfor %}
                     </tr>
                 {% endfor %}
@@ -67,7 +67,7 @@
                     {% for item in data.data_field_1_ratios.rows %}
                         <tr>
                             <td>{{ item.column }}</td>
-                            <th>{{ item.value|floatformat:-2 }}</th>
+                            <th>{{ item.value|floatformat:-1 }}</th>
                         </tr>
                     {% endfor %}
 
@@ -87,7 +87,7 @@
                     {% for item in data.data_field_2_ratios.rows %}
                         <tr>
                             <td>{{ item.column }}</td>
-                            <th>{{ item.value|floatformat:-2 }}</th>
+                            <th>{{ item.value|floatformat:-1 }}</th>
                         </tr>
                     {% endfor %}
 
@@ -111,7 +111,7 @@
                     {% for item in data.data_field_1_calculated.rows %}
                         <tr>
                             <td>{{ item.column }}</td>
-                            <th>{{ item.value|floatformat:-2 }}</th>
+                            <th>{{ item.value|floatformat:-1 }}</th>
                         </tr>
                     {% endfor %}
 
@@ -131,7 +131,7 @@
                     {% for item in data.data_field_2_calculated.rows %}
                         <tr>
                             <td>{{ item.column }}</td>
-                            <th>{{ item.value|floatformat:-2 }}</th>
+                            <th>{{ item.value|floatformat:-1 }}</th>
                         </tr>
                     {% endfor %}
 
@@ -144,7 +144,7 @@
         <hr>
         <div class="final-score col-md-offset-3 col-md-2">
             <span class="-up">
-                 {{ data.data_field_1_COUNT|floatformat:-2 }}
+                 {{ data.data_field_1_COUNT|floatformat:-1 }}
             </span>
             <span class="-down">
                  NNRTI COUNT
@@ -152,7 +152,7 @@
         </div>
         <div class="final-score col-md-2">
             <span class="-up">
-                {{ data.FINAL_SCORE|floatformat:-2 }} %
+                {{ data.FINAL_SCORE|floatformat:-1 }} %
             </span>
             <span class="-down">
                 DIFFERENCE (ABSOLUTE)
@@ -160,7 +160,7 @@
         </div>
         <div class="final-score col-md-2">
             <span class="-up">
-                 {{ data.data_field_2_COUNT|floatformat:-2 }}
+                 {{ data.data_field_2_COUNT|floatformat:-1 }}
             </span>
             <span class="-down">
                 NNRTI & PIS COUNT
