@@ -320,7 +320,7 @@ class GuidelineAdherenceDataSource(CheckDataSource):
         if table_total == 0:
             score = 0
         else:
-            score = float(df1_sum) / float(table_total)
+            score = (float(df1_sum) * 100) / float(table_total)
         data["score"] = score
         return data
 
