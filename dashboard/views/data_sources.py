@@ -341,7 +341,7 @@ class NNRTIDataSource(CheckDataSource):
     }
 
     def get_context(self, score, test, combination):
-        nnrti_titles = {DF1: "NNRTI", DF2: "NNRTI/PI"}
+        nnrti_titles = {DF1: "NRTI", DF2: "NNRTI/PI"}
         context = defaultdict(dict)
         context["main_title"] = "RAW ORDER DATA"
         check_config = self.checks.get(test).get(CHECK).combinations[0]
