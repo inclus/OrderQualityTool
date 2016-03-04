@@ -17,4 +17,5 @@ omit =
     *migrations*
     *local_settings*
     *wsgi*
+    *dashboard/management*
 ignore_errors = True

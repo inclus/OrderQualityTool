@@ -21,6 +21,13 @@ def get_combination(combinations, name):
     return pydash.select(combinations, lambda x: x[NAME] == name)[0]
 
 
+def get_int(value):
+    try:
+        return int(value), True
+    except (ValueError, TypeError):
+        return value, False
+
+
 class CheckDataSource():
     def __init__(self):
         pass
@@ -50,7 +57,8 @@ class NegativesCheckDataSource(CheckDataSource):
             formulation_data = {NAME: consumption.formulation}
             records = []
             for field in check.fields:
-                records.append({COLUMN: FIELD_NAMES.get(field), VALUE: getattr(consumption, field)})
+                raw_value, valid = get_int(getattr(consumption, field))
+                records.append({COLUMN: FIELD_NAMES.get(field), VALUE: raw_value})
             formulation_data['records'] = records
             tables.append(formulation_data)
         return {"main_title": "RAW ORDER DATA", "formulations": tables}
@@ -111,9 +119,10 @@ class ConsumptionAndPatientsDataSource(CheckDataSource):
             records = []
             sum = 0
             for field in check_combination.get(FIELDS, []):
-                value = getattr(consumption, field)
-                sum += int(value)
-                records.append({COLUMN: FIELD_NAMES.get(field), VALUE: value})
+                int_value, valid_int = get_int(getattr(consumption, field))
+                if valid_int:
+                    sum += int_value
+                records.append({COLUMN: FIELD_NAMES.get(field), VALUE: int_value})
             records.append({COLUMN: TOTAL, VALUE: sum, IS_HEADER: True})
 
             formulation_data['records'] = records
@@ -127,9 +136,10 @@ class ConsumptionAndPatientsDataSource(CheckDataSource):
             records = []
             sum = 0
             for field in [NEW, EXISTING]:
-                value = getattr(pr, field)
-                sum += int(value)
-                records.append({COLUMN: FIELD_NAMES.get(field), VALUE: value})
+                int_value, valid_int = get_int(getattr(pr, field))
+                if valid_int:
+                    sum += int(int_value)
+                records.append({COLUMN: FIELD_NAMES.get(field), VALUE: int_value})
             records.append({COLUMN: TOTAL, VALUE: sum, IS_HEADER: True})
             formulation_data['records'] = records
             patient_tables.append(formulation_data)
@@ -211,8 +221,8 @@ class ClosingBalanceMatchesOpeningBalanceDataSource(CheckDataSource):
         rows = []
         for consumption in consumption_records:
             for field in fields:
-                value = getattr(consumption, field)
-                rows.append({COLUMN: FIELD_NAMES.get(field), VALUE: value})
+                int_value, valid_int = get_int(getattr(consumption, field))
+                rows.append({COLUMN: FIELD_NAMES.get(field), VALUE: int_value})
         tables[0][ROWS] = rows
         return tables
 
@@ -229,9 +239,10 @@ class StableConsumptionDataSource(TwoCycleDataSource):
         for consumption in consumption_records:
             tot = 0
             for field in check.fields:
-                value = getattr(consumption, field)
-                tot += int(value)
-                rows.append({COLUMN: FIELD_NAMES.get(field), VALUE: value})
+                int_value, valid_int = get_int(getattr(consumption, field))
+                if valid_int:
+                    tot += int_value
+                rows.append({COLUMN: FIELD_NAMES.get(field), VALUE: int_value})
             rows.append({COLUMN: TOTAL, VALUE: tot, IS_HEADER: True})
         return rows
 
@@ -248,10 +259,10 @@ class StablePatientVolumesDataSource(TwoCycleDataSource):
         for field in check.fields:
             value_total = 0
             for consumption in records:
-                value = getattr(consumption, field)
-                current_value = int(value)
-                value_total += current_value
-                total += current_value
+                int_value, valid_int = get_int(getattr(consumption, field))
+                if valid_int:
+                    value_total += int_value
+                    total += int_value
             rows.append({COLUMN: FIELD_NAMES.get(field), VALUE: value_total})
         rows.append({COLUMN: TOTAL, VALUE: total, IS_HEADER: True})
         return rows
@@ -304,11 +315,12 @@ class GuidelineAdherenceDataSource(CheckDataSource):
                 row = {COLUMN: record.formulation}
                 part_sum = 0
                 for field in check_combination.get(FIELDS):
-                    value = getattr(record, field)
-                    part_sum += int(value)
+                    int_value, valid_int = get_int(getattr(record, field))
                     header = FIELD_NAMES.get(field)
-                    row[header] = value
-                    totals[header] += int(value)
+                    if valid_int:
+                        part_sum += int(int_value)
+                        totals[header] += int(int_value)
+                    row[header] = int_value
                 row["sum"] = part_sum
                 totals["sum"] += part_sum
                 table[ROWS].append(row)
@@ -370,11 +382,11 @@ class NNRTIDataSource(CheckDataSource):
 
                 row_sum = 0
                 for field in check_fields:
-                    value = getattr(record, field)
-                    if value:
-                        row_sum += int(value)
+                    int_value, valid_int = get_int(getattr(record, field))
+                    if valid_int:
+                        row_sum += int(int_value)
                     header = get_field_name(field)
-                    row[header] = value
+                    row[header] = int_value
                 row[TOTAL] = row_sum
                 context[part][ROWS].append(row)
                 combination_ratio = check_config.get(RATIO)
