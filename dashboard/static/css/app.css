@@ -7177,6 +7177,15 @@ hr {
   color: #9B9B9B;
   letter-spacing: 1px;
 }
+.modal-content table tr th.left {
+  text-align: left;
+}
+.modal-content table tr th.center {
+  text-align: center;
+}
+.modal-content table tr td {
+  text-align: left;
+}
 .modal-content .table-condensed tr td {
   font-size: 0.8em;
 }

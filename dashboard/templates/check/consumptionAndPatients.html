@@ -71,7 +71,7 @@
             {% for item in  data.packs %}
                 <tr>
                         {% if item.isHeader %}
-                            <th>{{ item.column }}</th>
+                            <th class="left">{{ item.column }}</th>
                             <th>{{ item.value }}</th>
                         {% else %}
                             <td>{{ item.column }}</td>
@@ -102,7 +102,7 @@
                 {% for item in data.consumption_totals %}
                     <tr>
                         {% if item.isHeader %}
-                            <th>{{ item.column }}</th>
+                            <th class="left">{{ item.column }}</th>
                             <th>{{ item.value }}</th>
                         {% else %}
                             <td>{{ item.column }}</td>
