@@ -2,6 +2,11 @@ $(document).ready(function() {
     var tableId = "#score-tables";
 
     var oTable = $(tableId).DataTable({
+        "dom": '<"top"f>rt<"bottom"lp><"clear">',
+        language: {
+            search: "",
+            searchPlaceholder: "Search"
+        },
         "processing": true,
         "serverSide": true,
         "ordering": true,
@@ -17,6 +22,10 @@ $(document).ready(function() {
         "scrollX": "100%",
         "scrollCollapse": true,
         "bLengthChange": true,
+        "columnDefs": [{
+            "width": "90%",
+            "targets": 0
+        }],
         "ajax": {
             "url": "/api/table/scores",
             "type": "POST",
@@ -58,20 +67,23 @@ $(document).ready(function() {
                     for (var i = 0; i < value.length; i +=
                         1) {
                         tagsToDisplay.push({
-                            "value": value[i]
+                            "value": value[i],
+                            "name": key
                         });
                     };
                 } else {
                     tagsToDisplay.push({
-                        "value": value
+                        "value": value,
+                        "name": key
                     });
                 }
 
             }
         });
+
         var template =
             $.templates(
-                "{{for tags}}<span class='filter-tag'>{{:value}}</span>{{/for}}<a href='#' id='resetFilter' class='btn btn-sm reset-tag'>Reset</a>"
+                "{{for tags}}<span class='filter-tag'>{{:value}} <button type='button'  class='close close-tag' aria-label='Close' ><span aria-hidden='true' data-name='{{:name}}' data-value='{{:value}}'>&times;</span></button></span>{{/for}}<a href='#' id='resetFilter' class='btn btn-sm reset-tag'>Reset</a>"
             );
         var html = template.render({
             tags: tagsToDisplay
@@ -83,6 +95,23 @@ $(document).ready(function() {
                     .val();
                 $(id).select2("val", firstValue);
             });
+        });
+
+        $(".close-tag").click(function(ev) {
+            var name = $(ev.target).data("name");
+            var value = $(ev.target).data("value");
+            var selectId = "#" + name + "_select";
+            if (name == "district") {
+                var values = $(selectId).val();
+                var index = values.indexOf(value);
+                values.splice(index, 1);
+                $(selectId).select2().val(values).trigger("change");;
+            } else {
+                var firstValue = $(selectId + " option:first")
+                    .val();
+                $(selectId).select2("val", firstValue);
+            }
+
         });
 
     };

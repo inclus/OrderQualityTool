@@ -315,8 +315,16 @@ nav.with-flag {
 }
 .filter-tag {
   flex: 1;
-  padding: 5/@em;
+  padding: 1/@em;
   max-width: 10%;
+
+  button.close {
+    margin-top: 5px;
+    font-weight: 300;
+    line-height: 1;
+    color: #FFF;
+    opacity: 1;
+  }
 }
 .reset-tag {
   flex: 0.5;
@@ -390,6 +398,33 @@ hr {
     tr {
       td {
         font-size: 12/@em;
+      }
+    }
+  }
+}
+#score-tables_wrapper {
+  font-size: 14/@em;
+
+  .table-bordered > thead > tr > td, .table-bordered > tbody > tr > td, .table-bordered > tfoot > tr > td {
+    border: none;
+  }
+  .table {
+    tr {
+      td {
+        vertical-align: middle;
+      }
+    }
+  }
+  #score-tables_filter {
+    text-align: left;
+
+    label {
+      text-align: left;
+      margin-top: 5px;
+      margin-bottom: 0;
+
+      input {
+        margin: 0;
       }
     }
   }
