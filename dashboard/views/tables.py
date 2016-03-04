@@ -136,7 +136,7 @@ class ScoreDetailsView(View):
         combination = request.GET.get('combination', DEFAULT)
         column = int(column)
         score = Score.objects.get(id=id)
-        score_data = {'ip': score.ip, 'district': score.district, 'warehouse': score.warehouse, 'name': score.name, 'cycle': score.cycle}
+        score_data = {'ip': score.ip, 'district': score.district, 'warehouse': score.warehouse, 'name': score.name, 'cycle': score.cycle, 'combination': combination}
         has_result = column > 3
         response_data = {'score': score_data, 'has_result': has_result}
         template_name = "check/base.html"
