@@ -2,14 +2,14 @@ angular.module('dashboard').controller('MainChecksController', ['$scope',
     function($scope) {
         $scope.tests = [{
             "url": "orderFormFreeOfGaps",
-            "desc": "NO BLANKS: If the facility reported, is the whole order form free of blanks?",
+            "desc": "NO BLANKS: Order form free of blanks?",
             "hasRegimen": false,
             "hasChart": true,
             "testNumber": 3,
             "template": "/static/views/chart.html"
         }, {
             "url": "facilitiesMultiple",
-            "desc": "DUPLICATE ORDERS: Facilities that submitted more than one order over the cycle",
+            "desc": "MULTIPLE ORDERS: Submitted more than one order?",
             "hasRegimen": false,
             "hasChart": false,
             "hasCycle": true,
@@ -17,77 +17,77 @@ angular.module('dashboard').controller('MainChecksController', ['$scope',
             "template": "/static/views/table.html"
         }, {
             "url": "orderFormFreeOfNegativeNumbers",
-            "desc": "NO NEGATIVES: Is the order free of negative numbers?",
+            "desc": "NO NEGATIVES: Order free of negative inputs?",
             "hasRegimen": true,
             "hasChart": true,
             "testNumber": 5,
             "template": "/static/views/chart.html"
         }, {
             "url": "consumptionAndPatients",
-            "desc": "CONSUMPTION AND PATIENTS: Do consumption volumes tally with corresponding patient regimen volumes (i.e. they are within 30% of each other)?",
+            "desc": "VOLUME TALLY: Consumption and patient volumes within 30%?",
             "hasRegimen": true,
             "hasChart": true,
             "testNumber": 6,
             "template": "/static/views/chart.html"
         }, {
             "url": "differentOrdersOverTime",
-            "desc": "NON-REPEATING ORDERS: Does the facility avoid repeating the same orders in consecutive cycles?",
+            "desc": "NON-REPEATING: Order changes in consecutive cycles?",
             "hasRegimen": true,
             "hasChart": true,
             "testNumber": 7,
             "template": "/static/views/chart.html"
         }, {
             "url": "closingBalance",
-            "desc": "Does Opening  balance of the cycle = Closing balance from the previous one?",
+            "desc": "OPENING = CLOSING: Opening  balance = Closing balance from previous cycle?",
             "hasRegimen": true,
             "hasChart": true,
             "testNumber": 8,
             "template": "/static/views/chart.html"
         }, {
             "url": "stableConsumption",
-            "desc": "STABLE CONSUMPTION: Is total consumption stable from one cycle to the next (i.e. less than 50% growth or decline from one cycle to the next)?",
+            "desc": "STABLE CONSUMPTION: Consumption changes by less than 50% vs. previous cycle?",
             "hasRegimen": true,
             "hasChart": true,
             "testNumber": 9,
             "template": "/static/views/chart.html"
         }, {
             "url": "stablePatientVolumes",
-            "desc": "STABLE PATIENT VOLUMES: Are total patient numbers stable from one cycle to the next?",
+            "desc": "STABLE PATIENTS: Patient volumes change by less than 50% vs. previous cycle?",
             "hasRegimen": true,
             "hasChart": true,
             "testNumber": 11,
             "template": "/static/views/chart.html"
         }, {
             "url": "warehouseFulfilment",
-            "desc": "WAREHOUSE FULFILMENT: Does volume ordered = volume delivered in following cycle?",
+            "desc": "WAREHOUSE FULFILMENT: Volume delivered = volume ordered in previous cycle?",
             "hasRegimen": true,
             "hasChart": true,
             "testNumber": 10,
             "template": "/static/views/chart.html"
         }, {
             "url": "nnrtiCurrentAdults",
-            "desc": "NRTI vs NNRTI/PI VOLUMES (CURRENT ADULTS): Do total current Adult NRTI patient volumes tally with total NNRTI & PI patient volumes?",
+            "desc": "NRTI and NNRTI/PI patient volumes (ADULT - CURRENT): Differ by <30%?",
             "hasRegimen": false,
             "hasChart": true,
             "testNumber": 15,
             "template": "/static/views/chart.html"
         }, {
             "url": "nnrtiCurrentPaed",
-            "desc": "NRTI vs NNRTI/PI VOLUMES (CURRENT PAED): Do total current Paed NRTI patient volumes tally with total NNRTI & PI patient volumes?",
+            "desc": "NRTI and NNRTI/PI patient volumes (PAED - CURRENT): Differ by <30%?",
             "hasRegimen": false,
             "hasChart": true,
             "testNumber": 16,
             "template": "/static/views/chart.html"
         }, {
             "url": "nnrtiNewAdults",
-            "desc": "NRTI vs NNRTI/PI VOLUMES (ESTIMATED NEW ADULTS): Do total Estimated New Adult NRTI patient volumes tally with total NNRTI & PI patient volumes?",
+            "desc": "NRTI and NNRTI/PI patient volumes (ADULT - ESTIMATED NEW): Differ by <30%?",
             "hasRegimen": false,
             "hasChart": true,
             "testNumber": 17,
             "template": "/static/views/chart.html"
         }, {
             "url": "nnrtiNewPaed",
-            "desc": "NRTI vs NNRTI/PI VOLUMES (ESTIMATED NEW PAED): Do total Estimated New Paed NRTI patient volumes tally with total NNRTI & PI patient volumes?",
+            "desc": "NRTI and NNRTI/PI patient volumes (PAED - ESTIMATED NEW): Differ by <30%?",
             "hasRegimen": false,
             "hasChart": true,
             "testNumber": 18,
