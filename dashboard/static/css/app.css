@@ -6702,7 +6702,6 @@ body {
   padding-top: 90px;
   font-size: 15px;
   padding-bottom: 30px;
-  letter-spacing: 1.5px;
   font-weight: 400;
 }
 body input,
@@ -6717,7 +6716,8 @@ h2,
 h3,
 h4,
 h5,
-h6 {
+h6,
+th {
   letter-spacing: 1.5px;
 }
 .quality_test {
@@ -6916,7 +6916,6 @@ a.label-qdb:hover {
 .table-bordered td,
 .table-bordered th {
   text-align: center;
-  min-width: 110px;
 }
 .table-bordered .column-sum {
   border: none;
