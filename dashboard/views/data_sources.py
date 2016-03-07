@@ -25,6 +25,8 @@ def get_int(value):
     try:
         return int(value), True
     except (ValueError, TypeError):
+        if value is None:
+            return "", False
         return value, False
 
 
