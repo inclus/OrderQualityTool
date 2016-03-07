@@ -9,7 +9,7 @@
             <div id="tags" class="tags">
             </div>
         </div>
-        <div class="score_filters">
+        <div class="score_filters facility_filters">
             <select name="district" id="district_select" class="filter" multiple="multiple">
                 {% for district in districts %}
                     <option value="{{ district.district }}">{{ district.district }}</option>
@@ -41,6 +41,27 @@
         <div class="scores-table">
             <table class="table table-striped table-bordered table-condensed" cellspacing="0" width="100%" id="score-tables">
                 <thead>
+                 <!-- <tr>-->
+                    <!--<th colspan="4"></th>-->
+                    <!--<th class="calc-score">0</th>-->
+                    <!--<th class="calc-score">8</th>-->
+                    <!--<th class="calc-score">9</th>-->
+                    <!--<th class="calc-score">9</th>-->
+                    <!--<th class="calc-score">9</th>-->
+                    <!--<th class="calc-score">9</th>-->
+                    <!--<th class="calc-score">9</th>-->
+                    <!--<th class="calc-score">9</th>-->
+                    <!--<th class="calc-score">9</th>-->
+                    <!--<th class="calc-score">9</th>-->
+                    <!--<th class="calc-score">9</th>-->
+                    <!--<th class="calc-score">9</th>-->
+                    <!--<th class="calc-score">9</th>-->
+                    <!--<th class="calc-score">9</th>-->
+                    <!--<th class="calc-score">9</th>-->
+                    <!--<th class="calc-score">9</th>-->
+                    <!--<th class="calc-score">9</th>-->
+                    <!--<th class="calc-score">9</th>-->
+                  <!--</tr>-->
                 <tr>
                     <th>FACILITY</th>
                     <th>DISTRICT</th>
@@ -76,6 +97,7 @@
 {% endblock content %}
 {% block js %}
     <script type="text/javascript" src='{% static "vendor/select2/dist/js/select2.full.min.js" %}'></script>
+    <script type="text/javascript" src='{% static "vendor/multiple-select/multiple-select.js" %}'></script>
     <script type="text/javascript" src='{% static "vendor/jsrender/jsrender.min.js" %}'></script>
     <script type="text/javascript" src='{% static "js/scores_table.js" %}'></script>
 

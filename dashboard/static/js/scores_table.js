@@ -64,13 +64,17 @@ $(document).ready(function() {
         _.forIn(tags, function(value, key) {
             if (value) {
                 if (key == "district") {
+                  if (value.length < 5){
                     for (var i = 0; i < value.length; i +=
                         1) {
                         tagsToDisplay.push({
                             "value": value[i],
                             "name": key
                         });
-                    };
+                    }
+                  }else {
+                    tagsToDisplay.push({ "value": value.length + " districts", "name": "Districts"});
+                  }
                 } else {
                     tagsToDisplay.push({
                         "value": value,
@@ -105,7 +109,7 @@ $(document).ready(function() {
                 var values = $(selectId).val();
                 var index = values.indexOf(value);
                 values.splice(index, 1);
-                $(selectId).select2().val(values).trigger("change");;
+                $(selectId).val(values).multipleSelect("refresh");
             } else {
                 var firstValue = $(selectId + " option:first")
                     .val();
@@ -119,8 +123,9 @@ $(document).ready(function() {
     _.forEach(selectIds, function(id) {
         var name = $(id).attr("name");
         if (id == "#district_select") {
-            $(id).select2({
-                placeholder: "ALL DISTRICTS"
+            $(id).multipleSelect({
+                placeholder: "ALL DISTRICTS",
+                tags: false
             });
         } else {
             $(id).select2();

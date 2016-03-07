@@ -6899,6 +6899,10 @@ a.label-qdb:hover {
     width: 2.5%;
   }
 }
+.spacer h5 {
+  margin-top: 6px;
+  margin-bottom: 0px;
+}
 @media (max-width: 768px) {
   .spacer {
     display: none;
@@ -7103,7 +7107,7 @@ nav.with-flag {
   -webkit-flex: 1;
   -ms-flex: 1;
   flex: 1;
-  padding: 0.06666667em;
+  padding: 0em;
   max-width: 10%;
 }
 .filter-tag button.close {
@@ -7217,4 +7221,30 @@ hr {
 }
 #score-tables_wrapper #score-tables_filter label input {
   margin: 0;
+}
+.score_filters {
+  font-size: 0.86666667em;
+}
+.score_filters .select2-container .select2-selection--multiple,
+.score_filters .select2-container .select2-selection--single {
+  min-height: 28px;
+}
+button.ms-choice {
+  border-radius: 0px;
+  height: 28px;
+}
+#district_select {
+  height: 28px;
+}
+.range_filter select.form-control {
+  height: 28px;
+  padding-top: 0px;
+  padding-bottom: 0px;
+}
+.facility_filters {
+  margin-bottom: 40px;
+}
+.calc-score {
+  background-color: #27ae60;
+  color: white;
 }

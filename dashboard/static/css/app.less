@@ -127,7 +127,10 @@ a.label-qdb {
 }
 .spacer {
   .make-md-column(0.3);
-
+  h5 {
+    margin-top: 6px;
+    margin-bottom: 0px;
+  }
   @media (max-width:@screen-sm) {
     display: none
   }
@@ -315,7 +318,7 @@ nav.with-flag {
 }
 .filter-tag {
   flex: 1;
-  padding: 1/@em;
+  padding: 0/@em;
   max-width: 10%;
 
   button.close {
@@ -428,4 +431,35 @@ hr {
       }
     }
   }
+}
+.score_filters {
+  font-size: 13/@em;
+  .select2-container{
+    .select2-selection--multiple, .select2-selection--single{
+      min-height: 28px;
+    }
+  }
+}
+
+button.ms-choice {
+  border-radius: 0px;
+  height: 28px;
+}
+
+#district_select{
+  height: 28px;
+}
+.range_filter{
+  select.form-control{
+    height: 28px;
+    padding-top: 0px;
+    padding-bottom: 0px;
+  }
+}
+.facility_filters{
+  margin-bottom: 40px;
+}
+.calc-score {
+  background-color: @chai-green;
+  color: white;
 }
