@@ -348,16 +348,18 @@ class NNRTIDataSource(CheckDataSource):
         return "check/nnrti.html"
 
     checks = {
-        NNRTI_NEW_PAED: {CHECK: NNRTINEWPAEDCheck},
-        NNRTI_NEW_ADULTS: {CHECK: NNRTINewAdultsCheck},
-        NNRTI_CURRENT_ADULTS: {CHECK: NNRTICURRENTADULTSCheck},
-        NNRTI_CURRENT_PAED: {CHECK: NNRTICURRENTPAEDCheck},
+        NNRTI_NEW_PAED: {CHECK: NNRTINEWPAEDCheck, "sub": "Estimated New Patients"},
+        NNRTI_NEW_ADULTS: {CHECK: NNRTINewAdultsCheck, "sub": "Estimated New Patients"},
+        NNRTI_CURRENT_ADULTS: {CHECK: NNRTICURRENTADULTSCheck, "sub": "Consumption"},
+        NNRTI_CURRENT_PAED: {CHECK: NNRTICURRENTPAEDCheck, "sub": "Consumption"},
     }
 
     def get_context(self, score, test, combination):
         nnrti_titles = {DF1: "NRTI", DF2: "NNRTI/PI"}
         context = defaultdict(dict)
         context["main_title"] = "RAW ORDER DATA"
+        sub_title = self.checks.get(test).get("sub")
+        context["sub_title"] = sub_title
         check_config = self.checks.get(test).get(CHECK).combinations[0]
 
         has_other = OTHER in check_config
