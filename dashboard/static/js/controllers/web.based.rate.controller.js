@@ -11,10 +11,21 @@ angular.module('dashboard').controller('WebBasedRateController', ['$scope', 'Rep
                 $scope.options = {
                     data: values,
                     chart: {
+                      legend: {
+                        position: 'right'
+                      },
+                      grid: {
+                            y: {
+                                  show: true
+                            }
+                        },
                         axis: {
                             y: {
                                 max: 100,
                                 min: 0,
+                                tick: {
+                                  count: 5
+                                },
                                 padding: {
                                     top: 0,
                                     bottom: 0
@@ -31,6 +42,7 @@ angular.module('dashboard').controller('WebBasedRateController', ['$scope', 'Rep
                             axis: 'y',
                             type: 'line',
                             name: 'Web',
+                            color: '#27ae60',
                             dataType: 'numeric',
                             displayFormat: d3.format(".1f")
                         },
@@ -38,6 +50,7 @@ angular.module('dashboard').controller('WebBasedRateController', ['$scope', 'Rep
                             axis: 'y',
                             type: 'line',
                             name: 'Paper',
+                            color: 'red',
                             dataType: 'numeric',
                             displayFormat: d3.format(".1f")
                         }

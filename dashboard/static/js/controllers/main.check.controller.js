@@ -153,10 +153,21 @@ angular.module('dashboard').controller('LineChartController', ['$scope', 'Report
                 $scope.options = {
                     data: values,
                     chart: {
+                        legend: {
+                          position: 'right'
+                        },
+                        grid:{
+                          y:{
+                            show: true
+                          }
+                        },
                         axis: {
                             y: {
                                 max: 100,
                                 min: 0,
+                                tick: {
+                                  count: 5
+                                },
                                 padding: {
                                     top: 0,
                                     bottom: 0
@@ -169,19 +180,19 @@ angular.module('dashboard').controller('LineChartController', ['$scope', 'Report
                             axis: 'x',
                             type: 'line'
                         },
-                        no: {
-                            axis: 'y',
-                            type: 'line',
-                            name: 'Fail',
-                            color: 'red',
-                            dataType: 'numeric',
-                            displayFormat: d3.format(".1f")
-                        },
                         yes: {
                             axis: 'y',
                             type: 'line',
                             name: 'Pass',
                             color: '#27ae60',
+                            dataType: 'numeric',
+                            displayFormat: d3.format(".1f")
+                        },
+                        no: {
+                            axis: 'y',
+                            type: 'line',
+                            name: 'Fail',
+                            color: 'red',
                             dataType: 'numeric',
                             displayFormat: d3.format(".1f")
                         },

@@ -6785,6 +6785,7 @@ th {
   color: #1e8449;
 }
 .test-area {
+  padding-top: 30px;
   position: relative;
   min-height: 1px;
   padding-left: 15px;
@@ -7246,4 +7247,10 @@ button.ms-choice {
 .calc-score {
   background-color: #27ae60;
   color: white;
+}
+.c3-line.c3-line-web,
+.c3-line.c3-line-pass,
+.c3-line.c3-line-yes,
+.c3-line.c3-line-reporting {
+  stroke-width: 3px;
 }
