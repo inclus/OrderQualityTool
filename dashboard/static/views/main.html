@@ -77,7 +77,7 @@
         <table class="table table-bordered" ng-table="worstTableParams">
             <tr>
                 <th>{{worstPerforming}}</th>
-                <th>Rate</th>
+                <th>Average Number of Fails</th>
             </tr>
             <tr ng-repeat="district in $data">
                 <td>{{district.name}}</td>
@@ -94,7 +94,6 @@
                     <ul class="dropdown-menu">
                          <li ng-repeat="level in rankingLevels"><a ng-click="selectBest(level)">{{level}}</a></li>
                     </ul>
-                   
                 </div>  
                  <a class="pull-right label label-qdb" ng-click="downloadBest()">CSV</a>
 
@@ -104,7 +103,7 @@
         <table class="table table-bordered" ng-table="bestTableParams">
             <tr>
                 <th> {{bestPerforming}} </th>
-                <th>Percentage of</th>
+                <th>Average Number of Passes</th>
             </tr>
             <tr ng-repeat="district in $data">
                 <td>{{district.name}}</td>
