@@ -1,5 +1,5 @@
-angular.module('dashboard').controller('GuidelineAdherenceController', ['$scope', 'ReportService',
-    function($scope, ReportService) {
+angular.module('dashboard').controller('GuidelineAdherenceController', ['$scope', 'ReportService', '$rootScope',
+    function($scope, ReportService, $rootScope) {
         $scope.guidelineType = 'Adult 1L';
         var update = function(start, end) {
             ReportService.getDataForTest('guidelineAdherence', {
@@ -77,6 +77,7 @@ angular.module('dashboard').controller('GuidelineAdherenceController', ['$scope'
         $scope.$watch('guidelineType', function(guidelineType) {
             if (guidelineType) {
                 update($scope.startCycle, $scope.endCycle);
+                $rootScope.$broadcast('GUIDELINE_TYPE', guidelineType);
             }
 
         }, true);

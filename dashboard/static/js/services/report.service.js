@@ -7,8 +7,8 @@ angular.module('services').service('ReportService', ['$http',
             return $http.get('/api/cycles').then(handleResponse);
         };
 
-        var getMetrics = function() {
-            return $http.get('/api/test/metrics').then(handleResponse);
+        var getMetrics = function(guideline_type) {
+            return $http.get('/api/test/metrics', {params:{adh: guideline_type}}).then(handleResponse);
         };
 
         var getBestRankings = function(level, selectedCycle) {

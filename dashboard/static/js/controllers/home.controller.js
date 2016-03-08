@@ -41,7 +41,7 @@ angular.module('dashboard').controller('HomeController', ['$scope', 'ReportServi
             });
             var url = "/api/test/ranking/best/csv?" + query;
             downloadURL(url, 'best.csv');
-        }
+        };
 
         $scope.downloadWorst = function() {
             var query = $httpParamSerializer({
@@ -50,7 +50,7 @@ angular.module('dashboard').controller('HomeController', ['$scope', 'ReportServi
             });
             var url = "/api/test/ranking/worst/csv?" + query;
             downloadURL(url, 'worst.csv');
-        }
+        };
 
         var updateWorstList = function() {
             ReportService.getWorstRankings($scope.worstPerforming, $scope.selectedCycle).then(function(data) {
@@ -89,20 +89,26 @@ angular.module('dashboard').controller('HomeController', ['$scope', 'ReportServi
             updateBestList();
         });
 
-
         $scope.$watch('worstPerforming', function() {
             updateWorstList();
         });
 
-        ReportService.getMetrics().then(function(data) {
+        var setupMetrics = function(guidelineType){
+          ReportService.getMetrics(guidelineType).then(function(data) {
             $scope.webRate = data.webBased;
             $scope.reportingRate = data.reporting;
             $scope.adherenceRate = data.adherence;
-        });
+          });
+        };
+
+        $scope.$on('GUIDELINE_TYPE', function(event, data) { setupMetrics(data); });
+
+        setupMetrics();
+
         ReportService.getRankingsAccess().then(function(data) {
-            $scope.rankingLevels = data.values;
-            $scope.bestPerforming = $scope.rankingLevels[0];
-            $scope.worstPerforming = $scope.rankingLevels[0];
+          $scope.rankingLevels = data.values;
+          $scope.bestPerforming = $scope.rankingLevels[0];
+          $scope.worstPerforming = $scope.rankingLevels[0];
         });
     }
-])
+]);

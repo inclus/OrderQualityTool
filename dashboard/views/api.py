@@ -136,18 +136,20 @@ class CyclesView(APIView):
 
 class ReportMetrics(APIView):
     def get(self, request):
-        records = [cycle['cycle'] for cycle in Score.objects.values('cycle').distinct()]
-        most_recent_cycle, = sorted(records, sort_cycle, reverse=True)[:1]
+        adh = self.request.GET.get("adh", None)
+        records = [cycle['cycle'] for cycle in CycleFormulationScore.objects.values('cycle').distinct()]
+        most_recent_cycle, = sorted(records, key=cmp_to_key(sort_cycle), reverse=True)[:1]
         web_score = CycleFormulationScore.objects.get(cycle=most_recent_cycle, test=WEB_BASED, combination='DEFAULT')
         report_score = CycleFormulationScore.objects.get(cycle=most_recent_cycle, test=REPORTING, combination='DEFAULT')
-        adscore = CycleFormulationScore.objects.filter(cycle=most_recent_cycle,
-                                                       test__icontains=GUIDELINE_ADHERENCE,
-                                                       combination='DEFAULT').aggregate(
-            adherence=Avg('yes')).get("adherence", 0)
+        adh_filter = GUIDELINE_ADHERENCE
+        if adh is not None:
+            adh_filter = adh.replace(" ", "")
+        adherence_qs = CycleFormulationScore.objects.filter(cycle=most_recent_cycle,
+                                                            test__icontains=adh_filter,
+                                                            combination='DEFAULT')
         web_rate = "{0:.1f}".format(web_score.yes)
         report_rate = "{0:.1f}".format(report_score.yes)
-        adherence = "{0:.1f}".format(report_score.yes)
-        adherence = "{0:.1f}".format(adscore)
+        adherence = "{0:.1f}".format(adherence_qs[0].yes) if len(adherence_qs) > 0 else ""
         return Response({"webBased": web_rate, "reporting": report_rate, "adherence": adherence})
 
 
