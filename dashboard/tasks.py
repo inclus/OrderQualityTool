@@ -13,7 +13,7 @@ from dashboard.data.negatives import NegativeNumbersQualityCheck
 from dashboard.data.nn import NNRTICURRENTADULTSCheck, NNRTINewAdultsCheck, NNRTINEWPAEDCheck
 from dashboard.data.nn import NNRTICURRENTPAEDCheck
 from dashboard.data.utils import facility_has_single_order
-from dashboard.helpers import YES, get_prev_cycle, WEB
+from dashboard.helpers import YES, get_prev_cycle, WEB,F1, F2, F3, DEFAULT
 from dashboard.models import CycleFormulationScore, Score, Cycle, Consumption, AdultPatientsRecord, PAEDPatientsRecord, MultipleOrderFacility
 
 
@@ -129,22 +129,29 @@ def get_report_for_other_cycle(report):
 
 def persist_scores(report):
     scores = list()
+    mapping = {
+        F1: {"pass": "f1_pass_count", "fail": "f1_fail_count"},
+        F2: {"pass": "f2_pass_count", "fail": "f2_fail_count"},
+        F3: {"pass": "f3_pass_count", "fail": "f3_fail_count"},
+        DEFAULT: {"pass": "default_pass_count", "fail": "default_fail_count"},
+    }
     for facility in report.locs:
         s = Score(
             name=facility.get('name', None),
             ip=facility.get('IP', None),
             district=facility.get('District', None),
             warehouse=facility.get('Warehouse', None),
-            cycle=report.cycle,
-            fail_count=0,
-            pass_count=0)
+            cycle=report.cycle)
         for key, value in facility['scores'].items():
             setattr(s, key, value)
             for f, result in value.items():
+                formulation_mapping = mapping.get(f)
                 if result in [YES, WEB]:
-                    s.pass_count += 1
+                    model_field = formulation_mapping.get("pass")
+                    s.__dict__[model_field] += 1
                 else:
-                    s.fail_count += 1
+                    model_field = formulation_mapping.get("fail")
+                    s.__dict__[model_field] += 1
 
         scores.append(s)
     Score.objects.filter(cycle=report.cycle).delete()

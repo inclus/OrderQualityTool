@@ -42,7 +42,7 @@
             </a>
         </div>
     </div>
-    
+
 </div>
 <div class="row">
     <div class="col-md-12">
@@ -50,7 +50,7 @@
             <div ui-view></div>
         </div>
     </div>
-    
+
 </div>
 <div class="row ranking_lists">
     <div class="col-md-12">
@@ -65,12 +65,12 @@
                     <ul class="dropdown-menu">
 
                         <li ng-repeat="level in rankingLevels"><a ng-click="selectWorst(level)">{{level}}</a></li>
-                      
+
                     </ul>
                 </div>
 
                 <a class="pull-right label label-qdb" ng-click="downloadWorst()">CSV</a>
-                
+
                 </h3>
             </div>
         </div>
@@ -81,7 +81,7 @@
             </tr>
             <tr ng-repeat="district in $data">
                 <td>{{district.name}}</td>
-                <td>{{district.rate | number : 1}} %</td>
+                <td>{{district.rate | number : 1}}</td>
             </tr>
         </table>
     </div>
@@ -94,7 +94,7 @@
                     <ul class="dropdown-menu">
                          <li ng-repeat="level in rankingLevels"><a ng-click="selectBest(level)">{{level}}</a></li>
                     </ul>
-                </div>  
+                </div>
                  <a class="pull-right label label-qdb" ng-click="downloadBest()">CSV</a>
 
                 </h3>
@@ -107,7 +107,7 @@
             </tr>
             <tr ng-repeat="district in $data">
                 <td>{{district.name}}</td>
-                <td>{{district.rate | number : 1}} %
+                <td>{{district.rate | number : 1}}
 
                 </td>
             </tr>

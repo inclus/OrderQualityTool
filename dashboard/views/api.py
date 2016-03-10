@@ -3,18 +3,20 @@ from functools import cmp_to_key
 
 from arrow import now
 from braces.views import LoginRequiredMixin
-from django.db.models import Count, Avg, Sum
+from django.db.models import Count, Sum
 from django.http import HttpResponse
 from rest_framework import filters
 from rest_framework.generics import ListAPIView
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from django.db.models.expressions import F
 
 from dashboard.helpers import generate_cycles, to_date, GUIDELINE_ADHERENCE, ORDER_FORM_FREE_OF_GAPS, \
     ORDER_FORM_FREE_OF_NEGATIVE_NUMBERS, DIFFERENT_ORDERS_OVER_TIME, CLOSING_BALANCE_MATCHES_OPENING_BALANCE, \
     CONSUMPTION_AND_PATIENTS, STABLE_CONSUMPTION, WAREHOUSE_FULFILMENT, STABLE_PATIENT_VOLUMES, NNRTI_CURRENT_ADULTS, \
-    NNRTI_CURRENT_PAED, NNRTI_NEW_ADULTS, NNRTI_NEW_PAED, sort_cycle, WEB_BASED, REPORTING
-from dashboard.models import CycleFormulationScore, Score, WAREHOUSE, DISTRICT, MultipleOrderFacility
+    NNRTI_CURRENT_PAED, NNRTI_NEW_ADULTS, NNRTI_NEW_PAED, sort_cycle, WEB_BASED, REPORTING, F1, F2, F3
+
+from dashboard.models import CycleFormulationScore, Score, WAREHOUSE, DISTRICT, MultipleOrderFacility, Cycle
 from dashboard.serializers import ScoreSerializer
 
 
@@ -75,6 +77,7 @@ class FacilitiesMultipleReportingView(APIView):
 
 class BestPerformingDistrictsView(APIView):
     reverse = True
+    acc = 'best'
 
     def get(self, request):
         results = self.get_data(request)
@@ -83,36 +86,50 @@ class BestPerformingDistrictsView(APIView):
     def get_data(self, request):
         filters = {}
         levels = {'district': 'district', 'ip': 'ip', 'warehouse': 'warehouse', 'facility': 'name'}
-        cycle = request.GET.get('cycle', None)
+        formulation = request.GET.get('formulation', F1)
         level = request.GET.get('level', 'district').lower()
         name = levels.get(level, 'district')
+        records = [cycle['title'] for cycle in Cycle.objects.values('title').distinct()]
+        cycles = sorted(records, key=cmp_to_key(sort_cycle), reverse=True)[:1]
+        most_recent_cycle = cycles[0] if len(cycles) > 0 else None
+        cycle = request.GET.get('cycle', most_recent_cycle)
+
         if cycle:
             filters['cycle'] = cycle
 
+        mapping = {
+            F1: {"pass": "f1_pass_count", "fail": "f1_fail_count"},
+            F2: {"pass": "f2_pass_count", "fail": "f2_fail_count"},
+            F3: {"pass": "f3_pass_count", "fail": "f3_fail_count"},
+        }
+
+        fm = mapping.get(formulation, mapping.get(F1))
         data = Score.objects.filter(**filters).values(name, 'cycle').annotate(count=Count('pk'),
-                                                                              yes_count=Sum('pass_count'),
-                                                                              fail_count=Sum('fail_count'))
+                                                                              best=Sum(F(fm['pass']) + F('default_pass_count')),
+                                                                              worst=Sum(F(fm['fail']) + F('default_fail_count')))
+
         for item in data:
             item['name'] = item[name]
-            total = item['yes_count'] + item['fail_count']
-            item['rate'] = (float(item['yes_count']) / float(total)) * 100
-        results = sorted(data, key=lambda x: (x['rate'], x['yes_count']), reverse=self.reverse)
+            item['rate'] = (float(item[self.acc]) / float(item['count']))
+        results = sorted(data, key=lambda x: (x['rate'], x[self.acc]), reverse=True)
         return results
 
 
 class WorstPerformingDistrictsView(BestPerformingDistrictsView):
     reverse = False
+    acc = 'worst'
 
 
 class BestPerformingDistrictsCSVView(BestPerformingDistrictsView):
     file_name = 'best'
+    title = 'Average Number of Passes'
 
     def get(self, request):
         response = HttpResponse(content_type='text/csv')
         level = request.GET.get('level', 'district').lower()
         response['Content-Disposition'] = 'attachment; filename="%s-%s.csv"' % (self.file_name, level)
         writer = csv.writer(response)
-        writer.writerow([level, 'reporting rate'])
+        writer.writerow([level, self.title])
         results = self.get_data(request)
         for n in results:
             writer.writerow([n['name'], n['rate']])
@@ -122,6 +139,8 @@ class BestPerformingDistrictsCSVView(BestPerformingDistrictsView):
 class WorstPerformingDistrictsCSVView(BestPerformingDistrictsCSVView):
     file_name = 'worst'
     reverse = False
+    acc = 'worst'
+    title = 'Average Number of Fails'
 
 
 class CyclesView(APIView):

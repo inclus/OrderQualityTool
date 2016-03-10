@@ -39,7 +39,7 @@ class ScoreDetailTestCase():
         district = "D1"
         cycle = "Jan - Feb 2015"
         score = Score.objects.create(name=name, warehouse=warehouse, ip=ip, district=district, REPORTING={DEFAULT: YES},
-                                     WEB_BASED={DEFAULT: YES}, pass_count=2, fail_count=0, cycle=cycle)
+                                     WEB_BASED={DEFAULT: YES}, cycle=cycle)
         for q in F1_PATIENT_QUERY:
             mommy.make(AdultPatientsRecord, name=name, warehouse=warehouse, ip=ip, district=district, cycle=cycle, formulation=q, new=random.randrange(0, 600), existing=random.randrange(0, 600))
             mommy.make(PAEDPatientsRecord, name=name, warehouse=warehouse, ip=ip, district=district, cycle=cycle, formulation=q, new=random.randrange(0, 600), existing=random.randrange(0, 600))
@@ -52,7 +52,7 @@ class ScoreDetailTestCase():
 
     def test_correct_template_rendered(self):
         score = Score.objects.create(name="F1", warehouse="W1", ip="I1", district="D1", REPORTING={DEFAULT: YES},
-                                     WEB_BASED={DEFAULT: YES}, pass_count=2, fail_count=0, cycle="Jan - Feb 2015")
+                                     WEB_BASED={DEFAULT: YES}, cycle="Jan - Feb 2015")
         url = reverse("scores-detail", kwargs={"id": score.id, "column": self.column}) + "?combination=" + F1
         response = self.app.get(url)
         self.assertEqual(response.status_code, 200)

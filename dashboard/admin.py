@@ -104,14 +104,16 @@ class CycleFormulationScoreAdmin(ModelAdmin):
 
 
 class ScoreAdmin(ModelAdmin):
-    search_fields = ('name',)
+    search_fields = ('name','district')
     list_display = ('name',
                     'cycle',
                     'district',
                     'ip',
                     'warehouse',
-                    'fail_count',
-                    'pass_count',
+                    'default_pass_count',
+                    'default_fail_count',
+                    'f1_pass_count',
+                    'f1_fail_count',
                     'nnrtiNewPaed',
                     'stablePatientVolumes',
                     'REPORTING',

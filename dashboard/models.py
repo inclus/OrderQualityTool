@@ -86,8 +86,15 @@ class Score(models.Model):
     closingBalanceMatchesOpeningBalance = JSONField()
     orderFormFreeOfNegativeNumbers = JSONField()
     stableConsumption = JSONField()
-    pass_count = models.IntegerField(default=0)
-    fail_count = models.IntegerField(default=0)
+    default_fail_count = models.IntegerField(default=0)
+    default_pass_count = models.IntegerField(default=0)
+    f1_fail_count = models.IntegerField(default=0)
+    f1_pass_count = models.IntegerField(default=0)
+    f2_fail_count = models.IntegerField(default=0)
+    f2_pass_count = models.IntegerField(default=0)
+    f3_fail_count = models.IntegerField(default=0)
+    f3_pass_count = models.IntegerField(default=0)
+
 
     class Meta:
         unique_together = ("name", "cycle", "district", "ip", "warehouse")

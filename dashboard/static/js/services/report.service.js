@@ -11,20 +11,23 @@ angular.module('services').service('ReportService', ['$http',
             return $http.get('/api/test/metrics', {params:{adh: guideline_type}}).then(handleResponse);
         };
 
-        var getBestRankings = function(level, selectedCycle) {
+        var getBestRankings = function(level, selectedCycle, formulation) {
             return $http.get('/api/test/ranking/best', {
                 params: {
                     level: level,
-                    cycle: selectedCycle
+                    cycle: selectedCycle,
+                    formulation: formulation
+
                 }
             }).then(handleResponse);
         };
 
-        var getWorstRankings = function(level, selectedCycle) {
+        var getWorstRankings = function(level, selectedCycle, formulation) {
             return $http.get('/api/test/ranking/worst', {
                 params: {
                     level: level,
-                    cycle: selectedCycle
+                    cycle: selectedCycle,
+                    formulation: formulation
                 }
             }).then(handleResponse);
         };

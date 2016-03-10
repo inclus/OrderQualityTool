@@ -58,8 +58,8 @@ class TaskTestCase(TestCase):
         persist_scores(report)
         self.assertEqual(Score.objects.count(), 2)
         first_score = Score.objects.all()[0]
-        self.assertEqual(first_score.pass_count, 1)
-        self.assertEqual(first_score.fail_count, 1)
+        self.assertEqual(first_score.default_pass_count, 1)
+        self.assertEqual(first_score.default_fail_count, 1)
 
     def test_should_record_consumption_for_each_facility(self):
         report = FakeReport()
