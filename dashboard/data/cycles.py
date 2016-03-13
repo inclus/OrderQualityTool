@@ -198,7 +198,9 @@ class StablePatientVolumesCheck(StableConsumptionCheck):
         include_record = current_population > threshold or prev_population > threshold
         result = NOT_REPORTING
         data_is_sufficient = pre_count > 0 and current_count > 0 and not facility_not_reporting(facility)
+        return self.run_calculation(current_population, prev_population, total_count, not_reporting, yes, no, result, data_is_sufficient, include_record)
 
+    def run_calculation(self, current_population, prev_population, total_count, not_reporting, yes, no, result, data_is_sufficient, include_record):
         if include_record:
             total_count += 1
             numerator = float(current_population)
@@ -206,7 +208,6 @@ class StablePatientVolumesCheck(StableConsumptionCheck):
             if abs(numerator) > abs(denominator):
                 numerator = float(prev_population)
                 denominator = float(current_population)
-            total = current_population + prev_population
             quotient = abs(numerator / denominator)
             if not data_is_sufficient:
                 not_reporting += 1
@@ -221,3 +222,4 @@ class StablePatientVolumesCheck(StableConsumptionCheck):
         else:
             pass
         return result, no, not_reporting, yes, total_count
+
