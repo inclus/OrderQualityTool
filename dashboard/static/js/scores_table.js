@@ -94,10 +94,13 @@ $(document).ready(function() {
         });
         $("#tags").html(html);
         $("#resetFilter").click(function() {
-            _.forEach(selectIds, function(id) {
-                var firstValue = $(id + " option:first")
-                    .val();
-                $(id).select2("val", firstValue);
+          _.forEach(selectIds, function(id) {
+            if (id == "#district_select") {
+              $(id).val("").multipleSelect("refresh");
+            }
+            else {
+              $(id).select2("val", "");
+            }
             });
         });
 
