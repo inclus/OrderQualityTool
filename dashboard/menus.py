@@ -18,6 +18,14 @@ Menu.add_item("main", MenuItem("FACILITY REPORT",
                                reverse("reports"),
                                weight=10))
 
+Menu.add_item("main", MenuItem("ABOUT",
+                               reverse("about"),
+                               weight=10))
+
+Menu.add_item("main", MenuItem("TESTS",
+                               reverse("about.tests"),
+                               weight=10))
+
 Menu.add_item("main", MenuItem("IMPORT FILES",
                                reverse("import"),
                                check=user_is_admin,

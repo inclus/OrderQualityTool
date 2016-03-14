@@ -8,7 +8,7 @@ from django.db.models import Count, Case, When
 from django.views.generic import TemplateView, FormView
 from dashboard.forms import FileUploadForm
 from dashboard.helpers import YES, F3, F2, F1
-from dashboard.models import Score, Cycle
+from dashboard.models import Score
 from dashboard.tasks import import_general_report
 
 
@@ -19,6 +19,20 @@ class HomeView(LoginRequiredMixin, TemplateView):
         context = super(HomeView, self).get_context_data(**kwargs)
         return context
 
+class AboutPageView(TemplateView):
+    template_name = "about.html"
+
+class AboutTestPageView(TemplateView):
+    template_name = "about_tests.html"
+
+class AboutBackground(TemplateView):
+    template_name = "about_background.html"
+
+class AboutHowWorks(TemplateView):
+    template_name = "about_works.html"
+
+class AboutHowUsed(TemplateView):
+    template_name = "about_used.html"
 
 class DataImportView(LoginRequiredMixin, StaffuserRequiredMixin, FormView):
     template_name = "import.html"
