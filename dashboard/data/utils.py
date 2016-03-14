@@ -145,6 +145,14 @@ def facility_has_single_order(facility):
     not_multiple = facility['Multiple'].strip() != 'Multiple orders'
     return not_multiple
 
+def multiple_orders_score(facility):
+    text_value = facility.get('Multiple', '').strip().lower()
+    if 'multiple' in text_value:
+        return NO
+    elif 'not' in text_value:
+        return NOT_REPORTING
+    else:
+        return YES
 
 def get_records_from_collection(collection, facility_name):
     records = collection.get(facility_name, [])
