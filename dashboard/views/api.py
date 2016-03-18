@@ -14,56 +14,51 @@ from django.db.models.expressions import F
 from dashboard.helpers import generate_cycles, to_date, GUIDELINE_ADHERENCE, ORDER_FORM_FREE_OF_GAPS, \
     ORDER_FORM_FREE_OF_NEGATIVE_NUMBERS, DIFFERENT_ORDERS_OVER_TIME, CLOSING_BALANCE_MATCHES_OPENING_BALANCE, \
     CONSUMPTION_AND_PATIENTS, STABLE_CONSUMPTION, WAREHOUSE_FULFILMENT, STABLE_PATIENT_VOLUMES, NNRTI_CURRENT_ADULTS, \
-    NNRTI_CURRENT_PAED, NNRTI_NEW_ADULTS, NNRTI_NEW_PAED, sort_cycle, WEB_BASED, REPORTING, F1, F2, F3
+    NNRTI_CURRENT_PAED, NNRTI_NEW_ADULTS, NNRTI_NEW_PAED, sort_cycle, WEB_BASED, REPORTING, F1, F2, F3, DEFAULT, YES, NO, NOT_REPORTING
 
 from dashboard.models import CycleFormulationScore, Score, WAREHOUSE, DISTRICT, MultipleOrderFacility, Cycle
 from dashboard.serializers import ScoreSerializer
 
+def generate_data(test, start, end, formulation=None, keys={YES: 'yes', NO: 'no', NOT_REPORTING: 'not_reporting'}):
+    filters = {}
+    if formulation is not None:
+        filters = {'combination__icontains': formulation}
+    cycles = generate_cycles(now().replace(years=-2), now())
+    if start and end:
+        start_index = cycles.index(start)
+        end_index = cycles.index(end)
+        cycles_included = cycles[start_index: end_index + 1]
+        cycles = cycles_included
+        filters['cycle__in'] = cycles_included
+    scores = CycleFormulationScore.objects.filter(test=test, **filters)
+    data = dict((k.cycle, k) for k in scores)
+    results = []
+    for cycle in cycles:
+        if cycle in data:
+            item = data.get(cycle)
+            results.append({"cycle": cycle, keys.get(YES): item.yes, keys.get(NO): item.no, keys.get(NOT_REPORTING): item.not_reporting})
+        else:
+            results.append({"cycle": cycle, "rate": None, keys.get(YES): None, keys.get(NO): None, keys.get(NOT_REPORTING): None})
+    return Response({'values': results})
+
 
 class FacilitiesReportingView(APIView):
+    test = REPORTING
+
     def get(self, request):
         start = request.GET.get('start', None)
         end = request.GET.get('end', None)
-        filters = {}
-        cycles = generate_cycles(now().replace(years=-2), now())
-        if start and end:
-            start_index = cycles.index(start)
-            end_index = cycles.index(end)
-            cycles_included = cycles[start_index: end_index + 1]
-            cycles = cycles_included
-            filters['cycle__in'] = cycles_included
-        results = []
-        for cycle in cycles:
-            scores = CycleFormulationScore.objects.filter(cycle=cycle, test=REPORTING)
-            if len(scores) > 0:
-                results.append({"cycle": cycle, "reporting": scores[0].yes, "not_reporting": scores[0].no})
-            else:
-                results.append({"cycle": cycle, "reporting": None, "not_reporting": None})
-        return Response({"values": results})
-
+        keys = {YES: 'reporting', NO: 'not_reporting', NOT_REPORTING: 'n_a'}
+        return generate_data(self.test, start, end, None, keys)
 
 class WebBasedReportingView(APIView):
+    test = WEB_BASED
+
     def get(self, request):
         start = request.GET.get('start', None)
         end = request.GET.get('end', None)
-        filters = {}
-        cycles = generate_cycles(now().replace(years=-2), now())
-        if start and end:
-            start_index = cycles.index(start)
-            end_index = cycles.index(end)
-            cycles_included = cycles[start_index: end_index + 1]
-            cycles = cycles_included
-            filters['cycle__in'] = cycles_included
-
-        results = []
-        for cycle in cycles:
-            scores = CycleFormulationScore.objects.filter(cycle=cycle, test=WEB_BASED)
-            if len(scores) > 0:
-                results.append({"cycle": cycle, "web": scores[0].yes, "paper": scores[0].no})
-            else:
-                results.append({"cycle": cycle, "web": None, "paper": None})
-        return Response({"values": results})
-
+        keys = {YES: 'web', NO: 'paper', NOT_REPORTING: 'not_reporting'}
+        return generate_data(self.test, start, end, None, keys)
 
 class FacilitiesMultipleReportingView(APIView):
     def get(self, request):
@@ -178,25 +173,7 @@ class OrderFormFreeOfGapsView(APIView):
     def get(self, request):
         start = request.GET.get('start', None)
         end = request.GET.get('end', None)
-        filters = {}
-        cycles = generate_cycles(now().replace(years=-2), now())
-        if start and end:
-            start_index = cycles.index(start)
-            end_index = cycles.index(end)
-            cycles_included = cycles[start_index: end_index + 1]
-            cycles = cycles_included
-            filters['cycle__in'] = cycles_included
-        scores = CycleFormulationScore.objects.filter(test=self.test, **filters)
-        data = dict((k.cycle, k) for k in scores)
-        results = []
-        for cycle in cycles:
-            if cycle in data:
-                item = data.get(cycle)
-                results.append({"cycle": cycle, "yes": item.yes, "no": item.no, "not_reporting": item.not_reporting})
-            else:
-                results.append({"cycle": cycle, "rate": None, "yes": None, "no": None, "not_reporting": None})
-        return Response({'values': results})
-
+        return generate_data(self.test, start, end)
 
 class OrderFormFreeOfNegativeNumbersView(APIView):
     test = ORDER_FORM_FREE_OF_NEGATIVE_NUMBERS
@@ -205,25 +182,7 @@ class OrderFormFreeOfNegativeNumbersView(APIView):
         start = request.GET.get('start', None)
         end = request.GET.get('end', None)
         formulation = request.GET.get('regimen', None)
-        filters = {'combination__icontains': formulation}
-        cycles = generate_cycles(now().replace(years=-2), now())
-        if start and end:
-            start_index = cycles.index(start)
-            end_index = cycles.index(end)
-            cycles_included = cycles[start_index: end_index + 1]
-            cycles = cycles_included
-            filters['cycle__in'] = cycles_included
-        scores = CycleFormulationScore.objects.filter(test=self.test, **filters)
-        data = dict((k.cycle, k) for k in scores)
-        results = []
-        for cycle in cycles:
-            if cycle in data:
-                item = data.get(cycle)
-                results.append({"cycle": cycle, "yes": item.yes, "no": item.no, "not_reporting": item.not_reporting})
-            else:
-                results.append({"cycle": cycle, "rate": None, "yes": None, "no": None, "not_reporting": None})
-        return Response({'values': results})
-
+        return generate_data(self.test, start, end, formulation)
 
 class DifferentOrdersOverTimeView(OrderFormFreeOfNegativeNumbersView):
     test = DIFFERENT_ORDERS_OVER_TIME
