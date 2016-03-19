@@ -15,13 +15,13 @@ class UserListView(LoginRequiredMixin, SuperuserRequiredMixin, ListView):
 class NewUserForm(EmailUserCreationForm):
     class Meta:
         model = get_user_model()
-        fields = ('email', 'is_staff', 'is_superuser', 'access_level')
+        fields = ('email', 'is_staff', 'is_superuser', 'access_level', 'access_area')
 
 
 class EditUserForm(ModelForm):
     class Meta:
         model = get_user_model()
-        fields = ('email', 'is_staff', 'is_superuser', 'access_level')
+        fields = ('email', 'is_superuser', 'access_level', 'access_area')
 
 
 class UserAddView(LoginRequiredMixin, SuperuserRequiredMixin, FormView):

@@ -23,7 +23,11 @@ LOCATION = "Facility Index"
 
 class DashboardUser(AbstractEmailUser):
     access_level = CharField(
-        choices=((WAREHOUSE, WAREHOUSE), (DISTRICT, DISTRICT), (IIP, IIP), (MOH_CENTRAL, MOH_CENTRAL)), max_length=50)
+        choices=(
+            (WAREHOUSE, WAREHOUSE),
+            (DISTRICT, DISTRICT),
+            (IIP, IIP), (MOH_CENTRAL, MOH_CENTRAL)), max_length=50)
+    access_area = CharField(max_length=250, null=True, blank=True)
 
     def get_full_name(self):
         return self.email
