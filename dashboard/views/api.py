@@ -19,57 +19,6 @@ from dashboard.helpers import generate_cycles, to_date, GUIDELINE_ADHERENCE, ORD
 from dashboard.models import CycleFormulationScore, Score, WAREHOUSE, DISTRICT, MultipleOrderFacility, Cycle
 from dashboard.serializers import ScoreSerializer
 
-def generate_data(test, start, end, formulation=None, keys={YES: 'yes', NO: 'no', NOT_REPORTING: 'not_reporting'}):
-    filters = {}
-    if formulation is not None:
-        filters = {'combination__icontains': formulation}
-    cycles = generate_cycles(now().replace(years=-2), now())
-    if start and end:
-        start_index = cycles.index(start)
-        end_index = cycles.index(end)
-        cycles_included = cycles[start_index: end_index + 1]
-        cycles = cycles_included
-        filters['cycle__in'] = cycles_included
-    scores = CycleFormulationScore.objects.filter(test=test, **filters)
-    data = dict((k.cycle, k) for k in scores)
-    results = []
-    for cycle in cycles:
-        if cycle in data:
-            item = data.get(cycle)
-            results.append({"cycle": cycle, keys.get(YES): item.yes, keys.get(NO): item.no, keys.get(NOT_REPORTING): item.not_reporting})
-        else:
-            results.append({"cycle": cycle, "rate": None, keys.get(YES): None, keys.get(NO): None, keys.get(NOT_REPORTING): None})
-    return Response({'values': results})
-
-
-class FacilitiesReportingView(APIView):
-    test = REPORTING
-
-    def get(self, request):
-        start = request.GET.get('start', None)
-        end = request.GET.get('end', None)
-        keys = {YES: 'reporting', NO: 'not_reporting', NOT_REPORTING: 'n_a'}
-        return generate_data(self.test, start, end, None, keys)
-
-class WebBasedReportingView(APIView):
-    test = WEB_BASED
-
-    def get(self, request):
-        start = request.GET.get('start', None)
-        end = request.GET.get('end', None)
-        keys = {YES: 'web', NO: 'paper', NOT_REPORTING: 'not_reporting'}
-        return generate_data(self.test, start, end, None, keys)
-
-class FacilitiesMultipleReportingView(APIView):
-    def get(self, request):
-        cycles = [cycle['cycle'] for cycle in MultipleOrderFacility.objects.values('cycle').distinct()]
-        sorted_cycles = sorted(cycles, key=cmp_to_key(sort_cycle), reverse=True)
-        most_recent_cycle = sorted_cycles[0]
-        cycle = request.GET.get('cycle', most_recent_cycle)
-        records = MultipleOrderFacility.objects.filter(cycle=cycle).order_by('name').values('name', 'district', 'ip', 'warehouse')
-        return Response({"values": records})
-
-
 class BestPerformingDistrictsView(APIView):
     reverse = True
     acc = 'best'
@@ -136,6 +85,57 @@ class WorstPerformingDistrictsCSVView(BestPerformingDistrictsCSVView):
     reverse = False
     acc = 'worst'
     title = 'Average Number of Fails'
+
+
+def generate_data(test, start, end, formulation=None, keys={YES: 'yes', NO: 'no', NOT_REPORTING: 'not_reporting'}):
+    filters = {}
+    if formulation is not None:
+        filters = {'combination__icontains': formulation}
+    cycles = generate_cycles(now().replace(years=-2), now())
+    if start and end:
+        start_index = cycles.index(start)
+        end_index = cycles.index(end)
+        cycles_included = cycles[start_index: end_index + 1]
+        cycles = cycles_included
+        filters['cycle__in'] = cycles_included
+    scores = CycleFormulationScore.objects.filter(test=test, **filters)
+    data = dict((k.cycle, k) for k in scores)
+    results = []
+    for cycle in cycles:
+        if cycle in data:
+            item = data.get(cycle)
+            results.append({"cycle": cycle, keys.get(YES): item.yes, keys.get(NO): item.no, keys.get(NOT_REPORTING): item.not_reporting})
+        else:
+            results.append({"cycle": cycle, "rate": None, keys.get(YES): None, keys.get(NO): None, keys.get(NOT_REPORTING): None})
+    return Response({'values': results})
+
+
+class FacilitiesReportingView(APIView):
+    test = REPORTING
+
+    def get(self, request):
+        start = request.GET.get('start', None)
+        end = request.GET.get('end', None)
+        keys = {YES: 'reporting', NO: 'not_reporting', NOT_REPORTING: 'n_a'}
+        return generate_data(self.test, start, end, None, keys)
+
+class WebBasedReportingView(APIView):
+    test = WEB_BASED
+
+    def get(self, request):
+        start = request.GET.get('start', None)
+        end = request.GET.get('end', None)
+        keys = {YES: 'web', NO: 'paper', NOT_REPORTING: 'not_reporting'}
+        return generate_data(self.test, start, end, None, keys)
+
+class FacilitiesMultipleReportingView(APIView):
+    def get(self, request):
+        cycles = [cycle['cycle'] for cycle in MultipleOrderFacility.objects.values('cycle').distinct()]
+        sorted_cycles = sorted(cycles, key=cmp_to_key(sort_cycle), reverse=True)
+        most_recent_cycle = sorted_cycles[0]
+        cycle = request.GET.get('cycle', most_recent_cycle)
+        records = MultipleOrderFacility.objects.filter(cycle=cycle).order_by('name').values('name', 'district', 'ip', 'warehouse')
+        return Response({"values": records})
 
 
 class CyclesView(APIView):
