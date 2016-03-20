@@ -88,6 +88,35 @@ class WorstPerformingDistrictsCSVView(BestPerformingDistrictsCSVView):
     title = 'Average Number of Fails'
 
 
+class CyclesView(APIView):
+    def get(self, request):
+        records = [cycle['cycle'] for cycle in Score.objects.values('cycle').distinct()]
+        most_recent_cycle, = sorted(records, key=cmp_to_key(sort_cycle), reverse=True)[:1]
+        month = to_date(most_recent_cycle)
+        cycles = generate_cycles(now().replace(years=-2), month)
+        cycles.reverse()
+        return Response({"values": cycles, "most_recent_cycle": most_recent_cycle})
+
+
+class ReportMetrics(APIView):
+    def get(self, request):
+        adh = self.request.GET.get("adh", None)
+        records = [cycle['cycle'] for cycle in CycleFormulationScore.objects.values('cycle').distinct()]
+        most_recent_cycle, = sorted(records, key=cmp_to_key(sort_cycle), reverse=True)[:1]
+        web_score = CycleFormulationScore.objects.get(cycle=most_recent_cycle, test=WEB_BASED, combination='DEFAULT')
+        report_score = CycleFormulationScore.objects.get(cycle=most_recent_cycle, test=REPORTING, combination='DEFAULT')
+        adh_filter = GUIDELINE_ADHERENCE
+        if adh is not None:
+            adh_filter = adh.replace(" ", "")
+        adherence_qs = CycleFormulationScore.objects.filter(cycle=most_recent_cycle,
+                                                            test__icontains=adh_filter,
+                                                            combination='DEFAULT')
+        web_rate = "{0:.1f}".format(web_score.yes)
+        report_rate = "{0:.1f}".format(report_score.yes)
+        adherence = "{0:.1f}".format(adherence_qs[0].yes) if len(adherence_qs) > 0 else ""
+        return Response({"webBased": web_rate, "reporting": report_rate, "adherence": adherence})
+
+
 def generate_data(test, start, end, formulation=None, keys={YES: 'yes', NO: 'no', NOT_REPORTING: 'not_reporting'}):
     filters = {}
     if formulation is not None:
@@ -120,6 +149,7 @@ class FacilitiesReportingView(APIView):
         keys = {YES: 'reporting', NO: 'not_reporting', NOT_REPORTING: 'n_a'}
         return generate_data(self.test, start, end, None, keys)
 
+
 class WebBasedReportingView(APIView):
     test = WEB_BASED
 
@@ -128,6 +158,7 @@ class WebBasedReportingView(APIView):
         end = request.GET.get('end', None)
         keys = {YES: 'web', NO: 'paper', NOT_REPORTING: 'not_reporting'}
         return generate_data(self.test, start, end, None, keys)
+
 
 class FacilitiesMultipleReportingView(APIView):
     def get(self, request):
@@ -139,35 +170,6 @@ class FacilitiesMultipleReportingView(APIView):
         return Response({"values": records})
 
 
-class CyclesView(APIView):
-    def get(self, request):
-        records = [cycle['cycle'] for cycle in Score.objects.values('cycle').distinct()]
-        most_recent_cycle, = sorted(records, key=cmp_to_key(sort_cycle), reverse=True)[:1]
-        month = to_date(most_recent_cycle)
-        cycles = generate_cycles(now().replace(years=-2), month)
-        cycles.reverse()
-        return Response({"values": cycles, "most_recent_cycle": most_recent_cycle})
-
-
-class ReportMetrics(APIView):
-    def get(self, request):
-        adh = self.request.GET.get("adh", None)
-        records = [cycle['cycle'] for cycle in CycleFormulationScore.objects.values('cycle').distinct()]
-        most_recent_cycle, = sorted(records, key=cmp_to_key(sort_cycle), reverse=True)[:1]
-        web_score = CycleFormulationScore.objects.get(cycle=most_recent_cycle, test=WEB_BASED, combination='DEFAULT')
-        report_score = CycleFormulationScore.objects.get(cycle=most_recent_cycle, test=REPORTING, combination='DEFAULT')
-        adh_filter = GUIDELINE_ADHERENCE
-        if adh is not None:
-            adh_filter = adh.replace(" ", "")
-        adherence_qs = CycleFormulationScore.objects.filter(cycle=most_recent_cycle,
-                                                            test__icontains=adh_filter,
-                                                            combination='DEFAULT')
-        web_rate = "{0:.1f}".format(web_score.yes)
-        report_rate = "{0:.1f}".format(report_score.yes)
-        adherence = "{0:.1f}".format(adherence_qs[0].yes) if len(adherence_qs) > 0 else ""
-        return Response({"webBased": web_rate, "reporting": report_rate, "adherence": adherence})
-
-
 class OrderFormFreeOfGapsView(APIView):
     test = ORDER_FORM_FREE_OF_GAPS
 
@@ -175,6 +177,7 @@ class OrderFormFreeOfGapsView(APIView):
         start = request.GET.get('start', None)
         end = request.GET.get('end', None)
         return generate_data(self.test, start, end)
+
 
 class OrderFormFreeOfNegativeNumbersView(APIView):
     test = ORDER_FORM_FREE_OF_NEGATIVE_NUMBERS
@@ -184,6 +187,7 @@ class OrderFormFreeOfNegativeNumbersView(APIView):
         end = request.GET.get('end', None)
         formulation = request.GET.get('regimen', None)
         return generate_data(self.test, start, end, formulation)
+
 
 class DifferentOrdersOverTimeView(OrderFormFreeOfNegativeNumbersView):
     test = DIFFERENT_ORDERS_OVER_TIME
@@ -280,6 +284,7 @@ class RankingsAccessView(LoginRequiredMixin, APIView):
         if request.user.access_level == DISTRICT:
             levels = ['IP', 'Warehouse', 'Facility']
         return Response({"values": levels})
+
 
 class AccessAreasView(APIView):
     def get(self, request):
