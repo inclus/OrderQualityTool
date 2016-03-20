@@ -48,7 +48,7 @@ class FacilitiesReportingView(WebTest):
         url = "/api/test/submittedOrder"
         json_response = self.app.get(url, user="testuser").content.decode('utf8')
         data = loads(json_response)['values']
-        self.assertIn({"reporting": 50, "cycle": cycle, "not_reporting": 50}, data)
+        self.assertIn({"reporting": 50, "cycle": cycle, "not_reporting": 50, "n_a": None}, data)
 
     @patch("dashboard.views.api.now")
     def test_that_start_end_work(self, time_mock):
@@ -69,7 +69,7 @@ class WebBasedReportingViewTestCase(WebTest):
         url = "/api/test/orderType"
         json_response = self.app.get(url, user="testuser").content.decode('utf8')
         data = loads(json_response)['values']
-        self.assertIn({"web": 50, "cycle": cycle, "paper": 50}, data)
+        self.assertIn({"web": 50, "cycle": cycle, "paper": 50, "not_reporting": None}, data)
 
     @patch("dashboard.views.api.now")
     def test_that_start_end_work(self, time_mock):
