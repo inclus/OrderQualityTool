@@ -10,6 +10,7 @@
                     <th>Id</th>
                     <th>Email Address</th>
                     <th>Access Level</th>
+                    <th>Access Area</th>
                     <th>Is Admin</th>
                 </tr>
                 </thead>
@@ -25,6 +26,10 @@
                     <td>
                         {{user.access_level}}
                     </td>
+                    <td>
+                      {{user.access_area}}
+                    </td>
+
                     <td>
                         {% if user.is_staff %}
                         <i class="fa fa-check"></i>

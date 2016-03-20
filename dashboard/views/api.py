@@ -1,5 +1,6 @@
 import csv
 from functools import cmp_to_key
+import pydash
 
 from arrow import now
 from braces.views import LoginRequiredMixin
@@ -279,3 +280,12 @@ class RankingsAccessView(LoginRequiredMixin, APIView):
         if request.user.access_level == DISTRICT:
             levels = ['IP', 'Warehouse', 'Facility']
         return Response({"values": levels})
+
+class AccessAreasView(APIView):
+    def get(self, request):
+        level = request.GET.get('level', None)
+        access_levels = ['district', 'warehouse', 'ip', 'facility']
+        access_areas = []
+        if level and level.lower() in access_levels:
+            access_areas = pydash.reject(Score.objects.values_list(level, flat=True).distinct(), lambda x: len(x) < 1)
+        return Response(access_areas)

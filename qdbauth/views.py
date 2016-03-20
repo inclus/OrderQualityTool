@@ -3,9 +3,10 @@ from custom_user.forms import EmailUserCreationForm
 from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import AdminPasswordChangeForm
 from django.core.urlresolvers import reverse
-from django.forms import ModelForm
+from django.forms import ModelForm, CharField, Select
 from django.http import HttpResponseRedirect
 from django.views.generic import ListView, FormView
+from dashboard.models import Score
 
 
 class UserListView(LoginRequiredMixin, SuperuserRequiredMixin, ListView):
@@ -13,15 +14,27 @@ class UserListView(LoginRequiredMixin, SuperuserRequiredMixin, ListView):
 
 
 class NewUserForm(EmailUserCreationForm):
+    access_area = CharField(widget=Select)
+
     class Meta:
         model = get_user_model()
         fields = ('email', 'is_staff', 'is_superuser', 'access_level', 'access_area')
 
 
 class EditUserForm(ModelForm):
+    access_area = CharField(widget=Select(choices=[]))
+
     class Meta:
         model = get_user_model()
         fields = ('email', 'is_superuser', 'access_level', 'access_area')
+
+    def __init__(self, *args, **kwargs):
+        super(EditUserForm, self).__init__(*args, **kwargs)
+        level = self.instance.access_level.lower()
+        if level in ["district", "ip", "warehouse", "name"]:
+            choices = Score.objects.values_list(level, flat=True).distinct()
+            print "the level", self.fields["access_area"]
+            self.fields["access_area"].widget.choices = [(ch, ch) for ch in choices]
 
 
 class UserAddView(LoginRequiredMixin, SuperuserRequiredMixin, FormView):

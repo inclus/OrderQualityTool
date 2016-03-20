@@ -1,5 +1,6 @@
 {% extends "layout.html" %}
 {% load bootstrap3 %}
+{% load staticfiles %}
 {% block content %}
 <div class="container">
     <div class="row">
@@ -17,3 +18,7 @@
     </div>
 </div>
 {% endblock content %}
+{% block js %}
+    <script type="text/javascript" src='{% static "vendor/select2/dist/js/select2.full.min.js" %}'></script>
+    <script type="text/javascript" src='{% static "js/users.js" %}'></script>
+{% endblock js %}
