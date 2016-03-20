@@ -14,7 +14,7 @@ class UserListView(LoginRequiredMixin, SuperuserRequiredMixin, ListView):
 
 
 class NewUserForm(EmailUserCreationForm):
-    access_area = CharField(widget=Select)
+    access_area = CharField(widget=Select(choices=[]), required=False)
 
     class Meta:
         model = get_user_model()
@@ -22,7 +22,7 @@ class NewUserForm(EmailUserCreationForm):
 
 
 class EditUserForm(ModelForm):
-    access_area = CharField(widget=Select(choices=[]))
+    access_area = CharField(widget=Select(choices=[]), required=False)
 
     class Meta:
         model = get_user_model()
