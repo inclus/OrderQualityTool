@@ -3,9 +3,10 @@ from django.core.urlresolvers import reverse
 from django_webtest import WebTest
 from mock import MagicMock, patch
 from dashboard.helpers import *
+from dashboard.models import Score
 from dashboard.views.api import OrderFormFreeOfNegativeNumbersView, DifferentOrdersOverTimeView, ClosingBalanceView, \
     ConsumptionAndPatientsView, StableConsumptionView, WarehouseFulfilmentView, StablePatientVolumesView, \
-    GuideLineAdherenceView
+    GuideLineAdherenceView, OrderFormFreeOfGapsView
 
 
 class RegimenCheckViewCaseMixin():
@@ -17,70 +18,43 @@ class OrderFormFreeOfNegativesViewTestCase(WebTest, RegimenCheckViewCaseMixin):
     url_name = 'order_form_free_of_negative_numbers'
     test = ORDER_FORM_FREE_OF_NEGATIVE_NUMBERS
     view = OrderFormFreeOfNegativeNumbersView
+    formulation = F1
 
     def test_view_is_wired_up(self):
         self.assertEqual(self.test, self.view.test)
 
     def get_url(self, end, start, url):
-        regimen = "reg"
+        regimen = F1
         return "%s?start=%s&&end=%s&&regimen=%s" % (url, start, end, regimen)
 
-    @patch("dashboard.views.api.CycleFormulationScore.objects.filter")
     @patch("dashboard.views.api.now")
-    def test_filter_is_setup(self, time_mock, filter_mock):
+    def test_filter_is_setup(self, time_mock):
         time_mock.return_value = arrow.Arrow(2015, 12, 1)
         year = "2015"
         url = reverse(self.url_name)
         start = "Mar - Apr %s" % year
         end = "Nov - Dec %s" % year
-        score = MagicMock()
-        score.cycle = 'Mar - Apr %s' % year
-        score.yes = 20
-        score.no = 40
-        score.not_reporting = 60
-        filter_mock.return_value = [score]
+        Score.objects.create(**{self.test: {self.formulation: YES}, 'name': "F4", 'cycle': start})
+        Score.objects.create(**{self.test: {self.formulation: NO}, 'name': "F5", 'cycle': start})
+        Score.objects.create(**{self.test: {self.formulation: NO}, 'name': "F6", 'cycle': start})
+        Score.objects.create(**{self.test: {self.formulation: NOT_REPORTING}, 'name': "F7", 'cycle': start})
+        Score.objects.create(**{self.test: {self.formulation: NOT_REPORTING}, 'name': "F8", 'cycle': start})
         response = self.app.get(self.get_url(end, start, url), user="testuser")
         self.assertEqual(200, response.status_code)
         json_content = response.content.decode('utf8')
         data = json.loads(json_content)
-        self.assertEqual(data['values'][0], {u'cycle': u'Mar - Apr 2015', u'no': 40, u'not_reporting': 60, u'yes': 20})
-        filter_mock.assert_called_with(
-            cycle__in=[(u'Mar - Apr %s' % year), (u'May - Jun %s' % year), (u'Jul - Aug %s' % year),
-                       (u'Sep - Oct %s' % year), (u'Nov - Dec %s' % year)], combination__icontains=u'reg',
-            test=self.test)
+        self.assertEqual(data['values'][0], {u'cycle': u'Mar - Apr 2015', u'no': 40, u'not_reporting': 40, u'yes': 20})
 
-
-class OrderFormFreeOfGapsViewTestCase(WebTest, RegimenCheckViewCaseMixin):
+class OrderFormFreeOfGapsViewTestCase(OrderFormFreeOfNegativesViewTestCase):
     url_name = 'order_form_free_of_gaps'
     test = ORDER_FORM_FREE_OF_GAPS
+    view = OrderFormFreeOfGapsView
+    formulation = DEFAULT
 
     def test_url_setup(self):
         url = reverse(self.url_name)
         response = self.app.get(url, user="testuser")
         self.assertEqual(200, response.status_code)
-
-    @patch("dashboard.views.api.CycleFormulationScore.objects.filter")
-    @patch("dashboard.views.api.now")
-    def test_filter_is_setup(self, time_mock, filter_mock):
-        time_mock.return_value = arrow.Arrow(2015, 12, 1)
-        year = "2015"
-        url = reverse(self.url_name)
-        start = "Mar - Apr %s" % year
-        end = "Nov - Dec %s" % year
-        score = MagicMock()
-        score.cycle = 'Mar - Apr %s' % year
-        score.yes = 20
-        score.no = 40
-        score.not_reporting = 60
-        filter_mock.return_value = [score]
-        response = self.app.get(self.get_url(end, start, url), user="testuser")
-        self.assertEqual(200, response.status_code)
-        json_content = response.content.decode('utf8')
-        data = json.loads(json_content)
-        self.assertEqual(data['values'][0], {u'cycle': u'Mar - Apr 2015', u'no': 40, u'not_reporting': 60, u'yes': 20})
-        filter_mock.assert_called_with(
-            cycle__in=[(u'Mar - Apr %s' % year), (u'May - Jun %s' % year), (u'Jul - Aug %s' % year),
-                       (u'Sep - Oct %s' % year), (u'Nov - Dec %s' % year)], test=self.test)
 
 
 class DifferentOrdersOverTimeViewTestCase(OrderFormFreeOfNegativesViewTestCase):
@@ -121,29 +95,13 @@ class StablePatientVolumesViewTestCase(OrderFormFreeOfNegativesViewTestCase):
 
 class GuideLineAdherenceViewTestCase(OrderFormFreeOfNegativesViewTestCase):
     url_name = 'guideline_adherence'
-    test = GUIDELINE_ADHERENCE
+    test = GUIDELINE_ADHERENCE_PAED_1L
     view = GuideLineAdherenceView
+    formulation = DEFAULT
 
-    @patch("dashboard.views.api.CycleFormulationScore.objects.filter")
-    @patch("dashboard.views.api.now")
-    def test_filter_is_setup(self, time_mock, filter_mock):
-        time_mock.return_value = arrow.Arrow(2015, 12, 1)
-        year = "2015"
-        url = reverse(self.url_name)
-        start = "Mar - Apr %s" % year
-        end = "Nov - Dec %s" % year
-        score = MagicMock()
-        score.cycle = 'Mar - Apr %s' % year
-        score.yes = 20
-        score.no = 40
-        score.not_reporting = 60
-        filter_mock.return_value = [score]
-        response = self.app.get(self.get_url(end, start, url), user="testuser")
-        self.assertEqual(200, response.status_code)
-        json_content = response.content.decode('utf8')
-        data = json.loads(json_content)
-        self.assertEqual(data['values'][0], {u'cycle': u'Mar - Apr 2015', u'no': 40, u'not_reporting': 60, u'yes': 20})
-        filter_mock.assert_called_with(
-            cycle__in=[(u'Mar - Apr %s' % year), (u'May - Jun %s' % year), (u'Jul - Aug %s' % year),
-                       (u'Sep - Oct %s' % year), (u'Nov - Dec %s' % year)], combination__icontains=u'DEFAULT',
-            test=self.test + "reg")
+    def get_url(self, end, start, url):
+        regimen = "Paed 1L"
+        return "%s?start=%s&end=%s&regimen=%s" % (url, start, end, regimen)
+
+    def test_view_is_wired_up(self):
+        pass

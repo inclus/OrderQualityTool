@@ -1,8 +1,10 @@
 import json
+from arrow import now
 from django.core.urlresolvers import reverse
 from django_webtest import WebTest
 from model_mommy import mommy
-from dashboard.models import DashboardUser, IIP, DISTRICT, WAREHOUSE, Cycle, Score
+from dashboard.models import DashboardUser, IIP, DISTRICT, WAREHOUSE, Score
+from dashboard.helpers import DEFAULT, YES, NO
 
 
 class RankingsAccessViewTestCase(WebTest):
@@ -44,3 +46,14 @@ class CyclesViewTestCase(WebTest):
         response = self.app.get(url)
         data = json.loads(response.content.decode('utf8'))
         self.assertTrue(score.cycle in data['values'])
+
+class ReportingRateAggregateViewTestCase(WebTest):
+    def test_should_only_consider_faciilites_user_has_access_to(self):
+        cycle = 'Jan - Feb %s' % now().format("YYYY")
+        Score.objects.create(name="F1", ip="IP1", cycle=cycle, REPORTING={DEFAULT: YES})
+        Score.objects.create(name="F2", ip="IP1", cycle=cycle, REPORTING={DEFAULT: NO})
+        user = mommy.make(DashboardUser, access_level='IP', access_area='IP1')
+        url = reverse('submiited_order')
+        response = self.app.get(url, user=user)
+        data = json.loads(response.content.decode('utf8'))['values']
+        self.assertIn({"reporting": 50, "cycle": cycle, "not_reporting": 50, "n_a": 0}, data)

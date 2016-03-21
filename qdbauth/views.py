@@ -33,7 +33,6 @@ class EditUserForm(ModelForm):
         level = self.instance.access_level.lower()
         if level in ["district", "ip", "warehouse", "name"]:
             choices = Score.objects.values_list(level, flat=True).distinct()
-            print "the level", self.fields["access_area"]
             self.fields["access_area"].widget.choices = [(ch, ch) for ch in choices]
 
 

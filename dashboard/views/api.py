@@ -1,4 +1,5 @@
 import csv
+import json
 from functools import cmp_to_key
 import pydash
 
@@ -17,8 +18,41 @@ from dashboard.helpers import generate_cycles, to_date, GUIDELINE_ADHERENCE, ORD
     CONSUMPTION_AND_PATIENTS, STABLE_CONSUMPTION, WAREHOUSE_FULFILMENT, STABLE_PATIENT_VOLUMES, NNRTI_CURRENT_ADULTS, \
     NNRTI_CURRENT_PAED, NNRTI_NEW_ADULTS, NNRTI_NEW_PAED, sort_cycle, WEB_BASED, REPORTING, F1, F2, F3, DEFAULT, YES, NO, NOT_REPORTING
 
-from dashboard.models import CycleFormulationScore, Score, WAREHOUSE, DISTRICT, MultipleOrderFacility, Cycle
+from dashboard.models import Score, WAREHOUSE, DISTRICT, MultipleOrderFacility, Cycle
 from dashboard.serializers import ScoreSerializer
+
+def aggregate_scores(user, test, cycles, formulation, keys):
+    scores_filter = {}
+    if user:
+        access_level = user.access_level
+        access_area = user.access_area
+        if access_level and access_area:
+            scores_filter[access_level.lower()] = access_area
+    score_objects = Score.objects.filter(**scores_filter).values(test, "cycle")
+    grouped_objects = pydash.group_by(score_objects, lambda x: x["cycle"])
+
+    def get_count_key(value):
+        value_as_dict = json.loads(value[test])
+        return value_as_dict.get(formulation, None) if type(value_as_dict) is dict else None
+
+    def agg(value):
+        values = grouped_objects.get(value, [])
+        result = {'cycle': value}
+        total = len(values)
+        if total > 0:
+            counts = pydash.count_by(values, get_count_key)
+            yes_count = counts.get(YES, 0)
+            no_count = counts.get(NO, 0)
+            not_reporting_count = counts.get(NOT_REPORTING, 0)
+            result[keys[YES]] = (yes_count * 100 / float(total))
+            result[keys[NO]] = (no_count * 100 / float(total))
+            result[keys[NOT_REPORTING]] = (not_reporting_count * 100 / float(total))
+        else:
+            result[keys[YES]] = 0
+            result[keys[NO]] = 0
+            result[keys[NOT_REPORTING]] = 0
+        return result
+    return pydash.collect(cycles, agg)
 
 class BestPerformingDistrictsView(APIView):
     reverse = True
@@ -100,44 +134,30 @@ class CyclesView(APIView):
 
 class ReportMetrics(APIView):
     def get(self, request):
-        adh = self.request.GET.get("adh", None)
-        records = [cycle['cycle'] for cycle in CycleFormulationScore.objects.values('cycle').distinct()]
+        adh = self.request.GET.get("adh", "Adult 1L")
+        records = [cycle['cycle'] for cycle in Score.objects.values('cycle').distinct()]
         most_recent_cycle, = sorted(records, key=cmp_to_key(sort_cycle), reverse=True)[:1]
-        web_score = CycleFormulationScore.objects.get(cycle=most_recent_cycle, test=WEB_BASED, combination='DEFAULT')
-        report_score = CycleFormulationScore.objects.get(cycle=most_recent_cycle, test=REPORTING, combination='DEFAULT')
-        adh_filter = GUIDELINE_ADHERENCE
-        if adh is not None:
-            adh_filter = adh.replace(" ", "")
-        adherence_qs = CycleFormulationScore.objects.filter(cycle=most_recent_cycle,
-                                                            test__icontains=adh_filter,
-                                                            combination='DEFAULT')
-        web_rate = "{0:.1f}".format(web_score.yes)
-        report_rate = "{0:.1f}".format(report_score.yes)
-        adherence = "{0:.1f}".format(adherence_qs[0].yes) if len(adherence_qs) > 0 else ""
+        adh_filter = "%s%s" % (GUIDELINE_ADHERENCE, adh.replace(" ", ""))
+        web_based_scores = aggregate_scores(self.request.user, WEB_BASED, [most_recent_cycle], DEFAULT, {YES: 'yes', NO: 'no', NOT_REPORTING: 'not_reporting'})
+        reporting_scores = aggregate_scores(self.request.user, REPORTING, [most_recent_cycle], DEFAULT, {YES: 'yes', NO: 'no', NOT_REPORTING: 'not_reporting'})
+        adherence_scores = aggregate_scores(self.request.user, adh_filter, [most_recent_cycle], DEFAULT, {YES: 'yes', NO: 'no', NOT_REPORTING: 'not_reporting'})
+        web_rate = "{0:.1f}".format(web_based_scores[0]['yes']) if len(web_based_scores) > 0 else ""
+        report_rate = "{0:.1f}".format(reporting_scores[0]['yes']) if len(reporting_scores) > 0 else ""
+        adherence = "{0:.1f}".format(adherence_scores[0]['yes']) if len(adherence_scores) > 0 else ""
         return Response({"webBased": web_rate, "reporting": report_rate, "adherence": adherence})
 
 
 class ScoresAPIView(APIView):
-    def generate_data(self, test, start, end, formulation=None, keys={YES: 'yes', NO: 'no', NOT_REPORTING: 'not_reporting'}):
-        filters = {}
-        if formulation is not None:
-            filters = {'combination__icontains': formulation}
+    def generate_data(self, test, start, end, formulation=DEFAULT, keys={YES: 'yes', NO: 'no', NOT_REPORTING: 'not_reporting'}):
+        if formulation is None:
+            formulation = DEFAULT
         cycles = generate_cycles(now().replace(years=-2), now())
         if start and end:
             start_index = cycles.index(start)
             end_index = cycles.index(end)
             cycles_included = cycles[start_index: end_index + 1]
             cycles = cycles_included
-            filters['cycle__in'] = cycles_included
-        scores = CycleFormulationScore.objects.filter(test=test, **filters)
-        data = dict((k.cycle, k) for k in scores)
-        results = []
-        for cycle in cycles:
-            if cycle in data:
-                item = data.get(cycle)
-                results.append({"cycle": cycle, keys.get(YES): item.yes, keys.get(NO): item.no, keys.get(NOT_REPORTING): item.not_reporting})
-            else:
-                results.append({"cycle": cycle, "rate": None, keys.get(YES): None, keys.get(NO): None, keys.get(NOT_REPORTING): None})
+        results = aggregate_scores(self.request.user, test, cycles, formulation, keys)
         return Response({'values': results})
 
 
@@ -221,26 +241,8 @@ class GuideLineAdherenceView(DifferentOrdersOverTimeView):
         start = request.GET.get('start', None)
         end = request.GET.get('end', None)
         formulation = request.GET.get('regimen', None)
-        filters = {'combination__icontains': 'DEFAULT'}
-        cycles = generate_cycles(now().replace(years=-2), now())
-        if start and end:
-            start_index = cycles.index(start)
-            end_index = cycles.index(end)
-            cycles_included = cycles[start_index: end_index + 1]
-            cycles = cycles_included
-            filters['cycle__in'] = cycles_included
-
         test_name = "%s%s" % (self.test, formulation.replace(" ", ""))
-        scores = CycleFormulationScore.objects.filter(test=test_name, **filters)
-        data = dict((k.cycle, k) for k in scores)
-        results = []
-        for cycle in cycles:
-            if cycle in data:
-                item = data.get(cycle)
-                results.append({"cycle": cycle, "yes": item.yes, "no": item.no, "not_reporting": item.not_reporting})
-            else:
-                results.append({"cycle": cycle, "rate": None, "yes": None, "no": None, "not_reporting": None})
-        return Response({'values': results})
+        return self.generate_data(test_name, start, end, DEFAULT)
 
 
 class NNRTICurrentAdultsView(OrderFormFreeOfGapsView):
