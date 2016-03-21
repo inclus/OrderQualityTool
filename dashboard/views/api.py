@@ -1,5 +1,7 @@
 import csv
+import json
 from functools import cmp_to_key
+import pydash
 
 from arrow import now
 from braces.views import LoginRequiredMixin
@@ -14,66 +16,43 @@ from django.db.models.expressions import F
 from dashboard.helpers import generate_cycles, to_date, GUIDELINE_ADHERENCE, ORDER_FORM_FREE_OF_GAPS, \
     ORDER_FORM_FREE_OF_NEGATIVE_NUMBERS, DIFFERENT_ORDERS_OVER_TIME, CLOSING_BALANCE_MATCHES_OPENING_BALANCE, \
     CONSUMPTION_AND_PATIENTS, STABLE_CONSUMPTION, WAREHOUSE_FULFILMENT, STABLE_PATIENT_VOLUMES, NNRTI_CURRENT_ADULTS, \
-    NNRTI_CURRENT_PAED, NNRTI_NEW_ADULTS, NNRTI_NEW_PAED, sort_cycle, WEB_BASED, REPORTING, F1, F2, F3
+    NNRTI_CURRENT_PAED, NNRTI_NEW_ADULTS, NNRTI_NEW_PAED, sort_cycle, WEB_BASED, REPORTING, F1, F2, F3, DEFAULT, YES, NO, NOT_REPORTING
 
-from dashboard.models import CycleFormulationScore, Score, WAREHOUSE, DISTRICT, MultipleOrderFacility, Cycle
+from dashboard.models import Score, WAREHOUSE, DISTRICT, MultipleOrderFacility, Cycle
 from dashboard.serializers import ScoreSerializer
 
+def aggregate_scores(user, test, cycles, formulation, keys):
+    scores_filter = {}
+    if user:
+        access_level = user.access_level
+        access_area = user.access_area
+        if access_level and access_area:
+            scores_filter[access_level.lower()] = access_area
+    score_objects = Score.objects.filter(**scores_filter).values(test, "cycle")
+    grouped_objects = pydash.group_by(score_objects, lambda x: x["cycle"])
 
-class FacilitiesReportingView(APIView):
-    def get(self, request):
-        start = request.GET.get('start', None)
-        end = request.GET.get('end', None)
-        filters = {}
-        cycles = generate_cycles(now().replace(years=-2), now())
-        if start and end:
-            start_index = cycles.index(start)
-            end_index = cycles.index(end)
-            cycles_included = cycles[start_index: end_index + 1]
-            cycles = cycles_included
-            filters['cycle__in'] = cycles_included
-        results = []
-        for cycle in cycles:
-            scores = CycleFormulationScore.objects.filter(cycle=cycle, test=REPORTING)
-            if len(scores) > 0:
-                results.append({"cycle": cycle, "reporting": scores[0].yes, "not_reporting": scores[0].no})
-            else:
-                results.append({"cycle": cycle, "reporting": None, "not_reporting": None})
-        return Response({"values": results})
+    def get_count_key(value):
+        value_as_dict = json.loads(value[test])
+        return value_as_dict.get(formulation, None) if type(value_as_dict) is dict else None
 
-
-class WebBasedReportingView(APIView):
-    def get(self, request):
-        start = request.GET.get('start', None)
-        end = request.GET.get('end', None)
-        filters = {}
-        cycles = generate_cycles(now().replace(years=-2), now())
-        if start and end:
-            start_index = cycles.index(start)
-            end_index = cycles.index(end)
-            cycles_included = cycles[start_index: end_index + 1]
-            cycles = cycles_included
-            filters['cycle__in'] = cycles_included
-
-        results = []
-        for cycle in cycles:
-            scores = CycleFormulationScore.objects.filter(cycle=cycle, test=WEB_BASED)
-            if len(scores) > 0:
-                results.append({"cycle": cycle, "web": scores[0].yes, "paper": scores[0].no})
-            else:
-                results.append({"cycle": cycle, "web": None, "paper": None})
-        return Response({"values": results})
-
-
-class FacilitiesMultipleReportingView(APIView):
-    def get(self, request):
-        cycles = [cycle['cycle'] for cycle in MultipleOrderFacility.objects.values('cycle').distinct()]
-        sorted_cycles = sorted(cycles, key=cmp_to_key(sort_cycle), reverse=True)
-        most_recent_cycle = sorted_cycles[0]
-        cycle = request.GET.get('cycle', most_recent_cycle)
-        records = MultipleOrderFacility.objects.filter(cycle=cycle).order_by('name').values('name', 'district', 'ip', 'warehouse')
-        return Response({"values": records})
-
+    def agg(value):
+        values = grouped_objects.get(value, [])
+        result = {'cycle': value}
+        total = len(values)
+        if total > 0:
+            counts = pydash.count_by(values, get_count_key)
+            yes_count = counts.get(YES, 0)
+            no_count = counts.get(NO, 0)
+            not_reporting_count = counts.get(NOT_REPORTING, 0)
+            result[keys[YES]] = (yes_count * 100 / float(total))
+            result[keys[NO]] = (no_count * 100 / float(total))
+            result[keys[NOT_REPORTING]] = (not_reporting_count * 100 / float(total))
+        else:
+            result[keys[YES]] = 0
+            result[keys[NO]] = 0
+            result[keys[NOT_REPORTING]] = 0
+        return result
+    return pydash.collect(cycles, agg)
 
 class BestPerformingDistrictsView(APIView):
     reverse = True
@@ -155,74 +134,80 @@ class CyclesView(APIView):
 
 class ReportMetrics(APIView):
     def get(self, request):
-        adh = self.request.GET.get("adh", None)
-        records = [cycle['cycle'] for cycle in CycleFormulationScore.objects.values('cycle').distinct()]
+        adh = self.request.GET.get("adh", "Adult 1L")
+        records = [cycle['cycle'] for cycle in Score.objects.values('cycle').distinct()]
         most_recent_cycle, = sorted(records, key=cmp_to_key(sort_cycle), reverse=True)[:1]
-        web_score = CycleFormulationScore.objects.get(cycle=most_recent_cycle, test=WEB_BASED, combination='DEFAULT')
-        report_score = CycleFormulationScore.objects.get(cycle=most_recent_cycle, test=REPORTING, combination='DEFAULT')
-        adh_filter = GUIDELINE_ADHERENCE
-        if adh is not None:
-            adh_filter = adh.replace(" ", "")
-        adherence_qs = CycleFormulationScore.objects.filter(cycle=most_recent_cycle,
-                                                            test__icontains=adh_filter,
-                                                            combination='DEFAULT')
-        web_rate = "{0:.1f}".format(web_score.yes)
-        report_rate = "{0:.1f}".format(report_score.yes)
-        adherence = "{0:.1f}".format(adherence_qs[0].yes) if len(adherence_qs) > 0 else ""
+        adh_filter = "%s%s" % (GUIDELINE_ADHERENCE, adh.replace(" ", ""))
+        web_based_scores = aggregate_scores(self.request.user, WEB_BASED, [most_recent_cycle], DEFAULT, {YES: 'yes', NO: 'no', NOT_REPORTING: 'not_reporting'})
+        reporting_scores = aggregate_scores(self.request.user, REPORTING, [most_recent_cycle], DEFAULT, {YES: 'yes', NO: 'no', NOT_REPORTING: 'not_reporting'})
+        adherence_scores = aggregate_scores(self.request.user, adh_filter, [most_recent_cycle], DEFAULT, {YES: 'yes', NO: 'no', NOT_REPORTING: 'not_reporting'})
+        web_rate = "{0:.1f}".format(web_based_scores[0]['yes']) if len(web_based_scores) > 0 else ""
+        report_rate = "{0:.1f}".format(reporting_scores[0]['yes']) if len(reporting_scores) > 0 else ""
+        adherence = "{0:.1f}".format(adherence_scores[0]['yes']) if len(adherence_scores) > 0 else ""
         return Response({"webBased": web_rate, "reporting": report_rate, "adherence": adherence})
 
 
-class OrderFormFreeOfGapsView(APIView):
-    test = ORDER_FORM_FREE_OF_GAPS
-
-    def get(self, request):
-        start = request.GET.get('start', None)
-        end = request.GET.get('end', None)
-        filters = {}
+class ScoresAPIView(APIView):
+    def generate_data(self, test, start, end, formulation=DEFAULT, keys={YES: 'yes', NO: 'no', NOT_REPORTING: 'not_reporting'}):
+        if formulation is None:
+            formulation = DEFAULT
         cycles = generate_cycles(now().replace(years=-2), now())
         if start and end:
             start_index = cycles.index(start)
             end_index = cycles.index(end)
             cycles_included = cycles[start_index: end_index + 1]
             cycles = cycles_included
-            filters['cycle__in'] = cycles_included
-        scores = CycleFormulationScore.objects.filter(test=self.test, **filters)
-        data = dict((k.cycle, k) for k in scores)
-        results = []
-        for cycle in cycles:
-            if cycle in data:
-                item = data.get(cycle)
-                results.append({"cycle": cycle, "yes": item.yes, "no": item.no, "not_reporting": item.not_reporting})
-            else:
-                results.append({"cycle": cycle, "rate": None, "yes": None, "no": None, "not_reporting": None})
+        results = aggregate_scores(self.request.user, test, cycles, formulation, keys)
         return Response({'values': results})
 
 
-class OrderFormFreeOfNegativeNumbersView(APIView):
+class FacilitiesReportingView(ScoresAPIView):
+    test = REPORTING
+
+    def get(self, request):
+        start = request.GET.get('start', None)
+        end = request.GET.get('end', None)
+        keys = {YES: 'reporting', NO: 'not_reporting', NOT_REPORTING: 'n_a'}
+        return self.generate_data(self.test, start, end, None, keys)
+
+
+class WebBasedReportingView(ScoresAPIView):
+    test = WEB_BASED
+
+    def get(self, request):
+        start = request.GET.get('start', None)
+        end = request.GET.get('end', None)
+        keys = {YES: 'web', NO: 'paper', NOT_REPORTING: 'not_reporting'}
+        return self.generate_data(self.test, start, end, None, keys)
+
+
+class FacilitiesMultipleReportingView(ScoresAPIView):
+    def get(self, request):
+        cycles = [cycle['cycle'] for cycle in MultipleOrderFacility.objects.values('cycle').distinct()]
+        sorted_cycles = sorted(cycles, key=cmp_to_key(sort_cycle), reverse=True)
+        most_recent_cycle = sorted_cycles[0]
+        cycle = request.GET.get('cycle', most_recent_cycle)
+        records = MultipleOrderFacility.objects.filter(cycle=cycle).order_by('name').values('name', 'district', 'ip', 'warehouse')
+        return Response({"values": records})
+
+
+class OrderFormFreeOfGapsView(ScoresAPIView):
+    test = ORDER_FORM_FREE_OF_GAPS
+
+    def get(self, request):
+        start = request.GET.get('start', None)
+        end = request.GET.get('end', None)
+        return self.generate_data(self.test, start, end)
+
+
+class OrderFormFreeOfNegativeNumbersView(ScoresAPIView):
     test = ORDER_FORM_FREE_OF_NEGATIVE_NUMBERS
 
     def get(self, request):
         start = request.GET.get('start', None)
         end = request.GET.get('end', None)
         formulation = request.GET.get('regimen', None)
-        filters = {'combination__icontains': formulation}
-        cycles = generate_cycles(now().replace(years=-2), now())
-        if start and end:
-            start_index = cycles.index(start)
-            end_index = cycles.index(end)
-            cycles_included = cycles[start_index: end_index + 1]
-            cycles = cycles_included
-            filters['cycle__in'] = cycles_included
-        scores = CycleFormulationScore.objects.filter(test=self.test, **filters)
-        data = dict((k.cycle, k) for k in scores)
-        results = []
-        for cycle in cycles:
-            if cycle in data:
-                item = data.get(cycle)
-                results.append({"cycle": cycle, "yes": item.yes, "no": item.no, "not_reporting": item.not_reporting})
-            else:
-                results.append({"cycle": cycle, "rate": None, "yes": None, "no": None, "not_reporting": None})
-        return Response({'values': results})
+        return self.generate_data(self.test, start, end, formulation)
 
 
 class DifferentOrdersOverTimeView(OrderFormFreeOfNegativeNumbersView):
@@ -256,26 +241,8 @@ class GuideLineAdherenceView(DifferentOrdersOverTimeView):
         start = request.GET.get('start', None)
         end = request.GET.get('end', None)
         formulation = request.GET.get('regimen', None)
-        filters = {'combination__icontains': 'DEFAULT'}
-        cycles = generate_cycles(now().replace(years=-2), now())
-        if start and end:
-            start_index = cycles.index(start)
-            end_index = cycles.index(end)
-            cycles_included = cycles[start_index: end_index + 1]
-            cycles = cycles_included
-            filters['cycle__in'] = cycles_included
-
         test_name = "%s%s" % (self.test, formulation.replace(" ", ""))
-        scores = CycleFormulationScore.objects.filter(test=test_name, **filters)
-        data = dict((k.cycle, k) for k in scores)
-        results = []
-        for cycle in cycles:
-            if cycle in data:
-                item = data.get(cycle)
-                results.append({"cycle": cycle, "yes": item.yes, "no": item.no, "not_reporting": item.not_reporting})
-            else:
-                results.append({"cycle": cycle, "rate": None, "yes": None, "no": None, "not_reporting": None})
-        return Response({'values': results})
+        return self.generate_data(test_name, start, end, DEFAULT)
 
 
 class NNRTICurrentAdultsView(OrderFormFreeOfGapsView):
@@ -320,3 +287,13 @@ class RankingsAccessView(LoginRequiredMixin, APIView):
         if request.user.access_level == DISTRICT:
             levels = ['IP', 'Warehouse', 'Facility']
         return Response({"values": levels})
+
+
+class AccessAreasView(APIView):
+    def get(self, request):
+        level = request.GET.get('level', None)
+        access_levels = ['district', 'warehouse', 'ip', 'facility']
+        access_areas = []
+        if level and level.lower() in access_levels:
+            access_areas = pydash.reject(Score.objects.values_list(level, flat=True).distinct(), lambda x: len(x) < 1)
+        return Response(access_areas)

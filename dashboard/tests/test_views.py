@@ -9,7 +9,7 @@ from django_webtest import WebTest
 from mock import patch, ANY
 from webtest import Upload
 
-from dashboard.helpers import REPORTING, YES, MULTIPLE_ORDERS, TEST_NAMES, DEFAULT
+from dashboard.helpers import REPORTING, YES, MULTIPLE_ORDERS, TEST_NAMES, DEFAULT, NO
 from dashboard.models import Cycle, Score, DashboardUser, CycleFormulationScore, MultipleOrderFacility
 
 
@@ -44,11 +44,12 @@ class DataImportViewTestCase(WebTest):
 class FacilitiesReportingView(WebTest):
     def test_that_cycles_are_padded(self):
         cycle = 'Jan - Feb %s' % now().format("YYYY")
-        CycleFormulationScore.objects.create(combination="DEFAULT", test=REPORTING, yes=50, no=50, cycle=cycle)
+        Score.objects.create(REPORTING={DEFAULT: YES}, name="F2", cycle=cycle)
+        Score.objects.create(REPORTING={DEFAULT: NO}, name="F3", cycle=cycle)
         url = "/api/test/submittedOrder"
         json_response = self.app.get(url, user="testuser").content.decode('utf8')
         data = loads(json_response)['values']
-        self.assertIn({"reporting": 50, "cycle": cycle, "not_reporting": 50}, data)
+        self.assertIn({"reporting": 50, "cycle": cycle, "not_reporting": 50, "n_a": 0}, data)
 
     @patch("dashboard.views.api.now")
     def test_that_start_end_work(self, time_mock):
@@ -65,11 +66,12 @@ class FacilitiesReportingView(WebTest):
 class WebBasedReportingViewTestCase(WebTest):
     def test_that_cycles_are_padded(self):
         cycle = 'Jan - Feb %s' % now().format("YYYY")
-        CycleFormulationScore.objects.create(combination="DEFAULT", test="WEB_BASED", yes=50, no=50, cycle=cycle)
+        Score.objects.create(WEB_BASED={DEFAULT: YES}, name="F2", cycle=cycle)
+        Score.objects.create(WEB_BASED={DEFAULT: NO}, name="F3", cycle=cycle)
         url = "/api/test/orderType"
         json_response = self.app.get(url, user="testuser").content.decode('utf8')
         data = loads(json_response)['values']
-        self.assertIn({"web": 50, "cycle": cycle, "paper": 50}, data)
+        self.assertIn({"web": 50, "cycle": cycle, "paper": 50, "not_reporting": 0}, data)
 
     @patch("dashboard.views.api.now")
     def test_that_start_end_work(self, time_mock):

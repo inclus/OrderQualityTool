@@ -96,6 +96,11 @@ class ScoresTableView(BaseDatatableView):
             filters['ip'] = ip
         if warehouse:
             filters['warehouse'] = warehouse
+
+        if self.request.user:
+            if self.request.user.access_level and self.request.user.access_area:
+                filters[self.request.user.access_level.lower()] = self.request.user.access_area
+
         qs = qs.filter(**filters)
         return qs
 

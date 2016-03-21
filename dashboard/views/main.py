@@ -57,10 +57,16 @@ class ReportsView(LoginRequiredMixin, TemplateView):
 
     def get_context_data(self, *args, **kwargs):
         context = super(ReportsView, self).get_context_data(*args, **kwargs)
-        ips = Score.objects.values('ip').order_by('ip').distinct()
-        warehouses = Score.objects.values('warehouse').order_by('warehouse').distinct()
-        districts = Score.objects.values('district').order_by('district').distinct()
-        cycles = Score.objects.values('cycle').distinct()
+        access_level = self.request.user.access_level
+        access_area = self.request.user.access_area
+        qs_filter = {}
+        if access_level and access_area:
+            qs_filter[access_level.lower()] = access_area
+        qs = Score.objects.filter(**qs_filter)
+        ips = qs.values('ip').order_by('ip').distinct()
+        warehouses = qs.values('warehouse').order_by('warehouse').distinct()
+        districts = qs.values('district').order_by('district').distinct()
+        cycles = qs.values('cycle').distinct()
         context['districts'] = districts
         context['ips'] = ips
         context['warehouses'] = warehouses
