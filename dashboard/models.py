@@ -39,22 +39,6 @@ class DashboardUser(AbstractEmailUser):
         app_label = 'dashboard'
 
 
-class CycleFormulationScore(models.Model):
-    cycle = models.CharField(max_length=256)
-    test = models.CharField(max_length=256)
-    yes = models.FloatField(null=True)
-    no = models.FloatField(null=True)
-    not_reporting = models.FloatField(null=True)
-    combination = models.CharField(max_length=256, null=True, blank=True)
-
-    class Meta:
-        unique_together = ("cycle", "combination", "test")
-
-    def __unicode__(self):
-        return "%s %s YES:%s NO:%s NOT_REPORTING:%s FORMULATION:%s" % (
-            self.cycle, self.test, self.yes, self.no, self.not_reporting, self.combination)
-
-
 class Cycle(models.Model):
     title = models.CharField(max_length=256, db_index=True, unique=True)
     state = PickledObjectField()

@@ -4,31 +4,11 @@ from django.test import TestCase
 from mock import patch, call
 
 from dashboard.data.tests.test_data import FakeReport
-from dashboard.models import Score, CycleFormulationScore, Consumption, AdultPatientsRecord, PAEDPatientsRecord, Cycle, MultipleOrderFacility
-from dashboard.tasks import persist_scores, run_checks_and_persist_formulation_scores, persist_consumption, persist_adult_records, persist_paed_records, get_report_for_other_cycle, calculate_scores_for_checks_in_cycle, persist_multiple_order_records
+from dashboard.models import Score, Consumption, AdultPatientsRecord, PAEDPatientsRecord, Cycle, MultipleOrderFacility
+from dashboard.tasks import persist_scores, persist_consumption, persist_adult_records, persist_paed_records, get_report_for_other_cycle, calculate_scores_for_checks_in_cycle, persist_multiple_order_records
 
 
 class TaskTestCase(TestCase):
-    def test_should_create_scores_for_each_check(self):
-        report = FakeReport()
-        report.cs = defaultdict(list)
-        report.ads = defaultdict(list)
-        report.pds = defaultdict(list)
-        report.cycle = "May - Jun 2015"
-        report.locs = [{
-            'name': 'location_one',
-            'IP': 'ip_one',
-            'District': 'district_one',
-            'Warehouse': 'warehouse_one',
-            'Multiple': '',
-            'status': '',
-            'Web/Paper': '',
-            'scores': defaultdict(dict)
-        }]
-        self.assertEqual(CycleFormulationScore.objects.count(), 0)
-        run_checks_and_persist_formulation_scores(report)
-        run_checks_and_persist_formulation_scores(report)
-        self.assertEqual(CycleFormulationScore.objects.count(), 32)
 
     def test_should_record_scores_for_each_facility(self):
         report = FakeReport()
@@ -171,7 +151,7 @@ class TaskTestCase(TestCase):
         other_report = get_report_for_other_cycle(report)
         self.assertEqual(other_report.cs, [1, 2])
 
-    @patch('dashboard.tasks.run_checks_and_persist_formulation_scores')
+    @patch('dashboard.tasks.run_checks')
     @patch('dashboard.tasks.persist_scores')
     @patch('dashboard.tasks.persist_consumption')
     @patch('dashboard.tasks.persist_adult_records')

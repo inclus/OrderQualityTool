@@ -5,7 +5,6 @@ import time
 import pydash
 
 from dashboard.helpers import NO, NOT_REPORTING, YES, NAME, EXISTING, NEW, FORMULATION
-from dashboard.models import CycleFormulationScore
 
 TWO_CYCLE = "two_cycle"
 
@@ -106,13 +105,7 @@ class QCheck:
         self.report = report
 
     def score(self):
-        formulation_scores = list()
-        scores = self.run()
-        for key, value in scores.items():
-            formulation_scores.append(
-                CycleFormulationScore(cycle=self.report.cycle, combination=key, yes=value[YES], no=value[NO],
-                                      not_reporting=value[NOT_REPORTING], test=self.test))
-        return formulation_scores
+        self.run()
 
     def run(self):
         scores = dict()

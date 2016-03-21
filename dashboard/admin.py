@@ -8,7 +8,7 @@ from django.utils.translation import ugettext_lazy as _
 
 from dashboard.data.free_form_report import FreeFormReport
 from dashboard.models import DashboardUser, Consumption, Cycle, AdultPatientsRecord, PAEDPatientsRecord, \
-    CycleFormulationScore, Score, MultipleOrderFacility
+    Score, MultipleOrderFacility
 from dashboard.tasks import calculate_scores_for_checks_in_cycle
 
 
@@ -97,12 +97,6 @@ def run_tests(model_admin, request, queryset):
 
 run_tests.short_description = "Run quality tests for these cycles"
 
-
-class CycleFormulationScoreAdmin(ModelAdmin):
-    list_display = ('combination', 'cycle', 'test', 'yes', 'no', 'not_reporting')
-    list_filter = ('cycle', 'test', 'combination')
-
-
 class ScoreAdmin(ModelAdmin):
     search_fields = ('name','district')
     list_display = ('name',
@@ -147,7 +141,6 @@ admin_site = QdbSite()
 admin_site.register(Group, GroupAdmin)
 admin_site.register(DashboardUser, EmailUserAdmin)
 admin_site.register(Score, ScoreAdmin)
-admin_site.register(CycleFormulationScore, CycleFormulationScoreAdmin)
 admin_site.register(AdultPatientsRecord, PatientAdmin)
 admin_site.register(PAEDPatientsRecord, PatientAdmin)
 admin_site.register(Consumption, ConsumptionAdmin)

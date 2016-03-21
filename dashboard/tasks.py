@@ -14,7 +14,7 @@ from dashboard.data.nn import NNRTICURRENTADULTSCheck, NNRTINewAdultsCheck, NNRT
 from dashboard.data.nn import NNRTICURRENTPAEDCheck
 from dashboard.data.utils import facility_has_single_order
 from dashboard.helpers import YES, get_prev_cycle, WEB,F1, F2, F3, DEFAULT
-from dashboard.models import CycleFormulationScore, Score, Cycle, Consumption, AdultPatientsRecord, PAEDPatientsRecord, MultipleOrderFacility
+from dashboard.models import Score, Cycle, Consumption, AdultPatientsRecord, PAEDPatientsRecord, MultipleOrderFacility
 
 
 def persist_consumption(report):
@@ -76,7 +76,7 @@ def persist_multiple_order_records(report):
 
 @shared_task
 def calculate_scores_for_checks_in_cycle(report):
-    run_checks_and_persist_formulation_scores(report)
+    run_checks(report)
     persist_scores(report)
     persist_consumption(report)
     persist_adult_records(report)
@@ -84,8 +84,7 @@ def calculate_scores_for_checks_in_cycle(report):
     persist_multiple_order_records(report)
 
 
-def run_checks_and_persist_formulation_scores(report):
-    formulation_scores = list()
+def run_checks(report):
     one_cycle_checks = [
         BlanksQualityCheck,
         NegativeNumbersQualityCheck,
@@ -102,8 +101,7 @@ def run_checks_and_persist_formulation_scores(report):
         NNRTINEWPAEDCheck
     ]
     for check in one_cycle_checks:
-        score = check(report).score()
-        formulation_scores.extend(score)
+        check(report).score()
     other_report = get_report_for_other_cycle(report)
     two_cycle_checks = [BalancesMatchCheck,
                         OrdersOverTimeCheck,
@@ -112,10 +110,7 @@ def run_checks_and_persist_formulation_scores(report):
                         StablePatientVolumesCheck
                         ]
     for check in two_cycle_checks:
-        score = check(report, other_report).score()
-        formulation_scores.extend(score)
-    CycleFormulationScore.objects.filter(cycle=report.cycle).delete()
-    CycleFormulationScore.objects.bulk_create(formulation_scores)
+        check(report, other_report).score()
 
 
 def get_report_for_other_cycle(report):

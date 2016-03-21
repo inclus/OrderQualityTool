@@ -9,8 +9,8 @@ from django_webtest import WebTest
 from mock import patch, ANY
 from webtest import Upload
 
-from dashboard.helpers import REPORTING, YES, MULTIPLE_ORDERS, TEST_NAMES, DEFAULT, NO
-from dashboard.models import Cycle, Score, DashboardUser, CycleFormulationScore, MultipleOrderFacility
+from dashboard.helpers import YES, MULTIPLE_ORDERS, TEST_NAMES, DEFAULT, NO
+from dashboard.models import Cycle, Score, DashboardUser, MultipleOrderFacility
 
 
 class HomeViewTestCase(WebTest):
