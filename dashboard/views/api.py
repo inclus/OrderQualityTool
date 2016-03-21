@@ -13,15 +13,12 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.db.models.expressions import F
 
-from dashboard.helpers import generate_cycles, to_date, GUIDELINE_ADHERENCE, ORDER_FORM_FREE_OF_GAPS, \
-    ORDER_FORM_FREE_OF_NEGATIVE_NUMBERS, DIFFERENT_ORDERS_OVER_TIME, CLOSING_BALANCE_MATCHES_OPENING_BALANCE, \
-    CONSUMPTION_AND_PATIENTS, STABLE_CONSUMPTION, WAREHOUSE_FULFILMENT, STABLE_PATIENT_VOLUMES, NNRTI_CURRENT_ADULTS, \
-    NNRTI_CURRENT_PAED, NNRTI_NEW_ADULTS, NNRTI_NEW_PAED, sort_cycle, WEB_BASED, REPORTING, F1, F2, F3, DEFAULT, YES, NO, NOT_REPORTING
+from dashboard.helpers import *
 
 from dashboard.models import Score, WAREHOUSE, DISTRICT, MultipleOrderFacility, Cycle
 from dashboard.serializers import ScoreSerializer
 
-def aggregate_scores(user, test, cycles, formulation, keys):
+def aggregate_scores(user, test, cycles, formulation, keys, count_values):
     scores_filter = {}
     if user:
         access_level = user.access_level
@@ -39,11 +36,14 @@ def aggregate_scores(user, test, cycles, formulation, keys):
         values = grouped_objects.get(value, [])
         result = {'cycle': value}
         total = len(values)
+        yes_count_value = count_values[YES]
+        no_count_value = count_values[NO]
+        not_reporting_count_value = count_values[NOT_REPORTING]
         if total > 0:
             counts = pydash.count_by(values, get_count_key)
-            yes_count = counts.get(YES, 0)
-            no_count = counts.get(NO, 0)
-            not_reporting_count = counts.get(NOT_REPORTING, 0)
+            yes_count = counts.get(yes_count_value, 0)
+            no_count = counts.get(no_count_value, 0)
+            not_reporting_count = counts.get(not_reporting_count_value, 0)
             result[keys[YES]] = (yes_count * 100 / float(total))
             result[keys[NO]] = (no_count * 100 / float(total))
             result[keys[NOT_REPORTING]] = (not_reporting_count * 100 / float(total))
@@ -138,17 +138,17 @@ class ReportMetrics(APIView):
         records = [cycle['cycle'] for cycle in Score.objects.values('cycle').distinct()]
         most_recent_cycle, = sorted(records, key=cmp_to_key(sort_cycle), reverse=True)[:1]
         adh_filter = "%s%s" % (GUIDELINE_ADHERENCE, adh.replace(" ", ""))
-        web_based_scores = aggregate_scores(self.request.user, WEB_BASED, [most_recent_cycle], DEFAULT, {YES: 'yes', NO: 'no', NOT_REPORTING: 'not_reporting'})
-        reporting_scores = aggregate_scores(self.request.user, REPORTING, [most_recent_cycle], DEFAULT, {YES: 'yes', NO: 'no', NOT_REPORTING: 'not_reporting'})
-        adherence_scores = aggregate_scores(self.request.user, adh_filter, [most_recent_cycle], DEFAULT, {YES: 'yes', NO: 'no', NOT_REPORTING: 'not_reporting'})
-        web_rate = "{0:.1f}".format(web_based_scores[0]['yes']) if len(web_based_scores) > 0 else ""
-        report_rate = "{0:.1f}".format(reporting_scores[0]['yes']) if len(reporting_scores) > 0 else ""
+        web_based_scores = aggregate_scores(self.request.user, WEB_BASED, [most_recent_cycle], DEFAULT, {YES: 'web', NO: 'paper', NOT_REPORTING: 'not_reporting'}, {YES: WEB, NO: PAPER, NOT_REPORTING: NOT_REPORTING})
+        reporting_scores = aggregate_scores(self.request.user, REPORTING, [most_recent_cycle], DEFAULT, {YES: 'reporting', NO: 'not_reporting', NOT_REPORTING: 'n_a'}, {YES: YES, NO: NO, NOT_REPORTING: NOT_REPORTING})
+        adherence_scores = aggregate_scores(self.request.user, adh_filter, [most_recent_cycle], DEFAULT, {YES: 'yes', NO: 'no', NOT_REPORTING: 'not_reporting'}, {YES: YES, NO: NO, NOT_REPORTING: NOT_REPORTING})
+        web_rate = "{0:.1f}".format(web_based_scores[0]['web']) if len(web_based_scores) > 0 else ""
+        report_rate = "{0:.1f}".format(reporting_scores[0]['reporting']) if len(reporting_scores) > 0 else ""
         adherence = "{0:.1f}".format(adherence_scores[0]['yes']) if len(adherence_scores) > 0 else ""
         return Response({"webBased": web_rate, "reporting": report_rate, "adherence": adherence})
 
 
 class ScoresAPIView(APIView):
-    def generate_data(self, test, start, end, formulation=DEFAULT, keys={YES: 'yes', NO: 'no', NOT_REPORTING: 'not_reporting'}):
+    def generate_data(self, test, start, end, formulation=DEFAULT, keys={YES: 'yes', NO: 'no', NOT_REPORTING: 'not_reporting'}, count_values={YES: YES, NO: NO, NOT_REPORTING: NOT_REPORTING}):
         if formulation is None:
             formulation = DEFAULT
         cycles = generate_cycles(now().replace(years=-2), now())
@@ -157,7 +157,7 @@ class ScoresAPIView(APIView):
             end_index = cycles.index(end)
             cycles_included = cycles[start_index: end_index + 1]
             cycles = cycles_included
-        results = aggregate_scores(self.request.user, test, cycles, formulation, keys)
+        results = aggregate_scores(self.request.user, test, cycles, formulation, keys, count_values)
         return Response({'values': results})
 
 
@@ -178,7 +178,8 @@ class WebBasedReportingView(ScoresAPIView):
         start = request.GET.get('start', None)
         end = request.GET.get('end', None)
         keys = {YES: 'web', NO: 'paper', NOT_REPORTING: 'not_reporting'}
-        return self.generate_data(self.test, start, end, None, keys)
+        count_values = {YES: WEB, NO: PAPER, NOT_REPORTING: NOT_REPORTING}
+        return self.generate_data(self.test, start, end, None, keys, count_values)
 
 
 class FacilitiesMultipleReportingView(ScoresAPIView):

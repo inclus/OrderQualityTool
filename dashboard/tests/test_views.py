@@ -9,7 +9,7 @@ from django_webtest import WebTest
 from mock import patch, ANY
 from webtest import Upload
 
-from dashboard.helpers import YES, MULTIPLE_ORDERS, TEST_NAMES, DEFAULT, NO
+from dashboard.helpers import *
 from dashboard.models import Cycle, Score, DashboardUser, MultipleOrderFacility
 
 
@@ -66,8 +66,8 @@ class FacilitiesReportingView(WebTest):
 class WebBasedReportingViewTestCase(WebTest):
     def test_that_cycles_are_padded(self):
         cycle = 'Jan - Feb %s' % now().format("YYYY")
-        Score.objects.create(WEB_BASED={DEFAULT: YES}, name="F2", cycle=cycle)
-        Score.objects.create(WEB_BASED={DEFAULT: NO}, name="F3", cycle=cycle)
+        Score.objects.create(WEB_BASED={DEFAULT: WEB}, name="F2", cycle=cycle)
+        Score.objects.create(WEB_BASED={DEFAULT: PAPER}, name="F3", cycle=cycle)
         url = "/api/test/orderType"
         json_response = self.app.get(url, user="testuser").content.decode('utf8')
         data = loads(json_response)['values']
