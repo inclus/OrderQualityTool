@@ -18,7 +18,7 @@ class NewUserForm(EmailUserCreationForm):
 
     class Meta:
         model = get_user_model()
-        fields = ('email', 'is_staff', 'is_superuser', 'access_level', 'access_area')
+        fields = ('email', 'is_superuser', 'access_level', 'access_area')
 
 
 class EditUserForm(ModelForm):
