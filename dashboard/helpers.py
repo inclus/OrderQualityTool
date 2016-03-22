@@ -195,7 +195,7 @@ TEST_NAMES = {
     CONSUMPTION_AND_PATIENTS: "VOLUME TALLY: Consumption and patient volumes within 30%?",
     STABLE_CONSUMPTION: "STABLE CONSUMPTION: Consumption changes by less than 50% vs previous cycle?",
     WAREHOUSE_FULFILMENT: "WAREHOUSE FULFILMENT: Volume delivered = Volume ordered in previous cycle?",
-    STABLE_PATIENT_VOLUMES: "STABLE PATIENT VOLUMES: Are total patient numbers stable from one cycle to the next?",
+    STABLE_PATIENT_VOLUMES: "STABLE PATIENTS: Patient volumes change by less than 50% vs. previous cycle?",
     GUIDELINE_ADHERENCE_PAED_1L: "GUIDELINE ADHERENCE (PAED 1L): 80%+ estimated new patients on ABC formulations?",
     GUIDELINE_ADHERENCE_ADULT_2L: "GUIDELINE ADHERENCE (ADULT 2L): 73%+ estimated new patients on ATV/r formulations?",
     GUIDELINE_ADHERENCE_ADULT_1L: "GUIDELINE ADHERENCE (ADULT 1L): 80%+ estimated new patients on TDF formulations?",

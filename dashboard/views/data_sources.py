@@ -13,7 +13,7 @@ from dashboard.models import Consumption, AdultPatientsRecord, PAEDPatientsRecor
 CHECK = "check"
 IS_HEADER = "isHeader"
 HEADERS = "headers"
-
+RESULTS_TITLE = "results_title"
 query_map = {F1: F1_QUERY, F2: F2_QUERY, F3: F3_QUERY}
 
 
@@ -297,9 +297,9 @@ class GuidelineAdherenceDataSource(CheckDataSource):
         return "check/adherence.html"
 
     checks = {
-        GUIDELINE_ADHERENCE_ADULT_1L: {DF1: "TDF-based regimens", DF2: "AZT-based regimens", CHECK: GuidelineAdherenceCheckAdult1L},
-        GUIDELINE_ADHERENCE_ADULT_2L: {DF1: "ATV/r-based regimens", DF2: "LPV/r-based regimens", CHECK: GuidelineAdherenceCheckAdult2L},
-        GUIDELINE_ADHERENCE_PAED_1L: {DF1: "ABC-based regimens", DF2: "AZT-based regimens", CHECK: GuidelineAdherenceCheckPaed1L},
+        GUIDELINE_ADHERENCE_ADULT_1L: {RESULTS_TITLE: "TDF Based as % of the Total", DF1: "TDF-based regimens", DF2: "AZT-based regimens", CHECK: GuidelineAdherenceCheckAdult1L},
+        GUIDELINE_ADHERENCE_ADULT_2L: {RESULTS_TITLE: "ATV/r Based as % of the Total", DF1: "ATV/r-based regimens", DF2: "LPV/r-based regimens", CHECK: GuidelineAdherenceCheckAdult2L},
+        GUIDELINE_ADHERENCE_PAED_1L: {RESULTS_TITLE: "ABC Based as % of the Total", DF1: "ABC-based regimens", DF2: "AZT-based regimens", CHECK: GuidelineAdherenceCheckPaed1L},
     }
 
     def get_context(self, score, test, combination):
@@ -307,6 +307,7 @@ class GuidelineAdherenceDataSource(CheckDataSource):
         check = check_data.get(CHECK)({})
         check_combination = check.combinations[0]
         data = {"main_title": "RAW ORDER DATA", "tables": []}
+        data["result_title"] = check_data[RESULTS_TITLE]
         for part in [DF1, DF2]:
             field_names = [FIELD_NAMES.get(f) for f in check_combination.get(FIELDS)]
             table = {NAME: check_data.get(part), ROWS: [], HEADERS: field_names}

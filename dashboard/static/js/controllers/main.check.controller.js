@@ -9,7 +9,7 @@ angular.module('dashboard').controller('MainChecksController', ['$scope',
             "template": "/static/views/chart.html"
         }, {
             "url": "facilitiesMultiple",
-            "desc": "MULTIPLE ORDERS: Submitted more than one order?",
+            "desc": "MULTIPLE ORDERS: Submitted more than one order during the cycle?",
             "hasRegimen": false,
             "hasChart": false,
             "hasCycle": true,
