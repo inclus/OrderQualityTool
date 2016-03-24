@@ -1,11 +1,16 @@
 angular.module('dashboard').controller('GuidelineAdherenceController', ['$scope', 'ReportService', '$rootScope',
     function($scope, ReportService, $rootScope) {
-        $scope.guidelineType = 'Adult 1L';
+        $scope.guidelineTypes = [
+          {code: 'Adult 1L' , name: 'Adult First Line'},
+          {code: 'Adult 2L' , name: 'Adult Second Line'},
+          {code: 'Paed 1L' , name: 'Paed First Line'}
+        ];
+        $scope.guidelineType = $scope.guidelineTypes[0];
         var update = function(start, end) {
             ReportService.getDataForTest('guidelineAdherence', {
                 start: start,
                 end: end,
-                regimen: $scope.guidelineType
+                regimen: $scope.guidelineType.code
             }).then(function(data) {
                 var values = data.values;
                 $scope.options = {

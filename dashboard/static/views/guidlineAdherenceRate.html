@@ -1,17 +1,12 @@
 <div ng-controller="GuidelineAdherenceController">
-<h4 class="text-center">FACILITIES ADHERING TO NATIONAL GUIDELINE - {{guidelineType}} (%)</h4>
+<h4 class="text-center">FACILITIES ADHERING TO NATIONAL GUIDELINE - {{guidelineType.name}} (%)</h4>
     <div class="col-md-3">
         <h5>Select National Guideline</h5>
-        <select ng-model="guidelineType" id="" class="form-control select-drop">
-            <option value="Adult 1L">Adult First Line</option>
-            <option value="Adult 2L">Adult Second Line</option>
-            <option value="Paed 1L">Paed First Line</option>
-        </select>
+        <select class="form-control select-drop" ng-options="item as item.name for item in guidelineTypes track by item.code" ng-model="guidelineType"></select>
     </div>
     <div class="col-md-9">
         <div class="page_graph">
             <angular-chart options="options"></angular-chart>
         </div>
     </div>
-    
 </div>
