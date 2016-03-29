@@ -132,7 +132,27 @@ class NNRTICurrentAdultCheckDetailView(WebTest, NNRTICheckTestMixin):
 
 class StablePatientsCheckDetailView(WebTest, ScoreDetailTestCase):
     column = 16
-    template_name = "check/differentOrdersOverTime.html"
+    template_name = "check/patientStability.html"
+
+    def test_should_have_headers(self):
+        name = "F1"
+        warehouse = "W1"
+        ip = "I1"
+        district = "D1"
+        cycle = "Jan - Feb 2015"
+        score = Score.objects.create(name=name, warehouse=warehouse, ip=ip, district=district, REPORTING={DEFAULT: YES},
+                                     WEB_BASED={DEFAULT: YES}, cycle=cycle)
+        for q in F1_PATIENT_QUERY:
+            mommy.make(AdultPatientsRecord, name=name, warehouse=warehouse, ip=ip, district=district, cycle=cycle, formulation=q, new=50, existing=100)
+            mommy.make(PAEDPatientsRecord, name=name, warehouse=warehouse, ip=ip, district=district, cycle=cycle, formulation=q, new=60, existing=150)
+        for formulation in self.get_formulations():
+            values = generate_values()
+            mommy.make(Consumption, name=name, warehouse=warehouse, ip=ip, district=district, cycle=cycle, formulation=formulation, **values)
+        url = reverse("scores-detail", kwargs={"id": score.id, "column": self.column}) + "?combination=" + F1
+        response = self.app.get(url)
+        self.assertEqual(response.context['data']['current_cycle'][0]['headers'], ['New', 'Existing', 'TOTAL'])
+        self.assertEqual(response.context['data']['current_cycle'][0]['totals'], {'New': 100, 'Existing':200, 'TOTAL':300})
+
 
 
 class ConsumptionAndPatientsCheckDetailView(WebTest, ScoreDetailTestCase):

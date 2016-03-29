@@ -251,23 +251,42 @@ class StableConsumptionDataSource(TwoCycleDataSource):
 
 class StablePatientVolumesDataSource(TwoCycleDataSource):
     def get_template(self, test):
-        return "check/differentOrdersOverTime.html"
+        return "check/patientStability.html"
 
     check = StablePatientVolumesCheck({}, {})
+
+    def get_table_for_cycle(self, cycle, check, combination, score):
+        check_combination = get_combination(check.combinations, combination)
+        records = self.get_queryset(check_combination, cycle, score)
+        tables = [
+            {"cycle": cycle}
+        ]
+        tables[0][ROWS], tables[0][HEADERS] , tables[0]['totals']= self.build_rows(check, records)
+        return tables
 
     def build_rows(self, check, records):
         rows = []
         total = 0
-        for field in check.fields:
-            value_total = 0
-            for consumption in records:
+        headers = [FIELD_NAMES.get(field) for field in check.fields]
+        headers.append(TOTAL)
+        totals = {}
+        for field in headers:
+            totals[field] = 0
+        for consumption in records:
+            row_total = 0
+            row = {COLUMN: consumption.formulation}
+            for field in check.fields:
+                field_name = FIELD_NAMES.get(field)
                 int_value, valid_int = get_int(getattr(consumption, field))
                 if valid_int:
-                    value_total += int_value
-                    total += int_value
-            rows.append({COLUMN: FIELD_NAMES.get(field), VALUE: value_total})
-        rows.append({COLUMN: TOTAL, VALUE: total, IS_HEADER: True})
-        return rows
+                    row_total += int_value
+                    row[field_name] = int_value
+                    totals[field_name] += int_value
+            row[TOTAL] = row_total
+            totals[TOTAL] += row_total
+            rows.append(row)
+            total += row_total
+        return rows, headers, totals
 
     def get_queryset(self, check_combination, cycle, score):
         query = check_combination.get(PATIENT_QUERY)

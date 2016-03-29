@@ -1,0 +1,76 @@
+{% extends "check/base.html" %}
+{% load table %}
+{% block content %}
+    <span class="score_detail_data_title col-md-12">{{ data.main_title }}</span>
+    {% for n in data.previous_cycle %}
+        <div class="col-md-6">
+            <table class="table table-striped table-bordered">
+                <thead>
+                <tr>
+                    <th class="left">{{ n.cycle }}</th>
+                    {% for b in n.headers %}
+                    <th>{{b}}</th>
+                    {% endfor %}
+                </tr>
+                </thead>
+                <tbody>
+                {% for b in n.rows %}
+                    <tr>
+                        {% if b.isHeader %}
+                            <th class="left">{{ b.column }}</th>
+                        {% else %}
+                            <td>{{ b.column }}</td>
+                        {% endif %}
+                        {% for h in n.headers %}
+                        <td>{{ b|lookup:h }}</td>
+                        {% endfor %}
+
+                    </tr>
+                    {% endfor %}
+                    <tr>
+                      <th>Total</th>
+                      {% for h in n.headers %}
+                      <td>{{ n.totals|lookup:h }}</td>
+                      {% endfor %}
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    {% endfor %}
+    {% for n in data.current_cycle %}
+        <div class="col-md-6">
+            <table class="table table-striped table-bordered">
+                <thead>
+                <tr>
+                    <th class="left">{{ n.cycle }}</th>
+                    {% for b in n.headers %}
+                    <th>{{b}}</th>
+                    {% endfor %}
+                </tr>
+                </thead>
+                <tbody>
+                {% for b in n.rows %}
+                    <tr>
+                        {% if b.isHeader %}
+                            <th class="left">{{ b.column }}</th>
+                        {% else %}
+                            <td>{{ b.column }}</td>
+                        {% endif %}
+                        {% for h in n.headers %}
+                        <td>{{ b|lookup:h }}</td>
+                        {% endfor %}
+
+                    </tr>
+                    {% endfor %}
+                    <tr>
+                      <th>Total</th>
+                      {% for h in n.headers %}
+                      <td>{{ n.totals|lookup:h }}</td>
+                      {% endfor %}
+                    </tr>
+                </tbody>
+            </table>
+
+        </div>
+    {% endfor %}
+{% endblock %}
