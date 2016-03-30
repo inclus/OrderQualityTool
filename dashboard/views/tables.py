@@ -174,9 +174,11 @@ class ScoreDetailsView(View):
 
 class ScoreDetailsCSVView(ScoreDetailsView):
     def get(self, request, id, column):
+        view = ScoresTableView()
+        test = view.columns[int(column)]
         response_data, template_name, score = self.get_context_data(request, id, column)
         response = HttpResponse(content_type='text/csv')
-        response['Content-Disposition'] = 'attachment; filename="%s.csv"' % score.name
+        response['Content-Disposition'] = 'attachment; filename="%s-%s.csv"' % (score.name, test)
         t = loader.get_template(template_name.replace('html', 'csv'))
         c = Context(response_data)
         response.write(t.render(c))
