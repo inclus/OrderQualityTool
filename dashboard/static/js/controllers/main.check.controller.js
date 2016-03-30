@@ -95,10 +95,10 @@ angular.module('dashboard').controller('MainChecksController', ['$scope',
         }];
         $scope.regimens = [{
             name: "TDF/3TC/EFV (Adult)",
-            value: "TDF/3TC/EFV"
+            value: "TDF/3TC/EFV (Adult)"
         }, {
             name: "ABC/3TC (Paed)",
-            value: "ABC/3TC"
+            value: "ABC/3TC (Paed)"
         }, {
             name: "EFV200 (Paed)",
             value: "EFV200 (Paed)"
