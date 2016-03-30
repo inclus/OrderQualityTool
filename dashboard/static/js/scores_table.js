@@ -1,6 +1,16 @@
+function downloadURL(url, name) {
+  var link = document.createElement("a");
+  link.download = name;
+  link.href = url;
+  link.click();
+}
+
+var downloadCSV = function(url, name){
+  downloadURL(url, name + '.csv');
+};
+
 $(document).ready(function() {
     var tableId = "#score-tables";
-
     var oTable = $(tableId).DataTable({
         "dom": '<"top"f>rt<"bottom"lBp><"clear">',
         buttons: [
@@ -153,7 +163,6 @@ $(document).ready(function() {
     _.forEach(["#cycle_select", "#formulation_select"], function(id) {
         var firstValue = $(id + " option:first").val();
         $(id).select2("val", firstValue);
-        console.log("val", firstValue);
     });
 
     $(tableId).on("click", "td", function(e) {
@@ -183,6 +192,7 @@ $(document).ready(function() {
         }
 
     });
+
 
     $("[name='score-tables_length']").removeClass();
 

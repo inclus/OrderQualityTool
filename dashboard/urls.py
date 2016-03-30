@@ -40,6 +40,7 @@ urlpatterns = [
     url(r'^api/filters', dashboard.views.api.FilterValuesView.as_view(), name='filters'),
     url(r'^api/rankingsAccess', dashboard.views.api.RankingsAccessView.as_view(), name='rankings-access'),
     url(r'^api/table/scores$', csrf_exempt(dashboard.views.tables.ScoresTableView.as_view()), name='scores-table'),
-    url(r'^api/table/scores/detail/(?P<id>\d+)/(?P<column>\d+)', csrf_exempt(dashboard.views.tables.ScoreDetailsView.as_view()), name='scores-detail'),
+    url(r'^api/table/scores/detail/(?P<id>\d+)/(?P<column>\d+$)', csrf_exempt(dashboard.views.tables.ScoreDetailsView.as_view()), name='scores-detail'),
+    url(r'^api/table/scores/csv/(?P<id>\d+)/(?P<column>\d+$)', csrf_exempt(dashboard.views.tables.ScoreDetailsCSVView.as_view()), name='scores-detail-csv'),
     url(r'^api/access/areas$', csrf_exempt(dashboard.views.api.AccessAreasView.as_view()), name='access-areas'),
 ]

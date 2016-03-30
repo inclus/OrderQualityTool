@@ -1,8 +1,9 @@
 from django.db.models import Q
+from django.http import HttpResponse
 from django.shortcuts import render_to_response
 from django.views.generic import View
 from django_datatables_view.base_datatable_view import BaseDatatableView
-
+from django.template import loader, Context
 from dashboard.helpers import *
 from dashboard.models import Score
 from dashboard.views.data_sources import NegativesCheckDataSource, ConsumptionAndPatientsDataSource, TwoCycleDataSource, ClosingBalanceMatchesOpeningBalanceDataSource, StableConsumptionDataSource, StablePatientVolumesDataSource, WarehouseFulfillmentDataSource, GuidelineAdherenceDataSource, NNRTIDataSource
@@ -120,7 +121,7 @@ class ScoresTableView(BaseDatatableView):
 
 
 class ScoreDetailsView(View):
-    def get(self, request, id, column):
+    def get_context_data(self, request, id, column):
         TEST_DATA = {
             ORDER_FORM_FREE_OF_NEGATIVE_NUMBERS: NegativesCheckDataSource,
             CONSUMPTION_AND_PATIENTS: ConsumptionAndPatientsDataSource,
@@ -164,4 +165,20 @@ class ScoreDetailsView(View):
             actual_result = combination_yes() if combination in result else combination_no()
             result_data = {'test': TEST_NAMES.get(test, None), 'result': scores.get(actual_result), 'has_combination': len(result) > 1}
             response_data['result'] = result_data
+        response_data['detail'] = {'id': id, 'column': column, 'test': score.name}
+        return response_data, template_name, score
+
+    def get(self, request, id, column):
+        response_data, template_name, score = self.get_context_data(request, id, column)
         return render_to_response(template_name, context=response_data)
+
+class ScoreDetailsCSVView(ScoreDetailsView):
+    def get(self, request, id, column):
+        response_data, template_name, score = self.get_context_data(request, id, column)
+        response = HttpResponse(content_type='text/csv')
+        response['Content-Disposition'] = 'attachment; filename="%s.csv"' % score.name
+        t = loader.get_template(template_name.replace('html', 'csv'))
+        c = Context(response_data)
+        response.write(t.render(c))
+        return response
+
