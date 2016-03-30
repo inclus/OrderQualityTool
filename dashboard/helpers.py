@@ -33,7 +33,7 @@ def generate_cycles(start, end):
 
 
 def generate_choices():
-    return [(s, s) for s in generate_cycles(now().replace(years=-2), now())]
+    return [(s, s) for s in generate_cycles(now().replace(years=-2), now().replace(years=4))]
 
 
 def to_date(text):
