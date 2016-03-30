@@ -1,4 +1,5 @@
 import os
+from functools import cmp_to_key
 from braces.views import LoginRequiredMixin, StaffuserRequiredMixin
 from django.conf import settings
 from django.contrib import messages
@@ -7,7 +8,7 @@ from django.core.files.storage import default_storage
 from django.db.models import Count, Case, When
 from django.views.generic import TemplateView, FormView
 from dashboard.forms import FileUploadForm
-from dashboard.helpers import YES, F3, F2, F1
+from dashboard.helpers import YES, F3, F2, F1, sort_cycle
 from dashboard.models import Score
 from dashboard.tasks import import_general_report
 
@@ -66,7 +67,8 @@ class ReportsView(LoginRequiredMixin, TemplateView):
         ips = qs.values('ip').order_by('ip').distinct()
         warehouses = qs.values('warehouse').order_by('warehouse').distinct()
         districts = qs.values('district').order_by('district').distinct()
-        cycles = qs.values('cycle').distinct()
+        raw_cycles = [c[0] for c in qs.values_list('cycle').distinct()]
+        cycles = sorted(raw_cycles, key=cmp_to_key(sort_cycle), reverse=True)
         context['districts'] = districts
         context['ips'] = ips
         context['warehouses'] = warehouses
