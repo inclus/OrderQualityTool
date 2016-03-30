@@ -2,7 +2,13 @@ $(document).ready(function() {
     var tableId = "#score-tables";
 
     var oTable = $(tableId).DataTable({
-        "dom": '<"top"f>rt<"bottom"lp><"clear">',
+        "dom": '<"top"f>rt<"bottom"lBp><"clear">',
+        buttons: [
+          {
+            text: 'Export to CSV',
+            extend: 'csv'
+          }
+        ],
         language: {
             search: "",
             searchPlaceholder: "Search"
