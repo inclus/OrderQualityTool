@@ -152,8 +152,8 @@ class WarehouseFulfillmentCheck(TwoCycleQCheck):
         prev_values = values_for_records([PACKS_ORDERED, ], prev_records)
         current_values = values_for_records([QUANTITY_RECEIVED], current_records)
         current_values_have_blanks = pydash.some(current_values, lambda x: x is None)
-        amount_ordered = pydash.chain(prev_values).reject(lambda x: x is None).sum().value()
-        amount_received = pydash.chain(current_values).reject(lambda x: x is None).sum().value()
+        # amount_ordered = pydash.chain(prev_values).reject(lambda x: x is None).sum().value()
+        # amount_received = pydash.chain(current_values).reject(lambda x: x is None).sum().value()
         facility_is_not_reporting = facility_not_reporting(facility)
         result = NOT_REPORTING
         data_is_insufficient = count_prev < 1 or count_current < 1 or facility_is_not_reporting
@@ -205,16 +205,13 @@ class StablePatientVolumesCheck(StableConsumptionCheck):
             total_count += 1
             numerator = float(current_population)
             denominator = float(prev_population)
-            if abs(numerator) > abs(denominator):
-                numerator = float(prev_population)
-                denominator = float(current_population)
             quotient = abs(numerator / denominator)
             if not data_is_sufficient:
                 not_reporting += 1
-            elif 0.5 < quotient < 1.0:
+            elif 0.5 < quotient < 1.5:
                 yes += 1
                 result = YES
-            elif quotient <= 0.5 or quotient >= 1.0:
+            elif quotient <= 0.5 or quotient >= 1.5:
                 no += 1
                 result = NO
             else:
@@ -222,4 +219,3 @@ class StablePatientVolumesCheck(StableConsumptionCheck):
         else:
             pass
         return result, no, not_reporting, yes, total_count
-
