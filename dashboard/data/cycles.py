@@ -205,7 +205,10 @@ class StablePatientVolumesCheck(StableConsumptionCheck):
             total_count += 1
             numerator = float(current_population)
             denominator = float(prev_population)
-            quotient = abs(numerator / denominator)
+            if denominator == 0:
+                quotient = 0
+            else:
+                quotient = abs(numerator / denominator)
             if not data_is_sufficient:
                 not_reporting += 1
             elif 0.5 < quotient < 1.5:

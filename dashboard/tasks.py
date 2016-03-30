@@ -13,7 +13,7 @@ from dashboard.data.negatives import NegativeNumbersQualityCheck
 from dashboard.data.nn import NNRTICURRENTADULTSCheck, NNRTINewAdultsCheck, NNRTINEWPAEDCheck
 from dashboard.data.nn import NNRTICURRENTPAEDCheck
 from dashboard.data.utils import facility_has_single_order
-from dashboard.helpers import YES, get_prev_cycle, WEB,F1, F2, F3, DEFAULT
+from dashboard.helpers import YES, get_prev_cycle, WEB, F1, F2, F3, DEFAULT, NO
 from dashboard.models import Score, Cycle, Consumption, AdultPatientsRecord, PAEDPatientsRecord, MultipleOrderFacility
 
 
@@ -139,14 +139,16 @@ def persist_scores(report):
             cycle=report.cycle)
         for key, value in facility['scores'].items():
             setattr(s, key, value)
-            for f, result in value.items():
-                formulation_mapping = mapping.get(f)
-                if result in [YES, WEB]:
-                    model_field = formulation_mapping.get("pass")
-                    s.__dict__[model_field] += 1
-                else:
-                    model_field = formulation_mapping.get("fail")
-                    s.__dict__[model_field] += 1
+            print key
+            if key != "REPORTING":
+                for f, result in value.items():
+                    formulation_mapping = mapping.get(f)
+                    if result in [YES, WEB]:
+                        model_field = formulation_mapping.get("pass")
+                        s.__dict__[model_field] += 1
+                    elif result in [NO]:
+                        model_field = formulation_mapping.get("fail")
+                        s.__dict__[model_field] += 1
 
         scores.append(s)
     Score.objects.filter(cycle=report.cycle).delete()
