@@ -139,7 +139,6 @@ def persist_scores(report):
             cycle=report.cycle)
         for key, value in facility['scores'].items():
             setattr(s, key, value)
-            print key
             if key != "REPORTING":
                 for f, result in value.items():
                     formulation_mapping = mapping.get(f)
