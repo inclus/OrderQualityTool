@@ -1,0 +1,4 @@
+{{result.test}},
+,
+Facility,District,Warehouse,IP,Cycle,Result
+{{score.name}},{{score.district}},{{score.warehouse}},{{score.ip}},{{score.cycle}},{{result.result}}
