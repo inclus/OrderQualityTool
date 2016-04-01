@@ -1,0 +1,12 @@
+{{result.test}},
+,
+Facility,District,Warehouse,IP,Cycle,Result
+{{score.name}},{{score.district}},{{score.warehouse}},{{score.ip}},{{score.cycle}},{{result.result}}
+,
+,
+{{data.main_title}},
+,
+{% for formulation in data.formulations %}{{ formulation.name }},
+{% for record in formulation.records %}{{record.column}},{{record.value}},
+{% endfor %}
+{% endfor %}

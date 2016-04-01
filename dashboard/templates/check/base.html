@@ -47,7 +47,7 @@
             <div class="row">
                 <div class="pull-right">
                     <button type="button" class="btn btn-default" data-dismiss="modal" aria-label="Close">CLOSE</button>
-                    <button type="button" class="btn btn-default" onclick="downloadCSV('{% url "scores-detail-csv" id=detail.id column=detail.column %}', '{{details.test}}')">CSV</button>
+                    <button type="button" class="btn btn-default" onclick="downloadCSV('{% url "scores-detail-csv" id=detail.id column=detail.column %}?combination={{score.combination}}', '{{details.test}}')">CSV</button>
                 </div>
             </div>
         </div>
