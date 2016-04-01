@@ -1,4 +1,5 @@
 from django.db.models import Q
+import csv
 from django.http import HttpResponse
 from django.shortcuts import render_to_response
 from django.views.generic import View
@@ -184,3 +185,35 @@ class ScoreDetailsCSVView(ScoreDetailsView):
         response.write(t.render(c))
         return response
 
+
+class TableCSVExportView(View):
+    def parse_value(self, value):
+        mapping = {YES:PASS, NO:FAIL, NOT_REPORTING:N_A}
+        return mapping.get(value, value)
+
+    def get(self, request):
+        formulation = request.GET.get('formulation', F1)
+        cycle = request.GET.get('cycle', None)
+        columns = ScoresTableView.columns
+        response = HttpResponse(content_type='text/csv')
+        response['Content-Disposition'] = 'attachment; filename="facilitytable-%s-%s.csv"' % (cycle, formulation)
+        writer = csv.writer(response)
+        writer.writerow(columns)
+        filter = {'cycle': cycle}
+        if self.request.user:
+            if self.request.user.access_level and self.request.user.access_area:
+                filters[self.request.user.access_level.lower()] = self.request.user.access_area
+        for score in Score.objects.filter(**filter).order_by('name'):
+            row = []
+            for c in columns:
+                value = getattr(score, c)
+                if type(value) is dict:
+                    if DEFAULT in value:
+                        row.append(self.parse_value(value.get(DEFAULT)))
+                    else:
+                        row.append(self.parse_value(value.get(formulation)))
+                else:
+                    row.append(value)
+            writer.writerow(row)
+
+        return response

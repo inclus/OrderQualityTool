@@ -16,7 +16,12 @@ $(document).ready(function() {
         buttons: [
           {
             text: 'Export to CSV',
-            extend: 'csv'
+            action: function ( e, dt, node, config ) {
+              var formulation = $("#formulation_select").val();
+              var cycle = $("#cycle_select").val();
+              var url = "/api/tables/export/csv?cycle="+ cycle +"&&formulation=" + formulation ;
+              downloadCSV(url, "facilitytable");
+            }
           }
         ],
         language: {
