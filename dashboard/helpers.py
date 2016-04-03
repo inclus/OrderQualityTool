@@ -205,7 +205,8 @@ TEST_NAMES = {
     NNRTI_NEW_PAED: "NRTI vs NNRTI/PI patient volumes(PAED - NEW):Differ by <30%?",
     NNRTI_NEW_ADULTS: "NRTI vs NNRTI/PI patient volumes(ADULT - NEW) Differ by <30%?",
     NNRTI_CURRENT_PAED: "NRTI vs NNRTI/PI patient volumes (PAED - CURRENT): Differ by <30%?",
-    NNRTI_CURRENT_ADULTS: "NRTI and NNRTI/PI patient volumes(ADULT - CURRENT): Differ by <30%?"}
+    NNRTI_CURRENT_ADULTS: "NRTI and NNRTI/PI patient volumes(ADULT - CURRENT): Differ by <30%?"
+}
 
 
 def get_prev_cycle(cycle):
@@ -226,11 +227,12 @@ SHOW_CONVERSION = "show_conversion"
 WEB = "Web"
 PAPER = "Paper"
 
+
 def get_actual_result(result, combination):
-        def combination_yes():
-            return result.get(combination) if type(result) == dict else result
+    def combination_yes():
+        return result.get(combination) if type(result) == dict else result
 
-        def combination_no():
-            return result.get(DEFAULT, None) if type(result) == dict else result
+    def combination_no():
+        return result.get(DEFAULT, None) if type(result) == dict else result
 
-        return combination_yes() if combination in result else combination_no()
+    return combination_yes() if combination in result else combination_no()
