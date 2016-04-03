@@ -437,6 +437,70 @@ class GuidelineAdherenceDataSource(CheckDataSource):
         GUIDELINE_ADHERENCE_PAED_1L: {RESULTS_TITLE: "ABC Based as % of the Total", DF1: "ABC-based regimens", DF2: "AZT-based regimens", CHECK: GuidelineAdherenceCheckPaed1L},
     }
 
+    def as_array(self, score, test, combination):
+        row = super(GuidelineAdherenceDataSource, self).as_array(score, test, combination)
+        data = self.get_context(score, test, combination)
+        row.append(["", "Estimated New Patients"])
+        tables = data.get('tables', [])
+        if len(tables) > 1:
+            left_table = tables[0]
+            right_table = tables[1]
+            left_rows = left_table.get('rows', [])
+            right_rows = right_table.get('rows', [])
+            size = max(len(left_rows), len(right_rows))
+            header_row = ["", left_table.get('name')]
+            for header in left_table.get('headers'):
+                header_row.append(header)
+            header_row.append(TOTAL)
+            header_row.append("")
+            header_row.append(right_table.get('name'))
+            for header in right_table.get('headers'):
+                header_row.append(header)
+            header_row.append(TOTAL)
+            row.append(header_row)
+            for line in range(size):
+                current_row = [""]
+                if line < len(left_rows):
+                    left_item = left_rows[line]
+                    current_row.append(left_item.get('column'))
+                    for header in left_table.get('headers'):
+                        current_row.append(left_item.get(header))
+                    current_row.append(left_item.get("sum"))
+                else:
+                    current_row.append("")
+                    for header in left_table.get('headers'):
+                        current_row.append("")
+                    current_row.append("")
+                current_row.append("")
+                if line < len(right_rows):
+                    right_item = right_rows[line]
+                    current_row.append(right_item.get('column'))
+                    for header in right_table.get('headers'):
+                        current_row.append(right_item.get(header))
+                    current_row.append(right_item.get("sum"))
+                else:
+                    current_row.append("")
+                    for header in right_table.get('headers'):
+                        current_row.append("")
+                    current_row.append("")
+                row.append(current_row)
+            total_row = ["", TOTAL]
+            left_totals = left_table.get('totals')
+            right_totals = right_table.get('totals')
+            for header in left_table.get('headers'):
+                total_row.append(left_totals.get(header))
+            total_row.append(left_totals.get("sum"))
+            total_row.append("")
+            total_row.append(TOTAL)
+            for header in right_table.get('headers'):
+                total_row.append(right_totals.get(header))
+            total_row.append(right_totals.get("sum"))
+            row.append(total_row)
+            row.append([])
+            row.append(["", data.get('score'), data.get('result_title')])
+
+        return row
+
     def get_context(self, score, test, combination):
         check_data = self.checks.get(test)
         check = check_data.get(CHECK)({})
