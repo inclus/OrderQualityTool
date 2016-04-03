@@ -4,11 +4,27 @@ from django.http import HttpResponse
 from django.shortcuts import render_to_response
 from django.views.generic import View
 from django_datatables_view.base_datatable_view import BaseDatatableView
-from django.template import loader, Context
 from dashboard.helpers import *
 from dashboard.models import Score
 from dashboard.views.data_sources import NegativesCheckDataSource, ConsumptionAndPatientsDataSource, TwoCycleDataSource, ClosingBalanceMatchesOpeningBalanceDataSource, StableConsumptionDataSource, StablePatientVolumesDataSource, WarehouseFulfillmentDataSource, GuidelineAdherenceDataSource, NNRTIDataSource
 
+
+TEST_DATA = {
+    ORDER_FORM_FREE_OF_NEGATIVE_NUMBERS: NegativesCheckDataSource,
+    CONSUMPTION_AND_PATIENTS: ConsumptionAndPatientsDataSource,
+    DIFFERENT_ORDERS_OVER_TIME: TwoCycleDataSource,
+    CLOSING_BALANCE_MATCHES_OPENING_BALANCE: ClosingBalanceMatchesOpeningBalanceDataSource,
+    STABLE_CONSUMPTION: StableConsumptionDataSource,
+    STABLE_PATIENT_VOLUMES: StablePatientVolumesDataSource,
+    WAREHOUSE_FULFILMENT: WarehouseFulfillmentDataSource,
+    GUIDELINE_ADHERENCE_PAED_1L: GuidelineAdherenceDataSource,
+    GUIDELINE_ADHERENCE_ADULT_2L: GuidelineAdherenceDataSource,
+    GUIDELINE_ADHERENCE_ADULT_1L: GuidelineAdherenceDataSource,
+    NNRTI_NEW_PAED: NNRTIDataSource,
+    NNRTI_NEW_ADULTS: NNRTIDataSource,
+    NNRTI_CURRENT_ADULTS: NNRTIDataSource,
+    NNRTI_CURRENT_PAED: NNRTIDataSource
+}
 
 class ScoresTableView(BaseDatatableView):
     model = Score
@@ -123,22 +139,6 @@ class ScoresTableView(BaseDatatableView):
 
 class ScoreDetailsView(View):
     def get_context_data(self, request, id, column):
-        TEST_DATA = {
-            ORDER_FORM_FREE_OF_NEGATIVE_NUMBERS: NegativesCheckDataSource,
-            CONSUMPTION_AND_PATIENTS: ConsumptionAndPatientsDataSource,
-            DIFFERENT_ORDERS_OVER_TIME: TwoCycleDataSource,
-            CLOSING_BALANCE_MATCHES_OPENING_BALANCE: ClosingBalanceMatchesOpeningBalanceDataSource,
-            STABLE_CONSUMPTION: StableConsumptionDataSource,
-            STABLE_PATIENT_VOLUMES: StablePatientVolumesDataSource,
-            WAREHOUSE_FULFILMENT: WarehouseFulfillmentDataSource,
-            GUIDELINE_ADHERENCE_PAED_1L: GuidelineAdherenceDataSource,
-            GUIDELINE_ADHERENCE_ADULT_2L: GuidelineAdherenceDataSource,
-            GUIDELINE_ADHERENCE_ADULT_1L: GuidelineAdherenceDataSource,
-            NNRTI_NEW_PAED: NNRTIDataSource,
-            NNRTI_NEW_ADULTS: NNRTIDataSource,
-            NNRTI_CURRENT_ADULTS: NNRTIDataSource,
-            NNRTI_CURRENT_PAED: NNRTIDataSource
-        }
         scores = {YES: "Pass", NO: "Fail", NOT_REPORTING: "N/A", PAPER: PAPER, WEB: WEB}
         combination = request.GET.get('combination', DEFAULT)
         column = int(column)
@@ -156,33 +156,27 @@ class ScoreDetailsView(View):
                 template_name = data_source.get_template(test)
                 response_data['data'] = data_source.load(score, test, combination)
             result = getattr(score, test, None)
-
-            def combination_yes():
-                return result.get(combination) if type(result) == dict else result
-
-            def combination_no():
-                return result.get(DEFAULT, None) if type(result) == dict else result
-
-            actual_result = combination_yes() if combination in result else combination_no()
+            actual_result = get_actual_result(result, combination)
             result_data = {'test': TEST_NAMES.get(test, None), 'result': scores.get(actual_result), 'has_combination': len(result) > 1}
             response_data['result'] = result_data
         response_data['detail'] = {'id': id, 'column': column, 'test': score.name}
-        return response_data, template_name, score
+        return response_data, template_name, score, combination
 
     def get(self, request, id, column):
-        response_data, template_name, score = self.get_context_data(request, id, column)
+        response_data, template_name, score, combination = self.get_context_data(request, id, column)
         return render_to_response(template_name, context=response_data)
 
 class ScoreDetailsCSVView(ScoreDetailsView):
     def get(self, request, id, column):
         view = ScoresTableView()
         test = view.columns[int(column)]
-        response_data, template_name, score = self.get_context_data(request, id, column)
+        response_data, template_name, score, combination = self.get_context_data(request, id, column)
         response = HttpResponse(content_type='text/csv')
         response['Content-Disposition'] = 'attachment; filename="%s-%s.csv"' % (score.name, test)
-        t = loader.get_template(template_name.replace('html', 'csv'))
-        c = Context(response_data)
-        response.write(t.render(c))
+        writer = csv.writer(response)
+        data_source_class = TEST_DATA.get(test)
+        data_source = data_source_class()
+        writer.writerows(data_source.as_array(score, test, combination))
         return response
 
 

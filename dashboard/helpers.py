@@ -225,3 +225,12 @@ OTHER = "other"
 SHOW_CONVERSION = "show_conversion"
 WEB = "Web"
 PAPER = "Paper"
+
+def get_actual_result(result, combination):
+        def combination_yes():
+            return result.get(combination) if type(result) == dict else result
+
+        def combination_no():
+            return result.get(DEFAULT, None) if type(result) == dict else result
+
+        return combination_yes() if combination in result else combination_no()

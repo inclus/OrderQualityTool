@@ -7,7 +7,7 @@ from dashboard.data.consumption_patients import ConsumptionAndPatientsQualityChe
 from dashboard.data.cycles import OrdersOverTimeCheck, BalancesMatchCheck, StableConsumptionCheck, StablePatientVolumesCheck
 from dashboard.data.negatives import NegativeNumbersQualityCheck
 from dashboard.data.nn import NNRTINEWPAEDCheck, NNRTINewAdultsCheck, NNRTICURRENTADULTSCheck, NNRTICURRENTPAEDCheck
-from dashboard.helpers import FIELD_NAMES, CONSUMPTION_QUERY, FIELDS, NEW, EXISTING, F1, F2, F3, F1_QUERY, F2_QUERY, F3_QUERY, NAME, IS_ADULT, PATIENT_QUERY, RATIO, get_prev_cycle, CLOSING_BALANCE, OPENING_BALANCE, ADULT, PACKS_ORDERED, QUANTITY_RECEIVED, GUIDELINE_ADHERENCE_ADULT_1L, GUIDELINE_ADHERENCE_ADULT_2L, GUIDELINE_ADHERENCE_PAED_1L, DF1, DF2, NNRTI_NEW_PAED, NNRTI_NEW_ADULTS, NNRTI_CURRENT_ADULTS, NNRTI_CURRENT_PAED, ROWS, VALUE, COLUMN, TOTAL, OTHER, SHOW_CONVERSION
+from dashboard.helpers import *
 from dashboard.models import Consumption, AdultPatientsRecord, PAEDPatientsRecord
 
 CHECK = "check"
@@ -30,7 +30,7 @@ def get_int(value):
         return value, False
 
 
-class CheckDataSource():
+class CheckDataSource(object):
     def __init__(self):
         pass
 
@@ -45,25 +45,50 @@ class CheckDataSource():
     def get_context(self, score, test, combination):
         raise NotImplementedError()
 
+    def as_array(self, score, test, combination):
+        row = []
+        data = self.get_context(score, test, combination)
+        result = getattr(score, test, None)
+        name_row = ["", TEST_NAMES.get(test, None)]
+        row.append([""])
+        row.append(name_row)
+        row.append([""])
+        row.append(["", "Facility", "District", "Warehouse", "IP", "Cycle", "Result"])
+        row.append(["", score.name, score.district, score.warehouse, score.ip, score.cycle, get_actual_result(result, combination)])
+        row.append([""])
+        row.append([""])
+        row.append(["", data["main_title"]])
+        return row
+
+
+def get_negatives_data(score, test, combination):
+    check = NegativeNumbersQualityCheck({})
+    formulation_query = query_map.get(combination)
+    consumption_records = Consumption.objects.filter(name=score.name, district=score.district, cycle=score.cycle, formulation__icontains=formulation_query)
+    tables = []
+    for consumption in consumption_records:
+        formulation_data = {NAME: consumption.formulation}
+        records = []
+        for field in check.fields:
+            raw_value, valid = get_int(getattr(consumption, field))
+            records.append({COLUMN: FIELD_NAMES.get(field), VALUE: raw_value})
+        formulation_data['records'] = records
+        tables.append(formulation_data)
+    return {"main_title": "RAW ORDER DATA", "formulations": tables}
+
 
 class NegativesCheckDataSource(CheckDataSource):
     def get_context(self, score, test, combination):
-        return self.get_negatives_data(score, test, combination)
+        return get_negatives_data(score, test, combination)
 
-    def get_negatives_data(self, score, test, combination):
-        check = NegativeNumbersQualityCheck({})
-        formulation_query = query_map.get(combination)
-        consumption_records = Consumption.objects.filter(name=score.name, district=score.district, cycle=score.cycle, formulation__icontains=formulation_query)
-        tables = []
-        for consumption in consumption_records:
-            formulation_data = {NAME: consumption.formulation}
-            records = []
-            for field in check.fields:
-                raw_value, valid = get_int(getattr(consumption, field))
-                records.append({COLUMN: FIELD_NAMES.get(field), VALUE: raw_value})
-            formulation_data['records'] = records
-            tables.append(formulation_data)
-        return {"main_title": "RAW ORDER DATA", "formulations": tables}
+    def as_array(self, score, test, combination):
+        row = super(NegativesCheckDataSource, self).as_array(score, test, combination)
+        data = self.get_context(score, test, combination)
+        for formulation in data.get("formulations", []):
+            row.append(["", formulation["name"]])
+            for record in formulation["records"]:
+                row.append(["", record["column"], record["value"]])
+        return row
 
 
 def values_for_models(fields, models):
@@ -75,90 +100,180 @@ def values_for_models(fields, models):
     return output
 
 
+def append_values_for_header(consumption, header_row, n, no_consumption_tables, records_key='records'):
+    records = []
+    records_count = 0
+    if n < no_consumption_tables:
+        name = consumption[n].get('name')
+        header_row.append(name)
+        header_row.append("")
+        records = consumption[n].get(records_key, [])
+        records_count = len(records)
+    else:
+        header_row.append("")
+        header_row.append("")
+    return records, records_count
+
+
+def append_values_for_row(records, current_row, records_count, record_index):
+    if record_index < records_count:
+        consumption_record = records[record_index]
+        current_row.append(consumption_record.get(COLUMN))
+        current_row.append(consumption_record.get(VALUE))
+    else:
+        current_row.append("")
+        current_row.append("")
+
+
+def calculate_packs(check_combination):
+    packs = [{COLUMN: check_combination.get(CONSUMPTION_QUERY), VALUE: check_combination.get(RATIO)}]
+    return packs
+
+
+def calculate_consumption_totals(check_combination, consumption_records):
+    totals = []
+    total = 0
+    for consumption in consumption_records:
+        entry = {COLUMN: consumption.formulation}
+        values = values_for_models(check_combination.get(FIELDS, []), [consumption])
+        caluclated_sum = pydash.chain(values).reject(lambda x: x is None).sum().value()
+        reduced_sum = caluclated_sum / check_combination[RATIO]
+        entry[VALUE] = reduced_sum
+        total += reduced_sum
+        totals.append(entry)
+    totals.append({COLUMN: TOTAL, VALUE: total, IS_HEADER: True})
+    return totals
+
+
+def calculate_consumption_tables(check_combination, consumption_records):
+    tables = []
+    for consumption in consumption_records:
+        formulation_data = {NAME: consumption.formulation}
+        records = []
+        calculated_sum = 0
+        for field in check_combination.get(FIELDS, []):
+            int_value, valid_int = get_int(getattr(consumption, field))
+            if valid_int:
+                calculated_sum += int_value
+            records.append({COLUMN: FIELD_NAMES.get(field), VALUE: int_value})
+        records.append({COLUMN: TOTAL, VALUE: calculated_sum, IS_HEADER: True})
+
+        formulation_data['records'] = records
+        tables.append(formulation_data)
+    return tables
+
+
+def calculate_patient_tables(patient_records):
+    patient_tables = []
+    for pr in patient_records:
+        formulation_data = {NAME: pr.formulation}
+        records = []
+        calculated_sum = 0
+        for field in [NEW, EXISTING]:
+            int_value, valid_int = get_int(getattr(pr, field))
+            if valid_int:
+                calculated_sum += int(int_value)
+            records.append({COLUMN: FIELD_NAMES.get(field), VALUE: int_value})
+        records.append({COLUMN: TOTAL, VALUE: calculated_sum, IS_HEADER: True})
+        formulation_data['records'] = records
+        patient_tables.append(formulation_data)
+    return patient_tables
+
+
+def calculate_patient_totals(patient_records):
+    patient_totals = []
+    total = 0
+    for pr in patient_records:
+        entry = {COLUMN: pr.formulation}
+        values = values_for_models([NEW, EXISTING], [pr])
+        sum = pydash.chain(values).reject(lambda x: x is None).sum().value()
+        entry[VALUE] = sum
+        total += int(sum)
+        patient_totals.append(entry)
+    patient_totals.append({COLUMN: TOTAL, VALUE: total, IS_HEADER: True})
+    return patient_totals
+
+
+def get_consumption_and_patients(score, test, combination_name):
+    check = ConsumptionAndPatientsQualityCheck({})
+    check_combination = get_combination(check.combinations, combination_name)
+    formulation_query = check_combination.get(CONSUMPTION_QUERY)
+    consumption_records = Consumption.objects.filter(name=score.name, district=score.district, cycle=score.cycle, formulation__icontains=formulation_query)
+    model = AdultPatientsRecord if check_combination.get(IS_ADULT, False) else PAEDPatientsRecord
+    patient_records = model.objects.filter(name=score.name, district=score.district, cycle=score.cycle, formulation__in=check_combination.get(PATIENT_QUERY))
+
+    return {
+        "main_title": "RAW ORDER DATA",
+        "consumption": (calculate_consumption_tables(check_combination, consumption_records)),
+        "patients": (calculate_patient_tables(patient_records)),
+        "packs": (calculate_packs(check_combination)),
+        "patient_totals": (calculate_patient_totals(patient_records)),
+        "consumption_totals": (calculate_consumption_totals(check_combination, consumption_records))
+    }
+
+
+def add_blank_column(header_row):
+    header_row.append("")
+
+
+def add_blank_row(row):
+    row.append([])
+
+
 class ConsumptionAndPatientsDataSource(CheckDataSource):
     def get_context(self, score, test, combination):
-        return self.get_consumption_and_patients(score, test, combination)
+        return get_consumption_and_patients(score, test, combination)
 
-    def get_consumption_and_patients(self, score, test, combination_name):
-        check = ConsumptionAndPatientsQualityCheck({})
-        check_combination = get_combination(check.combinations, combination_name)
-        formulation_query = check_combination.get(CONSUMPTION_QUERY)
-        consumption_records = Consumption.objects.filter(name=score.name, district=score.district, cycle=score.cycle, formulation__icontains=formulation_query)
-        model = AdultPatientsRecord if check_combination.get(IS_ADULT, False) else PAEDPatientsRecord
-        patient_records = model.objects.filter(name=score.name, district=score.district, cycle=score.cycle, formulation__in=check_combination.get(PATIENT_QUERY))
+    def as_array(self, score, test, combination):
+        row = super(ConsumptionAndPatientsDataSource, self).as_array(score, test, combination)
+        data = self.get_context(score, test, combination)
+        row.append(["", "CONSUMPTION", "", "", "PATIENTS"])
+        patients = data.get('patients', [])
+        consumption = data.get('consumption', [])
+        no_patient_tables = len(patients)
+        no_consumption_tables = len(consumption)
+        size = max(no_patient_tables, no_consumption_tables)
+        for n in range(size):
+            header_row = [""]
 
-        return {
-            "main_title": "RAW ORDER DATA",
-            "consumption": (self.calculate_consumption_tables(check_combination, consumption_records)),
-            "patients": (self.calculate_patient_tables(patient_records)),
-            "packs": (self.calculate_packs(check_combination)),
-            "patient_totals": (self.calculate_patient_totals(patient_records)),
-            "consumption_totals": (self.calculate_consumption_totals(check_combination, consumption_records))
-        }
+            consumption_records, no_consumption_records = append_values_for_header(consumption, header_row, n, no_consumption_tables)
+            add_blank_column(header_row)
+            patient_records, no_patient_records = append_values_for_header(patients, header_row, n, no_patient_tables)
 
-    def calculate_packs(self, check_combination):
-        packs = [{COLUMN: check_combination.get(CONSUMPTION_QUERY), VALUE: check_combination.get(RATIO)}]
-        return packs
+            add_blank_row(row)
+            row.append(header_row)
 
-    def calculate_consumption_totals(self, check_combination, consumption_records):
-        totals = []
-        total = 0
-        for consumption in consumption_records:
-            entry = {COLUMN: consumption.formulation}
-            values = values_for_models(check_combination.get(FIELDS, []), [consumption])
-            sum = pydash.chain(values).reject(lambda x: x is None).sum().value()
-            reduced_sum = sum / check_combination[RATIO]
-            entry[VALUE] = reduced_sum
-            total += reduced_sum
-            totals.append(entry)
-        totals.append({COLUMN: TOTAL, VALUE: total, IS_HEADER: True})
-        return totals
+            i = max(no_patient_records, no_consumption_records)
 
-    def calculate_consumption_tables(self, check_combination, consumption_records):
-        tables = []
-        for consumption in consumption_records:
-            formulation_data = {NAME: consumption.formulation}
-            records = []
-            sum = 0
-            for field in check_combination.get(FIELDS, []):
-                int_value, valid_int = get_int(getattr(consumption, field))
-                if valid_int:
-                    sum += int_value
-                records.append({COLUMN: FIELD_NAMES.get(field), VALUE: int_value})
-            records.append({COLUMN: TOTAL, VALUE: sum, IS_HEADER: True})
+            for record_index in range(i):
+                current_row = [""]
+                append_values_for_row(consumption_records, current_row, no_consumption_records, record_index)
+                add_blank_column(current_row)
+                append_values_for_row(patient_records, current_row, no_patient_records, record_index)
+                row.append(current_row)
 
-            formulation_data['records'] = records
-            tables.append(formulation_data)
-        return tables
+        add_blank_row(row)
+        add_blank_row(row)
+        row.append(["", "Conversion Ratio (packs per patient, bimonthly)"])
+        for pack in data.get('packs', []):
+            row.append(["", pack.get(COLUMN), pack.get(VALUE)])
 
-    def calculate_patient_tables(self, patient_records):
-        patient_tables = []
-        for pr in patient_records:
-            formulation_data = {NAME: pr.formulation}
-            records = []
-            sum = 0
-            for field in [NEW, EXISTING]:
-                int_value, valid_int = get_int(getattr(pr, field))
-                if valid_int:
-                    sum += int(int_value)
-                records.append({COLUMN: FIELD_NAMES.get(field), VALUE: int_value})
-            records.append({COLUMN: TOTAL, VALUE: sum, IS_HEADER: True})
-            formulation_data['records'] = records
-            patient_tables.append(formulation_data)
-        return patient_tables
-
-    def calculate_patient_totals(self, patient_records):
-        patient_totals = []
-        total = 0
-        for pr in patient_records:
-            entry = {COLUMN: pr.formulation}
-            values = values_for_models([NEW, EXISTING], [pr])
-            sum = pydash.chain(values).reject(lambda x: x is None).sum().value()
-            entry[VALUE] = sum
-            total += int(sum)
-            patient_totals.append(entry)
-        patient_totals.append({COLUMN: TOTAL, VALUE: total, IS_HEADER: True})
-        return patient_totals
+        add_blank_row(row)
+        add_blank_row(row)
+        row.append(["", "ESTIMATED CURRENT PATIENTS"])
+        row.append(["", "From Consumption Data", "", "", "From Patient Data"])
+        patient_totals = data.get('patient_totals', [])
+        consumption_totals = data.get('consumption_totals', [])
+        no_patient_totals = len(patient_totals)
+        no_consumption_totals = len(consumption_totals)
+        row_count = max(no_patient_totals, no_consumption_totals)
+        for record_index in range(row_count):
+            current_row = [""]
+            append_values_for_row(consumption_totals, current_row, no_consumption_totals, record_index)
+            add_blank_column(current_row)
+            append_values_for_row(patient_totals, current_row, no_patient_totals, record_index)
+            row.append(current_row)
+        return row
 
 
 class TwoCycleDataSource(CheckDataSource):
@@ -198,6 +313,22 @@ class TwoCycleDataSource(CheckDataSource):
         return rows
 
 
+def get_table_for_cycle(cycle, check, combination, score, fields):
+    check_combination = get_combination(check.combinations, combination)
+    formulation_query = check_combination.get(CONSUMPTION_QUERY)
+    consumption_records = Consumption.objects.filter(name=score.name, district=score.district, cycle=cycle, formulation__icontains=formulation_query)
+    tables = [
+        {"cycle": cycle}
+    ]
+    rows = []
+    for consumption in consumption_records:
+        for field in fields:
+            int_value, valid_int = get_int(getattr(consumption, field))
+            rows.append({COLUMN: FIELD_NAMES.get(field), VALUE: int_value})
+    tables[0][ROWS] = rows
+    return tables
+
+
 class ClosingBalanceMatchesOpeningBalanceDataSource(CheckDataSource):
     check = BalancesMatchCheck({}, {})
 
@@ -209,24 +340,9 @@ class ClosingBalanceMatchesOpeningBalanceDataSource(CheckDataSource):
         prev_cycle = get_prev_cycle(current_cycle)
         return {
             "main_title": "RAW ORDER DATA",
-            "previous_cycle": self.get_table_for_cycle(prev_cycle, self.check, combination, score, [CLOSING_BALANCE]),
-            "current_cycle": self.get_table_for_cycle(current_cycle, self.check, combination, score, [OPENING_BALANCE]),
+            "previous_cycle": get_table_for_cycle(prev_cycle, self.check, combination, score, [CLOSING_BALANCE]),
+            "current_cycle": get_table_for_cycle(current_cycle, self.check, combination, score, [OPENING_BALANCE]),
         }
-
-    def get_table_for_cycle(self, cycle, check, combination, score, fields):
-        check_combination = get_combination(check.combinations, combination)
-        formulation_query = check_combination.get(CONSUMPTION_QUERY)
-        consumption_records = Consumption.objects.filter(name=score.name, district=score.district, cycle=cycle, formulation__icontains=formulation_query)
-        tables = [
-            {"cycle": cycle}
-        ]
-        rows = []
-        for consumption in consumption_records:
-            for field in fields:
-                int_value, valid_int = get_int(getattr(consumption, field))
-                rows.append({COLUMN: FIELD_NAMES.get(field), VALUE: int_value})
-        tables[0][ROWS] = rows
-        return tables
 
 
 class StableConsumptionDataSource(TwoCycleDataSource):
@@ -261,7 +377,7 @@ class StablePatientVolumesDataSource(TwoCycleDataSource):
         tables = [
             {"cycle": cycle}
         ]
-        tables[0][ROWS], tables[0][HEADERS] , tables[0]['totals']= self.build_rows(check, records)
+        tables[0][ROWS], tables[0][HEADERS], tables[0]['totals'] = self.build_rows(check, records)
         return tables
 
     def build_rows(self, check, records):
@@ -306,8 +422,8 @@ class WarehouseFulfillmentDataSource(ClosingBalanceMatchesOpeningBalanceDataSour
         prev_cycle = get_prev_cycle(current_cycle)
         return {
             "main_title": "RAW ORDER DATA",
-            "previous_cycle": self.get_table_for_cycle(prev_cycle, self.check, combination, score, [PACKS_ORDERED]),
-            "current_cycle": self.get_table_for_cycle(current_cycle, self.check, combination, score, [QUANTITY_RECEIVED]),
+            "previous_cycle": get_table_for_cycle(prev_cycle, self.check, combination, score, [PACKS_ORDERED]),
+            "current_cycle": get_table_for_cycle(current_cycle, self.check, combination, score, [QUANTITY_RECEIVED]),
         }
 
 
