@@ -372,6 +372,34 @@ class ClosingBalanceMatchesOpeningBalanceDataSource(CheckDataSource):
             "current_cycle": get_table_for_cycle(current_cycle, self.check, combination, score, [OPENING_BALANCE]),
         }
 
+    def as_array(self, score, test, combination):
+        row = super(ClosingBalanceMatchesOpeningBalanceDataSource, self).as_array(score, test, combination)
+        data = self.get_context(score, test, combination)
+        previous_cycle = data.get('previous_cycle', [])
+        current_cycle = data.get('current_cycle', [])
+        no_previous_cycle_tables = len(previous_cycle)
+        no_current_cycle_tables = len(current_cycle)
+        size = max(no_previous_cycle_tables, no_current_cycle_tables)
+        for n in range(size):
+            header_row = [""]
+
+            prev_records, no_prev_records = append_values_for_header(previous_cycle, header_row, n, no_previous_cycle_tables, "rows", "cycle")
+            add_blank_column(header_row)
+            current_records, no_current_records = append_values_for_header(current_cycle, header_row, n, no_current_cycle_tables, "rows", "cycle")
+
+            add_blank_row(row)
+            row.append(header_row)
+
+            i = max(no_current_records, no_prev_records)
+
+            for record_index in range(i):
+                current_row = [""]
+                append_values_for_row(prev_records, current_row, no_prev_records, record_index)
+                add_blank_column(current_row)
+                append_values_for_row(current_records, current_row, no_current_records, record_index)
+                row.append(current_row)
+        return row
+
 
 class StableConsumptionDataSource(TwoCycleDataSource):
     check = StableConsumptionCheck({}, {})
@@ -393,7 +421,8 @@ class StableConsumptionDataSource(TwoCycleDataSource):
         return rows
 
 
-def build_dynamic_header(header_row, n, no_tables, records, tables):
+def build_dynamic_header(header_row, n, no_tables, tables):
+    records = []
     table = []
     if n < no_tables:
         table = tables[n]
@@ -452,7 +481,18 @@ class StablePatientVolumesDataSource(TwoCycleDataSource):
         return records
 
     def as_array(self, score, test, combination):
-        row = super(StablePatientVolumesDataSource, self).as_array(score, test, combination)
+        row = []
+        data = self.get_context(score, test, combination)
+        result = getattr(score, test, None)
+        name_row = ["", TEST_NAMES.get(test, None)]
+        row.append([""])
+        row.append(name_row)
+        row.append([""])
+        row.append(["", "Facility", "District", "Warehouse", "IP", "Cycle", "Result"])
+        row.append(["", score.name, score.district, score.warehouse, score.ip, score.cycle, get_actual_result(result, combination)])
+        row.append([""])
+        row.append([""])
+        row.append(["", data["main_title"]])
         data = self.get_context(score, test, combination)
         previous_cycle = data.get('previous_cycle', [])
         current_cycle = data.get('current_cycle', [])
@@ -461,9 +501,9 @@ class StablePatientVolumesDataSource(TwoCycleDataSource):
         size = max(no_previous_cycle_tables, no_current_cycle_tables)
         for n in range(size):
             header_row = [""]
-            prev_records, prev_table = build_dynamic_header(header_row, n, no_previous_cycle_tables, prev_records, previous_cycle)
+            prev_records, prev_table = build_dynamic_header(header_row, n, no_previous_cycle_tables, previous_cycle)
             header_row.append("")
-            current_records, current_table = build_dynamic_header(header_row, n, no_current_cycle_tables, current_records, current_cycle)
+            current_records, current_table = build_dynamic_header(header_row, n, no_current_cycle_tables, current_cycle)
             row.append(header_row)
 
             i = max(len(prev_records), len(current_records))
@@ -690,8 +730,8 @@ class NNRTIDataSource(CheckDataSource):
         row = super(NNRTIDataSource, self).as_array(score, test, combination)
         data = self.get_context(score, test, combination)
         row.append(["", data.get('sub_title')])
-        df1 = data.get(DF1, [])
-        df2 = data.get(DF2, [])
+        df1 = data.get(DF1, {})
+        df2 = data.get(DF2, {})
         df1_rows = df1.get("rows", [])
         df2_rows = df2.get("rows", [])
         df1_headers = df1.get("headers", [])
