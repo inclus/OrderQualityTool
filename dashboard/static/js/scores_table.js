@@ -22,6 +22,10 @@ $(document).ready(function() {
               var url = "/api/tables/export/csv?cycle="+ cycle +"&&formulation=" + formulation ;
               downloadCSV(url, "facilitytable");
             }
+          },
+          {
+          text: 'Export Current View as CSV',
+          extend : 'csv'
           }
         ],
         language: {
