@@ -7254,3 +7254,9 @@ button.ms-choice {
 .c3-line.c3-line-reporting {
   stroke-width: 3px;
 }
+button.close {
+  padding-right: 10px;
+}
+.filter.tag {
+  padding-right: 10px;
+}
