@@ -393,6 +393,19 @@ class StableConsumptionDataSource(TwoCycleDataSource):
         return rows
 
 
+def build_dynamic_header(header_row, n, no_tables, records, tables):
+    table = []
+    if n < no_tables:
+        table = tables[n]
+        records = table.get('rows', [])
+        name = table.get('cycle')
+        header_row.append(name)
+
+        for header in table.get('headers'):
+            header_row.append(header)
+    return records, table
+
+
 class StablePatientVolumesDataSource(TwoCycleDataSource):
     def get_template(self, test):
         return "check/patientStability.html"
@@ -439,7 +452,7 @@ class StablePatientVolumesDataSource(TwoCycleDataSource):
         return records
 
     def as_array(self, score, test, combination):
-        row = super(TwoCycleDataSource, self).as_array(score, test, combination)
+        row = super(StablePatientVolumesDataSource, self).as_array(score, test, combination)
         data = self.get_context(score, test, combination)
         previous_cycle = data.get('previous_cycle', [])
         current_cycle = data.get('current_cycle', [])
@@ -448,25 +461,9 @@ class StablePatientVolumesDataSource(TwoCycleDataSource):
         size = max(no_previous_cycle_tables, no_current_cycle_tables)
         for n in range(size):
             header_row = [""]
-            prev_records = []
-            current_records = []
-            if n < no_previous_cycle_tables:
-                prev_table = previous_cycle[n]
-                prev_records = prev_table.get('rows', [])
-                name = prev_table.get('cycle')
-                header_row.append(name)
-
-                for header in prev_table.get('headers'):
-                    header_row.append(header)
+            prev_records, prev_table = build_dynamic_header(header_row, n, no_previous_cycle_tables, prev_records, previous_cycle)
             header_row.append("")
-            if n < no_current_cycle_tables:
-                current_table = current_cycle[n]
-                current_records = current_table.get('rows', [])
-                name = current_table.get('cycle')
-                header_row.append(name)
-
-                for header in current_table.get('headers'):
-                    header_row.append(header)
+            current_records, current_table = build_dynamic_header(header_row, n, no_current_cycle_tables, current_records, current_cycle)
             row.append(header_row)
 
             i = max(len(prev_records), len(current_records))
@@ -688,3 +685,65 @@ class NNRTIDataSource(CheckDataSource):
         context[SHOW_CONVERSION] = check_config.get(SHOW_CONVERSION)
 
         return context
+
+    def as_array(self, score, test, combination):
+        row = super(NNRTIDataSource, self).as_array(score, test, combination)
+        data = self.get_context(score, test, combination)
+        row.append(["", data.get('sub_title')])
+        df1 = data.get(DF1, [])
+        df2 = data.get(DF2, [])
+        df1_rows = df1.get("rows", [])
+        df2_rows = df2.get("rows", [])
+        df1_headers = df1.get("headers", [])
+        df2_headers = df2.get("headers", [])
+        header_row = [""]
+        header_row.append(df1.get("table_header"))
+        for header in df1_headers:
+            header_row.append(header)
+        header_row.append("")
+        header_row.append(df2.get("table_header"))
+        for header in df2_headers:
+            header_row.append(header)
+        row.append(header_row)
+        size = max(len(df1_rows), len(df2_rows))
+        for line in range(size):
+            current_row = [""]
+            append_values_for_headers(current_row, df1_rows, df1, line, False)
+            current_row.append("")
+            append_values_for_headers(current_row, df2_rows, df2, line, False)
+            row.append(current_row)
+        show_conversion = data.get('show_conversion', False)
+        if show_conversion:
+            conversion_header = ["", df1.get("table_header"), "", "", df2.get("table_header")]
+            row.append(conversion_header)
+            df1_ratios = data.get("data_field_1_ratios", {}).get("rows", [])
+            df2_ratios = data.get("data_field_2_ratios", {}).get("rows", [])
+            df1_ratios_count = len(df1_ratios)
+            df2_ratios_count = len(df2_ratios)
+            for record_index in range(size):
+                current_row = [""]
+                append_values_for_row(df1_ratios, current_row, df1_ratios_count, record_index)
+                add_blank_column(current_row)
+                append_values_for_row(df2_ratios, current_row, df2_ratios_count, record_index)
+                row.append(current_row)
+
+            row.append([])
+            row.append(["", "ESTIMATED CURRENT PATIENTS"])
+            calculations_header = ["", df1.get("table_header"), "", "", df2.get("table_header")]
+            row.append(calculations_header)
+            df1_calculations = data.get("data_field_1_calculated", {}).get("rows", [])
+            df2_calculations = data.get("data_field_2_calculated", {}).get("rows", [])
+            df1_calculations_count = len(df1_calculations)
+            df2_calculations_count = len(df2_calculations)
+            for record_index in range(size):
+                current_row = [""]
+                append_values_for_row(df1_calculations, current_row, df1_calculations_count, record_index)
+                add_blank_column(current_row)
+                append_values_for_row(df2_calculations, current_row, df2_calculations_count, record_index)
+                row.append(current_row)
+        row.append(["", data.get("data_field_1_COUNT"), data.get("data_field_2_COUNT")])
+        row.append(["", "NRTI COUNT", "NNRTI/PI COUNT"])
+        row.append([])
+        row.append(["", data.get("FINAL_SCORE")])
+        row.append(["", "DIFFERENCE (ABSOLUTE)"])
+        return row
