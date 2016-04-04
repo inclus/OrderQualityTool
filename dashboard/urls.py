@@ -43,5 +43,6 @@ urlpatterns = [
     url(r'^api/table/scores/detail/(?P<id>\d+)/(?P<column>\d+$)', csrf_exempt(dashboard.views.tables.ScoreDetailsView.as_view()), name='scores-detail'),
     url(r'^api/table/scores/csv/(?P<id>\d+)/(?P<column>\d+$)', csrf_exempt(dashboard.views.tables.ScoreDetailsCSVView.as_view()), name='scores-detail-csv'),
     url(r'^api/access/areas$', csrf_exempt(dashboard.views.api.AccessAreasView.as_view()), name='access-areas'),
-    url(r'^api/tables/export/csv$', dashboard.views.tables.TableCSVExportView.as_view(), name='export-table')
+    url(r'^api/tables/export/csv$', dashboard.views.tables.TableCSVExportView.as_view(), name='export-table'),
+    url(r'^api/access/admin$', dashboard.views.api.AdminAccessView.as_view(), name='admin-view')
 ]

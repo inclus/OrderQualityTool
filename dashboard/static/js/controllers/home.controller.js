@@ -1,6 +1,24 @@
 angular.module('dashboard').controller('HomeController', ['$scope', 'ReportService', '$httpParamSerializer', 'NgTableParams',
     function($scope, ReportService, $httpParamSerializer, NgTableParams) {
         $scope.formulation = "TDF/3TC/EFV";
+        $scope.isAdmin = false;
+        ReportService.getAdminStatus().then(function(data){
+            $scope.isAdmin = data.is_admin;
+        });
+
+        ReportService.getFilters().then(function(data){
+            $scope.districts = data.districts;
+            $scope.districts.unshift({"district": "All Districts"});
+            $scope.ips = data.ips;
+            $scope.ips.unshift({"ip": "All IPs"});
+            $scope.warehouses = data.warehouses;
+            $scope.warehouses.unshift({"warehouse": "All Warehouses"});
+
+            $scope.selectedIp = $scope.ips[0];
+            $scope.selectedDistrict = $scope.districts[0];
+            $scope.selectedWarehouse = $scope.warehouses[0];
+        });
+
         $scope.displayCycle = function(cycle) {
             return "CYCLE " + cycle.number + " '" + cycle.year;
         };

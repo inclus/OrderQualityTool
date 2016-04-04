@@ -12,6 +12,25 @@
     </div>
         
 </div>
+<div class="row" ng-show="isAdmin">
+
+    <div class="col-md-2 pull-right">
+        <a class="btn btn-primary" role="button" data-toggle="collapse" href="#view-as-filter" aria-expanded="false" aria-controls="collapseExample">
+            VIEW DASHBOARD FOR
+        </a>
+    </div>
+    <div class="col-md-12 collapse" id="view-as-filter">
+        <div class="score_filters facility_filters">
+            <select name="district" class="form-control filter" ng-model="selectedDistrict" ng-options="district.district for district in districts">
+            </select>
+            <select name="warehouse" class="form-control filter" ng-model="selectedWarehouse" ng-options="warehouse.warehouse for warehouse in warehouses">
+            </select>
+            <select name="ip" class="form-control filter" ng-model="selectedIp" ng-options="ip.ip for ip in ips">
+            </select>
+        </div>
+    </div>
+
+</div>
 <div class="row">
 
     <div class="col-md-12">

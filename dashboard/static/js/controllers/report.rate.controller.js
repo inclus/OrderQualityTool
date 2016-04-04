@@ -1,10 +1,6 @@
 angular.module('dashboard').controller('ReportingRateController', ['$scope', 'ReportService',
     function($scope, ReportService) {
-        var update = function(start, end) {
-            ReportService.getDataForTest('submittedOrder', {
-                start: start,
-                end: end
-            }).then(function(data) {
+        var setUpScope = function(data) {
                 var values = data.values;
                 $scope.options = {
                     data: values,
@@ -55,8 +51,25 @@ angular.module('dashboard').controller('ReportingRateController', ['$scope', 'Re
                         }
                     }
                 };
-            });
+            };
+
+        var update = function(start, end) {
+            ReportService.getDataForTest('submittedOrder', {
+                start: start,
+                end: end
+            }).then(setUpScope);
         };
+
+        var updateWithLocation = function(start, end) {
+            ReportService.getDataForTest('submittedOrder', {
+                start: start,
+                end: end,
+                ip: $scope.selectedIp.ip,
+                warehouse: $scope.selectedWarehouse.warehouse,
+                district: $scope.selectedDistrict.district
+            }).then(setUpScope);
+        };
+
         $scope.$watch('startCycle', function(start) {
             if (start) {
                 update($scope.startCycle, $scope.endCycle);
@@ -68,5 +81,11 @@ angular.module('dashboard').controller('ReportingRateController', ['$scope', 'Re
                 update($scope.startCycle, $scope.endCycle);
             }
         }, true);
+
+        $scope.$watchGroup(['selectedIp', 'selectedWarehouse', 'selectedDistrict'], function(data){
+            if(data[0] && data[1] && data[2]){
+                updateWithLocation($scope.startCycle, $scope.endCycle);
+            }
+        });
     }
 ]);

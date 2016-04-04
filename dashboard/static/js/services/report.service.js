@@ -17,7 +17,6 @@ angular.module('services').service('ReportService', ['$http',
                     level: level,
                     cycle: selectedCycle,
                     formulation: formulation
-
                 }
             }).then(handleResponse);
         };
@@ -44,12 +43,16 @@ angular.module('services').service('ReportService', ['$http',
             }).then(handleResponse);
         };
 
-        var getFilters = function(test) {
+        var getFilters = function() {
             return $http.get('/api/filters/').then(handleResponse);
         };
 
         var getRankingsAccess = function() {
             return $http.get('/api/rankingsAccess/').then(handleResponse);
+        };
+
+        var getAdminStatus = function(){
+            return $http.get('/api/access/admin').then(handleResponse);
         };
 
         return {
@@ -61,6 +64,7 @@ angular.module('services').service('ReportService', ['$http',
             "getScores": getScores,
             "getFilters": getFilters,
             "getRankingsAccess": getRankingsAccess,
+            "getAdminStatus": getAdminStatus,
         };
     }
 ])

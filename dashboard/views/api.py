@@ -1,22 +1,22 @@
 import csv
 import json
 from functools import cmp_to_key
-import pydash
 
-from arrow import now
+import pydash
 from braces.views import LoginRequiredMixin
+from django.contrib.auth.models import AnonymousUser
 from django.db.models import Count, Sum
+from django.db.models.expressions import F
 from django.http import HttpResponse
 from rest_framework import filters
 from rest_framework.generics import ListAPIView
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from django.db.models.expressions import F
 
 from dashboard.helpers import *
-
-from dashboard.models import Score, WAREHOUSE, DISTRICT, MultipleOrderFacility, Cycle
+from dashboard.models import Score, WAREHOUSE, DISTRICT, MultipleOrderFacility, Cycle, MOH_CENTRAL
 from dashboard.serializers import ScoreSerializer
+
 
 def aggregate_scores(user, test, cycles, formulation, keys, count_values):
     scores_filter = {}
@@ -52,7 +52,9 @@ def aggregate_scores(user, test, cycles, formulation, keys, count_values):
             result[keys[NO]] = 0
             result[keys[NOT_REPORTING]] = 0
         return result
+
     return pydash.collect(cycles, agg)
+
 
 class BestPerformingDistrictsView(APIView):
     reverse = True
@@ -298,3 +300,9 @@ class AccessAreasView(APIView):
         if level and level.lower() in access_levels:
             access_areas = pydash.reject(Score.objects.values_list(level, flat=True).distinct(), lambda x: len(x) < 1)
         return Response(access_areas)
+
+
+class AdminAccessView(APIView):
+    def get(self, request):
+        is_admin = type(request.user) != AnonymousUser and (request.user.access_level == MOH_CENTRAL or request.user.is_superuser)
+        return Response({"is_admin": is_admin})
