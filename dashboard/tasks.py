@@ -139,15 +139,14 @@ def persist_scores(report):
             cycle=report.cycle)
         for key, value in facility['scores'].items():
             setattr(s, key, value)
-            if key != "REPORTING":
-                for f, result in value.items():
-                    formulation_mapping = mapping.get(f)
-                    if result in [YES, WEB]:
-                        model_field = formulation_mapping.get("pass")
-                        s.__dict__[model_field] += 1
-                    elif result in [NO]:
-                        model_field = formulation_mapping.get("fail")
-                        s.__dict__[model_field] += 1
+            for f, result in value.items():
+                formulation_mapping = mapping.get(f)
+                if result in [YES, WEB]:
+                    model_field = formulation_mapping.get("pass")
+                    s.__dict__[model_field] += 1
+                elif result in [NO]:
+                    model_field = formulation_mapping.get("fail")
+                    s.__dict__[model_field] += 1
 
         scores.append(s)
     Score.objects.filter(cycle=report.cycle).delete()
