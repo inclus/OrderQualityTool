@@ -100,11 +100,11 @@ def values_for_models(fields, models):
     return output
 
 
-def append_values_for_header(consumption, header_row, n, no_consumption_tables, records_key='records'):
+def append_values_for_header(consumption, header_row, n, table_count, records_key='records', header_key='name'):
     records = []
     records_count = 0
-    if n < no_consumption_tables:
-        name = consumption[n].get('name')
+    if n < table_count:
+        name = consumption[n].get(header_key)
         header_row.append(name)
         header_row.append("")
         records = consumption[n].get(records_key, [])
@@ -312,6 +312,34 @@ class TwoCycleDataSource(CheckDataSource):
                 rows.append({COLUMN: FIELD_NAMES.get(field), VALUE: value})
         return rows
 
+    def as_array(self, score, test, combination):
+        row = super(TwoCycleDataSource, self).as_array(score, test, combination)
+        data = self.get_context(score, test, combination)
+        previous_cycle = data.get('previous_cycle', [])
+        current_cycle = data.get('current_cycle', [])
+        no_previous_cycle_tables = len(previous_cycle)
+        no_current_cycle_tables = len(current_cycle)
+        size = max(no_previous_cycle_tables, no_current_cycle_tables)
+        for n in range(size):
+            header_row = [""]
+
+            prev_records, no_prev_records = append_values_for_header(previous_cycle, header_row, n, no_previous_cycle_tables, "rows", "cycle")
+            add_blank_column(header_row)
+            current_records, no_current_records = append_values_for_header(current_cycle, header_row, n, no_current_cycle_tables, "rows", "cycle")
+
+            add_blank_row(row)
+            row.append(header_row)
+
+            i = max(no_current_records, no_prev_records)
+
+            for record_index in range(i):
+                current_row = [""]
+                append_values_for_row(prev_records, current_row, no_prev_records, record_index)
+                add_blank_column(current_row)
+                append_values_for_row(current_records, current_row, no_current_records, record_index)
+                row.append(current_row)
+        return row
+
 
 def get_table_for_cycle(cycle, check, combination, score, fields):
     check_combination = get_combination(check.combinations, combination)
@@ -410,6 +438,54 @@ class StablePatientVolumesDataSource(TwoCycleDataSource):
         records = model.objects.filter(name=score.name, district=score.district, cycle=cycle, formulation__in=query)
         return records
 
+    def as_array(self, score, test, combination):
+        row = super(TwoCycleDataSource, self).as_array(score, test, combination)
+        data = self.get_context(score, test, combination)
+        previous_cycle = data.get('previous_cycle', [])
+        current_cycle = data.get('current_cycle', [])
+        no_previous_cycle_tables = len(previous_cycle)
+        no_current_cycle_tables = len(current_cycle)
+        size = max(no_previous_cycle_tables, no_current_cycle_tables)
+        for n in range(size):
+            header_row = [""]
+            prev_records = []
+            current_records = []
+            if n < no_previous_cycle_tables:
+                prev_table = previous_cycle[n]
+                prev_records = prev_table.get('rows', [])
+                name = prev_table.get('cycle')
+                header_row.append(name)
+
+                for header in prev_table.get('headers'):
+                    header_row.append(header)
+            header_row.append("")
+            if n < no_current_cycle_tables:
+                current_table = current_cycle[n]
+                current_records = current_table.get('rows', [])
+                name = current_table.get('cycle')
+                header_row.append(name)
+
+                for header in current_table.get('headers'):
+                    header_row.append(header)
+            row.append(header_row)
+
+            i = max(len(prev_records), len(current_records))
+
+            for record_index in range(i):
+                current_row = [""]
+                append_values_for_headers(current_row, prev_records, prev_table, n, False)
+                current_row.append("")
+                append_values_for_headers(current_row, current_records, current_table, n, False)
+                row.append(current_row)
+            total_row = ["", TOTAL]
+            prev_totals = prev_table.get('totals')
+            current_totals = current_table.get('totals')
+            append_total_row(prev_table, prev_totals, total_row)
+            total_row.append(TOTAL)
+            append_total_row(current_table, current_totals, total_row)
+            row.append(total_row)
+        return row
+
 
 class WarehouseFulfillmentDataSource(ClosingBalanceMatchesOpeningBalanceDataSource):
     check = BalancesMatchCheck({}, {})
@@ -425,6 +501,28 @@ class WarehouseFulfillmentDataSource(ClosingBalanceMatchesOpeningBalanceDataSour
             "previous_cycle": get_table_for_cycle(prev_cycle, self.check, combination, score, [PACKS_ORDERED]),
             "current_cycle": get_table_for_cycle(current_cycle, self.check, combination, score, [QUANTITY_RECEIVED]),
         }
+
+
+def append_values_for_headers(current_row, rows, table, line, has_sum=True):
+    if line < len(rows):
+        left_item = rows[line]
+        current_row.append(left_item.get('column'))
+        for header in table.get('headers'):
+            current_row.append(left_item.get(header))
+        if has_sum:
+            current_row.append(left_item.get("sum"))
+    else:
+        current_row.append("")
+        for header in table.get('headers'):
+            current_row.append("")
+        if has_sum:
+            current_row.append("")
+
+
+def append_total_row(table, totals, total_row):
+    for header in table.get('headers'):
+        total_row.append(totals.get(header))
+    total_row.append(totals.get("sum"))
 
 
 class GuidelineAdherenceDataSource(CheckDataSource):
@@ -460,41 +558,17 @@ class GuidelineAdherenceDataSource(CheckDataSource):
             row.append(header_row)
             for line in range(size):
                 current_row = [""]
-                if line < len(left_rows):
-                    left_item = left_rows[line]
-                    current_row.append(left_item.get('column'))
-                    for header in left_table.get('headers'):
-                        current_row.append(left_item.get(header))
-                    current_row.append(left_item.get("sum"))
-                else:
-                    current_row.append("")
-                    for header in left_table.get('headers'):
-                        current_row.append("")
-                    current_row.append("")
+                append_values_for_headers(current_row, left_rows, left_table, line)
                 current_row.append("")
-                if line < len(right_rows):
-                    right_item = right_rows[line]
-                    current_row.append(right_item.get('column'))
-                    for header in right_table.get('headers'):
-                        current_row.append(right_item.get(header))
-                    current_row.append(right_item.get("sum"))
-                else:
-                    current_row.append("")
-                    for header in right_table.get('headers'):
-                        current_row.append("")
-                    current_row.append("")
+                append_values_for_headers(current_row, right_rows, right_table, line)
                 row.append(current_row)
             total_row = ["", TOTAL]
             left_totals = left_table.get('totals')
             right_totals = right_table.get('totals')
-            for header in left_table.get('headers'):
-                total_row.append(left_totals.get(header))
-            total_row.append(left_totals.get("sum"))
+            append_total_row(left_table, left_totals, total_row)
             total_row.append("")
             total_row.append(TOTAL)
-            for header in right_table.get('headers'):
-                total_row.append(right_totals.get(header))
-            total_row.append(right_totals.get("sum"))
+            append_total_row(right_table, right_totals, total_row)
             row.append(total_row)
             row.append([])
             row.append(["", data.get('score'), data.get('result_title')])
