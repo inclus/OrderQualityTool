@@ -31,6 +31,8 @@ def get_int(value):
 
 
 class CheckDataSource(object):
+    show_formulation = True
+
     def __init__(self):
         pass
 
@@ -53,8 +55,15 @@ class CheckDataSource(object):
         row.append([""])
         row.append(name_row)
         row.append([""])
-        row.append(["", "Facility", "District", "Warehouse", "IP", "Cycle", "Result"])
-        row.append(["", score.name, score.district, score.warehouse, score.ip, score.cycle, get_actual_result(result, combination)])
+        headers = ["", "Facility", "District", "Warehouse", "IP", "Cycle"]
+        details = ["", score.name, score.district, score.warehouse, score.ip, score.cycle]
+        if self.show_formulation:
+            headers.append("Formulation")
+            details.append(combination)
+        headers.append("Result")
+        details.append(get_actual_result(result, combination))
+        row.append(headers)
+        row.append(details)
         row.append([""])
         row.append([""])
         row.append(["", data["main_title"]])
@@ -488,8 +497,16 @@ class StablePatientVolumesDataSource(TwoCycleDataSource):
         row.append([""])
         row.append(name_row)
         row.append([""])
-        row.append(["", "Facility", "District", "Warehouse", "IP", "Cycle", "Result"])
-        row.append(["", score.name, score.district, score.warehouse, score.ip, score.cycle, get_actual_result(result, combination)])
+        headers = ["", "Facility", "District", "Warehouse", "IP", "Cycle"]
+        details = ["", score.name, score.district, score.warehouse, score.ip, score.cycle]
+        if self.show_formulation:
+            headers.append("Formulation")
+            details.append(combination)
+        headers.append("Result")
+        details.append(get_actual_result(result, combination))
+        row.append(headers)
+        row.append(details)
+
         row.append([""])
         row.append([""])
         row.append(["", data["main_title"]])
@@ -563,6 +580,7 @@ def append_total_row(table, totals, total_row):
 
 
 class GuidelineAdherenceDataSource(CheckDataSource):
+    show_formulation = False
     def get_template(self, test):
         return "check/adherence.html"
 
@@ -655,6 +673,8 @@ def get_field_name(field):
 
 
 class NNRTIDataSource(CheckDataSource):
+    show_formulation = False
+
     def get_template(self, test):
         return "check/nnrti.html"
 
@@ -752,14 +772,18 @@ class NNRTIDataSource(CheckDataSource):
             current_row.append("")
             append_values_for_headers(current_row, df2_rows, df2, line, False)
             row.append(current_row)
+        row.append([])
         show_conversion = data.get('show_conversion', False)
         if show_conversion:
+            row.append(["", "CONVERSION RATIO (ESTIMATED AVERAGE PACKS PER PATIENT, BIMONTHLY)"])
+            row.append([])
             conversion_header = ["", df1.get("table_header"), "", "", df2.get("table_header")]
             row.append(conversion_header)
             df1_ratios = data.get("data_field_1_ratios", {}).get("rows", [])
             df2_ratios = data.get("data_field_2_ratios", {}).get("rows", [])
             df1_ratios_count = len(df1_ratios)
             df2_ratios_count = len(df2_ratios)
+            size = max(df1_ratios_count, df2_ratios_count)
             for record_index in range(size):
                 current_row = [""]
                 append_values_for_row(df1_ratios, current_row, df1_ratios_count, record_index)
@@ -775,15 +799,18 @@ class NNRTIDataSource(CheckDataSource):
             df2_calculations = data.get("data_field_2_calculated", {}).get("rows", [])
             df1_calculations_count = len(df1_calculations)
             df2_calculations_count = len(df2_calculations)
+            size = max(df1_calculations_count, df2_calculations_count)
             for record_index in range(size):
                 current_row = [""]
                 append_values_for_row(df1_calculations, current_row, df1_calculations_count, record_index)
                 add_blank_column(current_row)
                 append_values_for_row(df2_calculations, current_row, df2_calculations_count, record_index)
                 row.append(current_row)
-        row.append(["", data.get("data_field_1_COUNT"), data.get("data_field_2_COUNT")])
-        row.append(["", "NRTI COUNT", "NNRTI/PI COUNT"])
         row.append([])
-        row.append(["", data.get("FINAL_SCORE")])
+        row.append([])
+        row.append(["", data.get("data_field_1_COUNT"), "", data.get("data_field_2_COUNT")])
+        row.append(["", "NRTI COUNT", "", "NNRTI/PI COUNT"])
+        row.append([])
+        row.append(["", "%f %%" % data.get("FINAL_SCORE")])
         row.append(["", "DIFFERENCE (ABSOLUTE)"])
         return row
