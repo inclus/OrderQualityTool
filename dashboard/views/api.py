@@ -18,13 +18,15 @@ from dashboard.models import Score, WAREHOUSE, DISTRICT, MultipleOrderFacility, 
 from dashboard.serializers import ScoreSerializer
 
 
-def aggregate_scores(user, test, cycles, formulation, keys, count_values):
+def aggregate_scores(user, test, cycles, formulation, keys, count_values, filters):
     scores_filter = {}
     if user:
         access_level = user.access_level
         access_area = user.access_area
         if access_level and access_area:
             scores_filter[access_level.lower()] = access_area
+    if user.is_superuser:
+        scores_filter = filters
     score_objects = Score.objects.filter(**scores_filter).values(test, "cycle")
     grouped_objects = pydash.group_by(score_objects, lambda x: x["cycle"])
 
@@ -136,21 +138,38 @@ class CyclesView(APIView):
 
 class ReportMetrics(APIView):
     def get(self, request):
+        filters = build_filters(self.request)
         adh = self.request.GET.get("adh", "Adult 1L")
         records = [cycle['cycle'] for cycle in Score.objects.values('cycle').distinct()]
         most_recent_cycle, = sorted(records, key=cmp_to_key(sort_cycle), reverse=True)[:1]
         adh_filter = "%s%s" % (GUIDELINE_ADHERENCE, adh.replace(" ", ""))
-        web_based_scores = aggregate_scores(self.request.user, WEB_BASED, [most_recent_cycle], DEFAULT, {YES: 'web', NO: 'paper', NOT_REPORTING: 'not_reporting'}, {YES: WEB, NO: PAPER, NOT_REPORTING: NOT_REPORTING})
-        reporting_scores = aggregate_scores(self.request.user, REPORTING, [most_recent_cycle], DEFAULT, {YES: 'reporting', NO: 'not_reporting', NOT_REPORTING: 'n_a'}, {YES: YES, NO: NO, NOT_REPORTING: NOT_REPORTING})
-        adherence_scores = aggregate_scores(self.request.user, adh_filter, [most_recent_cycle], DEFAULT, {YES: 'yes', NO: 'no', NOT_REPORTING: 'not_reporting'}, {YES: YES, NO: NO, NOT_REPORTING: NOT_REPORTING})
+        web_based_scores = aggregate_scores(self.request.user, WEB_BASED, [most_recent_cycle], DEFAULT, {YES: 'web', NO: 'paper', NOT_REPORTING: 'not_reporting'}, {YES: WEB, NO: PAPER, NOT_REPORTING: NOT_REPORTING}, filters)
+        reporting_scores = aggregate_scores(self.request.user, REPORTING, [most_recent_cycle], DEFAULT, {YES: 'reporting', NO: 'not_reporting', NOT_REPORTING: 'n_a'}, {YES: YES, NO: NO, NOT_REPORTING: NOT_REPORTING}, filters)
+        adherence_scores = aggregate_scores(self.request.user, adh_filter, [most_recent_cycle], DEFAULT, {YES: 'yes', NO: 'no', NOT_REPORTING: 'not_reporting'}, {YES: YES, NO: NO, NOT_REPORTING: NOT_REPORTING}, filters)
         web_rate = "{0:.1f}".format(web_based_scores[0]['web']) if len(web_based_scores) > 0 else ""
         report_rate = "{0:.1f}".format(reporting_scores[0]['reporting']) if len(reporting_scores) > 0 else ""
         adherence = "{0:.1f}".format(adherence_scores[0]['yes']) if len(adherence_scores) > 0 else ""
         return Response({"webBased": web_rate, "reporting": report_rate, "adherence": adherence})
 
 
+def add_item_to_filter(name, value, filter):
+    if value is not None and "all %s" % name not in value.lower():
+        filters[name] = value
+
+
+def build_filters(request):
+    district = request.GET.get("district", None)
+    ip = request.GET.get("ip", None)
+    warehouse = request.GET.get("warehouse", None)
+    filters = {}
+    add_item_to_filter("district", district, filters)
+    add_item_to_filter("ip", ip, filters)
+    add_item_to_filter("warehouse", warehouse, filters)
+    return filters
+
 class ScoresAPIView(APIView):
     def generate_data(self, test, start, end, formulation=DEFAULT, keys={YES: 'yes', NO: 'no', NOT_REPORTING: 'not_reporting'}, count_values={YES: YES, NO: NO, NOT_REPORTING: NOT_REPORTING}):
+        filters = build_filters(self.request)
         if formulation is None:
             formulation = DEFAULT
         cycles = generate_cycles(now().replace(years=-2), now())
@@ -159,7 +178,7 @@ class ScoresAPIView(APIView):
             end_index = cycles.index(end)
             cycles_included = cycles[start_index: end_index + 1]
             cycles = cycles_included
-        results = aggregate_scores(self.request.user, test, cycles, formulation, keys, count_values)
+        results = aggregate_scores(self.request.user, test, cycles, formulation, keys, count_values, filters)
         return Response({'values': results})
 
 
