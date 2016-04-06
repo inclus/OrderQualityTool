@@ -131,11 +131,11 @@ class QCheck:
 
 
 def facility_not_reporting(facility):
-    return facility.get('status', '').strip() != 'Reporting'
+    return facility.get('status', '').strip().lower() != 'reporting'
 
 
 def facility_has_single_order(facility):
-    not_multiple = facility['Multiple'].strip() != 'Multiple orders'
+    not_multiple = facility['Multiple'].strip().lower() != 'multiple orders'
     return not_multiple
 
 def multiple_orders_score(facility):
