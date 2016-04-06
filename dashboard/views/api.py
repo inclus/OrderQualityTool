@@ -154,7 +154,7 @@ class ReportMetrics(APIView):
 
 def add_item_to_filter(name, value, filter):
     if value is not None and "all %s" % name not in value.lower():
-        filters[name] = value
+        filter[name] = value
 
 
 def build_filters(request):
@@ -205,11 +205,20 @@ class WebBasedReportingView(ScoresAPIView):
 
 class FacilitiesMultipleReportingView(ScoresAPIView):
     def get(self, request):
+        scores_filter = {}
+        filters = build_filters(self.request)
+        if request.user:
+            access_level = request.user.access_level
+            access_area = request.user.access_area
+            if access_level and access_area:
+                scores_filter[access_level.lower()] = access_area
+        if request.user.is_superuser:
+            scores_filter = filters
         cycles = [cycle['cycle'] for cycle in MultipleOrderFacility.objects.values('cycle').distinct()]
         sorted_cycles = sorted(cycles, key=cmp_to_key(sort_cycle), reverse=True)
         most_recent_cycle = sorted_cycles[0]
         cycle = request.GET.get('cycle', most_recent_cycle)
-        records = MultipleOrderFacility.objects.filter(cycle=cycle).order_by('name').values('name', 'district', 'ip', 'warehouse')
+        records = MultipleOrderFacility.objects.filter(cycle=cycle, **scores_filter).order_by('name').values('name', 'district', 'ip', 'warehouse')
         return Response({"values": records})
 
 

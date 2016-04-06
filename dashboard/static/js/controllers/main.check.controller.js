@@ -112,8 +112,14 @@ angular.module('dashboard').controller('MainChecksController', ['$scope',
 angular.module('dashboard').controller('MultipleOrdersController', ['$scope', 'ReportService', 'NgTableParams',
     function($scope, ReportService, NgTableParams) {
         var updateData = function() {
+            var district = $scope.selectedDistrict ? $scope.selectedDistrict.district : "";
+            var ip = $scope.selectedIp ? $scope.selectedIp.ip : "";
+            var warehouse = $scope.selectedWarehouse ? $scope.selectedWarehouse.warehouse : "";
             ReportService.getDataForTest('facilitiesMultiple', {
-                'cycle': $scope.selectedCycle
+                'cycle': $scope.selectedCycle,
+                district: district,
+                ip: ip,
+                warehouse: warehouse
             }).then(function(data) {
                 var values = data.values;
                 $scope.tableParams = new NgTableParams({
@@ -125,13 +131,19 @@ angular.module('dashboard').controller('MultipleOrdersController', ['$scope', 'R
                     data: values
                 });
             });
-        }
+        };
 
         updateData();
 
         $scope.$watch('selectedCycle', function() {
             updateData();
         }, true);
+
+        $scope.$watchGroup(['selectedIp', 'selectedWarehouse', 'selectedDistrict'], function(data){
+            if(data[0] && data[1] && data[2]){
+              updateData();
+            }
+        });
 
 
     }
@@ -144,10 +156,16 @@ angular.module('dashboard').controller('LineChartController', ['$scope', 'Report
             if ($scope.selectedRegimen) {
                 regimen = $scope.selectedRegimen.value;
             }
+            var district = $scope.selectedDistrict ? $scope.selectedDistrict.district : "";
+            var ip = $scope.selectedIp ? $scope.selectedIp.ip : "";
+            var warehouse = $scope.selectedWarehouse ? $scope.selectedWarehouse.warehouse : "";
             ReportService.getDataForTest(test, {
                 start: start,
                 end: end,
-                regimen: regimen
+                regimen: regimen,
+                district: district,
+                ip: ip,
+                warehouse: warehouse
             }).then(function(data) {
                 var values = data.values;
                 $scope.options = {
@@ -237,5 +255,11 @@ angular.module('dashboard').controller('LineChartController', ['$scope', 'Report
             }
 
         }, true);
+
+        $scope.$watchGroup(['selectedIp', 'selectedWarehouse', 'selectedDistrict'], function(data){
+            if(data[0] && data[1] && data[2]){
+              update($scope.startCycle, $scope.endCycle);
+            }
+        });
     }
 ]);

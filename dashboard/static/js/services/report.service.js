@@ -7,8 +7,16 @@ angular.module('services').service('ReportService', ['$http',
             return $http.get('/api/cycles').then(handleResponse);
         };
 
-        var getMetrics = function(guideline_type) {
-            return $http.get('/api/test/metrics', {params:{adh: guideline_type}}).then(handleResponse);
+        var getMetrics = function(guideline_type, d, i, w) {
+          var district = d ? d.district : "";
+          var ip = i ? i.ip : "";
+          var warehouse = w ? w.warehouse : "";
+          return $http.get('/api/test/metrics', {params: {
+            adh: guideline_type,
+            district: district,
+            ip:ip,
+            warehouse:warehouse}
+          }).then(handleResponse);
         };
 
         var getBestRankings = function(level, selectedCycle, formulation) {
