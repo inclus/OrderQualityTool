@@ -19,11 +19,12 @@ def command():
     # for k in CheckRegistryHolder.ONE_CYCLE_CHECKS_REGISTRY:
     #     print k
     # perform_checks()
-    # export_results()
+    export_results()
 
-
+def count_for_test(cycle):
+    Score.objects.filter
 def export_results():
-    cycles = ["Jul - Aug 2015"]
+    cycles = ["Sep - Oct 2015"]
     cycle = cycle2 = cycles[0]
     checks = [
         {'combination': DEFAULT, 'test': ORDER_FORM_FREE_OF_GAPS, 'cycle': cycle, 'expected': 46.2, YES: 820, NO: 615, NOT_REPORTING: 365},

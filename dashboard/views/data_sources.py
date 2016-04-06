@@ -527,9 +527,9 @@ class StablePatientVolumesDataSource(TwoCycleDataSource):
 
             for record_index in range(i):
                 current_row = [""]
-                append_values_for_headers(current_row, prev_records, prev_table, n, False)
+                append_values_for_headers(current_row, prev_records, prev_table, record_index, False)
                 current_row.append("")
-                append_values_for_headers(current_row, current_records, current_table, n, False)
+                append_values_for_headers(current_row, current_records, current_table, record_index, False)
                 row.append(current_row)
             total_row = ["", TOTAL]
             prev_totals = prev_table.get('totals')
@@ -559,12 +559,12 @@ class WarehouseFulfillmentDataSource(ClosingBalanceMatchesOpeningBalanceDataSour
 
 def append_values_for_headers(current_row, rows, table, line, has_sum=True):
     if line < len(rows):
-        left_item = rows[line]
-        current_row.append(left_item.get('column'))
+        item = rows[line]
+        current_row.append(item.get('column'))
         for header in table.get('headers'):
-            current_row.append(left_item.get(header))
+            current_row.append(item.get(header))
         if has_sum:
-            current_row.append(left_item.get("sum"))
+            current_row.append(item.get("sum"))
     else:
         current_row.append("")
         for header in table.get('headers'):
