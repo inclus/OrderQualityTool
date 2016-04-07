@@ -1,35 +1,26 @@
 <div class="row range_filter">
-    <div class="col-md-12">
-        <h3 for="">CYCLE RANGE</h3>
-        <select name="cycle" class="form-control cycle-select" ng-model="startCycle"
+    <div class="filter-titles col-md-12">
+         <h4 class="-cycle">CYCLE RANGE</h4>
+         <h4 class="-filters" ng-show="isAdmin">FILTERS</h4>
+    </div>
+    <div class="col-md-12 main-filters">
+        <select name="cycle" class="form-control filter cycle-select" ng-model="startCycle"
             ng-options="cycle for cycle in cycles">
         </select>
-    <div class="spacer">
-        <h5 class="text-center"> - </h5>
-    </div>
-        <select name="cycle" class="form-control cycle-select" ng-model="endCycle" ng-options="cycle for cycle in endCycles">
+        <div class="spacer">
+            <h5 class="text-center"> - </h5>
+        </div>
+        <select name="cycle" class="form-control filter cycle-select" ng-model="endCycle" ng-options="cycle for cycle in endCycles">
         </select>
-    </div>
-        
-</div>
-<div class="row" ng-show="isAdmin">
-
-    <div class="col-md-2 pull-right">
-        <button class="btn btn-primary" role="button" data-toggle="collapse" href="#view-as-filter" aria-expanded="false" aria-controls="collapseExample">
-            FILTER DASHBOARD
-        </button>
-    </div>
-    <div class="col-md-12 collapse" id="view-as-filter">
-        <div class="score_filters facility_filters">
-            <select name="district" class="form-control filter" ng-model="selectedDistrict" ng-options="district.district for district in districts">
+        <div class="admin-filters" >
+            <select ng-show="isAdmin" name="district" class="form-control filter cycle-select" ng-model="selectedDistrict" ng-options="district.district for district in districts">
             </select>
-            <select name="warehouse" class="form-control filter" ng-model="selectedWarehouse" ng-options="warehouse.warehouse for warehouse in warehouses">
+            <select ng-show="isAdmin" name="warehouse" class="form-control filter cycle-select" ng-model="selectedWarehouse" ng-options="warehouse.warehouse for warehouse in warehouses">
             </select>
-            <select name="ip" class="form-control filter" ng-model="selectedIp" ng-options="ip.ip for ip in ips">
+            <select ng-show="isAdmin" name="ip" class="form-control filter cycle-select" ng-model="selectedIp" ng-options="ip.ip for ip in ips">
             </select>
         </div>
     </div>
-
 </div>
 <div class="row">
 

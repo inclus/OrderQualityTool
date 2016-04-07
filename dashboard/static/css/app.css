@@ -7260,3 +7260,47 @@ button.close {
 .filter.tag {
   padding-right: 10px;
 }
+.main-filters {
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+}
+.main-filters .filter {
+  -webkit-flex: 1;
+  -ms-flex: 1;
+  flex: 1;
+}
+.main-filters .spacer {
+  -webkit-flex: 0.05;
+  -ms-flex: 0.05;
+  flex: 0.05;
+}
+.main-filters .admin-filters {
+  padding-left: 10px;
+  -webkit-flex: 3;
+  -ms-flex: 3;
+  flex: 3;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+}
+.main-filters .admin-filters .filter {
+  -webkit-flex: 1;
+  -ms-flex: 1;
+  flex: 1;
+}
+.filter-titles {
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+}
+.filter-titles .-filters {
+  -webkit-flex: 3;
+  -ms-flex: 3;
+  flex: 3;
+}
+.filter-titles .-cycle {
+  -webkit-flex: 2.6;
+  -ms-flex: 2.6;
+  flex: 2.6;
+}
