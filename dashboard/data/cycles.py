@@ -189,36 +189,34 @@ class StablePatientVolumesCheck(StableConsumptionCheck):
                                                 combination[PATIENT_QUERY], is_adult)
         current_records = self.get_patient_records(self.report, facility_name, combination[PATIENT_QUERY], is_adult)
         threshold = combination[THRESHOLD]
-        pre_count = len(prev_records)
-        current_count = len(current_records)
+        data_is_sufficient = len(prev_records) > 0 and len(current_records) > 0
         current_values = values_for_records(self.fields, current_records)
         current_population = pydash.chain(current_values).reject(lambda x: x is None).sum().value()
         prev_values = values_for_records(self.fields, prev_records)
         prev_population = pydash.chain(prev_values).reject(lambda x: x is None).sum().value()
-        include_record = current_population > threshold or prev_population > threshold
         result = NOT_REPORTING
-        data_is_sufficient = pre_count > 0 and current_count > 0 and not facility_not_reporting(facility)
+
+        include_record = data_is_sufficient and (current_population > threshold or prev_population > threshold)
         return self.run_calculation(current_population, prev_population, total_count, not_reporting, yes, no, result, data_is_sufficient, include_record)
 
     def run_calculation(self, current_population, prev_population, total_count, not_reporting, yes, no, result, data_is_sufficient, include_record):
-        if include_record:
-            total_count += 1
-            numerator = float(current_population)
-            denominator = float(prev_population)
-            if denominator == 0:
-                quotient = 0
-            else:
-                quotient = abs(numerator / denominator)
-            if not data_is_sufficient:
-                not_reporting += 1
-            elif 0.5 < quotient < 1.5:
-                yes += 1
-                result = YES
-            elif quotient <= 0.5 or quotient >= 1.5:
-                no += 1
-                result = NO
-            else:
-                not_reporting += 1
+        if data_is_sufficient:
+            if include_record:
+                total_count += 1
+                numerator = float(current_population)
+                denominator = float(prev_population)
+                if denominator == 0:
+                    quotient = 0
+                else:
+                    quotient = abs(numerator / denominator)
+                if 0.5 < quotient < 1.5:
+                    yes += 1
+                    result = YES
+                elif quotient <= 0.5 or quotient >= 1.5:
+                    no += 1
+                    result = NO
+                else:
+                    not_reporting += 1
         else:
-            pass
+            not_reporting += 1
         return result, no, not_reporting, yes, total_count
