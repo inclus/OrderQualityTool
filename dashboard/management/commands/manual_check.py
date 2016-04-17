@@ -55,7 +55,7 @@ def export_results():
                     data[key] = count
                 results.append(data)
             else:
-                for combination in [F1, F2, F3]:
+                for combination in [F1]:
                     yes_condition = {combination: YES}
                     no_condition = {combination: NO}
                     not_reporting_condition = {combination: NOT_REPORTING}
