@@ -122,7 +122,7 @@ class StableConsumptionCheck(TwoCycleQCheck):
             denominator = float(prev_consumption)
             if number_of_consumption_records_prev_cycle == 0 or number_of_consumption_records_current_cycle == 0:
                 not_reporting += 1
-            elif denominator != 0 and (0.5 < abs(numerator / denominator) < 1.5):
+            elif denominator != 0 and (0.5 <= abs(numerator / denominator) <= 1.5):
                 yes += 1
                 result = YES
             else:
@@ -212,9 +212,6 @@ class StablePatientVolumesCheck(StableConsumptionCheck):
                 if 0.5 < quotient < 1.5:
                     yes += 1
                     result = YES
-                elif quotient <= 0.5 or quotient >= 1.5:
-                    no += 1
-                    result = NO
                 else:
                     not_reporting += 1
         else:
