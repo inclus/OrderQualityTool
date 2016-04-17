@@ -27,7 +27,7 @@ class GuidelineAdherenceCheckAdult1L(QCheck):
 
         return pydash.select(records, filter_func)
 
-    def for_each_facility(self, facility, no, not_reporting, yes, combination):
+    def for_each_facility(self, facility, combination):
         facility_name = facility[NAME]
         ratio = combination[RATIO]
         df1_records = self.filter_records(facility_name, combination[DF1])
@@ -40,8 +40,7 @@ class GuidelineAdherenceCheckAdult1L(QCheck):
         sum_df2 = pydash.chain(df2_values).reject(lambda x: x is None).sum().value()
         all_df1_fields_are_blank = pydash.every(df1_values, lambda x: x is None)
         all_df2_fields_are_blank = pydash.every(df2_values, lambda x: x is None)
-        return calculate_score(df1_count, df2_count, sum_df1, sum_df2, ratio, yes, no,
-                               not_reporting, all_df1_fields_are_blank,
+        return calculate_score(df1_count, df2_count, sum_df1, sum_df2, ratio, all_df1_fields_are_blank,
                                all_df2_fields_are_blank, facility_not_reporting(facility))
 
 
@@ -68,7 +67,7 @@ class GuidelineAdherenceCheckPaed1L(GuidelineAdherenceCheckAdult1L):
     }]
 
 
-def calculate_score(df1_count, df2_count, sum_df1, sum_df2, ratio, yes, no, not_reporting,
+def calculate_score(df1_count, df2_count, sum_df1, sum_df2, ratio,
                     all_df1_fields_are_blank=False, all_df2_fields_are_blank=False, facility_is_not_reporting=False):
     total = float(sum_df1 + sum_df2)
     has_blanks = (all_df2_fields_are_blank or all_df1_fields_are_blank)
@@ -77,17 +76,13 @@ def calculate_score(df1_count, df2_count, sum_df1, sum_df2, ratio, yes, no, not_
     df1_is_at_least_adjusted_total = sum_df1 >= adjusted_total
     result = NOT_REPORTING
     if has_no_records or facility_is_not_reporting:
-        not_reporting += 1
+        pass
     elif df1_is_at_least_adjusted_total:
-        yes += 1
         result = YES
     elif not df1_is_at_least_adjusted_total:
-        no += 1
         result = NO
     elif not has_blanks and (sum_df1 == 0 and sum_df2 == 0):
-        yes += 1
         result = YES
     elif has_blanks:
-        no += 1
         result = NO
-    return result, no, not_reporting, yes
+    return result

@@ -22,7 +22,7 @@ class BlanksQualityCheck(QCheck):
               LOSES_ADJUSTMENTS,
               ESTIMATED_NUMBER_OF_NEW_ART_PATIENTS]
 
-    def for_each_facility(self, facility, no, not_reporting, yes, combination):
+    def for_each_facility(self, facility, combination):
         result = NOT_REPORTING
         facility_name = facility[NAME]
         c_records = self.report.cs[facility_name]
@@ -36,62 +36,40 @@ class BlanksQualityCheck(QCheck):
             values_for_records(self.fields, c_records), lambda v: v is None))
 
         if cr_count == 0 and ar_count == 0 and pr_count == 0:
-            not_reporting += 1
+            pass
         elif cr_count < 25 or ar_count < 22 or pr_count < 7:
-            no += 1
             result = NO
         elif number_of_consumption_record_blanks > 2:
-            no += 1
             result = NO
         else:
-            yes += 1
             result = YES
-        return result, no, not_reporting, yes
+        return result
 
 
 class WebBasedCheck(QCheck):
     test = WEB_BASED
     combinations = [{NAME: DEFAULT}]
 
-    def for_each_facility(self, facility, no, not_reporting, yes, combination):
+    def for_each_facility(self, facility, combination):
         value = facility[WEB_PAPER].strip()
         if value and value in [WEB, PAPER]:
             result = value
         else:
             result = NOT_REPORTING
-        if result == PAPER:
-            no += 1
-        elif result == WEB:
-            yes += 1
-        else:
-            not_reporting += 1
-        return result, no, not_reporting, yes
+        return result
 
 
 class IsReportingCheck(QCheck):
     test = REPORTING
     combinations = [{NAME: DEFAULT}]
 
-    def for_each_facility(self, facility, no, not_reporting, yes, combination):
-        result = NO if facility_not_reporting(facility) else YES
-        if result == NO:
-            no += 1
-        else:
-            yes += 1
-        return result, no, not_reporting, yes
+    def for_each_facility(self, facility, combination):
+        return NO if facility_not_reporting(facility) else YES
 
 
 class MultipleCheck(QCheck):
     test = MULTIPLE_ORDERS
     combinations = [{NAME: DEFAULT}]
 
-    def for_each_facility(self, facility, no, not_reporting, yes, combination):
-        not_reporting += 0
-        result = multiple_orders_score(facility)
-        if result == NO:
-            no += 1
-        elif result == YES:
-            yes += 1
-        else:
-            not_reporting += 1
-        return result, no, not_reporting, yes
+    def for_each_facility(self, facility, combination):
+        return multiple_orders_score(facility)

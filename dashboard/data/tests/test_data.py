@@ -87,14 +87,14 @@ class DataTestCase(TestCase):
         report = FreeFormReport(file_path, "May Jun").load()
         report.cycle = "Jul - Aug 2015"
         cases = [
-            {'test': BlanksQualityCheck, 'expected': 8.33, 'score': YES},
-                 {'test': MultipleCheck, 'expected': 79.17, 'score': YES},
-                 {'test': IsReportingCheck, 'expected': 100.0, 'score': YES},
-                 {'test': WebBasedCheck, 'expected': 100.0, 'score': YES}
-                 ]
+            {'test': BlanksQualityCheck, 'expected': NOT_REPORTING},
+            {'test': MultipleCheck, 'expected': YES},
+            {'test': IsReportingCheck, 'expected': YES},
+            {'test': WebBasedCheck, 'expected': WEB}
+        ]
         for case in cases:
-            result = case['test'](report).run()['DEFAULT']
-            self.assertAlmostEqual(result[case['score']], case['expected'], 2)
+            case['test'](report).run()
+            self.assertEquals(report.locs[0]["scores"][case['test'].test][DEFAULT], case['expected'])
 
     def xtest_calculate_score(self):
         file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', 'tests', 'fixtures',
@@ -110,11 +110,8 @@ class GuidelineAdherenceAdult1LTestCase(TestCase):
         sum_df1 = 9
         sum_df2 = 2
         ratio = 0.8
-        result, no, not_reporting, yes = calculate_score(df1_count, df2_count, sum_df1, sum_df2, ratio, 0, 0, 0)
+        result = calculate_score(df1_count, df2_count, sum_df1, sum_df2, ratio)
         self.assertEqual(result, YES)
-        self.assertEqual(yes, 1)
-        self.assertEqual(no, 0)
-        self.assertEqual(not_reporting, 0)
 
     def test_score_is_yes_if_sum_of_new_hiv_positive_women_and_new_art_for_tdf_is_zero_and_that_for_AZT_is_also_zero(
             self):
@@ -122,47 +119,35 @@ class GuidelineAdherenceAdult1LTestCase(TestCase):
         sum_df1 = 0
         sum_df2 = 0
         ratio = 0.8
-        result, no, not_reporting, yes = calculate_score(df1_count, df2_count, sum_df1, sum_df2, ratio, 0, 0, 0)
+        result = calculate_score(df1_count, df2_count, sum_df1, sum_df2, ratio)
         self.assertEqual(result, YES)
-        self.assertEqual(yes, 1)
-        self.assertEqual(no, 0)
-        self.assertEqual(not_reporting, 0)
 
     def test_score_is_no_if_tdf_cells_are_blank(self):
         df1_count = df2_count = 1
         sum_df1 = 0
         sum_df2 = 12
         ratio = 0.8
-        result, no, not_reporting, yes = calculate_score(df1_count, df2_count, sum_df1, sum_df2, ratio, 0, 0, 0, True,
-                                                         False)
+        result = calculate_score(df1_count, df2_count, sum_df1, sum_df2, ratio, True,
+                                 False)
         self.assertEqual(result, NO)
-        self.assertEqual(yes, 0)
-        self.assertEqual(no, 1)
-        self.assertEqual(not_reporting, 0)
 
     def test_score_is_no_if_azt_cells_are_blank(self):
         df1_count = df2_count = 1
         sum_df1 = 0
         sum_df2 = 20
         ratio = 0.8
-        result, no, not_reporting, yes = calculate_score(df1_count, df2_count, sum_df1, sum_df2, ratio, 0, 0, 0, False,
-                                                         True)
+        result = calculate_score(df1_count, df2_count, sum_df1, sum_df2, ratio, False,
+                                 True)
         self.assertEqual(result, NO)
-        self.assertEqual(yes, 0)
-        self.assertEqual(no, 1)
-        self.assertEqual(not_reporting, 0)
 
     def test_score_is_not_reporting_if_azt_or_tdf_cells_are_not_found(self):
         df1_count = df2_count = 0
         sum_df1 = 0
         sum_df2 = 0
         ratio = 0.8
-        result, no, not_reporting, yes = calculate_score(df1_count, df2_count, sum_df1, sum_df2, ratio, 0, 0, 0, False,
-                                                         True)
+        result = calculate_score(df1_count, df2_count, sum_df1, sum_df2, ratio, False,
+                                 True)
         self.assertEqual(result, NOT_REPORTING)
-        self.assertEqual(yes, 0)
-        self.assertEqual(no, 0)
-        self.assertEqual(not_reporting, 1)
 
     def test_run(self):
         report = FakeReport()
@@ -202,8 +187,8 @@ class GuidelineAdherenceAdult1LTestCase(TestCase):
                 },
                 {FORMULATION: "A", "openingBalance": 12}]
         }
-        check = GuidelineAdherenceCheckAdult1L(report)
-        assert check.run()['DEFAULT']['YES'] == 100
+        GuidelineAdherenceCheckAdult1L(report).run()
+        self.assertEqual(report.locs[0]["scores"][GUIDELINE_ADHERENCE_ADULT_1L][DEFAULT], YES)
 
 
 class TestDIFFERENTORDERSOVERTIMECheck(TestCase):
@@ -235,9 +220,8 @@ class TestDIFFERENTORDERSOVERTIMECheck(TestCase):
                 }
             ]
         }
-        scores = OrdersOverTimeCheck(report, other_report).run()
-        self.assertTrue(F1 in scores)
-        self.assertEqual(scores[F1], {NO: 100.0, YES: 0, NOT_REPORTING: 0})
+        OrdersOverTimeCheck(report, other_report).run()
+        self.assertEqual(report.locs[0]["scores"][DIFFERENT_ORDERS_OVER_TIME][F1], NO)
 
     def test_all_zeros_scores_yes(self):
         report = FakeReport()
@@ -267,9 +251,8 @@ class TestDIFFERENTORDERSOVERTIMECheck(TestCase):
                 }
             ]
         }
-        scores = OrdersOverTimeCheck(report, other_report).run()
-        self.assertTrue(F1 in scores)
-        self.assertEqual(scores[F1], {NO: 0.0, YES: 100.0, NOT_REPORTING: 0})
+        OrdersOverTimeCheck(report, other_report).run()
+        self.assertEqual(report.locs[0]["scores"][DIFFERENT_ORDERS_OVER_TIME][F1], YES)
 
     def test_diff_scores_yes(self):
         report = FakeReport()
@@ -299,9 +282,8 @@ class TestDIFFERENTORDERSOVERTIMECheck(TestCase):
                 }
             ]
         }
-        scores = OrdersOverTimeCheck(report, other_report).run()
-        self.assertTrue(F1 in scores)
-        self.assertEqual(scores[F1], {NO: 0.0, YES: 100.0, NOT_REPORTING: 0})
+        OrdersOverTimeCheck(report, other_report).run()
+        self.assertEqual(report.locs[0]["scores"][DIFFERENT_ORDERS_OVER_TIME][F1], YES)
 
     def test_missing_scores_na(self):
         report = FakeReport()
@@ -331,6 +313,5 @@ class TestDIFFERENTORDERSOVERTIMECheck(TestCase):
                 }
             ]
         }
-        scores = OrdersOverTimeCheck(report, other_report).run()
-        self.assertTrue(F1 in scores)
-        self.assertEqual(scores[F1], {NO: 0.0, YES: 0, NOT_REPORTING: 100.0})
+        OrdersOverTimeCheck(report, other_report).run()
+        self.assertEqual(report.locs[0]["scores"][DIFFERENT_ORDERS_OVER_TIME][F1], NOT_REPORTING)

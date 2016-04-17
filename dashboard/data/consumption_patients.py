@@ -23,7 +23,7 @@ class ConsumptionAndPatientsQualityCheck(QCheck):
         }]
     key_cache = defaultdict(dict)
 
-    def for_each_facility(self, facility, no, not_reporting, yes, combination):
+    def for_each_facility(self, facility, combination):
         result = NOT_REPORTING
 
         facility_name = facility[NAME]
@@ -38,16 +38,13 @@ class ConsumptionAndPatientsQualityCheck(QCheck):
         all_df1_blank = has_all_blanks(df1_records, combination[FIELDS])
         all_df2_blank = has_all_blanks(df2_records, [NEW, EXISTING])
         adjusted_df1_sum = float(df1_sum) / combination[RATIO]
-        no, not_reporting, result, yes = self.calculate_score(adjusted_df1_sum, df2_sum,
+        result = self.calculate_score(adjusted_df1_sum, df2_sum,
                                                               df1_count,
-                                                              df2_count, yes,
-                                                              no,
-                                                              not_reporting, result, all_df1_blank,
+                                                              df2_count, result, all_df1_blank,
                                                               all_df2_blank)
-        return result, no, not_reporting, yes
-
+        return result
     def calculate_score(self, df1_sum, df2_sum, number_of_consumption_records,
-                        number_of_patient_records, yes, no, not_reporting, result, all_df1_blank,
+                        number_of_patient_records, result, all_df1_blank,
                         all_df2_blank):
         numerator = float(df1_sum)
         denominator = float(df2_sum)
@@ -58,14 +55,12 @@ class ConsumptionAndPatientsQualityCheck(QCheck):
         both_are_zero = (df1_sum == 0 and df2_sum == 0)
         divisible = denominator != 0
         if number_of_consumption_records == 0 or number_of_patient_records == 0 or (all_df2_blank and all_df1_blank):
-            not_reporting += 1
+            pass
         elif no_blanks and (both_are_zero or (divisible and 0.7 < abs(numerator / denominator) < 1.429)):
-            yes += 1
             result = YES
         else:
-            no += 1
             result = NO
-        return no, not_reporting, result, yes
+        return result
 
     def get_patient_records(self, facility_name, combinations, is_adult=True):
         collection = self.report.ads if is_adult else self.report.pds

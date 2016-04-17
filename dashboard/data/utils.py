@@ -108,26 +108,18 @@ class QCheck:
         self.run()
 
     def run(self):
-        scores = dict()
         for combination in self.combinations:
-            self.for_each_combination(combination, scores)
-        return scores
+            self.for_each_combination(combination)
 
-    def for_each_combination(self, combination, scores):
+    def for_each_combination(self, combination):
         facilities = self.report.locs
-        yes = 0
-        no = 0
-        not_reporting = 0
-        total_count = len(facilities)
         formulation_name = combination[NAME]
         for facility in facilities:
-            result, no, not_reporting, yes = self.for_each_facility(facility, no, not_reporting, yes, combination)
+            result = self.for_each_facility(facility, combination)
             facility['scores'][self.test][formulation_name] = result
-        out = build_cycle_formulation_score(formulation_name, yes, no, not_reporting, total_count)
-        scores[formulation_name] = out
 
-    def for_each_facility(self, facility, no, not_reporting, yes, combination):
-        raise NotImplementedError
+    def for_each_facility(self, facility, combination):
+        raise NotImplementedError(self.test)
 
 
 def facility_not_reporting(facility):

@@ -39,7 +39,7 @@ class NNRTICURRENTADULTSCheck(QCheck):
 
         return pydash.select(records, filter_func)
 
-    def for_each_facility(self, facility, no, not_reporting, yes, combination):
+    def for_each_facility(self, facility, combination):
         facility_name = facility[NAME]
         df1_records = self.filter_records(facility_name, combination[DF1])
         df2_records = self.filter_records(facility_name, combination[DF2])
@@ -60,19 +60,15 @@ class NNRTICURRENTADULTSCheck(QCheck):
             denominator = float(sum_df1)
 
         if df1_count == 0 or df2_count == 0:
-            not_reporting += 1
             result = NOT_REPORTING
         elif (sum_df2 == 0 and sum_df1 == 0) or (denominator != 0 and 0.7 <= abs(numerator / denominator) <= 1.429):
-            yes += 1
             result = YES
         elif denominator != 0 and (abs(numerator / denominator) < 1.0 or abs(numerator / denominator) > 1.429):
-            no += 1
             result = NO
         elif all_df1_fields_are_blank or all_df2_fields_are_blank:
-            no += 1
             result = NO
 
-        return result, no, not_reporting, yes
+        return result
 
 
 class NNRTICURRENTPAEDCheck(NNRTICURRENTADULTSCheck):
@@ -97,7 +93,7 @@ class NNRTICURRENTPAEDCheck(NNRTICURRENTADULTSCheck):
         SHOW_CONVERSION: True
     }]
 
-    def for_each_facility(self, facility, no, not_reporting, yes, combination):
+    def for_each_facility(self, facility, combination):
         facility_name = facility[NAME]
         ratio = combination.get(RATIO)
         non_normalized_field = combination.get(OTHER)[0]
@@ -123,18 +119,15 @@ class NNRTICURRENTPAEDCheck(NNRTICURRENTADULTSCheck):
             denominator = adjusted_sum_df1
 
         if df1_count == 0 or df2_count == 0:
-            not_reporting += 1
             result = NOT_REPORTING
         elif total == 0 or (denominator != 0 and 0.7 <= abs(numerator / denominator) <= 1.429):
-            yes += 1
             result = YES
         elif denominator != 0 and (abs(numerator / denominator) < 1.0 or abs(numerator / denominator) > 1.429):
-            no += 1
             result = NO
         else:
             pass
 
-        return result, no, not_reporting, yes
+        return result
 
 
 class NNRTINEWPAEDCheck(NNRTICURRENTADULTSCheck):
