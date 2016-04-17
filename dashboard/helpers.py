@@ -226,7 +226,12 @@ OTHER = "other"
 SHOW_CONVERSION = "show_conversion"
 WEB = "Web"
 PAPER = "Paper"
-
+C_RECORDS = "consumption_records"
+A_RECORDS = "adult_records"
+P_RECORDS = "paed_records"
+C_COUNT = "consumption_count"
+A_COUNT = "adult_count"
+P_COUNT = "paed_count"
 
 def get_actual_result(result, combination):
     def combination_yes():

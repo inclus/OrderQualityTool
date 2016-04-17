@@ -23,12 +23,11 @@ class ConsumptionAndPatientsQualityCheck(QCheck):
         }]
     key_cache = defaultdict(dict)
 
-    def for_each_facility(self, facility, combination):
+    def for_each_facility(self, data, combination, previous_cycle_data=None):
         result = NOT_REPORTING
 
-        facility_name = facility[NAME]
-        df1_records = self.get_consumption_records(facility_name, combination[CONSUMPTION_QUERY])
-        df2_records = self.get_patient_records(facility_name, combination[PATIENT_QUERY],
+        df1_records = self.get_consumption_records(data, combination[CONSUMPTION_QUERY])
+        df2_records = self.get_patient_records(data, combination[PATIENT_QUERY],
                                                combination[IS_ADULT])
         df1_count = len(df1_records)
         df2_count = len(df2_records)
@@ -39,10 +38,11 @@ class ConsumptionAndPatientsQualityCheck(QCheck):
         all_df2_blank = has_all_blanks(df2_records, [NEW, EXISTING])
         adjusted_df1_sum = float(df1_sum) / combination[RATIO]
         result = self.calculate_score(adjusted_df1_sum, df2_sum,
-                                                              df1_count,
-                                                              df2_count, result, all_df1_blank,
-                                                              all_df2_blank)
+                                      df1_count,
+                                      df2_count, result, all_df1_blank,
+                                      all_df2_blank)
         return result
+
     def calculate_score(self, df1_sum, df2_sum, number_of_consumption_records,
                         number_of_patient_records, result, all_df1_blank,
                         all_df2_blank):
@@ -62,19 +62,13 @@ class ConsumptionAndPatientsQualityCheck(QCheck):
             result = NO
         return result
 
-    def get_patient_records(self, facility_name, combinations, is_adult=True):
-        collection = self.report.ads if is_adult else self.report.pds
-        records = self.get_records_from_collection(collection, facility_name)
+    def get_patient_records(self, data, combinations, is_adult=True):
+        records = data[A_RECORDS] if is_adult else data[P_RECORDS]
         return pydash.chain(records).select(
             lambda x: x[FORMULATION].strip() in combinations
         ).value()
 
-    def get_records_from_collection(self, collection, facility_name):
-        records = collection.get(facility_name, [])
-        return records
-
-    def get_consumption_records(self, facility_name, formulation_name):
-        records = self.report.cs[facility_name]
-        return pydash.chain(records).select(
+    def get_consumption_records(self, data, formulation_name):
+        return pydash.chain(data[C_RECORDS]).select(
             lambda x: formulation_name in x[FORMULATION]
         ).value()

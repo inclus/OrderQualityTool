@@ -1,6 +1,6 @@
 import pydash
 
-from dashboard.data.utils import QCheck, values_for_records, facility_not_reporting
+from dashboard.data.utils import QCheck, values_for_records, facility_not_reporting, filter_consumption_records
 from dashboard.helpers import *
 
 
@@ -16,22 +16,10 @@ class GuidelineAdherenceCheckAdult1L(QCheck):
         FIELDS: [ESTIMATED_NUMBER_OF_NEW_ART_PATIENTS, ESTIMATED_NUMBER_OF_NEW_PREGNANT_WOMEN]
     }]
 
-    def filter_records(self, facility_name, formulation_names):
-        records = self.report.cs[facility_name]
-
-        def filter_func(x):
-            for f in formulation_names:
-                if f in x[FORMULATION]:
-                    return True
-            return False
-
-        return pydash.select(records, filter_func)
-
-    def for_each_facility(self, facility, combination):
-        facility_name = facility[NAME]
+    def for_each_facility(self, data, combination, previous_cycle_data=None):
         ratio = combination[RATIO]
-        df1_records = self.filter_records(facility_name, combination[DF1])
-        df2_records = self.filter_records(facility_name, combination[DF2])
+        df1_records = filter_consumption_records(data, combination[DF1])
+        df2_records = filter_consumption_records(data, combination[DF2])
         df1_count = len(df1_records)
         df2_count = len(df2_records)
         df1_values = values_for_records(combination[FIELDS], df1_records)
@@ -41,7 +29,7 @@ class GuidelineAdherenceCheckAdult1L(QCheck):
         all_df1_fields_are_blank = pydash.every(df1_values, lambda x: x is None)
         all_df2_fields_are_blank = pydash.every(df2_values, lambda x: x is None)
         return calculate_score(df1_count, df2_count, sum_df1, sum_df2, ratio, all_df1_fields_are_blank,
-                               all_df2_fields_are_blank, facility_not_reporting(facility))
+                               all_df2_fields_are_blank, facility_not_reporting(data))
 
 
 class GuidelineAdherenceCheckAdult2L(GuidelineAdherenceCheckAdult1L):

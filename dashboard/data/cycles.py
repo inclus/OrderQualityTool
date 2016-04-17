@@ -1,12 +1,12 @@
 import pydash
 
-from dashboard.data.utils import values_for_records, facility_not_reporting, TwoCycleQCheck
+from dashboard.data.utils import values_for_records, facility_not_reporting, get_consumption_records, get_patient_records, QCheck
 from dashboard.helpers import *
 
 THRESHOLD = "threshold"
 
 
-class OrdersOverTimeCheck(TwoCycleQCheck):
+class OrdersOverTimeCheck(QCheck):
     two_cycle = True
     test = DIFFERENT_ORDERS_OVER_TIME
     combinations = [
@@ -16,13 +16,13 @@ class OrdersOverTimeCheck(TwoCycleQCheck):
     ]
     fields = [OPENING_BALANCE, ART_CONSUMPTION, ESTIMATED_NUMBER_OF_NEW_ART_PATIENTS]
 
-    def for_each_facility(self, facility, combination):
+    def for_each_facility(self, data, combination, previous_cycle_data=None):
         fields = self.fields
 
-        prev_records = self.get_consumption_records(self.other_cycle_report, facility[NAME], combination[CONSUMPTION_QUERY])
+        prev_records = get_consumption_records(previous_cycle_data, combination[CONSUMPTION_QUERY])
         prev_values = values_for_records(fields, prev_records)
 
-        current_records = self.get_consumption_records(self.report, facility[NAME], combination[CONSUMPTION_QUERY])
+        current_records = get_consumption_records(data, combination[CONSUMPTION_QUERY])
         current_values = values_for_records(fields, current_records)
 
         all_current_values_zero = pydash.every(current_values, lambda x: x == 0)
@@ -37,7 +37,7 @@ class OrdersOverTimeCheck(TwoCycleQCheck):
         return result
 
 
-class BalancesMatchCheck(TwoCycleQCheck):
+class BalancesMatchCheck(QCheck):
     two_cycle = True
     test = CLOSING_BALANCE_MATCHES_OPENING_BALANCE
     combinations = [
@@ -46,12 +46,11 @@ class BalancesMatchCheck(TwoCycleQCheck):
         {NAME: F3, CONSUMPTION_QUERY: F3_QUERY}
     ]
 
-    def for_each_facility(self, facility, combination):
+    def for_each_facility(self, data, combination, previous_cycle_data=None):
         result = NOT_REPORTING
-        facility_name = facility[NAME]
-        prev_records = self.get_consumption_records(self.other_cycle_report, facility_name,
-                                                    combination[CONSUMPTION_QUERY])
-        current_records = self.get_consumption_records(self.report, facility_name, combination[CONSUMPTION_QUERY])
+        prev_records = get_consumption_records(previous_cycle_data,
+                                               combination[CONSUMPTION_QUERY])
+        current_records = get_consumption_records(data, combination[CONSUMPTION_QUERY])
         closing_balance_values = values_for_records([CLOSING_BALANCE], prev_records)
         opening_balance_values = values_for_records([OPENING_BALANCE], current_records)
 
@@ -70,7 +69,7 @@ class BalancesMatchCheck(TwoCycleQCheck):
         return len(closing_balance_values) == 0 or len(opening_balance_values) == 0
 
 
-class StableConsumptionCheck(TwoCycleQCheck):
+class StableConsumptionCheck(QCheck):
     two_cycle = True
     test = STABLE_CONSUMPTION
     fields = [ART_CONSUMPTION, PMTCT_CONSUMPTION]
@@ -80,11 +79,9 @@ class StableConsumptionCheck(TwoCycleQCheck):
         {NAME: F3, CONSUMPTION_QUERY: F3_QUERY, THRESHOLD: 10}
     ]
 
-    def for_each_facility(self, facility, combination):
-        facility_name = facility[NAME]
-        prev_records = self.get_consumption_records(self.other_cycle_report, facility_name,
-                                                    combination[CONSUMPTION_QUERY])
-        current_records = self.get_consumption_records(self.report, facility_name, combination[CONSUMPTION_QUERY])
+    def for_each_facility(self, data, combination, previous_cycle_data=None):
+        prev_records = get_consumption_records(previous_cycle_data, combination[CONSUMPTION_QUERY])
+        current_records = get_consumption_records(data, combination[CONSUMPTION_QUERY])
         threshold = combination[THRESHOLD]
         number_of_consumption_records_prev_cycle = len(prev_records)
         number_of_consumption_records_current_cycle = len(current_records)
@@ -109,7 +106,7 @@ class StableConsumptionCheck(TwoCycleQCheck):
         return result
 
 
-class WarehouseFulfillmentCheck(TwoCycleQCheck):
+class WarehouseFulfillmentCheck(QCheck):
     two_cycle = True
     test = WAREHOUSE_FULFILMENT
     combinations = [
@@ -118,11 +115,9 @@ class WarehouseFulfillmentCheck(TwoCycleQCheck):
         {NAME: F3, CONSUMPTION_QUERY: F3_QUERY}
     ]
 
-    def for_each_facility(self, facility, combination):
-        facility_name = facility[NAME]
-        prev_records = self.get_consumption_records(self.other_cycle_report, facility_name,
-                                                    combination[CONSUMPTION_QUERY])
-        current_records = self.get_consumption_records(self.report, facility_name, combination[CONSUMPTION_QUERY])
+    def for_each_facility(self, data, combination, previous_cycle_data=None):
+        prev_records = get_consumption_records(previous_cycle_data, combination[CONSUMPTION_QUERY])
+        current_records = get_consumption_records(data, combination[CONSUMPTION_QUERY])
         count_prev = len(prev_records)
         count_current = len(current_records)
         prev_values = values_for_records([PACKS_ORDERED, ], prev_records)
@@ -130,7 +125,7 @@ class WarehouseFulfillmentCheck(TwoCycleQCheck):
         current_values_have_blanks = pydash.some(current_values, lambda x: x is None)
         # amount_ordered = pydash.chain(prev_values).reject(lambda x: x is None).sum().value()
         # amount_received = pydash.chain(current_values).reject(lambda x: x is None).sum().value()
-        facility_is_not_reporting = facility_not_reporting(facility)
+        facility_is_not_reporting = facility_not_reporting(data)
         result = NOT_REPORTING
         data_is_insufficient = count_prev < 1 or count_current < 1 or facility_is_not_reporting
 
@@ -155,12 +150,11 @@ class StablePatientVolumesCheck(StableConsumptionCheck):
     ]
     fields = [NEW, EXISTING]
 
-    def for_each_facility(self, facility, combination):
-        facility_name = facility[NAME]
+    def for_each_facility(self, data, combination, previous_cycle_data=None):
         is_adult = combination[ADULT]
-        prev_records = self.get_patient_records(self.other_cycle_report, facility_name,
-                                                combination[PATIENT_QUERY], is_adult)
-        current_records = self.get_patient_records(self.report, facility_name, combination[PATIENT_QUERY], is_adult)
+        prev_records = get_patient_records(previous_cycle_data,
+                                           combination[PATIENT_QUERY], is_adult)
+        current_records = get_patient_records(data, combination[PATIENT_QUERY], is_adult)
         threshold = combination[THRESHOLD]
         data_is_sufficient = len(prev_records) > 0 and len(current_records) > 0
         current_values = values_for_records(self.fields, current_records)

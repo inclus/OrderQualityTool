@@ -17,10 +17,9 @@ class NegativeNumbersQualityCheck(QCheck):
               ESTIMATED_NUMBER_OF_NEW_PREGNANT_WOMEN,
               ESTIMATED_NUMBER_OF_NEW_ART_PATIENTS]
 
-    def for_each_facility(self, facility, combination):
+    def for_each_facility(self, data, combination, previous_cycle_data=None):
         result = NOT_REPORTING
-        facility_name = facility[NAME]
-        df1_records = self.get_consumption_records(facility_name, combination[CONSUMPTION_QUERY])
+        df1_records = self.get_consumption_records(data, combination[CONSUMPTION_QUERY])
         values = values_for_records(self.fields, df1_records)
         all_cells_not_negative = pydash.every(values,
                                               lambda x: x >= 0 or x is None)
@@ -32,8 +31,8 @@ class NegativeNumbersQualityCheck(QCheck):
             result = NO
         return result
 
-    def get_consumption_records(self, facility_name, formulation_name):
-        records = self.report.cs[facility_name]
+    def get_consumption_records(self, data, formulation_name):
+        records = data[C_RECORDS]
         return pydash.chain(records).reject(
-                lambda x: formulation_name not in x[FORMULATION]
+            lambda x: formulation_name not in x[FORMULATION]
         ).value()

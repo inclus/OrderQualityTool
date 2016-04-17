@@ -22,22 +22,15 @@ class BlanksQualityCheck(QCheck):
               LOSES_ADJUSTMENTS,
               ESTIMATED_NUMBER_OF_NEW_ART_PATIENTS]
 
-    def for_each_facility(self, facility, combination):
+    def for_each_facility(self, data, combination, previous_cycle_data=None):
         result = NOT_REPORTING
-        facility_name = facility[NAME]
-        c_records = self.report.cs[facility_name]
-        a_records = self.report.ads[facility_name]
-        p_records = self.report.pds[facility_name]
-        cr_count = len(c_records)
-        ar_count = len(a_records)
-        pr_count = len(p_records)
 
         number_of_consumption_record_blanks = len(pydash.select(
-            values_for_records(self.fields, c_records), lambda v: v is None))
+            values_for_records(self.fields, data[C_RECORDS]), lambda v: v is None))
 
-        if cr_count == 0 and ar_count == 0 and pr_count == 0:
+        if data[C_COUNT] == 0 and data[A_COUNT] == 0 and data[P_COUNT] == 0:
             pass
-        elif cr_count < 25 or ar_count < 22 or pr_count < 7:
+        elif data[C_COUNT] < 25 or data[A_COUNT] < 22 or data[P_COUNT] < 7:
             result = NO
         elif number_of_consumption_record_blanks > 2:
             result = NO
@@ -50,8 +43,8 @@ class WebBasedCheck(QCheck):
     test = WEB_BASED
     combinations = [{NAME: DEFAULT}]
 
-    def for_each_facility(self, facility, combination):
-        value = facility[WEB_PAPER].strip()
+    def for_each_facility(self, data, combination, previous_cycle_data=None):
+        value = data[WEB_PAPER].strip()
         if value and value in [WEB, PAPER]:
             result = value
         else:
@@ -63,7 +56,7 @@ class IsReportingCheck(QCheck):
     test = REPORTING
     combinations = [{NAME: DEFAULT}]
 
-    def for_each_facility(self, facility, combination):
+    def for_each_facility(self, facility, combination, previous_cycle_data=None):
         return NO if facility_not_reporting(facility) else YES
 
 
@@ -71,5 +64,5 @@ class MultipleCheck(QCheck):
     test = MULTIPLE_ORDERS
     combinations = [{NAME: DEFAULT}]
 
-    def for_each_facility(self, facility, combination):
+    def for_each_facility(self, facility, combination, previous_cycle_data=None):
         return multiple_orders_score(facility)

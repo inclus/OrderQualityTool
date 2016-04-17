@@ -66,7 +66,7 @@ class NNRTICheckTestMixin(ScoreDetailTestCase):
     check = NNRTINEWPAEDCheck
 
     def get_formulations(self):
-        check = NNRTINEWPAEDCheck({})
+        check = NNRTINEWPAEDCheck()
         formulations = check.combinations[0][DF1] + check.combinations[0][DF2]
         return formulations
 

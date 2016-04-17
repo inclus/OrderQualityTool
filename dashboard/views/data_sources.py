@@ -71,7 +71,7 @@ class CheckDataSource(object):
 
 
 def get_negatives_data(score, test, combination):
-    check = NegativeNumbersQualityCheck({})
+    check = NegativeNumbersQualityCheck()
     formulation_query = query_map.get(combination)
     consumption_records = Consumption.objects.filter(name=score.name, district=score.district, cycle=score.cycle, formulation__icontains=formulation_query)
     tables = []
@@ -204,7 +204,7 @@ def calculate_patient_totals(patient_records):
 
 
 def get_consumption_and_patients(score, test, combination_name):
-    check = ConsumptionAndPatientsQualityCheck({})
+    check = ConsumptionAndPatientsQualityCheck()
     check_combination = get_combination(check.combinations, combination_name)
     formulation_query = check_combination.get(CONSUMPTION_QUERY)
     consumption_records = Consumption.objects.filter(name=score.name, district=score.district, cycle=score.cycle, formulation__icontains=formulation_query)
@@ -286,7 +286,7 @@ class ConsumptionAndPatientsDataSource(CheckDataSource):
 
 
 class TwoCycleDataSource(CheckDataSource):
-    check = OrdersOverTimeCheck({}, {})
+    check = OrdersOverTimeCheck()
 
     def get_context(self, score, test, combination):
 
@@ -367,7 +367,7 @@ def get_table_for_cycle(cycle, check, combination, score, fields):
 
 
 class ClosingBalanceMatchesOpeningBalanceDataSource(CheckDataSource):
-    check = BalancesMatchCheck({}, {})
+    check = BalancesMatchCheck()
 
     def get_template(self, test):
         return "check/differentOrdersOverTime.html"
@@ -411,7 +411,7 @@ class ClosingBalanceMatchesOpeningBalanceDataSource(CheckDataSource):
 
 
 class StableConsumptionDataSource(TwoCycleDataSource):
-    check = StableConsumptionCheck({}, {})
+    check = StableConsumptionCheck()
 
     def get_template(self, test):
         return "check/differentOrdersOverTime.html"
@@ -448,7 +448,7 @@ class StablePatientVolumesDataSource(TwoCycleDataSource):
     def get_template(self, test):
         return "check/patientStability.html"
 
-    check = StablePatientVolumesCheck({}, {})
+    check = StablePatientVolumesCheck()
 
     def get_table_for_cycle(self, cycle, check, combination, score):
         check_combination = get_combination(check.combinations, combination)
@@ -542,7 +542,7 @@ class StablePatientVolumesDataSource(TwoCycleDataSource):
 
 
 class WarehouseFulfillmentDataSource(ClosingBalanceMatchesOpeningBalanceDataSource):
-    check = BalancesMatchCheck({}, {})
+    check = BalancesMatchCheck()
 
     def get_template(self, test):
         return "check/differentOrdersOverTime.html"
@@ -581,6 +581,7 @@ def append_total_row(table, totals, total_row):
 
 class GuidelineAdherenceDataSource(CheckDataSource):
     show_formulation = False
+
     def get_template(self, test):
         return "check/adherence.html"
 
@@ -632,7 +633,7 @@ class GuidelineAdherenceDataSource(CheckDataSource):
 
     def get_context(self, score, test, combination):
         check_data = self.checks.get(test)
-        check = check_data.get(CHECK)({})
+        check = check_data.get(CHECK)()
         check_combination = check.combinations[0]
         data = {"main_title": "RAW ORDER DATA", "tables": []}
         data["result_title"] = check_data[RESULTS_TITLE]

@@ -1,5 +1,3 @@
-import os
-
 import pydash
 from celery import shared_task
 
@@ -12,19 +10,22 @@ from dashboard.data.free_form_report import FreeFormReport
 from dashboard.data.negatives import NegativeNumbersQualityCheck
 from dashboard.data.nn import NNRTICURRENTADULTSCheck, NNRTINewAdultsCheck, NNRTINEWPAEDCheck
 from dashboard.data.nn import NNRTICURRENTPAEDCheck
-from dashboard.data.utils import facility_has_single_order
-from dashboard.helpers import YES, get_prev_cycle, WEB, F1, F2, F3, DEFAULT, NO
+from dashboard.data.utils import facility_has_single_order, timeit
+from dashboard.helpers import YES, get_prev_cycle, WEB, F1, F2, F3, DEFAULT, NO, NAME, C_COUNT, A_COUNT, P_COUNT, WEB_PAPER, C_RECORDS, A_RECORDS, P_RECORDS
 from dashboard.models import Score, Cycle, Consumption, AdultPatientsRecord, PAEDPatientsRecord, MultipleOrderFacility
 
 
+@timeit
 def persist_consumption(report):
     persist_records(report.locs, Consumption, report.cs, report.cycle)
 
 
+@timeit
 def persist_adult_records(report):
     persist_records(report.locs, AdultPatientsRecord, report.ads, report.cycle)
 
 
+@timeit
 def persist_paed_records(report):
     persist_records(report.locs, PAEDPatientsRecord, report.pds, report.cycle)
 
@@ -67,6 +68,7 @@ def build_mof(report):
     return func
 
 
+@timeit
 def persist_multiple_order_records(report):
     facilities_with_multiple_orders = pydash.reject(report.locs, lambda f: facility_has_single_order(f))
     all = pydash.collect(facilities_with_multiple_orders, build_mof(report))
@@ -84,35 +86,56 @@ def calculate_scores_for_checks_in_cycle(report):
     persist_multiple_order_records(report)
 
 
+@timeit
 def run_checks(report):
-    one_cycle_checks = [
-        BlanksQualityCheck,
-        NegativeNumbersQualityCheck,
-        ConsumptionAndPatientsQualityCheck,
-        MultipleCheck,
-        WebBasedCheck,
-        IsReportingCheck,
-        GuidelineAdherenceCheckAdult1L,
-        GuidelineAdherenceCheckAdult2L,
-        GuidelineAdherenceCheckPaed1L,
-        NNRTICURRENTADULTSCheck,
-        NNRTICURRENTPAEDCheck,
-        NNRTINewAdultsCheck,
-        NNRTINEWPAEDCheck
-    ]
-    for check in one_cycle_checks:
-        check(report).score()
     other_report = get_report_for_other_cycle(report)
-    two_cycle_checks = [BalancesMatchCheck,
-                        OrdersOverTimeCheck,
-                        StableConsumptionCheck,
-                        WarehouseFulfillmentCheck,
-                        StablePatientVolumesCheck
-                        ]
-    for check in two_cycle_checks:
-        check(report, other_report).score()
+    checks = [
+        BlanksQualityCheck(),
+        NegativeNumbersQualityCheck(),
+        ConsumptionAndPatientsQualityCheck(),
+        MultipleCheck(),
+        WebBasedCheck(),
+        IsReportingCheck(),
+        GuidelineAdherenceCheckAdult1L(),
+        GuidelineAdherenceCheckAdult2L(),
+        GuidelineAdherenceCheckPaed1L(),
+        NNRTICURRENTADULTSCheck(),
+        NNRTICURRENTPAEDCheck(),
+        NNRTINewAdultsCheck(),
+        NNRTINEWPAEDCheck(),
+        BalancesMatchCheck(),
+        OrdersOverTimeCheck(),
+        StableConsumptionCheck(),
+        WarehouseFulfillmentCheck(),
+        StablePatientVolumesCheck()
+    ]
+    for facility in report.locs:
+        facility_data = build_facility_data(facility, report)
+        other_facility_data = build_facility_data(facility, other_report)
+        for check in checks:
+            for combination in check.combinations:
+                facility['scores'][check.test][combination[NAME]] = check.for_each_facility(facility_data, combination, other_facility_data)
 
 
+def build_facility_data(facility, report):
+    facility_data = {}
+    facility_name = facility[NAME]
+    c_records = report.cs[facility_name]
+    a_records = report.ads[facility_name]
+    p_records = report.pds[facility_name]
+    facility_data[C_COUNT] = len(c_records)
+    facility_data[A_COUNT] = len(a_records)
+    facility_data[P_COUNT] = len(p_records)
+    facility_data[WEB_PAPER] = facility[WEB_PAPER].strip()
+    facility_data[C_RECORDS] = c_records
+    facility_data[A_RECORDS] = a_records
+    facility_data[P_RECORDS] = p_records
+    facility_data['Multiple'] = facility['Multiple']
+    facility_data['status'] = facility['status']
+    return facility_data
+
+
+@timeit
 def get_report_for_other_cycle(report):
     prev_cycle_title = get_prev_cycle(report.cycle)
     other_report = FreeFormReport(None, prev_cycle_title)
@@ -122,6 +145,7 @@ def get_report_for_other_cycle(report):
     return other_report
 
 
+@timeit
 def persist_scores(report):
     scores = list()
     mapping = {

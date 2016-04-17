@@ -1,6 +1,6 @@
 import pydash
 
-from dashboard.data.utils import QCheck, values_for_records
+from dashboard.data.utils import QCheck, values_for_records, filter_consumption_records
 from dashboard.helpers import *
 
 
@@ -28,21 +28,9 @@ class NNRTICURRENTADULTSCheck(QCheck):
         SHOW_CONVERSION: True
     }]
 
-    def filter_records(self, facility_name, formulation_names):
-        records = self.report.cs[facility_name]
-
-        def filter_func(x):
-            for f in formulation_names:
-                if f in x[FORMULATION]:
-                    return True
-            return False
-
-        return pydash.select(records, filter_func)
-
-    def for_each_facility(self, facility, combination):
-        facility_name = facility[NAME]
-        df1_records = self.filter_records(facility_name, combination[DF1])
-        df2_records = self.filter_records(facility_name, combination[DF2])
+    def for_each_facility(self, data, combination, previous_cycle_data=None):
+        df1_records = filter_consumption_records(data, combination[DF1])
+        df2_records = filter_consumption_records(data, combination[DF2])
         df1_count = len(df1_records)
         df2_count = len(df2_records)
         df1_values = values_for_records(combination[FIELDS], df1_records)
@@ -93,13 +81,12 @@ class NNRTICURRENTPAEDCheck(NNRTICURRENTADULTSCheck):
         SHOW_CONVERSION: True
     }]
 
-    def for_each_facility(self, facility, combination):
-        facility_name = facility[NAME]
+    def for_each_facility(self, data, combination, other_cycle_data={}):
         ratio = combination.get(RATIO)
         non_normalized_field = combination.get(OTHER)[0]
-        df1_records = self.filter_records(facility_name, combination[DF1])
-        df2_records = self.filter_records(facility_name, combination[DF2])
-        other_records = self.filter_records(facility_name, [non_normalized_field])
+        df1_records = filter_consumption_records(data, combination[DF1])
+        df2_records = filter_consumption_records(data, combination[DF2])
+        other_records = filter_consumption_records(data, [non_normalized_field])
         df1_count = len(df1_records)
         df2_count = len(df2_records)
         df1_values = values_for_records(combination[FIELDS], df1_records)

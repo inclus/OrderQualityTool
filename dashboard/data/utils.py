@@ -4,7 +4,7 @@ import time
 
 import pydash
 
-from dashboard.helpers import NO, NOT_REPORTING, YES, NAME, EXISTING, NEW, FORMULATION
+from dashboard.helpers import NO, NOT_REPORTING, YES, EXISTING, NEW, FORMULATION, C_RECORDS, A_RECORDS, P_RECORDS
 
 TWO_CYCLE = "two_cycle"
 
@@ -81,44 +81,11 @@ def write_to_disk(report, file_out):
     return report
 
 
-class CheckRegistryHolder(type):
-    ONE_CYCLE_CHECKS_REGISTRY = {}
-    TWO_CYCLE_CHECKS_REGISTRY = {}
-
-    def __new__(cls, name, bases, attrs):
-        new_cls = type.__new__(cls, name, bases, attrs)
-        if IS_INTERFACE not in attrs:
-            if TWO_CYCLE in attrs:
-                cls.TWO_CYCLE_CHECKS_REGISTRY[new_cls.__name__] = new_cls
-            else:
-                cls.ONE_CYCLE_CHECKS_REGISTRY[new_cls.__name__] = new_cls
-        return new_cls
-
-
 class QCheck:
-    __metaclass__ = CheckRegistryHolder
-    is_interface = True
     combinations = []
     test = ""
 
-    def __init__(self, report):
-        self.report = report
-
-    def score(self):
-        self.run()
-
-    def run(self):
-        for combination in self.combinations:
-            self.for_each_combination(combination)
-
-    def for_each_combination(self, combination):
-        facilities = self.report.locs
-        formulation_name = combination[NAME]
-        for facility in facilities:
-            result = self.for_each_facility(facility, combination)
-            facility['scores'][self.test][formulation_name] = result
-
-    def for_each_facility(self, facility, combination):
+    def for_each_facility(self, data, combination, previous_cycle_data=None):
         raise NotImplementedError(self.test)
 
 
@@ -130,6 +97,7 @@ def facility_has_single_order(facility):
     not_multiple = facility['Multiple'].strip().lower() != 'multiple orders'
     return not_multiple
 
+
 def multiple_orders_score(facility):
     text_value = facility.get('Multiple', '').strip().lower()
     if 'multiple' in text_value:
@@ -139,28 +107,31 @@ def multiple_orders_score(facility):
     else:
         return YES
 
+
 def get_records_from_collection(collection, facility_name):
     records = collection.get(facility_name, [])
     return records
 
 
-class TwoCycleQCheck(QCheck):
-    is_interface = True
+def get_consumption_records(data, formulation_name):
+    return pydash.chain(data[C_RECORDS]).reject(
+        lambda x: formulation_name.strip().lower() not in x[FORMULATION].lower()
+    ).value()
 
-    def __init__(self, report, other_cycle_report):
-        QCheck.__init__(self, report)
-        self.other_cycle_report = other_cycle_report
 
-    def get_consumption_records(self, report, facility_name, formulation_name):
-        records = report.cs[facility_name]
-        return pydash.chain(records).reject(
-            lambda x: formulation_name.strip().lower() not in x[FORMULATION].lower()
-        ).value()
+def get_patient_records(data, combinations, is_adult=True):
+    lower_case_combinations = pydash.collect(combinations, lambda x: x.lower())
+    records = data[A_RECORDS] if is_adult else data[P_RECORDS]
+    return pydash.chain(records).select(
+        lambda x: x[FORMULATION].strip().lower() in lower_case_combinations
+    ).value()
 
-    def get_patient_records(self, report, facility_name, combinations, is_adult=True):
-        lower_case_combinations = pydash.collect(combinations, lambda x: x.lower())
-        collection = report.ads if is_adult else report.pds
-        records = get_records_from_collection(collection, facility_name)
-        return pydash.chain(records).select(
-            lambda x: x[FORMULATION].strip().lower() in lower_case_combinations
-        ).value()
+
+def filter_consumption_records(data, formulation_names):
+    def filter_func(x):
+        for f in formulation_names:
+            if f in x[FORMULATION]:
+                return True
+        return False
+
+    return pydash.select(data[C_RECORDS], filter_func)
