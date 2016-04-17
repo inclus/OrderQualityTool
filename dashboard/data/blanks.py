@@ -34,26 +34,18 @@ class BlanksQualityCheck(QCheck):
 
         number_of_consumption_record_blanks = len(pydash.select(
             values_for_records(self.fields, c_records), lambda v: v is None))
-        number_of_adult_records_with_blanks = len(
-            pydash.select(values_for_records([NEW, EXISTING], a_records),
-                          lambda v: v is None))
-        number_of_paed_records_with_blanks = len(
-            pydash.select(values_for_records([NEW, EXISTING], p_records),
-                          lambda v: v is None))
 
-        number_of_blanks = number_of_adult_records_with_blanks + number_of_consumption_record_blanks + number_of_paed_records_with_blanks
-
-        if (cr_count >= 25 and ar_count >= 22 and pr_count >= 7) and number_of_blanks <= 2:
+        if cr_count == 0 and ar_count == 0 and pr_count == 0:
+            not_reporting += 1
+        elif cr_count < 25 or ar_count < 22 or pr_count < 7:
+            no += 1
+            result = NO
+        elif number_of_consumption_record_blanks > 2:
+            no += 1
+            result = NO
+        else:
             yes += 1
             result = YES
-        elif cr_count >= 25 and ar_count >= 22 and pr_count >= 7 and number_of_blanks > 2:
-            no += 1
-            result = NO
-        elif cr_count > 0 or ar_count > 0 or pr_count > 0:
-            no += 1
-            result = NO
-        elif cr_count == 0 and ar_count == 0 and pr_count == 0:
-            not_reporting += 1
         return result, no, not_reporting, yes
 
 
@@ -101,5 +93,5 @@ class MultipleCheck(QCheck):
         elif result == YES:
             yes += 1
         else:
-            not_reporting +=1
+            not_reporting += 1
         return result, no, not_reporting, yes
