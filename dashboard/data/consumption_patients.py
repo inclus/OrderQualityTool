@@ -1,8 +1,6 @@
 from collections import defaultdict
 
-import pydash
-
-from dashboard.data.utils import get_patient_total, get_consumption_totals, has_all_blanks, QCheck
+from dashboard.data.utils import get_patient_total, get_consumption_totals, has_all_blanks, QCheck, get_consumption_records, get_patient_records
 from dashboard.helpers import *
 
 
@@ -26,9 +24,9 @@ class ConsumptionAndPatientsQualityCheck(QCheck):
     def for_each_facility(self, data, combination, previous_cycle_data=None):
         result = NOT_REPORTING
 
-        df1_records = self.get_consumption_records(data, combination[CONSUMPTION_QUERY])
-        df2_records = self.get_patient_records(data, combination[PATIENT_QUERY],
-                                               combination[IS_ADULT])
+        df1_records = get_consumption_records(data, combination[CONSUMPTION_QUERY])
+        df2_records = get_patient_records(data, combination[PATIENT_QUERY],
+                                          combination[IS_ADULT])
         df1_count = len(df1_records)
         df2_count = len(df2_records)
 
@@ -61,14 +59,3 @@ class ConsumptionAndPatientsQualityCheck(QCheck):
         else:
             result = NO
         return result
-
-    def get_patient_records(self, data, combinations, is_adult=True):
-        records = data[A_RECORDS] if is_adult else data[P_RECORDS]
-        return pydash.chain(records).select(
-            lambda x: x[FORMULATION].strip() in combinations
-        ).value()
-
-    def get_consumption_records(self, data, formulation_name):
-        return pydash.chain(data[C_RECORDS]).select(
-            lambda x: formulation_name in x[FORMULATION]
-        ).value()

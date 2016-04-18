@@ -8,7 +8,7 @@ from dashboard.data.consumption_patients import ConsumptionAndPatientsQualityChe
 from dashboard.data.cycles import OrdersOverTimeCheck
 from dashboard.data.free_form_report import FreeFormReport
 from dashboard.data.utils import clean_name, get_patient_total, get_consumption_totals, \
-    values_for_records
+    values_for_records, get_consumption_records, get_patient_records
 from dashboard.helpers import *
 from dashboard.models import Score
 from dashboard.tasks import persist_scores, build_facility_data
@@ -35,7 +35,7 @@ class DataTestCase(TestCase):
                            {FORMULATION: "A", "openingBalance": 12}]
 
         check = ConsumptionAndPatientsQualityCheck()
-        records = check.get_consumption_records(data, "A")
+        records = get_consumption_records(data, "A")
         assert records == [{FORMULATION: "A", "openingBalance": 3}, {FORMULATION: "A", "openingBalance": 12}]
 
     def test_adult_records(self):
@@ -47,7 +47,7 @@ class DataTestCase(TestCase):
 
         }
         check = ConsumptionAndPatientsQualityCheck()
-        records = check.get_patient_records(data, "A", True)
+        records = get_patient_records(data, "A", True)
         assert records == [{FORMULATION: "A", NEW: 3}, {FORMULATION: "A", NEW: 12}]
 
     def test_patient_totals(self):

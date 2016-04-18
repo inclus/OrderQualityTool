@@ -1,6 +1,7 @@
 from django.test import TestCase
 
 from dashboard.data.consumption_patients import ConsumptionAndPatientsQualityCheck
+from dashboard.data.utils import get_patient_records
 from dashboard.helpers import *
 
 
@@ -15,5 +16,5 @@ class ConsumptionAndPatientsQualityCheckTestCase(TestCase):
         }
 
         check = ConsumptionAndPatientsQualityCheck()
-        records = check.get_patient_records(data, ["A", "B"], True)
+        records = get_patient_records(data, ["A", "B"], True)
         self.assertEqual(records, [{'formulation': 'A', 'new': 1}, {'formulation': 'B', 'new': 2}])

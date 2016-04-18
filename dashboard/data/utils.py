@@ -117,7 +117,7 @@ def get_records_from_collection(collection, facility_name):
 
 
 def get_consumption_records(data, formulation_name):
-    return pydash.chain(data[C_RECORDS]).reject(
+    return pydash.chain(data.get(C_RECORDS, [])).reject(
         lambda x: formulation_name.strip().lower() not in x[FORMULATION].lower()
     ).value()
 
