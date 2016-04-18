@@ -4,8 +4,10 @@ import json
 import djclick as click
 from termcolor import colored
 
+from dashboard.data.free_form_report import FreeFormReport
 from dashboard.helpers import *
-from dashboard.models import Score
+from dashboard.models import Score, Cycle
+from dashboard.tasks import run_checks, persist_scores
 
 
 def make_cond(cond):
@@ -15,14 +17,9 @@ def make_cond(cond):
 
 @click.command()
 def command():
-    pass
-    # for k in CheckRegistryHolder.ONE_CYCLE_CHECKS_REGISTRY:
-    #     print k
-    # perform_checks()
-    export_results()
+    perform_checks()
 
-def count_for_test(cycle):
-    Score.objects.filter
+
 def export_results():
     cycles = ["Sep - Oct 2015"]
     cycle = cycle2 = cycles[0]
@@ -76,19 +73,23 @@ def export_results():
 
 
 def perform_checks():
-    cycle = "Jul - Aug 2015"
-    cycle2 = cycle
+    cycle = "Sep - Oct 2015"
+    data = Cycle.objects.filter(title=cycle)
+    for cycle in data:
+        report = FreeFormReport(None, cycle.title).build_form_db(cycle)
+        run_checks(report)
+        persist_scores(report)
     checks = [
-        {'combination': DEFAULT, 'test': ORDER_FORM_FREE_OF_GAPS, 'cycle': cycle, 'expected': 46.2, YES: 820, NO: 615, NOT_REPORTING: 365},
-        # {'combination': F3, 'test': ORDER_FORM_FREE_OF_NEGATIVE_NUMBERS, 'cycle': cycle, 'expected': 70.9, YES: 1000, NO: 100, NOT_REPORTING: 1000},
-        # {'combination': F3, 'test': CONSUMPTION_AND_PATIENTS, 'cycle': cycle, 'expected': 9.8},
-        # {'combination': F3, 'test': DIFFERENT_ORDERS_OVER_TIME, 'cycle': cycle2, 'expected': 47.7, YES: 1000, NO: 1000, NOT_REPORTING: 100},
-        {'combination': F3, 'test': STABLE_CONSUMPTION, 'cycle': cycle2, 'expected': 8.8, YES: 114, NO: 252, NOT_REPORTING: 1454},
-        {'combination': F3, 'test': WAREHOUSE_FULFILMENT, 'cycle': cycle2, 'expected': 32.4, YES: 345, NO: 366, NOT_REPORTING: 1109},
-        {'combination': F3, 'test': STABLE_PATIENT_VOLUMES, 'cycle': cycle2, 'expected': 15.6, YES: 213, NO: 156, NOT_REPORTING: 1451},
-        {'combination': DEFAULT, 'test': GUIDELINE_ADHERENCE_ADULT_1L, 'cycle': cycle, 'expected': 35.3, YES: 643, NO: 737, NOT_REPORTING: 440},
-        {'combination': DEFAULT, 'test': GUIDELINE_ADHERENCE_ADULT_2L, 'cycle': cycle, 'expected': 50.5, YES: 920, NO: 274, NOT_REPORTING: 626},
-        {'combination': DEFAULT, 'test': GUIDELINE_ADHERENCE_PAED_1L, 'cycle': cycle, 'expected': 28.9, YES: 526, NO: 752, NOT_REPORTING: 542},
+        {'combination': DEFAULT, 'test': ORDER_FORM_FREE_OF_GAPS, 'cycle': cycle, YES: 920, NO: 522, NOT_REPORTING: 390},
+        {'combination': F1, 'test': ORDER_FORM_FREE_OF_NEGATIVE_NUMBERS, 'cycle': cycle, YES: 1420, NO: 1, NOT_REPORTING: 409},
+        {'combination': F1, 'test': CONSUMPTION_AND_PATIENTS, 'cycle': cycle, YES: 455, NO: 817, NOT_REPORTING: 558},
+        {'combination': F1, 'test': DIFFERENT_ORDERS_OVER_TIME, 'cycle': cycle, YES: 1302, NO: 9, NOT_REPORTING: 519},
+        {'combination': F1, 'test': STABLE_CONSUMPTION, 'cycle': cycle, YES: 732, NO: 471, NOT_REPORTING: 627},
+        {'combination': F1, 'test': WAREHOUSE_FULFILMENT, 'cycle': cycle, YES: 711, NO: 600, NOT_REPORTING: 519},
+        {'combination': F1, 'test': STABLE_PATIENT_VOLUMES, 'cycle': cycle, YES: 793, NO: 405, NOT_REPORTING: 632},
+        {'combination': DEFAULT, 'test': GUIDELINE_ADHERENCE_ADULT_1L, 'cycle': cycle, YES: 646, NO: 702, NOT_REPORTING: 482},
+        {'combination': DEFAULT, 'test': GUIDELINE_ADHERENCE_ADULT_2L, 'cycle': cycle, YES: 894, NO: 286, NOT_REPORTING: 650},
+        {'combination': DEFAULT, 'test': GUIDELINE_ADHERENCE_PAED_1L, 'cycle': cycle, YES: 563, NO: 712, NOT_REPORTING: 555},
     ]
     for check in checks:
         if check.get('combination') == DEFAULT:
@@ -113,3 +114,4 @@ def perform_checks():
                 diff = abs(float(expected) - float(actual))
                 c = "yellow" if diff <= tolerance else "red"
                 print colored(test_description + " Failed", c), colored("Got %s instead of %s " % (actual, expected), c), colored("diff: %s" % diff, "blue")
+        print "\n"

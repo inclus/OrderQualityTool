@@ -82,6 +82,9 @@ def write_to_disk(report, file_out):
 
 
 class QCheck:
+    def __init__(self):
+        pass
+
     combinations = []
     test = ""
 
@@ -121,7 +124,7 @@ def get_consumption_records(data, formulation_name):
 
 def get_patient_records(data, combinations, is_adult=True):
     lower_case_combinations = pydash.collect(combinations, lambda x: x.lower())
-    records = data[A_RECORDS] if is_adult else data[P_RECORDS]
+    records = data.get(A_RECORDS, []) if is_adult else data.get(P_RECORDS, [])
     return pydash.chain(records).select(
         lambda x: x[FORMULATION].strip().lower() in lower_case_combinations
     ).value()

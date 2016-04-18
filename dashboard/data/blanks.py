@@ -4,14 +4,6 @@ from dashboard.data.utils import values_for_records, QCheck, facility_not_report
 from dashboard.helpers import *
 
 
-def has_blank_in_fields(fields):
-    def func(record):
-        values = values_for_records(fields, [record])
-        return pydash.some(values, lambda f: f is None)
-
-    return func
-
-
 class BlanksQualityCheck(QCheck):
     test = ORDER_FORM_FREE_OF_GAPS
     combinations = [{NAME: DEFAULT}]
@@ -25,12 +17,16 @@ class BlanksQualityCheck(QCheck):
     def for_each_facility(self, data, combination, previous_cycle_data=None):
         result = NOT_REPORTING
 
+        values = values_for_records(self.fields, data.get(C_RECORDS, []))
         number_of_consumption_record_blanks = len(pydash.select(
-            values_for_records(self.fields, data[C_RECORDS]), lambda v: v is None))
+            values, lambda v: v is None))
 
-        if data[C_COUNT] == 0 and data[A_COUNT] == 0 and data[P_COUNT] == 0:
-            pass
-        elif data[C_COUNT] < 25 or data[A_COUNT] < 22 or data[P_COUNT] < 7:
+        c_count_ = data.get(C_COUNT, 0)
+        a_count_ = data.get(A_COUNT, 0)
+        p_count_ = data.get(P_COUNT, 0)
+        if c_count_ == 0 and a_count_ == 0 and p_count_ == 0:
+            return result
+        if c_count_ < 25 or a_count_ < 22 or p_count_ < 7:
             result = NO
         elif number_of_consumption_record_blanks > 2:
             result = NO
@@ -45,10 +41,13 @@ class WebBasedCheck(QCheck):
 
     def for_each_facility(self, data, combination, previous_cycle_data=None):
         value = data[WEB_PAPER].strip()
-        if value and value in [WEB, PAPER]:
-            result = value
-        else:
-            result = NOT_REPORTING
+        result = NOT_REPORTING
+        if value:
+            if value.lower() == WEB.lower():
+                result = WEB
+            if value.lower() == PAPER.lower():
+                result = PAPER
+
         return result
 
 

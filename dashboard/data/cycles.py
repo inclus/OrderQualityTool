@@ -92,17 +92,17 @@ class StableConsumptionCheck(QCheck):
         prev_consumption = pydash.chain(prev_values).reject(lambda x: x is None).sum().value()
         include_record = current_consumption > threshold or prev_consumption > threshold
         result = NOT_REPORTING
+        if number_of_consumption_records_prev_cycle == 0 or number_of_consumption_records_current_cycle == 0:
+            return NOT_REPORTING
         if include_record:
             numerator = float(current_consumption)
             denominator = float(prev_consumption)
-            if number_of_consumption_records_prev_cycle == 0 or number_of_consumption_records_current_cycle == 0:
-                pass
-            elif denominator != 0 and (0.5 <= abs(numerator / denominator) <= 1.5):
+
+            if denominator != 0 and (0.5 <= abs(numerator / denominator) <= 1.5):
                 result = YES
             else:
                 result = NO
-        else:
-            pass
+
         return result
 
 
@@ -155,21 +155,22 @@ class StablePatientVolumesCheck(StableConsumptionCheck):
         prev_records = get_patient_records(previous_cycle_data,
                                            combination[PATIENT_QUERY], is_adult)
         current_records = get_patient_records(data, combination[PATIENT_QUERY], is_adult)
-        threshold = combination[THRESHOLD]
-        data_is_sufficient = len(prev_records) > 0 and len(current_records) > 0
-        current_values = values_for_records(self.fields, current_records)
-        current_population = pydash.chain(current_values).reject(lambda x: x is None).sum().value()
-        prev_values = values_for_records(self.fields, prev_records)
-        prev_population = pydash.chain(prev_values).reject(lambda x: x is None).sum().value()
-        result = NOT_REPORTING
 
-        include_record = data_is_sufficient and (current_population > threshold or prev_population > threshold)
-        if data_is_sufficient:
-            if include_record:
-                numerator = float(current_population)
-                denominator = float(prev_population)
-                if denominator != 0 and 0.5 < abs(numerator / denominator) < 1.5:
-                    result = YES
-                else:
-                    result = NO
+        data_is_sufficient = len(prev_records) > 0 and len(current_records) > 0
+
+        if not data_is_sufficient:
+            return NOT_REPORTING
+
+        current_population = pydash.chain(values_for_records(self.fields, current_records)).reject(lambda x: x is None).sum().value()
+        prev_population = pydash.chain(values_for_records(self.fields, prev_records)).reject(lambda x: x is None).sum().value()
+
+        threshold = combination[THRESHOLD]
+
+        include_record = (current_population > threshold or prev_population > threshold)
+        result = NOT_REPORTING
+        if include_record:
+            if float(prev_population) != 0 and 0.5 < abs(float(current_population) / float(prev_population)) < 1.5:
+                result = YES
+            else:
+                result = NO
         return result

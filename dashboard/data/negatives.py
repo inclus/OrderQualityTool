@@ -18,21 +18,16 @@ class NegativeNumbersQualityCheck(QCheck):
               ESTIMATED_NUMBER_OF_NEW_ART_PATIENTS]
 
     def for_each_facility(self, data, combination, previous_cycle_data=None):
-        result = NOT_REPORTING
         df1_records = self.get_consumption_records(data, combination[CONSUMPTION_QUERY])
         values = values_for_records(self.fields, df1_records)
         all_cells_not_negative = pydash.every(values,
-                                              lambda x: x >= 0 or x is None)
+                                              lambda x: x is None or x >= 0 )
         if len(df1_records) == 0:
-            pass
-        elif all_cells_not_negative:
-            result = YES
-        else:
-            result = NO
-        return result
+            return NOT_REPORTING
+        return YES if all_cells_not_negative else NO
 
     def get_consumption_records(self, data, formulation_name):
-        records = data[C_RECORDS]
+        records = data.get(C_RECORDS, [])
         return pydash.chain(records).reject(
             lambda x: formulation_name not in x[FORMULATION]
         ).value()
