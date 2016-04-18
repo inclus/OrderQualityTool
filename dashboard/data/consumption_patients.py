@@ -52,5 +52,4 @@ class ConsumptionAndPatientsQualityCheck(QCheck):
             result = YES
         else:
             result = NO
-        print df1_sum, df2_sum
         return result
