@@ -23,7 +23,6 @@ class ConsumptionAndPatientsQualityCheck(QCheck):
 
     def for_each_facility(self, data, combination, previous_cycle_data=None):
         result = NOT_REPORTING
-
         df1_records = get_consumption_records(data, combination[CONSUMPTION_QUERY])
         df2_records = get_patient_records(data, combination[PATIENT_QUERY],
                                           combination[IS_ADULT])
@@ -44,18 +43,14 @@ class ConsumptionAndPatientsQualityCheck(QCheck):
     def calculate_score(self, df1_sum, df2_sum, number_of_consumption_records,
                         number_of_patient_records, result, all_df1_blank,
                         all_df2_blank):
-        numerator = float(df1_sum)
-        denominator = float(df2_sum)
-        if df2_sum > df1_sum:
-            numerator = float(df2_sum)
-            denominator = float(df1_sum)
         no_blanks = not all_df1_blank and not all_df2_blank
         both_are_zero = (df1_sum == 0 and df2_sum == 0)
-        divisible = denominator != 0
+        divisible = float(df2_sum) != 0
         if number_of_consumption_records == 0 or number_of_patient_records == 0 or (all_df2_blank and all_df1_blank):
-            pass
-        elif no_blanks and (both_are_zero or (divisible and 0.7 < abs(numerator / denominator) < 1.429)):
+            return result
+        elif no_blanks and (both_are_zero or (divisible and 0.7 < float(df1_sum) / float(df2_sum) < 1.429)):
             result = YES
         else:
             result = NO
+        print df1_sum, df2_sum
         return result
