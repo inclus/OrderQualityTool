@@ -75,25 +75,3 @@ class ReportsView(LoginRequiredMixin, TemplateView):
         context['cycles'] = cycles
         context['formulations'] = [F1, F2, F3]
         return context
-
-    def build_totals(self, context):
-        qs = Score.objects.all()
-        aggregates = qs.aggregate(
-            count=Count('pk'),
-            REPORTING=Count(Case(When(REPORTING={DEFAULT: YES}, then=1))),
-            WEB_BASED=Count(Case(When(WEB_BASED={DEFAULT: YES}, then=1))),
-            MULTIPLE_ORDERS=Count(Case(When(MULTIPLE_ORDERS={DEFAULT: YES}, then=1))),
-            OrderFormFreeOfGaps=Count(Case(When(OrderFormFreeOfGaps={DEFAULT: YES}, then=1))),
-            guidelineAdherenceAdult1L=Count(Case(When(guidelineAdherenceAdult1L={DEFAULT: YES}, then=1))),
-            guidelineAdherenceAdult2L=Count(Case(When(guidelineAdherenceAdult2L={DEFAULT: YES}, then=1))),
-            guidelineAdherencePaed1L=Count(Case(When(guidelineAdherencePaed1L={DEFAULT: YES}, then=1))),
-            nnrtiNewPaed=Count(Case(When(nnrtiNewPaed={DEFAULT: YES}, then=1))),
-            nnrtiCurrentPaed=Count(Case(When(nnrtiCurrentPaed={DEFAULT: YES}, then=1))),
-            nnrtiNewAdults=Count(Case(When(nnrtiNewAdults={DEFAULT: YES}, then=1))),
-            nnrtiCurrentAdults=Count(Case(When(nnrtiCurrentAdults={DEFAULT: YES}, then=1))),
-        )
-        totals = dict()
-        for key, value in aggregates.items():
-            if key != "count":
-                totals[key] = "{0:.2f}".format(float(value) * 100 / float(aggregates['count'])) + " %"
-        context['totals'] = totals

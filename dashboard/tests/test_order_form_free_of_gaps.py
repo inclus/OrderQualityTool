@@ -9,12 +9,8 @@ from dashboard.views.api import OrderFormFreeOfNegativeNumbersView, DifferentOrd
     GuideLineAdherenceView, OrderFormFreeOfGapsView
 
 
-class RegimenCheckViewCaseMixin():
-    def get_url(self, end, start, url):
-        return "%s?start=%s&&end=%s" % (url, start, end)
 
-
-class OrderFormFreeOfNegativesViewTestCase(WebTest, RegimenCheckViewCaseMixin):
+class OrderFormFreeOfNegativesViewTestCase(WebTest):
     url_name = 'order_form_free_of_negative_numbers'
     test = ORDER_FORM_FREE_OF_NEGATIVE_NUMBERS
     view = OrderFormFreeOfNegativeNumbersView
