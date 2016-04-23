@@ -18,15 +18,15 @@ class EmailUserAdmin(UserAdmin):
         (_('Permissions'), {
             'fields': ('is_active', 'is_staff', 'is_superuser',
                        'groups', 'user_permissions')
-            }),
+        }),
         (_('Important dates'), {'fields': ('last_login', 'date_joined')}),
     )
     add_fieldsets = ((
-                         None, {
-                             'classes': ('wide',),
-                             'fields': ('email', 'password1', 'password2')
-                         }
-                     ),
+        None, {
+            'classes': ('wide',),
+            'fields': ('email', 'password1', 'password2')
+        }
+    ),
     )
 
     form = EmailUserChangeForm
@@ -98,7 +98,7 @@ def run_tests(model_admin, request, queryset):
 run_tests.short_description = "Run quality tests for these cycles"
 
 class ScoreAdmin(ModelAdmin):
-    search_fields = ('name','district')
+    search_fields = ('name', 'district')
     list_display = ('name',
                     'cycle',
                     'district',
