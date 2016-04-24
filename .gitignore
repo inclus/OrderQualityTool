@@ -149,3 +149,4 @@ dashboard/static/vendor/
 node_modules/
 .ropeproject
 *.sublime-workspace
+.vagrant
