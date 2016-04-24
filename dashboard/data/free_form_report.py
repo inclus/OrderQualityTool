@@ -50,7 +50,7 @@ class FreeFormReport():
         if i <= len(row):
             real_value = row[i].value
             value = real_value
-            if type(value) == unicode and "_" in value:
+            if "_" in str(value):
                 value = real_value = value.replace("_", "-")
             if value != "-" and value != '':
                 return real_value
