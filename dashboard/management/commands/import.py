@@ -2,8 +2,7 @@ import logging
 
 import djclick as click
 
-from dashboard.data.free_form_report import FreeFormReport
-from dashboard.tasks import calculate_scores_for_checks_in_cycle
+from dashboard.tasks import calculate_scores_for_checks_in_cycle, load_report, save_report
 
 logger = logging.getLogger(__name__)
 
@@ -13,6 +12,6 @@ logger = logging.getLogger(__name__)
 @click.argument('cycle')
 def command(path, cycle):
     click.secho('Importing {}'.format(path), fg='red')
-    report = FreeFormReport(path, cycle).load()
-    report.save()
+    report = load_report(cycle, path)
+    save_report(report)
     calculate_scores_for_checks_in_cycle(report)

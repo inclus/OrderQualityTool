@@ -78,7 +78,7 @@ def persist_multiple_order_records(report):
     MultipleOrderFacility.objects.bulk_create(all)
 
 
-@shared_task
+@timeit
 def calculate_scores_for_checks_in_cycle(report):
     run_checks(report)
     persist_scores(report)
@@ -187,11 +187,22 @@ def import_general_report(path, cycle):
     os.remove(path)
     calculate_scores_for_checks_in_cycle(report)
 
+
 @timeit
 def save_report(report):
     report.save()
+
 
 @timeit
 def load_report(cycle, path):
     report = FreeFormReport(path, cycle).load()
     return report
+
+
+@shared_task
+@timeit
+def update_checks(cycle_ids):
+    data = Cycle.objects.filter(id_in=cycle_ids).all()
+    for cycle in data:
+        report = FreeFormReport(None, cycle.title).build_form_db(cycle)
+        calculate_scores_for_checks_in_cycle(report)

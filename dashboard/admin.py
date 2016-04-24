@@ -6,10 +6,9 @@ from django.contrib.auth.models import Group
 from django.utils.translation import ugettext_lazy
 from django.utils.translation import ugettext_lazy as _
 
-from dashboard.data.free_form_report import FreeFormReport
 from dashboard.models import DashboardUser, Consumption, Cycle, AdultPatientsRecord, PAEDPatientsRecord, \
     Score, MultipleOrderFacility
-from dashboard.tasks import calculate_scores_for_checks_in_cycle
+from dashboard.tasks import update_checks
 
 
 class EmailUserAdmin(UserAdmin):
@@ -22,11 +21,11 @@ class EmailUserAdmin(UserAdmin):
         (_('Important dates'), {'fields': ('last_login', 'date_joined')}),
     )
     add_fieldsets = ((
-        None, {
-            'classes': ('wide',),
-            'fields': ('email', 'password1', 'password2')
-        }
-    ),
+                         None, {
+                             'classes': ('wide',),
+                             'fields': ('email', 'password1', 'password2')
+                         }
+                     ),
     )
 
     form = EmailUserChangeForm
@@ -89,13 +88,11 @@ class PatientAdmin(ModelAdmin):
 
 
 def run_tests(model_admin, request, queryset):
-    data = queryset.all()
-    for cycle in data:
-        report = FreeFormReport(None, cycle.title).build_form_db(cycle)
-        calculate_scores_for_checks_in_cycle.delay(report)
+    update_checks.delay([c.id for c in queryset.all()])
 
 
 run_tests.short_description = "Run quality tests for these cycles"
+
 
 class ScoreAdmin(ModelAdmin):
     search_fields = ('name', 'district')
