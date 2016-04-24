@@ -202,7 +202,7 @@ def load_report(cycle, path):
 @shared_task
 @timeit
 def update_checks(cycle_ids):
-    data = Cycle.objects.filter(id_in=cycle_ids).all()
+    data = Cycle.objects.filter(id__in=cycle_ids).all()
     for cycle in data:
         report = FreeFormReport(None, cycle.title).build_form_db(cycle)
         calculate_scores_for_checks_in_cycle(report)
