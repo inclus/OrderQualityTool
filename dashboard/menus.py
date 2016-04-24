@@ -3,7 +3,7 @@ from menu import Menu, MenuItem
 
 
 def user_is_admin(request):
-    return request.user and request.user.is_staff
+    return request.user and (request.user.is_staff or request.user.is_superuser)
 
 
 def user_is_super_user(request):
