@@ -182,7 +182,16 @@ def persist_scores(report):
 
 @shared_task
 def import_general_report(path, cycle):
-    report = FreeFormReport(path, cycle).load()
-    report.save()
+    report = load_report(cycle, path)
+    save_report(report)
     os.remove(path)
     calculate_scores_for_checks_in_cycle(report)
+
+@timeit
+def save_report(report):
+    report.save()
+
+@timeit
+def load_report(cycle, path):
+    report = FreeFormReport(path, cycle).load()
+    return report
