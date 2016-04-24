@@ -1,7 +1,7 @@
 import djclick as click
 
 from dashboard.data.free_form_report import FreeFormReport
-from dashboard.management.commands.manual_check import export_results
+from dashboard.management.commands.manual_check import export_results, perform_checks
 from dashboard.models import Cycle
 from dashboard.tasks import run_checks, persist_scores
 

@@ -7,6 +7,7 @@ THRESHOLD = "threshold"
 
 
 class OrdersOverTimeCheck(QCheck):
+    count = 0
     two_cycle = True
     test = DIFFERENT_ORDERS_OVER_TIME
     combinations = [
@@ -24,16 +25,17 @@ class OrdersOverTimeCheck(QCheck):
 
         current_records = get_consumption_records(data, combination[CONSUMPTION_QUERY])
         current_values = values_for_records(fields, current_records)
+        all_values = prev_values + current_values
+        all_zero = pydash.every(all_values, lambda x: x == 0)
+        all_blanks = pydash.every(all_values, lambda x: x is None)
+        result = NOT_REPORTING
 
-        all_current_values_zero = pydash.every(current_values, lambda x: x == 0)
-        all_prev_values_zero = pydash.every(prev_values, lambda x: x == 0)
-        all_zero = all_current_values_zero and all_prev_values_zero
-        if len(current_records) == 0 or len(prev_records) == 0:
-            result = NOT_REPORTING
-        elif current_values == prev_values and not all_zero:
-            result = NO
-        else:
+        if len(current_records) == 0 or len(prev_records) == 0 or all_blanks:
+            return result
+        if current_values != prev_values or all_zero:
             result = YES
+        else:
+            result = NO
         return result
 
 
@@ -123,8 +125,6 @@ class WarehouseFulfillmentCheck(QCheck):
         prev_values = values_for_records([PACKS_ORDERED, ], prev_records)
         current_values = values_for_records([QUANTITY_RECEIVED], current_records)
         current_values_have_blanks = pydash.some(current_values, lambda x: x is None)
-        # amount_ordered = pydash.chain(prev_values).reject(lambda x: x is None).sum().value()
-        # amount_received = pydash.chain(current_values).reject(lambda x: x is None).sum().value()
         facility_is_not_reporting = facility_not_reporting(data)
         result = NOT_REPORTING
         data_is_insufficient = count_prev < 1 or count_current < 1 or facility_is_not_reporting

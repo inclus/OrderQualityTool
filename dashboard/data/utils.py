@@ -45,26 +45,11 @@ def values_for_records(fields, records):
 
 def get_consumption_totals(fields, records):
     return pydash.chain(values_for_records(fields, records)).reject(
-        lambda x: x is None).sum().value()
+        lambda x: x is None).map(float).sum().value()
 
 
 def get_patient_total(records):
     return get_consumption_totals([NEW, EXISTING], records)
-
-
-def calculate_percentages(no, not_reporting, total_count, yes):
-    if total_count > 0:
-        yes_rate = float(yes * 100) / float(total_count)
-        no_rate = float(no * 100) / float(total_count)
-        not_reporting_rate = float(not_reporting * 100) / float(total_count)
-    else:
-        no_rate = not_reporting_rate = yes_rate = 0
-    return no_rate, not_reporting_rate, yes_rate
-
-
-def build_cycle_formulation_score(formulation, yes, no, not_reporting, total_count):
-    no, not_reporting, yes = calculate_percentages(no, not_reporting, total_count, yes)
-    return {NO: no, NOT_REPORTING: not_reporting, YES: yes}
 
 
 def has_blank(records, fields):

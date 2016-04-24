@@ -134,6 +134,7 @@ def build_facility_data(facility, report):
     facility_data[P_RECORDS] = p_records
     facility_data['Multiple'] = facility['Multiple']
     facility_data['status'] = facility['status']
+    facility_data[NAME] = facility_name
     return facility_data
 
 

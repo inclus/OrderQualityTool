@@ -16,40 +16,26 @@ class ConsumptionAndPatientsQualityCheck(QCheck):
             FIELDS: [ART_CONSUMPTION], IS_ADULT: False
         },
         {
-            NAME: F3, PATIENT_QUERY: F3_PATIENT_QUERY, CONSUMPTION_QUERY: F3_QUERY, RATIO: 1, FIELDS: [ART_CONSUMPTION],
+            NAME: F3, PATIENT_QUERY: F3_PATIENT_QUERY, CONSUMPTION_QUERY: F3_QUERY, RATIO: 1.0, FIELDS: [ART_CONSUMPTION],
             IS_ADULT: False
         }]
     key_cache = defaultdict(dict)
 
     def for_each_facility(self, data, combination, previous_cycle_data=None):
-        result = NOT_REPORTING
         df1_records = get_consumption_records(data, combination[CONSUMPTION_QUERY])
         df2_records = get_patient_records(data, combination[PATIENT_QUERY],
                                           combination[IS_ADULT])
-        df1_count = len(df1_records)
-        df2_count = len(df2_records)
-
         df2_sum = get_patient_total(df2_records)
         df1_sum = get_consumption_totals(combination[FIELDS], df1_records)
         all_df1_blank = has_all_blanks(df1_records, combination[FIELDS])
         all_df2_blank = has_all_blanks(df2_records, [NEW, EXISTING])
-        adjusted_df1_sum = float(df1_sum) / combination[RATIO]
-        result = self.calculate_score(adjusted_df1_sum, df2_sum,
-                                      df1_count,
-                                      df2_count, result, all_df1_blank,
-                                      all_df2_blank)
-        return result
-
-    def calculate_score(self, df1_sum, df2_sum, number_of_consumption_records,
-                        number_of_patient_records, result, all_df1_blank,
-                        all_df2_blank):
-        no_blanks = not all_df1_blank and not all_df2_blank
         both_are_zero = (df1_sum == 0 and df2_sum == 0)
-        divisible = float(df2_sum) != 0
-        if number_of_consumption_records == 0 or number_of_patient_records == 0 or (all_df2_blank and all_df1_blank):
-            return result
-        elif no_blanks and (both_are_zero or (divisible and 0.7 < float(df1_sum) / float(df2_sum) < 1.429)):
-            result = YES
+        if len(df1_records) == 0 and len(df2_records) == 0:
+            return NOT_REPORTING
+        adjusted_df1_sum = df1_sum / combination[RATIO]
+        no_blanks = not all_df1_blank and not all_df2_blank
+        divisible = df2_sum != 0
+        if no_blanks and (both_are_zero or (divisible and 0.7 < float(adjusted_df1_sum) / float(df2_sum) < 1.429)):
+            return YES
         else:
-            result = NO
-        return result
+            return NO
