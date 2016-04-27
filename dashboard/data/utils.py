@@ -122,4 +122,4 @@ def filter_consumption_records(data, formulation_names):
                 return True
         return False
 
-    return pydash.select(data[C_RECORDS], filter_func)
+    return pydash.select(data.get(C_RECORDS, []), filter_func)

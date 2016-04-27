@@ -82,17 +82,13 @@ def perform_checks():
         report = FreeFormReport(None, cycle.title).build_form_db(cycle)
         run_checks(report)
         persist_scores(report)
+
     checks = [
-        {'combination': DEFAULT, 'test': ORDER_FORM_FREE_OF_GAPS, 'cycle': cycle, YES: 920, NO: 522, NOT_REPORTING: 390},
-        {'combination': F1, 'test': ORDER_FORM_FREE_OF_NEGATIVE_NUMBERS, 'cycle': cycle, YES: 1420, NO: 1, NOT_REPORTING: 409},
-        {'combination': F1, 'test': CONSUMPTION_AND_PATIENTS, 'cycle': cycle, YES: 462, NO: 1000, NOT_REPORTING: 372},
-        {'combination': F1, 'test': DIFFERENT_ORDERS_OVER_TIME, 'cycle': cycle, YES: 1302, NO: 9, NOT_REPORTING: 523},
-        {'combination': F1, 'test': STABLE_CONSUMPTION, 'cycle': cycle, YES: 732, NO: 471, NOT_REPORTING: 627},
-        {'combination': F1, 'test': WAREHOUSE_FULFILMENT, 'cycle': cycle, YES: 711, NO: 600, NOT_REPORTING: 519},
         {'combination': F1, 'test': STABLE_PATIENT_VOLUMES, 'cycle': cycle, YES: 793, NO: 405, NOT_REPORTING: 632},
-        {'combination': DEFAULT, 'test': GUIDELINE_ADHERENCE_ADULT_1L, 'cycle': cycle, YES: 646, NO: 702, NOT_REPORTING: 482},
-        {'combination': DEFAULT, 'test': GUIDELINE_ADHERENCE_ADULT_2L, 'cycle': cycle, YES: 894, NO: 286, NOT_REPORTING: 650},
-        {'combination': DEFAULT, 'test': GUIDELINE_ADHERENCE_PAED_1L, 'cycle': cycle, YES: 563, NO: 712, NOT_REPORTING: 555},
+        {'combination': DEFAULT, 'test': NNRTI_NEW_PAED, 'cycle': cycle, YES: 681, NO: 644, NOT_REPORTING: 509},
+        {'combination': DEFAULT, 'test': NNRTI_NEW_ADULTS, 'cycle': cycle, YES: 799, NO: 573, NOT_REPORTING: 462},
+        {'combination': DEFAULT, 'test': NNRTI_CURRENT_PAED, 'cycle': cycle, YES: 548, NO: 780, NOT_REPORTING: 506},
+        {'combination': DEFAULT, 'test': NNRTI_CURRENT_ADULTS, 'cycle': cycle, YES: 937, NO: 439, NOT_REPORTING: 458},
     ]
     for check in checks:
         if check.get('combination') == DEFAULT:
