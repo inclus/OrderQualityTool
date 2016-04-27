@@ -1,0 +1,127 @@
+- hosts: all
+  sudo: true
+  vars:
+    - name: qdb
+    - service_name: change_the_domain.com
+
+  handlers:
+
+    - name: reload nginx
+      service: name=nginx state=reloaded
+
+    - name: reload supervisor
+      command: supervisorctl reload
+
+  tasks:
+    - name: create user account for app
+      user: name={{name}}
+
+    - name: create folder to house the python code
+      file: name=/src/qdb/ state=directory recurse=yes
+
+    - name: create folder to house uploaded files
+      file: name=/media/tmp/ state=directory recurse=yes mode=0777
+
+    - name: install git
+      apt: pkg={{item}} state=latest update_cache=yes
+      with_items: [git]
+
+    - name: checkout the code from github
+      git: repo=https://github.com/CHAIUganda/OrderQualityTool.git dest=/src/qdb
+      notify:
+        - reload supervisor
+
+    - name: create a local settings file
+      template: 'src=templates/local_settings.py dest=/src/qdb/orderqualitytool/local_settings.py'
+      notify:
+        - reload supervisor
+
+    - name: install packages required to compile python dependencies
+      apt: pkg={{item}} state=latest force=yes
+      with_items: [libpq-dev, build-essential, python-pip, python-dev]
+
+    - name: install all the python packages required
+      pip: requirements=/src/qdb/requirements.txt
+      notify:
+        - reload supervisor
+
+    - name: download node installer script
+      get_url: url=https://deb.nodesource.com/setup_5.x dest=/tmp/install_node.sh mode=0777
+
+    - name: install nodejs deb sources
+      command: /tmp/install_node.sh
+
+    - name: install nodejs
+      apt: pkg=nodejs state=latest
+
+    - name: install bower
+      npm: name=bower global=yes
+
+    - name: install bower packages
+      bower: path=/src/qdb
+
+    - name: install the database server (postgresql 9.3)
+      apt: pkg={{item}} state=latest update_cache=yes
+      with_items: [postgresql-9.3, postgresql-client-9.3,  postgresql-contrib-9.3]
+
+    - postgresql_user: name={{name}} password={{name}}
+      sudo_user: postgres
+
+    - name: pg_hba.conf localhost md5
+      lineinfile: dest=/etc/postgresql/9.3/main/pg_hba.conf regexp="^local[\s]+all[\s]+all[\s]+[\w]+$" line="local    all             all                                     md5"
+      register: confchange
+
+    - name: reload postgresql config
+      service: name=postgresql state=reloaded
+      when: confchange|changed
+
+    - name: create database
+      postgresql_db: name={{name}} owner={{name}} state=present
+      sudo_user: postgres
+
+    - name: run migrations
+      command: python manage.py migrate
+      args:
+        chdir: /src/qdb
+
+    - name: install supervisor
+      apt: pkg={{item}} state=latest force=yes
+      with_items: [supervisor, redis-server]
+
+    - name: setup the celery process
+      template: 'src=templates/celery.conf dest=/etc/supervisor/conf.d/celery.conf'
+      notify:
+        - reload supervisor
+
+    - name: setup the application server process
+      template: 'src=templates/gunicorn.conf dest=/etc/supervisor/conf.d/gunicorn.conf'
+      notify:
+        - reload supervisor
+
+    - name: make sure supervisor is running
+      command: supervisorctl reload
+
+    - name: makes sure the supervisor process are started
+      supervisorctl: name={{item}} state=started
+      with_items: [qdb_worker, qdb_app_server]
+
+    - name: collect static files
+      command: python manage.py collectstatic --noinput
+      args:
+        chdir: /src/qdb
+
+    - name: install nginx
+      apt: pkg={{item}} state=latest force=yes
+      with_items: [nginx]
+
+    - template: 'src=templates/nginx.conf dest=/etc/nginx/nginx.conf'
+      notify:
+        - reload nginx
+
+    - template: 'src=templates/qdb.conf dest=/etc/nginx/sites-enabled/qdb.conf'
+      notify:
+        - reload nginx
+
+    - file: path=/etc/nginx/sites-enabled/default state=absent
+      notify:
+        - reload nginx

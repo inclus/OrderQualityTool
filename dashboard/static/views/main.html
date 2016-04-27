@@ -1,0 +1,126 @@
+<div class="row range_filter">
+    <div class="filter-titles col-md-12">
+         <h4 class="-cycle">CYCLE RANGE</h4>
+         <h4 class="-filters" ng-show="isAdmin">FILTERS</h4>
+    </div>
+    <div class="col-md-12 main-filters">
+        <select name="cycle" class="form-control filter cycle-select" ng-model="startCycle"
+            ng-options="cycle for cycle in cycles">
+        </select>
+        <div class="spacer">
+            <h5 class="text-center"> - </h5>
+        </div>
+        <select name="cycle" class="form-control filter cycle-select" ng-model="endCycle" ng-options="cycle for cycle in endCycles">
+        </select>
+        <div class="admin-filters" >
+            <select ng-show="isAdmin" name="district" class="form-control filter cycle-select" ng-model="selectedDistrict" ng-options="district.district for district in districts">
+            </select>
+            <select ng-show="isAdmin" name="warehouse" class="form-control filter cycle-select" ng-model="selectedWarehouse" ng-options="warehouse.warehouse for warehouse in warehouses">
+            </select>
+            <select ng-show="isAdmin" name="ip" class="form-control filter cycle-select" ng-model="selectedIp" ng-options="ip.ip for ip in ips">
+            </select>
+        </div>
+    </div>
+</div>
+<div class="row">
+
+    <div class="col-md-12">
+     <h3>KEY METRICS</h3>
+        <div class="quality_test" ui-sref-active="quality_test_active">
+            <a ui-sref="home.reportingRate">
+                <span class="quality_test__metric">{{reportingRate}} %</span>
+                <span class="quality_test__description">{{"Reporting Rate" | uppercase}}</span>
+            </a>
+        </div>
+        <div class="quality_test" ui-sref-active="quality_test_active">
+            <a ui-sref="home.webVsPaper">
+                <span class="quality_test__metric">{{webRate}} %</span>
+                <span class="quality_test__description">{{"Web VS Paper Reporting" | uppercase}}</span>
+            </a>
+        </div>
+        <div class="quality_test" ui-sref-active="quality_test_active">
+            <a ui-sref="home.guidlineAdherenceRate">
+                <span class="quality_test__metric">{{adherenceRate }} %</span>
+                <span class="quality_test__description">{{"GuideLine Adherence Rate" | uppercase}}</span>
+            </a>
+        </div>
+
+        <div class="quality_test quality_test_add" ui-sref-active="quality_test_active">
+            <a ui-sref="home.addTests">
+                <span class="quality_test__metric glyphicon glyphicon-plus"></span>
+                <span class="quality_test__description">CLICK TO SHOW MORE TESTS</span>
+            </a>
+        </div>
+    </div>
+
+</div>
+<div class="row">
+    <div class="col-md-12">
+        <div class="test-area clearfix">
+            <div ui-view></div>
+        </div>
+    </div>
+
+</div>
+<div class="row ranking_lists">
+    <div class="col-md-12">
+        <h3>RANKINGS</h3>
+    </div>
+    <div class="col-md-6">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title"><span>Worst Performing</span>
+                <div class="dropdown ranking-dropdown">
+                    <a class="dropdown-toggle " data-toggle="dropdown"> {{worstPerforming}} <b class="caret"></b></a>
+                    <ul class="dropdown-menu">
+
+                        <li ng-repeat="level in rankingLevels"><a ng-click="selectWorst(level)">{{level}}</a></li>
+
+                    </ul>
+                </div>
+
+                <a class="pull-right label label-qdb" ng-click="downloadWorst()">CSV</a>
+
+                </h3>
+            </div>
+        </div>
+        <table class="table table-bordered" ng-table="worstTableParams">
+            <tr>
+                <th>{{worstPerforming}}</th>
+                <th>Average Number of Fails</th>
+            </tr>
+            <tr ng-repeat="district in $data">
+                <td>{{district.name}}</td>
+                <td>{{district.rate | number : 1}}</td>
+            </tr>
+        </table>
+    </div>
+    <div class="col-md-6">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title"><span>Best Performing</span>
+                <div class="dropdown ranking-dropdown">
+                    <a class="dropdown-toggle " data-toggle="dropdown"> {{bestPerforming}} <b class="caret"></b></a>
+                    <ul class="dropdown-menu">
+                         <li ng-repeat="level in rankingLevels"><a ng-click="selectBest(level)">{{level}}</a></li>
+                    </ul>
+                </div>
+                 <a class="pull-right label label-qdb" ng-click="downloadBest()">CSV</a>
+
+                </h3>
+            </div>
+        </div>
+        <table class="table table-bordered" ng-table="bestTableParams">
+            <tr>
+                <th> {{bestPerforming}} </th>
+                <th>Average Number of Passes</th>
+            </tr>
+            <tr ng-repeat="district in $data">
+                <td>{{district.name}}</td>
+                <td>{{district.rate | number : 1}}
+
+                </td>
+            </tr>
+        </table>
+    </div>
+</div>

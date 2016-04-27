@@ -1,4 +1,5 @@
 # Created by https://www.gitignore.io/api/jango,osx,pycharm,python
+*~lock*
 
 #!! ERROR: jango is undefined. Use list command to see defined gitignore types !!#
 
@@ -140,3 +141,12 @@ docs/_build/
 target/
 reports/
 *.sqlite3
+local_settings.py
+asset_files/
+tmp
+dashboard/static/vendor/
+~$*.xlsx
+node_modules/
+.ropeproject
+*.sublime-workspace
+.vagrant
