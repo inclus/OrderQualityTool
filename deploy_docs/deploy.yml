@@ -20,7 +20,7 @@
       file: name=/src/qdb/ state=directory recurse=yes
 
     - name: create folder to house uploaded files
-      file: name=/media/tmp/ state=directory recurse=yes mode=0777
+      file: name=/home/{{qdb}}/qdbfiles state=directory recurse=yes mode=0777 owner={{name}}
 
     - name: install git
       apt: pkg={{item}} state=latest update_cache=yes
@@ -32,7 +32,7 @@
         - reload supervisor
 
     - name: create a local settings file
-      template: 'src=templates/local_settings.py dest=/src/qdb/orderqualitytool/local_settings.py'
+      template: 'src=templates/local_settings.py.j2 dest=/src/qdb/orderqualitytool/local_settings.py'
       notify:
         - reload supervisor
 

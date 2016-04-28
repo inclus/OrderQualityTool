@@ -62,10 +62,15 @@ There is a an ansible playbook available to automate this entire process. You ca
 			ALLOWED_HOSTS = ['*']
 			BROKER_URL = 'redis://localhost:6379/0'
 			CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
-			MEDIA_ROOT = "/media/"
+			MEDIA_ROOT = "/home/qdb/qdbfiles"
 	
 	Feel free to change the values to reflect your database connection settings
-	
+
+* Create a folder to house the media files
+
+    sudo su qdb
+    mkdir -p /home/qdb/qdbfiles
+
 * Run the migrations and setup the static files
 
 		cd /src/qdb
