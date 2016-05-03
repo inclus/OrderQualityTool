@@ -40,6 +40,11 @@ class DataImportView(LoginRequiredMixin, StaffuserRequiredMixin, FormView):
     form_class = FileUploadForm
     success_url = '/'
 
+    def get_context_data(self, **kwargs):
+        context = super(DataImportView, self).get_context_data(**kwargs)
+        context['title'] = "Upload New Cycle"
+        return context
+
     def form_valid(self, form):
         import_file = form.cleaned_data['import_file']
         cycle = form.cleaned_data['cycle']

@@ -4,6 +4,8 @@ from django.views.decorators.csrf import csrf_exempt
 import dashboard.views.api
 import dashboard.views.main
 import dashboard.views.tables
+import dashboard.views.upload_users
+
 
 urlpatterns = [
     url(r'^$', dashboard.views.main.HomeView.as_view(), name='home'),
@@ -13,6 +15,7 @@ urlpatterns = [
     url(r'^about/how_works$', dashboard.views.main.AboutHowWorks.as_view(), name='about.how_works'),
     url(r'^about/how_used$', dashboard.views.main.AboutHowUsed.as_view(), name='about.how_used'),
     url(r'^import/$', dashboard.views.main.DataImportView.as_view(), name='import'),
+    url(r'^import/users/$', dashboard.views.upload_users.UserImportView.as_view(), name='import_users'),
     url(r'^reports/$', dashboard.views.main.ReportsView.as_view(), name='reports'),
     url(r'^api/test/submittedOrder', dashboard.views.api.FacilitiesReportingView.as_view(), name='submiited_order'),
     url(r'^api/test/orderType', dashboard.views.api.WebBasedReportingView.as_view(), name='order_type'),
