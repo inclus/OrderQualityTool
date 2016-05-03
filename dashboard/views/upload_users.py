@@ -1,4 +1,5 @@
 import csv
+from io import StringIO
 
 from braces.views import SuperuserRequiredMixin
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -29,7 +30,7 @@ class UserImportView(LoginRequiredMixin, SuperuserRequiredMixin, FormView):
         return context
 
     def form_valid(self, form):
-        import_file = form.cleaned_data['import_file']
+        import_file = StringIO(form.cleaned_data['import_file'].read().decode())
         reader = csv.reader(import_file)
         for row in reader:
             email, password, role, access_area, superuser = row
