@@ -20,7 +20,7 @@ There is a an ansible playbook available to automate this entire process. You ca
 * Install required packages
 	
 		sudo apt-get update
-		sudo apt-get install postgresql-9.3, postgresql-client-9.3,  postgresql-contrib-9.3 git libpq-dev, build-essential, python-pip, python-dev, supervisor, redis-server, nginx, nodejs
+		sudo apt-get install postgresql-9.3 postgresql-client-9.3 postgresql-contrib-9.3 git libpq-dev build-essential python-pip python-dev supervisor redis-server nginx nodejs
 		
 * Create a database and user
 		
