@@ -41,7 +41,8 @@ class FilterValuesViewTestCase(WebTest):
 
 class CyclesViewTestCase(WebTest):
     def test_cycles(self):
-        score = Score.objects.create(cycle="May - Jun 2015")
+        current_year = str(now().year)
+        score = Score.objects.create(cycle="May - Jun %s" % current_year)
         url = reverse("cycles")
         response = self.app.get(url)
         data = json.loads(response.content.decode('utf8'))
