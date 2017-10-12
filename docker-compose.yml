@@ -4,19 +4,20 @@ orderqualitytool:
   ports:
     - "9000:9000"
   volumes:
-    - /data/assets:/usr/src/app/asset_files
-    - /data/tmp:/usr/src/app/tmp
+    - ./data/assets:/usr/src/app/asset_files
+    - ./data/tmp:/usr/src/app/tmp
   links:
     - redis:redis
     - postgres:postgres
   env_file: .env
-  command: /usr/local/bin/gunicorn orderqualitytool.wsgi:application -w 2 -b :9000
+  #command: /usr/local/bin/gunicorn orderqualitytool.wsgi:application -w 2 -b :9000
+  command: uwsgi --http :9000 --module orderqualitytool.wsgi:application --static-map /static=/usr/src/app/asset_files
 
 postgres:
   restart: always
   image: postgres:latest
   volumes:
-    - /data/postgresql:/var/lib/postgresql
+    - ./data/postgresql:/var/lib/postgresql
   ports:
     - "5432:5432"
 
@@ -35,7 +36,7 @@ celery:
   volumes_from:
     - orderqualitytool
   env_file: .env
-  command: celery -A orderqualitytool.celery worker --concurrency=3
+  command: celery worker --app=orderqualitytool.celery --concurrency=3
 
 flower:
   restart: always
@@ -48,4 +49,4 @@ flower:
   volumes_from:
     - orderqualitytool
   env_file: .env
-  command: celery flower -A orderqualitytool.celery --address=0.0.0.0 --port=5555
+  command: celery flower -app=orderqualitytool.celery --address=0.0.0.0 --port=5555
