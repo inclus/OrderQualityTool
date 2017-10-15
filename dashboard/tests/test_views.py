@@ -63,28 +63,6 @@ class FacilitiesReportingView(WebTest):
         self.assertEqual(len(data), 2)
 
 
-class WebBasedReportingViewTestCase(WebTest):
-    def test_that_cycles_are_padded(self):
-        cycle = 'Jan - Feb %s' % now().format("YYYY")
-        Score.objects.create(WEB_BASED={DEFAULT: WEB}, name="F2", cycle=cycle)
-        Score.objects.create(WEB_BASED={DEFAULT: PAPER}, name="F3", cycle=cycle)
-        url = "/api/test/orderType"
-        json_response = self.app.get(url, user="testuser").content.decode('utf8')
-        data = loads(json_response)['values']
-        self.assertIn({"web": 50, "cycle": cycle, "paper": 50, "not_reporting": 0}, data)
-
-    @patch("dashboard.views.api.now")
-    def test_that_start_end_work(self, time_mock):
-        time_mock.return_value = arrow.Arrow(2015, 12, 1)
-        cycle = 'Jan - Feb 2015'
-        cycle_2 = 'Mar - Apr 2015'
-        Cycle.objects.create(title=cycle)
-        url = "/api/test/orderType?start=%s&end=%s" % (cycle, cycle_2)
-        json_response = self.app.get(url, user="testuser").content.decode('utf8')
-        data = loads(json_response)['values']
-        self.assertEqual(len(data), 2)
-
-
 class FacilitiesMultipleReportingViewTestCase(WebTest):
     def test_shows_all_facilities_that_report_multiple_times(self):
         cycle = 'Jan - Feb %s' % now().format("YYYY")
@@ -250,7 +228,7 @@ class ScoreDetailsViewTestCase(WebTest):
 
     def test_can_get_score(self):
         score = Score.objects.create(name="Name 1", ip="IP 1", district="District 1", warehouse="Warehouse 1", MULTIPLE_ORDERS={DEFAULT: YES})
-        url = reverse(self.url_name, kwargs={"id": score.id, "column": 10})
+        url = reverse(self.url_name, kwargs={"id": score.id, "column": 9})
         response = self.app.get(url)
         self.assertEqual(200, response.status_code)
         response_data = response.context

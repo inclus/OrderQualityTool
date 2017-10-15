@@ -3,7 +3,7 @@ import os
 from django.test import TestCase
 
 from dashboard.data.adherence import GuidelineAdherenceCheckAdult1L, calculate_score
-from dashboard.data.blanks import BlanksQualityCheck, IsReportingCheck, MultipleCheck, WebBasedCheck
+from dashboard.data.blanks import BlanksQualityCheck, IsReportingCheck, MultipleCheck
 from dashboard.data.consumption_patients import ConsumptionAndPatientsQualityCheck
 from dashboard.data.free_form_report import FreeFormReport
 from dashboard.data.utils import clean_name, get_patient_total, get_consumption_totals, \
@@ -62,21 +62,6 @@ class DataTestCase(TestCase):
     def test_values_for_records(self):
         assert values_for_records([NEW], [{NEW: 10, EXISTING: 12}, {NEW: None, EXISTING: 12}]) == [10, None]
 
-    def test_web_based_results(self):
-        file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', 'tests', 'fixtures',
-                                 "new_format.xlsx")
-        report = FreeFormReport(file_path, "May - Jun").load()
-        report.cycle = "Jul - Aug 2015"
-        cases = [
-            {'test': WebBasedCheck, 'expected': 96.0, 'score': WEB}
-        ]
-        for case in cases:
-            check = case['test']()
-            for combination in check.combinations:
-                report.locs[0]['scores'][check.test][combination[NAME]] = check.for_each_facility(report.locs[0], combination)
-            persist_scores(report)
-            self.assertEquals(Score.objects.count(), 24)
-            self.assertEquals(Score.objects.all()[0].WEB_BASED[DEFAULT], WEB)
 
     def test_blanks(self):
         file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', 'tests', 'fixtures',
@@ -87,7 +72,6 @@ class DataTestCase(TestCase):
             {'test': BlanksQualityCheck, 'expected': NOT_REPORTING},
             {'test': MultipleCheck, 'expected': YES},
             {'test': IsReportingCheck, 'expected': YES},
-            {'test': WebBasedCheck, 'expected': WEB}
         ]
         for case in cases:
             check = case['test']()

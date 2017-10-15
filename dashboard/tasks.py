@@ -5,7 +5,7 @@ from celery import shared_task
 
 from dashboard.data.adherence import GuidelineAdherenceCheckAdult1L, GuidelineAdherenceCheckPaed1L
 from dashboard.data.adherence import GuidelineAdherenceCheckAdult2L
-from dashboard.data.blanks import BlanksQualityCheck, MultipleCheck, WebBasedCheck, IsReportingCheck
+from dashboard.data.blanks import BlanksQualityCheck, MultipleCheck, IsReportingCheck
 from dashboard.data.consumption_patients import ConsumptionAndPatientsQualityCheck
 from dashboard.data.cycles import BalancesMatchCheck, StablePatientVolumesCheck, WarehouseFulfillmentCheck, StableConsumptionCheck, OrdersOverTimeCheck
 from dashboard.data.free_form_report import FreeFormReport
@@ -96,7 +96,6 @@ def run_checks(report):
         NegativeNumbersQualityCheck(),
         ConsumptionAndPatientsQualityCheck(),
         MultipleCheck(),
-        WebBasedCheck(),
         IsReportingCheck(),
         GuidelineAdherenceCheckAdult1L(),
         GuidelineAdherenceCheckAdult2L(),
