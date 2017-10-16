@@ -143,13 +143,11 @@ class ReportMetrics(APIView):
         records = [cycle['cycle'] for cycle in Score.objects.values('cycle').distinct()]
         most_recent_cycle, = sorted(records, key=cmp_to_key(sort_cycle), reverse=True)[:1]
         adh_filter = "%s%s" % (GUIDELINE_ADHERENCE, adh.replace(" ", ""))
-        web_based_scores = aggregate_scores(self.request.user, WEB_BASED, [most_recent_cycle], DEFAULT, {YES: 'web', NO: 'paper', NOT_REPORTING: 'not_reporting'}, {YES: WEB, NO: PAPER, NOT_REPORTING: NOT_REPORTING}, filters)
         reporting_scores = aggregate_scores(self.request.user, REPORTING, [most_recent_cycle], DEFAULT, {YES: 'reporting', NO: 'not_reporting', NOT_REPORTING: 'n_a'}, {YES: YES, NO: NO, NOT_REPORTING: NOT_REPORTING}, filters)
         adherence_scores = aggregate_scores(self.request.user, adh_filter, [most_recent_cycle], DEFAULT, {YES: 'yes', NO: 'no', NOT_REPORTING: 'not_reporting'}, {YES: YES, NO: NO, NOT_REPORTING: NOT_REPORTING}, filters)
-        web_rate = "{0:.1f}".format(web_based_scores[0]['web']) if len(web_based_scores) > 0 else ""
         report_rate = "{0:.1f}".format(reporting_scores[0]['reporting']) if len(reporting_scores) > 0 else ""
         adherence = "{0:.1f}".format(adherence_scores[0]['yes']) if len(adherence_scores) > 0 else ""
-        return Response({"webBased": web_rate, "reporting": report_rate, "adherence": adherence})
+        return Response({"reporting": report_rate, "adherence": adherence})
 
 
 def add_item_to_filter(name, value, filter):
@@ -190,17 +188,6 @@ class FacilitiesReportingView(ScoresAPIView):
         end = request.GET.get('end', None)
         keys = {YES: 'reporting', NO: 'not_reporting', NOT_REPORTING: 'n_a'}
         return self.generate_data(self.test, start, end, None, keys)
-
-
-class WebBasedReportingView(ScoresAPIView):
-    test = WEB_BASED
-
-    def get(self, request):
-        start = request.GET.get('start', None)
-        end = request.GET.get('end', None)
-        keys = {YES: 'web', NO: 'paper', NOT_REPORTING: 'not_reporting'}
-        count_values = {YES: WEB, NO: PAPER, NOT_REPORTING: NOT_REPORTING}
-        return self.generate_data(self.test, start, end, None, keys, count_values)
 
 
 class FacilitiesMultipleReportingView(ScoresAPIView):

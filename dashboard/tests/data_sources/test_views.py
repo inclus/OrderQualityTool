@@ -38,8 +38,7 @@ class ScoreDetailTestCase():
         ip = "I1"
         district = "D1"
         cycle = "Jan - Feb 2015"
-        score = Score.objects.create(name=name, warehouse=warehouse, ip=ip, district=district, REPORTING={DEFAULT: YES},
-                                     WEB_BASED={DEFAULT: YES}, cycle=cycle)
+        score = Score.objects.create(name=name, warehouse=warehouse, ip=ip, district=district, REPORTING={DEFAULT: YES}, cycle=cycle)
         for q in F1_PATIENT_QUERY:
             mommy.make(AdultPatientsRecord, name=name, warehouse=warehouse, ip=ip, district=district, cycle=cycle, formulation=q, new=random.randrange(0, 600), existing=random.randrange(0, 600))
             mommy.make(PAEDPatientsRecord, name=name, warehouse=warehouse, ip=ip, district=district, cycle=cycle, formulation=q, new=random.randrange(0, 600), existing=random.randrange(0, 600))
@@ -51,8 +50,7 @@ class ScoreDetailTestCase():
         self.assertEqual(response.status_code, 200)
 
     def test_correct_template_rendered(self):
-        score = Score.objects.create(name="F1", warehouse="W1", ip="I1", district="D1", REPORTING={DEFAULT: YES},
-                                     WEB_BASED={DEFAULT: YES}, cycle="Jan - Feb 2015")
+        score = Score.objects.create(name="F1", warehouse="W1", ip="I1", district="D1", REPORTING={DEFAULT: YES}, cycle="Jan - Feb 2015")
         url = reverse("scores-detail", kwargs={"id": score.id, "column": self.column}) + "?combination=" + F1
         response = self.app.get(url)
         self.assertEqual(response.status_code, 200)
@@ -76,62 +74,57 @@ class ReportingCheckDetailView(WebTest, ScoreDetailTestCase):
     template_name = "check/base.html"
 
 
-class OrderTypeCheckDetailView(WebTest, ScoreDetailTestCase):
-    column = 5
-    template_name = "check/base.html"
-
-
 class MultipleOrdersCheckDetailView(WebTest, ScoreDetailTestCase):
-    column = 11
-    template_name = "check/base.html"
-
-
-class GapsCheckDetailView(WebTest, ScoreDetailTestCase):
     column = 10
     template_name = "check/base.html"
 
 
+class GapsCheckDetailView(WebTest, ScoreDetailTestCase):
+    column = 9
+    template_name = "check/base.html"
+
+
 class GuideLineAdherenceAdult1LCheckDetailView(WebTest, ScoreDetailTestCase):
-    column = 6
+    column = 5
     template_name = "check/adherence.html"
 
 
 class GuideLineAdherenceAdult2LCheckDetailView(WebTest, ScoreDetailTestCase):
-    column = 7
+    column = 6
     template_name = "check/adherence.html"
 
 
 class GuideLineAdherencePaed1LCheckDetailView(WebTest, ScoreDetailTestCase):
-    column = 8
+    column = 7
     template_name = "check/adherence.html"
 
 
 class NNRTINewPaedCheckDetailView(WebTest, NNRTICheckTestMixin):
     check = NNRTINEWPAEDCheck
-    column = 18
+    column = 17
     template_name = "check/nnrti.html"
 
 
 class NNRTICurrentPaedCheckDetailView(WebTest, NNRTICheckTestMixin):
     check = NNRTICURRENTPAEDCheck
-    column = 19
+    column = 18
     template_name = "check/nnrti.html"
 
 
 class NNRTINewAdultCheckDetailView(WebTest, NNRTICheckTestMixin):
     check = NNRTINewAdultsCheck
-    column = 20
+    column = 19
     template_name = "check/nnrti.html"
 
 
 class NNRTICurrentAdultCheckDetailView(WebTest, NNRTICheckTestMixin):
     check = NNRTICURRENTADULTSCheck
-    column = 21
+    column = 20
     template_name = "check/nnrti.html"
 
 
 class StablePatientsCheckDetailView(WebTest, ScoreDetailTestCase):
-    column = 16
+    column = 15
     template_name = "check/patientStability.html"
 
     def test_should_have_headers(self):
@@ -156,30 +149,30 @@ class StablePatientsCheckDetailView(WebTest, ScoreDetailTestCase):
 
 
 class ConsumptionAndPatientsCheckDetailView(WebTest, ScoreDetailTestCase):
-    column = 12
+    column = 11
     template_name = "check/consumptionAndPatients.html"
 
 
 class WarehouseCheckDetailView(WebTest, ScoreDetailTestCase):
-    column = 17
+    column = 16
     template_name = "check/differentOrdersOverTime.html"
 
 
 class DiffOrdersCheckDetailView(WebTest, ScoreDetailTestCase):
-    column = 13
+    column = 12
     template_name = "check/differentOrdersOverTime.html"
 
 
 class ClosingBalanceCheckDetailView(WebTest, ScoreDetailTestCase):
-    column = 14
+    column = 13
     template_name = "check/differentOrdersOverTime.html"
 
 
 class NegativesCheckDetailView(WebTest, ScoreDetailTestCase):
-    column = 11
+    column = 10
     template_name = "check/orderFormFreeOfNegativeNumbers.html"
 
 
 class StableConsumptionCheckDetailView(WebTest, ScoreDetailTestCase):
-    column = 15
+    column = 14
     template_name = "check/differentOrdersOverTime.html"

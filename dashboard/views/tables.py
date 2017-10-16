@@ -34,7 +34,6 @@ class ScoresTableView(BaseDatatableView):
         WAREHOUSE.lower(),
         IP.lower(),
         REPORTING,
-        WEB_BASED,
         GUIDELINE_ADHERENCE_ADULT_1L,
         GUIDELINE_ADHERENCE_ADULT_2L,
         GUIDELINE_ADHERENCE_PAED_1L,
@@ -61,9 +60,8 @@ class ScoresTableView(BaseDatatableView):
         return data
 
     def render_column(self, row, column):
-        display_text = {YES: PASS, NO: FAIL, NOT_REPORTING: N_A, PAPER: PAPER.upper(), WEB: WEB.upper()}
+        display_text = {YES: PASS, NO: FAIL, NOT_REPORTING: N_A}
         default_columns = [REPORTING,
-                           WEB_BASED,
                            MULTIPLE_ORDERS,
                            ORDER_FORM_FREE_OF_GAPS,
                            GUIDELINE_ADHERENCE_ADULT_1L,
@@ -139,7 +137,7 @@ class ScoresTableView(BaseDatatableView):
 
 class ScoreDetailsView(View):
     def get_context_data(self, request, id, column):
-        scores = {YES: "Pass", NO: "Fail", NOT_REPORTING: "N/A", PAPER: PAPER, WEB: WEB}
+        scores = {YES: "Pass", NO: "Fail", NOT_REPORTING: "N/A"}
         combination = request.GET.get('combination', DEFAULT)
         column = int(column)
         score = Score.objects.get(id=id)

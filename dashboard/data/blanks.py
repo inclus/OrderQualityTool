@@ -35,22 +35,6 @@ class BlanksQualityCheck(QCheck):
         return result
 
 
-class WebBasedCheck(QCheck):
-    test = WEB_BASED
-    combinations = [{NAME: DEFAULT}]
-
-    def for_each_facility(self, data, combination, previous_cycle_data=None):
-        value = data[WEB_PAPER].strip()
-        result = NOT_REPORTING
-        if value:
-            if value.lower() == WEB.lower():
-                result = WEB
-            if value.lower() == PAPER.lower():
-                result = PAPER
-
-        return result
-
-
 class IsReportingCheck(QCheck):
     test = REPORTING
     combinations = [{NAME: DEFAULT}]

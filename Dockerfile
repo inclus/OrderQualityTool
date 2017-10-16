@@ -33,4 +33,4 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . /usr/src/app
 
 RUN bower install --allow-root
-ENTRYPOINT ["uwsgi", "--http", ":9000", "--module", "orderqualitytool.wsgi:application", "--static-map", "/static=/usr/src/app/asset_files"]
+# ENTRYPOINT ["uwsgi", "--http", ":9000", "--module", "orderqualitytool.wsgi:application", "--static-map", "/static=/usr/src/app/asset_files"]

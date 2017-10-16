@@ -11,9 +11,6 @@ dashboard.config(["$stateProvider", "$urlRouterProvider",
             }).state("home.reportingRate", {
                 url: "/reportingRate",
                 templateUrl: "/static/views/reporting_rate.html"
-            }).state("home.webVsPaper", {
-                url: "/webVsPaper",
-                templateUrl: "/static/views/web_vs_paper.html"
             }).state("home.guidlineAdherenceRate", {
                 url: "/guidlineAdherenceRate",
                 templateUrl: "/static/views/guidlineAdherenceRate.html"

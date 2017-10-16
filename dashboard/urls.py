@@ -18,7 +18,6 @@ urlpatterns = [
     url(r'^import/users/$', dashboard.views.upload_users.UserImportView.as_view(), name='import_users'),
     url(r'^reports/$', dashboard.views.main.ReportsView.as_view(), name='reports'),
     url(r'^api/test/submittedOrder', dashboard.views.api.FacilitiesReportingView.as_view(), name='submiited_order'),
-    url(r'^api/test/orderType', dashboard.views.api.WebBasedReportingView.as_view(), name='order_type'),
     url(r'^api/test/facilitiesMultiple', dashboard.views.api.FacilitiesMultipleReportingView.as_view(), name='facilities_multiple'),
     url(r'^api/test/orderFormFreeOfGaps', dashboard.views.api.OrderFormFreeOfGapsView.as_view(), name='order_form_free_of_gaps'),
     url(r'^api/test/closingBalance', dashboard.views.api.ClosingBalanceView.as_view(), name='closing_balance_matches_opening_balance'),

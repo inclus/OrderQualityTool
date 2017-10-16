@@ -49,4 +49,4 @@ flower:
   volumes_from:
     - orderqualitytool
   env_file: .env
-  command: celery flower -app=orderqualitytool.celery --address=0.0.0.0 --port=5555
+  command: celery flower --app=orderqualitytool.celery --address=0.0.0.0 --port=5555
