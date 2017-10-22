@@ -5,6 +5,8 @@ from django.contrib.auth.admin import GroupAdmin, UserAdmin
 from django.contrib.auth.models import Group
 from django.utils.translation import ugettext_lazy
 from django.utils.translation import ugettext_lazy as _
+from dynamic_preferences.admin import GlobalPreferenceAdmin
+from dynamic_preferences.models import GlobalPreferenceModel
 
 from dashboard.models import DashboardUser, Consumption, Cycle, AdultPatientsRecord, PAEDPatientsRecord, \
     Score, MultipleOrderFacility
@@ -143,3 +145,4 @@ admin_site.register(PAEDPatientsRecord, PatientAdmin)
 admin_site.register(Consumption, ConsumptionAdmin)
 admin_site.register(Cycle, CycleAdmin)
 admin_site.register(MultipleOrderFacility)
+admin_site.register(GlobalPreferenceModel, GlobalPreferenceAdmin)
