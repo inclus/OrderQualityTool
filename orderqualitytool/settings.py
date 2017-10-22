@@ -8,6 +8,7 @@ ALLOWED_HOSTS = ['*']
 INSTALLED_APPS = (
     'django.contrib.admin',
     'django.contrib.auth',
+    'dynamic_preferences',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
