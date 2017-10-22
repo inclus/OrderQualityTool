@@ -8,6 +8,7 @@ ALLOWED_HOSTS = ['*']
 INSTALLED_APPS = (
     'django.contrib.admin',
     'django.contrib.auth',
+    'dynamic_preferences',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
@@ -20,6 +21,7 @@ INSTALLED_APPS = (
     'admirarchy',
     'menu',
     'rest_framework',
+    'analytical',
     'django.contrib.sites',
     'custom_user'
 )
@@ -127,7 +129,7 @@ LOGGING = {
 
     }
 }
-
+GOOGLE_ANALYTICS_PROPERTY_ID = os.environ.get('GOOGLE_ANALYTICS_ID', 'UA-108170532-1')
 try:
     from local_settings import *
 except ImportError:
