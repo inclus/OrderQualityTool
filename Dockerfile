@@ -32,5 +32,10 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . /usr/src/app
 
-RUN bower install --allow-root
+RUN /usr/sbin/useradd --create-home --home-dir /usr/local/nonroot --shell /bin/bash nonroot
+RUN /usr/sbin/adduser nonroot sudo
+
+
+USER nonroot
+RUN bower install
 # ENTRYPOINT ["uwsgi", "--http", ":9000", "--module", "orderqualitytool.wsgi:application", "--static-map", "/static=/usr/src/app/asset_files"]
