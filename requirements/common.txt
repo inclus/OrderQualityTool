@@ -28,3 +28,4 @@ robber==0.1.0
 model_mommy
 uwsgi
 django-dynamic-preferences==1.4
+django-analytical==2.3.0
