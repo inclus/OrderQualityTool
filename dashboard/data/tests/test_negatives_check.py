@@ -2,7 +2,7 @@ from unittest import TestCase
 
 from nose_parameterized import parameterized
 
-from dashboard.data.negatives import NegativeNumbersQualityCheck
+from dashboard.data.negatives import NegativeNumbersQualityCheck, PMTCT_CONSUMPTION
 from dashboard.helpers import NOT_REPORTING, YES, C_RECORDS, OPENING_BALANCE, F1_QUERY, FORMULATION, NO
 
 has_no_data = {}
