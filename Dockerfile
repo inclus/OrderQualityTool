@@ -34,7 +34,7 @@ COPY . /usr/src/app
 
 RUN /usr/sbin/useradd --create-home --home-dir /usr/local/nonroot --shell /bin/bash nonroot
 RUN /usr/sbin/adduser nonroot sudo
-
+RUN chmod -R 777 /usr/src/app/dashboard/static
 
 USER nonroot
 RUN bower install

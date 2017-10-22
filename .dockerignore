@@ -1,2 +1,6 @@
 .tox/
-
+asset_files/
+tmp
+dashboard/static/vendor/
+.node_modules/
+data/
