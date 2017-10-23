@@ -147,7 +147,6 @@ MONTHS_OF_STOCK_OF_HAND = 'months_of_stock_of_hand'
 CLOSING_BALANCE = 'closing_balance'
 LOSES_ADJUSTMENTS = 'loses_adjustments'
 ART_CONSUMPTION = 'art_consumption'
-PMTCT_CONSUMPTION = 'pmtct_consumption'
 QUANTITY_RECEIVED = 'quantity_received'
 OPENING_BALANCE = 'opening_balance'
 
@@ -162,7 +161,6 @@ FIELD_NAMES = {
     CLOSING_BALANCE: 'Closing Balance',
     LOSES_ADJUSTMENTS: 'Loses Adjustments',
     ART_CONSUMPTION: 'ART Consumption',
-    PMTCT_CONSUMPTION: 'eMTCT Consumption',
     QUANTITY_RECEIVED: 'Quantity Received',
     OPENING_BALANCE: 'Opening Balance'
 }

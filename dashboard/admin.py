@@ -62,7 +62,6 @@ class ConsumptionAdmin(ModelAdmin):
         'formulation',
         'opening_balance',
         'quantity_received',
-        'pmtct_consumption',
         'art_consumption',
         'loses_adjustments',
         'closing_balance',

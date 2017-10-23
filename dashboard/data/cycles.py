@@ -74,7 +74,7 @@ class BalancesMatchCheck(QCheck):
 class StableConsumptionCheck(QCheck):
     two_cycle = True
     test = STABLE_CONSUMPTION
-    fields = [ART_CONSUMPTION, PMTCT_CONSUMPTION]
+    fields = [ART_CONSUMPTION]
     combinations = [
         {NAME: F1, CONSUMPTION_QUERY: F1_QUERY, THRESHOLD: 20},
         {NAME: F2, CONSUMPTION_QUERY: F2_QUERY, THRESHOLD: 10},

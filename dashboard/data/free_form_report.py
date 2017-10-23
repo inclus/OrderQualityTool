@@ -122,7 +122,7 @@ class FreeFormReport():
                 consumption_record[FORMULATION] = row[2].value
                 consumption_record[OPENING_BALANCE] = self.get_value(row, 4)
                 consumption_record[QUANTITY_RECEIVED] = self.get_value(row, 5)
-                consumption_record[PMTCT_CONSUMPTION] = self.get_value(row, 7)
+                # consumption_record[PMTCT_CONSUMPTION] = self.get_value(row, 7)
                 consumption_record[ART_CONSUMPTION] = self.get_value(row, 6)
                 consumption_record[LOSES_ADJUSTMENTS] = self.get_value(row, 8)
                 consumption_record[CLOSING_BALANCE] = self.get_value(row, 9)

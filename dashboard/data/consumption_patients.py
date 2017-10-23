@@ -9,7 +9,7 @@ class ConsumptionAndPatientsQualityCheck(QCheck):
     combinations = [
         {
             NAME: F1, PATIENT_QUERY: F1_PATIENT_QUERY, CONSUMPTION_QUERY: F1_QUERY, RATIO: 2.0,
-            FIELDS: [ART_CONSUMPTION, PMTCT_CONSUMPTION], IS_ADULT: True
+            FIELDS: [ART_CONSUMPTION], IS_ADULT: True
         },
         {
             NAME: F2, PATIENT_QUERY: F2_PATIENT_QUERY, CONSUMPTION_QUERY: F2_QUERY, RATIO: 4.6,

@@ -16,7 +16,6 @@ def generate_values():
         CLOSING_BALANCE,
         LOSES_ADJUSTMENTS,
         ART_CONSUMPTION,
-        PMTCT_CONSUMPTION,
         QUANTITY_RECEIVED,
         OPENING_BALANCE
     ]
@@ -84,8 +83,8 @@ class ConsumptionAndPatientsDataSourceExportTestCase(TestCase):
         self.assertEquals(generated_data[9], [])
         self.assertEquals(generated_data[10], ["", F1_QUERY, "", "", F1_PATIENT_QUERY[0], ""])
         self.assertEquals(generated_data[11], ["", FIELD_NAMES.get(ART_CONSUMPTION), 50, "", FIELD_NAMES.get(NEW), 50])
-        self.assertEquals(generated_data[12], ["", FIELD_NAMES.get(PMTCT_CONSUMPTION), 50, "", FIELD_NAMES.get(EXISTING), 50])
-        self.assertEquals(generated_data[13], ["", TOTAL, 100, "", TOTAL, 100])
+        self.assertEquals(generated_data[12], ["", TOTAL, 50, "", FIELD_NAMES.get(EXISTING), 50])
+        self.assertEquals(generated_data[13], ["", "", "", "", TOTAL, 100])
         self.assertEquals(generated_data[14], [])
         self.assertEquals(generated_data[15], ["", "", "", "", F1_PATIENT_QUERY[1], ""])
         self.assertEquals(generated_data[16], ["", "", "", "", FIELD_NAMES.get(NEW), 50])
@@ -99,6 +98,6 @@ class ConsumptionAndPatientsDataSourceExportTestCase(TestCase):
         self.assertEquals(generated_data[24], [])
         self.assertEquals(generated_data[25], ["", "ESTIMATED CURRENT PATIENTS"])
         self.assertEquals(generated_data[26], ["", "From Consumption Data", "", "", "From Patient Data"])
-        self.assertEquals(generated_data[27], ["", F1_QUERY, 50.0, "", F1_PATIENT_QUERY[0], 100.0])
-        self.assertEquals(generated_data[28], ["", "TOTAL", 50.0, "", "TDF/3TC/EFV (ADULT)", 100.0])
+        self.assertEquals(generated_data[27], ["", F1_QUERY, 25.0, "", F1_PATIENT_QUERY[0], 100.0])
+        self.assertEquals(generated_data[28], ["", "TOTAL", 25.0, "", "TDF/3TC/EFV (ADULT)", 100.0])
         self.assertEquals(generated_data[29], ["", "", "", "", "TOTAL", 200])
