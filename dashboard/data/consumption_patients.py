@@ -9,14 +9,14 @@ class ConsumptionAndPatientsQualityCheck(QCheck):
     combinations = [
         {
             NAME: F1, PATIENT_QUERY: F1_PATIENT_QUERY, CONSUMPTION_QUERY: F1_QUERY, RATIO: 2.0,
-            FIELDS: [ART_CONSUMPTION], IS_ADULT: True
+            FIELDS: [COMBINED_CONSUMPTION], IS_ADULT: True
         },
         {
             NAME: F2, PATIENT_QUERY: F2_PATIENT_QUERY, CONSUMPTION_QUERY: F2_QUERY, RATIO: 4.6,
-            FIELDS: [ART_CONSUMPTION], IS_ADULT: False
+            FIELDS: [COMBINED_CONSUMPTION], IS_ADULT: False
         },
         {
-            NAME: F3, PATIENT_QUERY: F3_PATIENT_QUERY, CONSUMPTION_QUERY: F3_QUERY, RATIO: 1.0, FIELDS: [ART_CONSUMPTION],
+            NAME: F3, PATIENT_QUERY: F3_PATIENT_QUERY, CONSUMPTION_QUERY: F3_QUERY, RATIO: 1.0, FIELDS: [COMBINED_CONSUMPTION],
             IS_ADULT: False
         }]
     key_cache = defaultdict(dict)

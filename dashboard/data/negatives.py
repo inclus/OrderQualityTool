@@ -12,7 +12,7 @@ class NegativeNumbersQualityCheck(QCheck):
 
     fields = [OPENING_BALANCE,
               QUANTITY_RECEIVED,
-              ART_CONSUMPTION,
+              COMBINED_CONSUMPTION,
               ESTIMATED_NUMBER_OF_NEW_PREGNANT_WOMEN,
               ESTIMATED_NUMBER_OF_NEW_ART_PATIENTS]
 

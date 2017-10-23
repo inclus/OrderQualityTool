@@ -62,7 +62,7 @@ class ConsumptionAdmin(ModelAdmin):
         'formulation',
         'opening_balance',
         'quantity_received',
-        'art_consumption',
+        'consumption',
         'loses_adjustments',
         'closing_balance',
         'months_of_stock_of_hand',

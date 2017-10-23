@@ -146,7 +146,7 @@ QUANTITY_REQUIRED_FOR_CURRENT_PATIENTS = 'quantity_required_for_current_patients
 MONTHS_OF_STOCK_OF_HAND = 'months_of_stock_of_hand'
 CLOSING_BALANCE = 'closing_balance'
 LOSES_ADJUSTMENTS = 'loses_adjustments'
-ART_CONSUMPTION = 'art_consumption'
+COMBINED_CONSUMPTION = 'consumption'
 QUANTITY_RECEIVED = 'quantity_received'
 OPENING_BALANCE = 'opening_balance'
 
@@ -160,7 +160,7 @@ FIELD_NAMES = {
     MONTHS_OF_STOCK_OF_HAND: 'Months of Stock of Hand',
     CLOSING_BALANCE: 'Closing Balance',
     LOSES_ADJUSTMENTS: 'Loses Adjustments',
-    ART_CONSUMPTION: 'ART Consumption',
+    COMBINED_CONSUMPTION: 'Consumption',
     QUANTITY_RECEIVED: 'Quantity Received',
     OPENING_BALANCE: 'Opening Balance'
 }

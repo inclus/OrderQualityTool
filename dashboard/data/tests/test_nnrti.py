@@ -4,36 +4,36 @@ from nose_parameterized import parameterized
 
 from dashboard.data.nn import NNRTICURRENTADULTSCheck, NNRTICURRENTPAEDCheck
 from dashboard.helpers import NOT_REPORTING, YES, C_RECORDS, OPENING_BALANCE, F1_QUERY, FORMULATION, NO, \
-    ART_CONSUMPTION
+    COMBINED_CONSUMPTION
 
 has_no_data = {}
 current_adult_initial = {
     C_RECORDS: [
         {
-            ART_CONSUMPTION: 10,
+            COMBINED_CONSUMPTION: 10,
             FORMULATION: "Zidovudine/Lamivudine (AZT/3TC) 300mg/150mg [Pack 60]"
         },
         {
-            ART_CONSUMPTION: 10,
+            COMBINED_CONSUMPTION: 10,
             FORMULATION: "Tenofovir/Lamivudine (TDF/3TC) 300mg/300mg [Pack 30]"
         },
         {
-            ART_CONSUMPTION: 10,
+            COMBINED_CONSUMPTION: 10,
             FORMULATION: "Abacavir/Lamivudine (ABC/3TC) 600mg/300mg [Pack 30]"
         },
         {
-            ART_CONSUMPTION: 10,
+            COMBINED_CONSUMPTION: 10,
             FORMULATION: "Efavirenz (EFV) 600mg [Pack 30]"
         },
         {
-            ART_CONSUMPTION: 10,
+            COMBINED_CONSUMPTION: 10,
             FORMULATION: "Nevirapine (NVP) 200mg [Pack 60]"
         },
         {
-            ART_CONSUMPTION: 10,
+            COMBINED_CONSUMPTION: 10,
             FORMULATION: "Atazanavir/Ritonavir (ATV/r) 300mg/100mg [Pack 30]"
         }, {
-            ART_CONSUMPTION: 10,
+            COMBINED_CONSUMPTION: 10,
             FORMULATION: "Lopinavir/Ritonavir (LPV/r) 200mg/50mg [Pack 120]"
         },
     ]
@@ -41,30 +41,30 @@ current_adult_initial = {
 current_adult_all_zero = {
     C_RECORDS: [
         {
-            ART_CONSUMPTION: 0,
+            COMBINED_CONSUMPTION: 0,
             FORMULATION: "Zidovudine/Lamivudine (AZT/3TC) 300mg/150mg [Pack 60]"
         },
         {
-            ART_CONSUMPTION: 0,
+            COMBINED_CONSUMPTION: 0,
             FORMULATION: "Tenofovir/Lamivudine (TDF/3TC) 300mg/300mg [Pack 30]"
         },
         {
-            ART_CONSUMPTION: 0,
+            COMBINED_CONSUMPTION: 0,
             FORMULATION: "Abacavir/Lamivudine (ABC/3TC) 600mg/300mg [Pack 30]"
         },
         {
-            ART_CONSUMPTION: 0,
+            COMBINED_CONSUMPTION: 0,
             FORMULATION: "Efavirenz (EFV) 600mg [Pack 30]"
         },
         {
-            ART_CONSUMPTION: 0,
+            COMBINED_CONSUMPTION: 0,
             FORMULATION: "Nevirapine (NVP) 200mg [Pack 60]"
         },
         {
-            ART_CONSUMPTION: 0,
+            COMBINED_CONSUMPTION: 0,
             FORMULATION: "Atazanavir/Ritonavir (ATV/r) 300mg/100mg [Pack 30]"
         }, {
-            ART_CONSUMPTION: 0,
+            COMBINED_CONSUMPTION: 0,
             FORMULATION: "Lopinavir/Ritonavir (LPV/r) 200mg/50mg [Pack 120]"
         },
     ]
@@ -72,30 +72,30 @@ current_adult_all_zero = {
 current_adult_either_all_blank = {
     C_RECORDS: [
         {
-            ART_CONSUMPTION: None,
+            COMBINED_CONSUMPTION: None,
             FORMULATION: "Zidovudine/Lamivudine (AZT/3TC) 300mg/150mg [Pack 60]"
         },
         {
-            ART_CONSUMPTION: None,
+            COMBINED_CONSUMPTION: None,
             FORMULATION: "Tenofovir/Lamivudine (TDF/3TC) 300mg/300mg [Pack 30]"
         },
         {
-            ART_CONSUMPTION: None,
+            COMBINED_CONSUMPTION: None,
             FORMULATION: "Abacavir/Lamivudine (ABC/3TC) 600mg/300mg [Pack 30]"
         },
         {
-            ART_CONSUMPTION: 0,
+            COMBINED_CONSUMPTION: 0,
             FORMULATION: "Efavirenz (EFV) 600mg [Pack 30]"
         },
         {
-            ART_CONSUMPTION: 0,
+            COMBINED_CONSUMPTION: 0,
             FORMULATION: "Nevirapine (NVP) 200mg [Pack 60]"
         },
         {
-            ART_CONSUMPTION: 0,
+            COMBINED_CONSUMPTION: 0,
             FORMULATION: "Atazanavir/Ritonavir (ATV/r) 300mg/100mg [Pack 30]"
         }, {
-            ART_CONSUMPTION: 0,
+            COMBINED_CONSUMPTION: 0,
             FORMULATION: "Lopinavir/Ritonavir (LPV/r) 200mg/50mg [Pack 120]"
         },
     ]
@@ -103,30 +103,30 @@ current_adult_either_all_blank = {
 current_adult_2 = {
     C_RECORDS: [
         {
-            ART_CONSUMPTION: 10,
+            COMBINED_CONSUMPTION: 10,
             FORMULATION: "Zidovudine/Lamivudine (AZT/3TC) 300mg/150mg [Pack 60]"
         },
         {
-            ART_CONSUMPTION: 10,
+            COMBINED_CONSUMPTION: 10,
             FORMULATION: "Tenofovir/Lamivudine (TDF/3TC) 300mg/300mg [Pack 30]"
         },
         {
-            ART_CONSUMPTION: 10,
+            COMBINED_CONSUMPTION: 10,
             FORMULATION: "Abacavir/Lamivudine (ABC/3TC) 600mg/300mg [Pack 30]"
         },
         {
-            ART_CONSUMPTION: 5,
+            COMBINED_CONSUMPTION: 5,
             FORMULATION: "Efavirenz (EFV) 600mg [Pack 30]"
         },
         {
-            ART_CONSUMPTION: 5,
+            COMBINED_CONSUMPTION: 5,
             FORMULATION: "Nevirapine (NVP) 200mg [Pack 60]"
         },
         {
-            ART_CONSUMPTION: 5,
+            COMBINED_CONSUMPTION: 5,
             FORMULATION: "Atazanavir/Ritonavir (ATV/r) 300mg/100mg [Pack 30]"
         }, {
-            ART_CONSUMPTION: 5,
+            COMBINED_CONSUMPTION: 5,
             FORMULATION: "Lopinavir/Ritonavir (LPV/r) 200mg/50mg [Pack 120]"
         },
     ]
@@ -135,27 +135,27 @@ current_adult_2 = {
 current_paed_initial = {
     C_RECORDS: [
         {
-            ART_CONSUMPTION: 38,
+            COMBINED_CONSUMPTION: 38,
             FORMULATION: "Abacavir/Lamivudine (ABC/3TC) 60mg/30mg [Pack 60]"
         },
         {
-            ART_CONSUMPTION: 38,
+            COMBINED_CONSUMPTION: 38,
             FORMULATION: "Zidovudine/Lamivudine (AZT/3TC) 60mg/30mg [Pack 60]"
         },
         {
-            ART_CONSUMPTION: 10,
+            COMBINED_CONSUMPTION: 10,
             FORMULATION: "Efavirenz (EFV) 200mg [Pack 90]"
         },
         {
-            ART_CONSUMPTION: 10,
+            COMBINED_CONSUMPTION: 10,
             FORMULATION: "Nevirapine (NVP) 50mg [Pack 60]"
         },
         {
-            ART_CONSUMPTION: 10,
+            COMBINED_CONSUMPTION: 10,
             FORMULATION: "Lopinavir/Ritonavir (LPV/r) 80mg/20ml oral susp [Bottle 60ml]"
         },
         {
-            ART_CONSUMPTION: 10,
+            COMBINED_CONSUMPTION: 10,
             FORMULATION: "Lopinavir/Ritonavir (LPV/r) 100mg/25mg"
         }
     ]
@@ -163,27 +163,27 @@ current_paed_initial = {
 current_paed_all_zero = {
     C_RECORDS: [
         {
-            ART_CONSUMPTION: 0,
+            COMBINED_CONSUMPTION: 0,
             FORMULATION: "Abacavir/Lamivudine (ABC/3TC) 60mg/30mg [Pack 60]"
         },
         {
-            ART_CONSUMPTION: 0,
+            COMBINED_CONSUMPTION: 0,
             FORMULATION: "Zidovudine/Lamivudine (AZT/3TC) 60mg/30mg [Pack 60]"
         },
         {
-            ART_CONSUMPTION: 0,
+            COMBINED_CONSUMPTION: 0,
             FORMULATION: "Efavirenz (EFV) 200mg [Pack 90]"
         },
         {
-            ART_CONSUMPTION: 0,
+            COMBINED_CONSUMPTION: 0,
             FORMULATION: "Nevirapine (NVP) 50mg [Pack 60]"
         },
         {
-            ART_CONSUMPTION: 0,
+            COMBINED_CONSUMPTION: 0,
             FORMULATION: "Lopinavir/Ritonavir (LPV/r) 80mg/20ml oral susp [Bottle 60ml]"
         },
         {
-            ART_CONSUMPTION: 0,
+            COMBINED_CONSUMPTION: 0,
             FORMULATION: "Lopinavir/Ritonavir (LPV/r) 100mg/25mg"
         }
     ]
@@ -192,27 +192,27 @@ current_paed_all_zero = {
 current_paed_either_all_blank = {
     C_RECORDS: [
         {
-            ART_CONSUMPTION: None,
+            COMBINED_CONSUMPTION: None,
             FORMULATION: "Abacavir/Lamivudine (ABC/3TC) 60mg/30mg [Pack 60]"
         },
         {
-            ART_CONSUMPTION: None,
+            COMBINED_CONSUMPTION: None,
             FORMULATION: "Zidovudine/Lamivudine (AZT/3TC) 60mg/30mg [Pack 60]"
         },
         {
-            ART_CONSUMPTION: None,
+            COMBINED_CONSUMPTION: None,
             FORMULATION: "Efavirenz (EFV) 200mg [Pack 90]"
         },
         {
-            ART_CONSUMPTION: None,
+            COMBINED_CONSUMPTION: None,
             FORMULATION: "Nevirapine (NVP) 50mg [Pack 60]"
         },
         {
-            ART_CONSUMPTION: None,
+            COMBINED_CONSUMPTION: None,
             FORMULATION: "Lopinavir/Ritonavir (LPV/r) 80mg/20ml oral susp [Bottle 60ml]"
         },
         {
-            ART_CONSUMPTION: None,
+            COMBINED_CONSUMPTION: None,
             FORMULATION: "Lopinavir/Ritonavir (LPV/r) 100mg/25mg"
         }
     ]

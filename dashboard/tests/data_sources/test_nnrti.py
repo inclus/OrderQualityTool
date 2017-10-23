@@ -22,7 +22,7 @@ class NNRTIDataSourceTestCaseForCurrentAdults(TestCase):
                                      WEB_BASED={DEFAULT: YES})
         data_source = NNRTIDataSource()
         data = data_source.load(score, self.test_name, combination)
-        self.assertEqual(data[DF1][HEADERS], ["ART", TOTAL])
+        self.assertEqual(data[DF1][HEADERS], ["", TOTAL])
         self.assertEqual(data[DF1]["table_header"], "NRTI")
 
     def test_that_table_for_df2_has_proper_header(self):
@@ -31,7 +31,7 @@ class NNRTIDataSourceTestCaseForCurrentAdults(TestCase):
                                      WEB_BASED={DEFAULT: YES})
         data_source = NNRTIDataSource()
         data = data_source.load(score, self.test_name, combination)
-        self.assertEqual(data[DF2][HEADERS], ["ART", TOTAL])
+        self.assertEqual(data[DF2][HEADERS], ["", TOTAL])
         self.assertEqual(data[DF2]["table_header"], "NNRTI/PI")
 
     def test_that_table_for_df1_has_2_rows(self):
@@ -248,7 +248,7 @@ class NNRTIDataSourceTestCaseForCurrentPaed(TestCase):
                                      WEB_BASED={DEFAULT: YES})
         data_source = NNRTIDataSource()
         data = data_source.load(score, self.test_name, combination)
-        self.assertEqual(data[DF1][HEADERS], ["ART", TOTAL])
+        self.assertEqual(data[DF1][HEADERS], ["", TOTAL])
         self.assertEqual(data[DF1]["table_header"], "NRTI")
 
     def test_that_table_for_df2_has_proper_header(self):
@@ -257,7 +257,7 @@ class NNRTIDataSourceTestCaseForCurrentPaed(TestCase):
                                      WEB_BASED={DEFAULT: YES})
         data_source = NNRTIDataSource()
         data = data_source.load(score, self.test_name, combination)
-        self.assertEqual(data[DF2][HEADERS], ["ART", TOTAL])
+        self.assertEqual(data[DF2][HEADERS], ["", TOTAL])
         self.assertEqual(data[DF2]["table_header"], "NNRTI/PI")
 
     def test_that_table_for_df1_has_2_rows(self):

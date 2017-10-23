@@ -10,7 +10,7 @@ class BlanksQualityCheck(QCheck):
 
     fields = [OPENING_BALANCE,
               QUANTITY_RECEIVED,
-              ART_CONSUMPTION,
+              COMBINED_CONSUMPTION,
               LOSES_ADJUSTMENTS,
               ESTIMATED_NUMBER_OF_NEW_ART_PATIENTS]
 

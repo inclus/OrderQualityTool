@@ -24,7 +24,7 @@ class BlankCheckTestCase(TestCase):
                     {
                         OPENING_BALANCE: 3,
                         QUANTITY_RECEIVED: 3,
-                        ART_CONSUMPTION: 3,
+                        COMBINED_CONSUMPTION: 3,
                         LOSES_ADJUSTMENTS: 3,
                         ESTIMATED_NUMBER_OF_NEW_ART_PATIENTS: 3,
                     }],
@@ -44,7 +44,7 @@ class BlankCheckTestCase(TestCase):
                     {
                         OPENING_BALANCE: 3,
                         QUANTITY_RECEIVED: 3,
-                        ART_CONSUMPTION: None,
+                        COMBINED_CONSUMPTION: None,
                         LOSES_ADJUSTMENTS: None,
                         ESTIMATED_NUMBER_OF_NEW_ART_PATIENTS: None,
                     }],

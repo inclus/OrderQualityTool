@@ -15,7 +15,7 @@ def generate_values():
         MONTHS_OF_STOCK_OF_HAND,
         CLOSING_BALANCE,
         LOSES_ADJUSTMENTS,
-        ART_CONSUMPTION,
+        COMBINED_CONSUMPTION,
         QUANTITY_RECEIVED,
         OPENING_BALANCE
     ]
@@ -82,7 +82,7 @@ class ConsumptionAndPatientsDataSourceExportTestCase(TestCase):
         self.assertEquals(generated_data[8][4], "PATIENTS")
         self.assertEquals(generated_data[9], [])
         self.assertEquals(generated_data[10], ["", F1_QUERY, "", "", F1_PATIENT_QUERY[0], ""])
-        self.assertEquals(generated_data[11], ["", FIELD_NAMES.get(ART_CONSUMPTION), 50, "", FIELD_NAMES.get(NEW), 50])
+        self.assertEquals(generated_data[11], ["", FIELD_NAMES.get(COMBINED_CONSUMPTION), 50, "", FIELD_NAMES.get(NEW), 50])
         self.assertEquals(generated_data[12], ["", TOTAL, 50, "", FIELD_NAMES.get(EXISTING), 50])
         self.assertEquals(generated_data[13], ["", "", "", "", TOTAL, 100])
         self.assertEquals(generated_data[14], [])

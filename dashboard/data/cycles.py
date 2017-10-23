@@ -15,7 +15,7 @@ class OrdersOverTimeCheck(QCheck):
         {NAME: F2, CONSUMPTION_QUERY: F2_QUERY},
         {NAME: F3, CONSUMPTION_QUERY: F3_QUERY}
     ]
-    fields = [OPENING_BALANCE, ART_CONSUMPTION, ESTIMATED_NUMBER_OF_NEW_ART_PATIENTS]
+    fields = [OPENING_BALANCE, COMBINED_CONSUMPTION, ESTIMATED_NUMBER_OF_NEW_ART_PATIENTS]
 
     def for_each_facility(self, data, combination, previous_cycle_data=None):
         fields = self.fields
@@ -74,7 +74,7 @@ class BalancesMatchCheck(QCheck):
 class StableConsumptionCheck(QCheck):
     two_cycle = True
     test = STABLE_CONSUMPTION
-    fields = [ART_CONSUMPTION]
+    fields = [COMBINED_CONSUMPTION]
     combinations = [
         {NAME: F1, CONSUMPTION_QUERY: F1_QUERY, THRESHOLD: 20},
         {NAME: F2, CONSUMPTION_QUERY: F2_QUERY, THRESHOLD: 10},

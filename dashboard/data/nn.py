@@ -21,7 +21,7 @@ class NNRTICURRENTADULTSCheck(QCheck):
             "Abacavir/Lamivudine (ABC/3TC) 600mg/300mg [Pack 30]"
         ],
         FIELDS: [
-            ART_CONSUMPTION
+            COMBINED_CONSUMPTION
         ],
         RATIO: 2.0,
         SHOW_CONVERSION: True
@@ -67,7 +67,7 @@ class NNRTICURRENTPAEDCheck(NNRTICURRENTADULTSCheck):
         ],
         OTHER: ["Efavirenz (EFV) 200mg [Pack 90]"],
         FIELDS: [
-            ART_CONSUMPTION
+            COMBINED_CONSUMPTION
         ],
         RATIO: 4.6,
         SHOW_CONVERSION: True

@@ -96,7 +96,7 @@ class Consumption(models.Model):
     warehouse = models.CharField(max_length=256, db_index=True)
     opening_balance = models.FloatField(null=True, blank=True)
     quantity_received = models.FloatField(null=True, blank=True)
-    art_consumption = models.FloatField(null=True, blank=True)
+    consumption = models.FloatField(null=True, blank=True)
     loses_adjustments = models.FloatField(null=True, blank=True)
     closing_balance = models.FloatField(null=True, blank=True)
     months_of_stock_of_hand = models.FloatField(null=True, blank=True)
