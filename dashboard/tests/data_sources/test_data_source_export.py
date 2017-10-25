@@ -8,7 +8,7 @@ from dashboard.views.data_sources import NegativesCheckDataSource, ConsumptionAn
 
 def generate_values():
     fields = [
-        PACKS_ORDERED,
+        QUANTITY_REQUIRED,
         ESTIMATED_NUMBER_OF_NEW_PREGNANT_WOMEN,
         ESTIMATED_NUMBER_OF_NEW_ART_PATIENTS,
         QUANTITY_REQUIRED_FOR_CURRENT_PATIENTS,
