@@ -10,7 +10,7 @@ from dashboard.data.consumption_patients import ConsumptionAndPatientsQualityChe
 from dashboard.data.cycles import BalancesMatchCheck, StablePatientVolumesCheck, WarehouseFulfillmentCheck, StableConsumptionCheck, OrdersOverTimeCheck
 from dashboard.data.free_form_report import FreeFormReport
 from dashboard.data.negatives import NegativeNumbersQualityCheck
-from dashboard.data.nn import NNRTICURRENTADULTSCheck, NNRTINewAdultsCheck, NNRTINEWPAEDCheck
+from dashboard.data.nn import NNRTICURRENTADULTSCheck, NNRTINEWPAEDCheck
 from dashboard.data.nn import NNRTICURRENTPAEDCheck
 from dashboard.data.utils import facility_has_single_order, timeit
 from dashboard.helpers import YES, get_prev_cycle, WEB, F1, F2, F3, DEFAULT, NO, NAME, C_COUNT, A_COUNT, P_COUNT, WEB_PAPER, C_RECORDS, A_RECORDS, P_RECORDS
@@ -102,7 +102,6 @@ def run_checks(report):
         GuidelineAdherenceCheckPaed1L(),
         NNRTICURRENTADULTSCheck(),
         NNRTICURRENTPAEDCheck(),
-        NNRTINewAdultsCheck(),
         NNRTINEWPAEDCheck(),
         BalancesMatchCheck(),
         OrdersOverTimeCheck(),

@@ -4,8 +4,11 @@ from django.core.urlresolvers import reverse
 from django_webtest import WebTest
 from model_mommy import mommy
 
-from dashboard.data.nn import NNRTINEWPAEDCheck, NNRTICURRENTPAEDCheck, NNRTINewAdultsCheck, NNRTICURRENTADULTSCheck
-from dashboard.helpers import DEFAULT, YES, F1, F1_QUERY, DF1, DF2, F1_PATIENT_QUERY, PACKS_ORDERED, ESTIMATED_NUMBER_OF_NEW_PREGNANT_WOMEN, ESTIMATED_NUMBER_OF_NEW_ART_PATIENTS, QUANTITY_REQUIRED_FOR_CURRENT_PATIENTS, MONTHS_OF_STOCK_OF_HAND, CLOSING_BALANCE, LOSES_ADJUSTMENTS, COMBINED_CONSUMPTION, QUANTITY_RECEIVED, OPENING_BALANCE
+from dashboard.data.nn import NNRTINEWPAEDCheck, NNRTICURRENTPAEDCheck, NNRTICURRENTADULTSCheck
+from dashboard.helpers import DEFAULT, YES, F1, F1_QUERY, DF1, DF2, F1_PATIENT_QUERY, PACKS_ORDERED, \
+    ESTIMATED_NUMBER_OF_NEW_PREGNANT_WOMEN, ESTIMATED_NUMBER_OF_NEW_ART_PATIENTS, \
+    QUANTITY_REQUIRED_FOR_CURRENT_PATIENTS, MONTHS_OF_STOCK_OF_HAND, CLOSING_BALANCE, LOSES_ADJUSTMENTS, \
+    COMBINED_CONSUMPTION, QUANTITY_RECEIVED, OPENING_BALANCE
 from dashboard.models import Score, Consumption, AdultPatientsRecord, PAEDPatientsRecord
 
 
@@ -37,19 +40,24 @@ class ScoreDetailTestCase():
         ip = "I1"
         district = "D1"
         cycle = "Jan - Feb 2015"
-        score = Score.objects.create(name=name, warehouse=warehouse, ip=ip, district=district, REPORTING={DEFAULT: YES}, cycle=cycle)
+        score = Score.objects.create(name=name, warehouse=warehouse, ip=ip, district=district, REPORTING={DEFAULT: YES},
+                                     cycle=cycle)
         for q in F1_PATIENT_QUERY:
-            mommy.make(AdultPatientsRecord, name=name, warehouse=warehouse, ip=ip, district=district, cycle=cycle, formulation=q, new=random.randrange(0, 600), existing=random.randrange(0, 600))
-            mommy.make(PAEDPatientsRecord, name=name, warehouse=warehouse, ip=ip, district=district, cycle=cycle, formulation=q, new=random.randrange(0, 600), existing=random.randrange(0, 600))
+            mommy.make(AdultPatientsRecord, name=name, warehouse=warehouse, ip=ip, district=district, cycle=cycle,
+                       formulation=q, new=random.randrange(0, 600), existing=random.randrange(0, 600))
+            mommy.make(PAEDPatientsRecord, name=name, warehouse=warehouse, ip=ip, district=district, cycle=cycle,
+                       formulation=q, new=random.randrange(0, 600), existing=random.randrange(0, 600))
         for formulation in self.get_formulations():
             values = generate_values()
-            mommy.make(Consumption, name=name, warehouse=warehouse, ip=ip, district=district, cycle=cycle, formulation=formulation, **values)
+            mommy.make(Consumption, name=name, warehouse=warehouse, ip=ip, district=district, cycle=cycle,
+                       formulation=formulation, **values)
         url = reverse("scores-detail", kwargs={"id": score.id, "column": self.column}) + "?combination=" + F1
         response = self.app.get(url)
         self.assertEqual(response.status_code, 200)
 
     def test_correct_template_rendered(self):
-        score = Score.objects.create(name="F1", warehouse="W1", ip="I1", district="D1", REPORTING={DEFAULT: YES}, cycle="Jan - Feb 2015")
+        score = Score.objects.create(name="F1", warehouse="W1", ip="I1", district="D1", REPORTING={DEFAULT: YES},
+                                     cycle="Jan - Feb 2015")
         url = reverse("scores-detail", kwargs={"id": score.id, "column": self.column}) + "?combination=" + F1
         response = self.app.get(url)
         self.assertEqual(response.status_code, 200)
@@ -110,12 +118,6 @@ class NNRTICurrentPaedCheckDetailView(WebTest, NNRTICheckTestMixin):
     template_name = "check/nnrti.html"
 
 
-class NNRTINewAdultCheckDetailView(WebTest, NNRTICheckTestMixin):
-    check = NNRTINewAdultsCheck
-    column = 19
-    template_name = "check/nnrti.html"
-
-
 class NNRTICurrentAdultCheckDetailView(WebTest, NNRTICheckTestMixin):
     check = NNRTICURRENTADULTSCheck
     column = 20
@@ -135,16 +137,19 @@ class StablePatientsCheckDetailView(WebTest, ScoreDetailTestCase):
         score = Score.objects.create(name=name, warehouse=warehouse, ip=ip, district=district, REPORTING={DEFAULT: YES},
                                      WEB_BASED={DEFAULT: YES}, cycle=cycle)
         for q in F1_PATIENT_QUERY:
-            mommy.make(AdultPatientsRecord, name=name, warehouse=warehouse, ip=ip, district=district, cycle=cycle, formulation=q, new=50, existing=100)
-            mommy.make(PAEDPatientsRecord, name=name, warehouse=warehouse, ip=ip, district=district, cycle=cycle, formulation=q, new=60, existing=150)
+            mommy.make(AdultPatientsRecord, name=name, warehouse=warehouse, ip=ip, district=district, cycle=cycle,
+                       formulation=q, new=50, existing=100)
+            mommy.make(PAEDPatientsRecord, name=name, warehouse=warehouse, ip=ip, district=district, cycle=cycle,
+                       formulation=q, new=60, existing=150)
         for formulation in self.get_formulations():
             values = generate_values()
-            mommy.make(Consumption, name=name, warehouse=warehouse, ip=ip, district=district, cycle=cycle, formulation=formulation, **values)
+            mommy.make(Consumption, name=name, warehouse=warehouse, ip=ip, district=district, cycle=cycle,
+                       formulation=formulation, **values)
         url = reverse("scores-detail", kwargs={"id": score.id, "column": self.column}) + "?combination=" + F1
         response = self.app.get(url)
         self.assertEqual(response.context['data']['current_cycle'][0]['headers'], ['New', 'Existing', 'TOTAL'])
-        self.assertEqual(response.context['data']['current_cycle'][0]['totals'], {'New': 100, 'Existing':200, 'TOTAL':300})
-
+        self.assertEqual(response.context['data']['current_cycle'][0]['totals'],
+                         {'New': 100, 'Existing': 200, 'TOTAL': 300})
 
 
 class ConsumptionAndPatientsCheckDetailView(WebTest, ScoreDetailTestCase):
