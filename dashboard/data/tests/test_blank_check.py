@@ -45,7 +45,7 @@ class BlankCheckTestCase(TestCase):
                         OPENING_BALANCE: 3,
                         QUANTITY_RECEIVED: None,
                         COMBINED_CONSUMPTION: None,
-                        LOSES_ADJUSTMENTS: None,
+                        CLOSING_BALANCE: None,
                     }],
             C_COUNT: 25,
             A_COUNT: 22,

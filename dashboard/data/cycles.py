@@ -1,6 +1,7 @@
 import pydash
 
-from dashboard.data.utils import values_for_records, facility_not_reporting, get_consumption_records, get_patient_records, QCheck
+from dashboard.data.utils import values_for_records, facility_not_reporting, get_consumption_records, \
+    get_patient_records, QCheck
 from dashboard.helpers import *
 
 THRESHOLD = "threshold"
@@ -15,7 +16,7 @@ class OrdersOverTimeCheck(QCheck):
         {NAME: F2, CONSUMPTION_QUERY: F2_QUERY},
         {NAME: F3, CONSUMPTION_QUERY: F3_QUERY}
     ]
-    fields = [OPENING_BALANCE, COMBINED_CONSUMPTION, ESTIMATED_NUMBER_OF_NEW_ART_PATIENTS]
+    fields = [OPENING_BALANCE, COMBINED_CONSUMPTION, DAYS_OUT_OF_STOCK]
 
     def for_each_facility(self, data, combination, previous_cycle_data=None):
         fields = self.fields
@@ -161,8 +162,10 @@ class StablePatientVolumesCheck(StableConsumptionCheck):
         if not data_is_sufficient:
             return NOT_REPORTING
 
-        current_population = pydash.chain(values_for_records(self.fields, current_records)).reject(lambda x: x is None).sum().value()
-        prev_population = pydash.chain(values_for_records(self.fields, prev_records)).reject(lambda x: x is None).sum().value()
+        current_population = pydash.chain(values_for_records(self.fields, current_records)).reject(
+            lambda x: x is None).sum().value()
+        prev_population = pydash.chain(values_for_records(self.fields, prev_records)).reject(
+            lambda x: x is None).sum().value()
 
         threshold = combination[THRESHOLD]
 
