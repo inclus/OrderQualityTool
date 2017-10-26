@@ -681,7 +681,7 @@ class NNRTIDataSource(CheckDataSource):
 
     checks = {
         NNRTI_NEW_PAED: {CHECK: NNRTINEWPAEDCheck, "sub": "Estimated New Patients"},
-        NNRTI_CURRENT_ADULTS: {CHECK: NNRTIADULTSCheck, "sub": "Consumption"},
+        NNRTI_ADULTS: {CHECK: NNRTIADULTSCheck, "sub": "Consumption"},
         NNRTI_CURRENT_PAED: {CHECK: NNRTICURRENTPAEDCheck, "sub": "Consumption"},
     }
 

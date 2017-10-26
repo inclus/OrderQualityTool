@@ -87,7 +87,7 @@ def perform_checks():
         {'combination': F1, 'test': STABLE_PATIENT_VOLUMES, 'cycle': cycle, YES: 793, NO: 405, NOT_REPORTING: 632},
         {'combination': DEFAULT, 'test': NNRTI_NEW_PAED, 'cycle': cycle, YES: 681, NO: 644, NOT_REPORTING: 509},
         {'combination': DEFAULT, 'test': NNRTI_CURRENT_PAED, 'cycle': cycle, YES: 548, NO: 780, NOT_REPORTING: 506},
-        {'combination': DEFAULT, 'test': NNRTI_CURRENT_ADULTS, 'cycle': cycle, YES: 937, NO: 439, NOT_REPORTING: 458},
+        {'combination': DEFAULT, 'test': NNRTI_ADULTS, 'cycle': cycle, YES: 937, NO: 439, NOT_REPORTING: 458},
     ]
     for check in checks:
         if check.get('combination') == DEFAULT:

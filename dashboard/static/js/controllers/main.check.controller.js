@@ -79,13 +79,6 @@ angular.module('dashboard').controller('MainChecksController', ['$scope',
             "testNumber": 16,
             "template": "/static/views/chart.html"
         }, {
-            "url": "nnrtiNewAdults",
-            "desc": "NRTI and NNRTI/PI patient volumes (ADULT - ESTIMATED NEW): Differ by <30%?",
-            "hasRegimen": false,
-            "hasChart": true,
-            "testNumber": 17,
-            "template": "/static/views/chart.html"
-        }, {
             "url": "nnrtiNewPaed",
             "desc": "NRTI and NNRTI/PI patient volumes (PAED - ESTIMATED NEW): Differ by <30%?",
             "hasRegimen": false,

@@ -117,9 +117,8 @@ class ScoreAdmin(ModelAdmin):
                     'WEB_BASED',
                     'OrderFormFreeOfGaps',
                     'MULTIPLE_ORDERS',
-                    'nnrtiNewAdults',
                     'orderFormFreeOfNegativeNumbers',
-                    'nnrtiCurrentAdults',
+                    'nnrtiAdults',
                     'stableConsumption',
                     )
     list_filter = ('cycle',)

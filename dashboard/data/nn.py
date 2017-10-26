@@ -5,7 +5,7 @@ from dashboard.helpers import *
 
 
 class NNRTIADULTSCheck(QCheck):
-    test = NNRTI_CURRENT_ADULTS
+    test = NNRTI_ADULTS
 
     combinations = [{
         NAME: DEFAULT,

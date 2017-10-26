@@ -98,10 +98,6 @@ angular.module('reports').controller('ReportsController', ['$scope', 'ReportServ
             'display': 'PAED NRTI',
             'formulation': false
         }, {
-            'test': 'nnrtiNewAdults',
-            'display': 'N. Adult NRTI',
-            'formulation': false
-        }, {
             'test': 'nnrtiNewPaed',
             'display': 'N. PAED NRTI',
             'formulation': false

@@ -264,7 +264,7 @@ class GuideLineAdherenceView(DifferentOrdersOverTimeView):
 
 
 class NNRTICurrentAdultsView(OrderFormFreeOfGapsView):
-    test = NNRTI_CURRENT_ADULTS
+    test = NNRTI_ADULTS
 
 
 class NNRTICurrentPaedView(OrderFormFreeOfGapsView):

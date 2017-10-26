@@ -21,7 +21,7 @@ TEST_DATA = {
     GUIDELINE_ADHERENCE_ADULT_2L: GuidelineAdherenceDataSource,
     GUIDELINE_ADHERENCE_ADULT_1L: GuidelineAdherenceDataSource,
     NNRTI_NEW_PAED: NNRTIDataSource,
-    NNRTI_CURRENT_ADULTS: NNRTIDataSource,
+    NNRTI_ADULTS: NNRTIDataSource,
     NNRTI_CURRENT_PAED: NNRTIDataSource
 }
 
@@ -47,7 +47,7 @@ class ScoresTableView(BaseDatatableView):
         WAREHOUSE_FULFILMENT,
         NNRTI_NEW_PAED,
         NNRTI_CURRENT_PAED,
-        NNRTI_CURRENT_ADULTS,
+        NNRTI_ADULTS,
     ]
     order_columns = columns
 
@@ -67,7 +67,7 @@ class ScoresTableView(BaseDatatableView):
                            GUIDELINE_ADHERENCE_PAED_1L,
                            NNRTI_NEW_PAED,
                            NNRTI_CURRENT_PAED,
-                           NNRTI_CURRENT_ADULTS, ]
+                           NNRTI_ADULTS, ]
         formulation_columns = [STABLE_PATIENT_VOLUMES,
                                CONSUMPTION_AND_PATIENTS,
                                WAREHOUSE_FULFILMENT,
