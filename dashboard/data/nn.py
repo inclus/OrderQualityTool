@@ -13,7 +13,8 @@ class NNRTIADULTSCheck(QCheck):
             "Efavirenz (EFV) 600mg [Pack 30]",
             "Nevirapine (NVP) 200mg [Pack 60]",
             "Atazanavir/Ritonavir (ATV/r) 300mg/100mg [Pack 30]",
-            "Lopinavir/Ritonavir (LPV/r) 200mg/50mg [Pack 120]"
+            "Lopinavir/Ritonavir (LPV/r) 200mg/50mg [Pack 120]",
+            "Dolutegravir (DTG) 50mg"
         ],
         DF1: [
             "Zidovudine/Lamivudine (AZT/3TC) 300mg/150mg [Pack 60]",
