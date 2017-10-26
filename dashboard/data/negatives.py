@@ -12,7 +12,9 @@ class NegativeNumbersQualityCheck(QCheck):
 
     fields = [OPENING_BALANCE,
               QUANTITY_RECEIVED,
-              COMBINED_CONSUMPTION]
+              COMBINED_CONSUMPTION,
+              CLOSING_BALANCE,
+              DAYS_OUT_OF_STOCK]
 
     def for_each_facility(self, data, combination, previous_cycle_data=None):
         consumption_records = get_consumption_records(data, combination[CONSUMPTION_QUERY])
