@@ -99,6 +99,7 @@ class Consumption(models.Model):
     loses_adjustments = models.FloatField(null=True, blank=True)
     closing_balance = models.FloatField(null=True, blank=True)
     months_of_stock_of_hand = models.FloatField(null=True, blank=True)
+    days_out_of_stock = models.FloatField(null=True, blank=True)
     quantity_required_for_current_patients = models.FloatField(null=True, blank=True)
     estimated_number_of_new_patients = models.FloatField(null=True, blank=True)
     estimated_number_of_new_pregnant_women = models.FloatField(null=True, blank=True)

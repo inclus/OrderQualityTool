@@ -11,7 +11,8 @@ class BlanksQualityCheck(QCheck):
     fields = [OPENING_BALANCE,
               QUANTITY_RECEIVED,
               COMBINED_CONSUMPTION,
-              LOSES_ADJUSTMENTS]
+              LOSES_ADJUSTMENTS,
+              DAYS_OUT_OF_STOCK]
 
     def for_each_facility(self, data, combination, previous_cycle_data=None):
         result = NOT_REPORTING
