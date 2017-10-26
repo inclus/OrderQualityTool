@@ -2,7 +2,7 @@ from unittest import TestCase
 
 from nose_parameterized import parameterized
 
-from dashboard.data.nn import NNRTICURRENTADULTSCheck, NNRTICURRENTPAEDCheck
+from dashboard.data.nn import NNRTIADULTSCheck, NNRTICURRENTPAEDCheck
 from dashboard.helpers import NOT_REPORTING, YES, C_RECORDS, OPENING_BALANCE, F1_QUERY, FORMULATION, NO, \
     COMBINED_CONSUMPTION
 
@@ -228,7 +228,7 @@ class NNRTICURRENTADULTSCheckTestCase(TestCase):
         ("> 1.429", current_adult_2, NO),
     ])
     def test_check(self, name, data, expected):
-        check = NNRTICURRENTADULTSCheck()
+        check = NNRTIADULTSCheck()
         result = check.for_each_facility(data, check.combinations[0])
         self.assertEquals(result, expected)
 

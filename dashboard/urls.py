@@ -30,7 +30,6 @@ urlpatterns = [
     url(r'^api/test/guidelineAdherence', dashboard.views.api.GuideLineAdherenceView.as_view(), name='guideline_adherence'),
     url(r'^api/test/nnrtiCurrentAdults', dashboard.views.api.NNRTICurrentAdultsView.as_view(), name='nnrti_current_adults'),
     url(r'^api/test/nnrtiCurrentPaed', dashboard.views.api.NNRTICurrentPaedView.as_view(), name='nnrti_current_paed'),
-    url(r'^api/test/nnrtiNewAdults', dashboard.views.api.NNRTINewAdultsView.as_view(), name='nnrti_new_adults'),
     url(r'^api/test/nnrtiNewPaed', dashboard.views.api.NNRTINewPaedView.as_view(), name='nnrti_new_paed'),
     url(r'^api/test/ranking/best$', dashboard.views.api.BestPerformingDistrictsView.as_view(), name='ranking_best'),
     url(r'^api/test/ranking/worst$', dashboard.views.api.WorstPerformingDistrictsView.as_view(), name='ranking_worst'),

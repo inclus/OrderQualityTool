@@ -4,7 +4,7 @@ from dashboard.data.utils import QCheck, values_for_records, filter_consumption_
 from dashboard.helpers import *
 
 
-class NNRTICURRENTADULTSCheck(QCheck):
+class NNRTIADULTSCheck(QCheck):
     test = NNRTI_CURRENT_ADULTS
 
     combinations = [{
@@ -51,7 +51,7 @@ class NNRTICURRENTADULTSCheck(QCheck):
         return result
 
 
-class NNRTICURRENTPAEDCheck(NNRTICURRENTADULTSCheck):
+class NNRTICURRENTPAEDCheck(NNRTIADULTSCheck):
     test = NNRTI_CURRENT_PAED
     combinations = [{
         NAME: DEFAULT,
@@ -107,7 +107,7 @@ class NNRTICURRENTPAEDCheck(NNRTICURRENTADULTSCheck):
         return result
 
 
-class NNRTINEWPAEDCheck(NNRTICURRENTADULTSCheck):
+class NNRTINEWPAEDCheck(NNRTIADULTSCheck):
     test = NNRTI_NEW_PAED
     combinations = [{
         NAME: DEFAULT,

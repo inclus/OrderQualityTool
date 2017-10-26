@@ -1,7 +1,7 @@
 from django.test import TestCase
 from model_mommy import mommy
 
-from dashboard.data.nn import NNRTICURRENTADULTSCheck, NNRTICURRENTPAEDCheck
+from dashboard.data.nn import NNRTIADULTSCheck, NNRTICURRENTPAEDCheck
 from dashboard.helpers import DEFAULT, DF1, NNRTI_CURRENT_ADULTS, DF2, FIELDS, YES, FORMULATION, VALUE, COLUMN, ROWS, \
     FINAL_SCORE, TOTAL, NNRTI_CURRENT_PAED, OTHER
 from dashboard.models import Score, Consumption
@@ -10,7 +10,7 @@ from dashboard.views.data_sources import NNRTIDataSource, HEADERS
 
 class NNRTIDataSourceTestCaseForCurrentAdults(TestCase):
     test_name = NNRTI_CURRENT_ADULTS
-    check_class = NNRTICURRENTADULTSCheck
+    check_class = NNRTIADULTSCheck
 
     def test_correct_template_is_selected(self):
         data_source = NNRTIDataSource()

@@ -6,7 +6,7 @@ from dashboard.data.adherence import GuidelineAdherenceCheckAdult1L, GuidelineAd
 from dashboard.data.consumption_patients import ConsumptionAndPatientsQualityCheck
 from dashboard.data.cycles import OrdersOverTimeCheck, BalancesMatchCheck, StableConsumptionCheck, StablePatientVolumesCheck
 from dashboard.data.negatives import NegativeNumbersQualityCheck
-from dashboard.data.nn import NNRTINEWPAEDCheck, NNRTICURRENTADULTSCheck, NNRTICURRENTPAEDCheck
+from dashboard.data.nn import NNRTINEWPAEDCheck, NNRTIADULTSCheck, NNRTICURRENTPAEDCheck
 from dashboard.helpers import *
 from dashboard.models import Consumption, AdultPatientsRecord, PAEDPatientsRecord
 
@@ -681,7 +681,7 @@ class NNRTIDataSource(CheckDataSource):
 
     checks = {
         NNRTI_NEW_PAED: {CHECK: NNRTINEWPAEDCheck, "sub": "Estimated New Patients"},
-        NNRTI_CURRENT_ADULTS: {CHECK: NNRTICURRENTADULTSCheck, "sub": "Consumption"},
+        NNRTI_CURRENT_ADULTS: {CHECK: NNRTIADULTSCheck, "sub": "Consumption"},
         NNRTI_CURRENT_PAED: {CHECK: NNRTICURRENTPAEDCheck, "sub": "Consumption"},
     }
 

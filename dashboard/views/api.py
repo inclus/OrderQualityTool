@@ -271,9 +271,6 @@ class NNRTICurrentPaedView(OrderFormFreeOfGapsView):
     test = NNRTI_CURRENT_PAED
 
 
-class NNRTINewAdultsView(OrderFormFreeOfGapsView):
-    test = NNRTI_NEW_ADULTS
-
 
 class NNRTINewPaedView(OrderFormFreeOfGapsView):
     test = NNRTI_NEW_PAED
