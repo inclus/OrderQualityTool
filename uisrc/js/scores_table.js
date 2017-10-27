@@ -1,5 +1,5 @@
-let $ = require('jquery');
-let _ = require('lodash');
+var $ = require('jquery');
+var _ = require('lodash');
 require('datatables.net');
 require('multiple-select');
 require('select2');
