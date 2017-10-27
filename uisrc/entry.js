@@ -1,0 +1,16 @@
+require("./css/app.less");
+require("./js/app.js");
+require("./js/scores_table");
+require("./js/ui-select/select.css");
+require("./js/ui-select/selectize.css");
+require("./js/ui-select/selectize.bootstrap3.css");
+require("./css/datatables.css");
+require("angular-chart.js/dist/angular-chart.css");
+require("c3/c3.css");
+require("ng-table/dist/ng-table.css");
+require("datatables.net-bs/css/dataTables.bootstrap.css");
+require("datatables.net-buttons-bs/css/buttons.bootstrap.css");
+require("datatables.net-fixedcolumns-bs/css/fixedColumns.bootstrap.css");
+require("components-font-awesome/css/font-awesome.min.css");
+require("select2/dist/css/select2.min.css");
+require("multiple-select/multiple-select.css");

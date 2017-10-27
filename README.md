@@ -15,13 +15,9 @@ Order Quality Tool and Dashboard, to connect to DHIS2 data
 
         $ npm install
 
-- Install bower
+- Install build ui files
 
-        $ npm install -g bower
-
-- Install bower packages
-
-        $ bower install
+        $ npm run build
 
 - Run the python dev server
 

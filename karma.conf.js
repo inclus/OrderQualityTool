@@ -14,21 +14,22 @@ module.exports = function(config) {
 
         // list of files / patterns to load in the browser
         files: [
-            "dashboard/static/vendor/angular/angular.js",
-            "dashboard/static/vendor/d3/d3.js",
-            "dashboard/static/vendor/c3/c3.js",
-            "dashboard/static/vendor/angular-mocks/angular-mocks.js",
-            "dashboard/static/vendor/angular-ui-router/release/angular-ui-router.min.js",
-            "dashboard/static/vendor/angular-bootstrap/ui-bootstrap-tpls.min.js",
-            "dashboard/static/vendor/angular-sanitize/angular-sanitize.js",
-            "dashboard/static/vendor/Chart.js/Chart.min.js",
-            "dashboard/static/vendor/ui-select/dist/select.js",
-            "dashboard/static/vendor/angular-chart.js/dist/angular-chart.js",
-            "dashboard/static/vendor/lodash/lodash.min.js",
-            "dashboard/static/vendor/checklist-model/checklist-model.js",
-            "dashboard/static/vendor/angular-chart/angular-chart.js",
-            "dashboard/static/vendor/ng-table/dist/ng-table.js",
-            "dashboard/static/js/**/*.js"
+            "node_modules/angular/angular.js",
+            // "node_modules/d3/d3.js",
+            // "node_modules/c3/c3.js",
+            "node_modules/angular-mocks/angular-mocks.js",
+            // "node_modules/angular-ui-router/release/angular-ui-router.min.js",
+            // "node_modules/angular-bootstrap/ui-bootstrap-tpls.min.js",
+            // "node_modules/angular-sanitize/angular-sanitize.js",
+            // "node_modules/Chart.js/Chart.min.js",
+            // "node_modules/ui-select/dist/select.js",
+            // "node_modules/angular-chart.js/dist/angular-chart.js",
+            // "node_modules/lodash/lodash.min.js",
+            // "node_modules/checklist-model/checklist-model.js",
+            // "node_modules/angular-chart/angular-chart.js",
+            // "node_modules/ng-table/dist/ng-table.js",
+            "uisrc/js/app.js",
+            "uisrc/js/appSpec.js",
         ],
 
 
@@ -38,7 +39,10 @@ module.exports = function(config) {
 
         // preprocess matching files before serving them to the browser
         // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
-        preprocessors: {},
+        preprocessors: {
+            'uisrc/js/**/*.js': ['webpack'],
+          },
+      
 
 
         // test results reporter to use

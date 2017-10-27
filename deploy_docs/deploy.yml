@@ -54,12 +54,13 @@
     - name: install nodejs
       apt: pkg=nodejs state=latest
 
-    - name: install bower
-      npm: name=bower global=yes
-
-    - name: install bower packages
-      bower: path=/src/qdb
-
+    - name: install npm packages
+      npm: path=/src/qdb
+    
+    - name: build ui files
+      command: npm run build
+      args:
+        chdir: /src/qdb
     - name: install the database server (postgresql 9.3)
       apt: pkg={{item}} state=latest update_cache=yes
       with_items: [postgresql-9.3, postgresql-client-9.3,  postgresql-contrib-9.3]

@@ -1,3 +1,17 @@
+let $ = require('jquery');
+let _ = require('lodash');
+require('datatables.net');
+require('multiple-select');
+require('select2');
+require('jsrender');
+require("bootstrap/dist/js/bootstrap")
+require("datatables.net-bs/js/dataTables.bootstrap");
+require("datatables.net-fixedcolumns/js/dataTables.fixedColumns");
+require("datatables.net-buttons/js/dataTables.buttons");
+require("datatables.net-buttons/js/buttons.flash");
+require("datatables.net-buttons/js/buttons.html5");
+require("datatables.net-buttons-bs/js/buttons.bootstrap");
+
 function downloadURL(url, name) {
   var link = document.createElement("a");
   link.download = name;
@@ -6,16 +20,18 @@ function downloadURL(url, name) {
 }
 
 var downloadCSV = function(url, name){
-  downloadURL(url, name + '.csv');
+  downloadURL(url, name + ".csv");
 };
+
+window.downloadCSV = downloadCSV;
 
 $(document).ready(function() {
     var tableId = "#score-tables";
     var oTable = $(tableId).DataTable({
-        "dom": '<"top"f>rt<"bottom"lBp><"clear">',
+        "dom": "<\"top\"f>rt<\"bottom\"lBp><\"clear\">",
         buttons: [
           {
-            text: 'Export to CSV',
+            text: "Export to CSV",
             action: function ( e, dt, node, config ) {
               var formulation = $("#formulation_select").val();
               var cycle = $("#cycle_select").val();
@@ -24,8 +40,8 @@ $(document).ready(function() {
             }
           },
           {
-          text: 'Export Current View as CSV',
-          extend : 'csv'
+          text: "Export Current View as CSV",
+          extend : "csv"
           }
         ],
         language: {

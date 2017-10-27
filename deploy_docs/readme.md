@@ -37,11 +37,11 @@ There is a an ansible playbook available to automate this entire process. You ca
 		cd /src/qdb
 		pip install -r requirements.txt
 		
-* Install bower dependencies
+* Install npm dependencies and build ui files
 		
-		npm install -g bower
 		cd /src/qdb
-		bower install
+		npm install
+		npm run build
 
 * Create local settings file
 			

@@ -1,29 +1,18 @@
-FROM python:2.7
+from node:alpine
 
-RUN set -ex \
-	&& for key in \
-		7937DFD2AB06298B2293C3187D33FF9D0246406D \
-		114F43EE0176B71C7BC219DD50A3051F888C628D \
-	; do \
-		gpg --keyserver ha.pool.sks-keyservers.net --recv-keys "$key"; \
-	done
-
-ENV NODE_VERSION 0.10.40
-ENV NPM_VERSION 2.14.1
-
-RUN curl -SLO "https://nodejs.org/dist/v$NODE_VERSION/node-v$NODE_VERSION-linux-x64.tar.gz" \
-	&& curl -SLO "https://nodejs.org/dist/v$NODE_VERSION/SHASUMS256.txt.asc" \
-	&& gpg --verify SHASUMS256.txt.asc \
-	&& grep " node-v$NODE_VERSION-linux-x64.tar.gz\$" SHASUMS256.txt.asc | sha256sum -c - \
-	&& tar -xzf "node-v$NODE_VERSION-linux-x64.tar.gz" -C /usr/local --strip-components=1 \
-	&& rm "node-v$NODE_VERSION-linux-x64.tar.gz" SHASUMS256.txt.asc \
-	&& npm install -g npm@"$NPM_VERSION" \
-	&& npm cache clear
-RUN npm install -g bower
-
-RUN mkdir -p /usr/src/app
+RUN mkdir -p /usr/src/app/dashboard/static
 WORKDIR /usr/src/app
 
+COPY package.json /usr/src/app/
+RUN npm install
+
+COPY webpack.config.js /usr/src/app/
+COPY uisrc /usr/src/app/uisrc/
+RUN npm run build
+
+FROM python:2.7
+RUN mkdir -p /usr/src/app
+WORKDIR /usr/src/app
 COPY requirements.txt /usr/src/app/
 COPY requirements /usr/src/app/
 COPY requirements/*.txt /usr/src/app/requirements/
@@ -31,11 +20,4 @@ COPY requirements/*.txt /usr/src/app/requirements/
 RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . /usr/src/app
-
-RUN /usr/sbin/useradd --create-home --home-dir /usr/local/nonroot --shell /bin/bash nonroot
-RUN /usr/sbin/adduser nonroot sudo
-RUN chmod -R 777 /usr/src/app/dashboard/static
-
-USER nonroot
-RUN bower install
-# ENTRYPOINT ["uwsgi", "--http", ":9000", "--module", "orderqualitytool.wsgi:application", "--static-map", "/static=/usr/src/app/asset_files"]
+COPY --from=0 /usr/src/app/dashboard/static /usr/src/app/dashboard/static/
