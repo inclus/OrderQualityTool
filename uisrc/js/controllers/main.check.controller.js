@@ -65,8 +65,8 @@ angular.module('dashboard').controller('MainChecksController', ['$scope',
             "testNumber": 10,
             "template": "/static/views/chart.html"
         }, {
-            "url": "nnrtiCurrentAdults",
-            "desc": "NRTI and NNRTI/PI patient volumes (ADULT - CURRENT): Differ by <30%?",
+            "url": "nnrtiAdults",
+            "desc": "NRTI and INSTI/NNRTI/PI patient volumes (ADULT): Differ by <30%?",
             "hasRegimen": false,
             "hasChart": true,
             "testNumber": 15,

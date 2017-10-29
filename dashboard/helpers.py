@@ -202,7 +202,7 @@ TEST_NAMES = {
     MULTIPLE_ORDERS: "DUPLICATE ORDERS: Facilities that submitted more than one order over the cycle",
     NNRTI_NEW_PAED: "NRTI vs NNRTI/PI patient volumes(PAED - NEW):Differ by <30%?",
     NNRTI_CURRENT_PAED: "NRTI vs NNRTI/PI patient volumes (PAED - CURRENT): Differ by <30%?",
-    NNRTI_ADULTS: "NRTI and NNRTI/PI patient volumes(ADULT - CURRENT): Differ by <30%?"
+    NNRTI_ADULTS: "NRTI and INSTI/NNRTI/PI patient volumes (ADULT): Differ by <30%?"
 }
 
 

@@ -263,7 +263,7 @@ class GuideLineAdherenceView(DifferentOrdersOverTimeView):
         return self.generate_data(test_name, start, end, DEFAULT)
 
 
-class NNRTICurrentAdultsView(OrderFormFreeOfGapsView):
+class NNRTIAdultsView(OrderFormFreeOfGapsView):
     test = NNRTI_ADULTS
 
 
