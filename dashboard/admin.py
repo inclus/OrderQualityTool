@@ -106,7 +106,6 @@ class ScoreAdmin(ModelAdmin):
                     'default_fail_count',
                     'f1_pass_count',
                     'f1_fail_count',
-                    'nnrtiNewPaed',
                     'stablePatientVolumes',
                     'REPORTING',
                     'consumptionAndPatients',

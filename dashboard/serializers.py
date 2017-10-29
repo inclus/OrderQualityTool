@@ -27,7 +27,6 @@ class ScoreSerializer(ModelSerializer):
     guidelineAdherenceAdult1L = JSONSerializerField()
     guidelineAdherenceAdult2L = JSONSerializerField()
     guidelineAdherencePaed1L = JSONSerializerField()
-    nnrtiNewPaed = JSONSerializerField()
     nnrtiCurrentPaed = JSONSerializerField()
     nnrtiAdults = JSONSerializerField()
     stablePatientVolumes = JSONSerializerField()

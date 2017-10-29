@@ -84,7 +84,6 @@ REPORTING = "REPORTING"
 WEB_BASED = "WEB_BASED"
 CONSUMPTION = 'consumption'
 MULTIPLE_ORDERS = "MULTIPLE_ORDERS"
-NNRTI_NEW_PAED = "nnrtiNewPaed"
 NNRTI_CURRENT_PAED = "nnrtiCurrentPaed"
 NNRTI_ADULTS = "nnrtiAdults"
 
@@ -200,7 +199,6 @@ TEST_NAMES = {
     REPORTING: "REPORTING",
     WEB_BASED: "WEB_BASED",
     MULTIPLE_ORDERS: "DUPLICATE ORDERS: Facilities that submitted more than one order over the cycle",
-    NNRTI_NEW_PAED: "NRTI vs NNRTI/PI patient volumes(PAED - NEW):Differ by <30%?",
     NNRTI_CURRENT_PAED: "NRTI vs NNRTI/PI patient volumes (PAED - CURRENT): Differ by <30%?",
     NNRTI_ADULTS: "NRTI and INSTI/NNRTI/PI patient volumes (ADULT): Differ by <30%?"
 }

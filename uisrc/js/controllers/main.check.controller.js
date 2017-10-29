@@ -78,13 +78,6 @@ angular.module('dashboard').controller('MainChecksController', ['$scope',
             "hasChart": true,
             "testNumber": 16,
             "template": "/static/views/chart.html"
-        }, {
-            "url": "nnrtiNewPaed",
-            "desc": "NRTI and NNRTI/PI patient volumes (PAED - ESTIMATED NEW): Differ by <30%?",
-            "hasRegimen": false,
-            "hasChart": true,
-            "testNumber": 18,
-            "template": "/static/views/chart.html"
         }];
         $scope.regimens = [{
             name: "TDF/3TC/EFV (Adult)",

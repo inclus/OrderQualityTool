@@ -271,11 +271,6 @@ class NNRTICurrentPaedView(OrderFormFreeOfGapsView):
     test = NNRTI_CURRENT_PAED
 
 
-
-class NNRTINewPaedView(OrderFormFreeOfGapsView):
-    test = NNRTI_NEW_PAED
-
-
 class FilterValuesView(APIView):
     def get(self, request):
         ips = Score.objects.values('ip').order_by('ip').distinct()

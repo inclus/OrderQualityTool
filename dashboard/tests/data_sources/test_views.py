@@ -4,7 +4,7 @@ from django.core.urlresolvers import reverse
 from django_webtest import WebTest
 from model_mommy import mommy
 
-from dashboard.data.nn import NNRTINEWPAEDCheck, NNRTICURRENTPAEDCheck, NNRTIADULTSCheck
+from dashboard.data.nn import NNRTICURRENTPAEDCheck, NNRTIADULTSCheck
 from dashboard.helpers import DEFAULT, YES, F1, F1_QUERY, DF1, DF2, F1_PATIENT_QUERY, PACKS_ORDERED, \
     ESTIMATED_NUMBER_OF_NEW_PREGNANT_WOMEN, ESTIMATED_NUMBER_OF_NEW_ART_PATIENTS, \
     QUANTITY_REQUIRED_FOR_CURRENT_PATIENTS, MONTHS_OF_STOCK_OF_HAND, CLOSING_BALANCE, LOSES_ADJUSTMENTS, \
@@ -68,10 +68,10 @@ class ScoreDetailTestCase():
 
 
 class NNRTICheckTestMixin(ScoreDetailTestCase):
-    check = NNRTINEWPAEDCheck
+    check = NNRTICURRENTPAEDCheck
 
     def get_formulations(self):
-        check = NNRTINEWPAEDCheck()
+        check = NNRTICURRENTPAEDCheck()
         formulations = check.combinations[0][DF1] + check.combinations[0][DF2]
         return formulations
 
@@ -106,21 +106,15 @@ class GuideLineAdherencePaed1LCheckDetailView(WebTest, ScoreDetailTestCase):
     template_name = "check/adherence.html"
 
 
-class NNRTINewPaedCheckDetailView(WebTest, NNRTICheckTestMixin):
-    check = NNRTINEWPAEDCheck
-    column = 17
-    template_name = "check/nnrti.html"
-
-
 class NNRTICurrentPaedCheckDetailView(WebTest, NNRTICheckTestMixin):
     check = NNRTICURRENTPAEDCheck
-    column = 18
+    column = 17
     template_name = "check/nnrti.html"
 
 
 class NNRTICurrentAdultCheckDetailView(WebTest, NNRTICheckTestMixin):
     check = NNRTIADULTSCheck
-    column = 19
+    column = 18
     template_name = "check/nnrti.html"
 
 

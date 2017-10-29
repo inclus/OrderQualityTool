@@ -108,24 +108,3 @@ class NNRTICURRENTPAEDCheck(NNRTIADULTSCheck):
         return result
 
 
-class NNRTINEWPAEDCheck(NNRTIADULTSCheck):
-    test = NNRTI_NEW_PAED
-    combinations = [{
-        NAME: DEFAULT,
-        DF2: [
-            "Efavirenz (EFV) 200mg [Pack 90]",
-            "Nevirapine (NVP) 50mg [Pack 60]",
-            "Lopinavir/Ritonavir (LPV/r) 80mg/20ml oral susp [Bottle 60ml]",
-            "Lopinavir/Ritonavir (LPV/r) 100mg/25mg"],
-        DF1: [
-            "Abacavir/Lamivudine (ABC/3TC) 60mg/30mg [Pack 60]",
-            "Zidovudine/Lamivudine (AZT/3TC) 60mg/30mg [Pack 60]"
-        ],
-        FIELDS: [
-            ESTIMATED_NUMBER_OF_NEW_ART_PATIENTS,
-            ESTIMATED_NUMBER_OF_NEW_PREGNANT_WOMEN
-        ],
-        RATIO: 1.0,
-        SHOW_CONVERSION: False
-    }]
-

@@ -63,7 +63,6 @@ class Score(models.Model):
     guidelineAdherenceAdult1L = JSONField()
     guidelineAdherenceAdult2L = JSONField()
     guidelineAdherencePaed1L = JSONField()
-    nnrtiNewPaed = JSONField()
     nnrtiCurrentPaed = JSONField()
     nnrtiAdults = JSONField()
     stablePatientVolumes = JSONField()
