@@ -109,7 +109,7 @@ class ScoreAdmin(ModelAdmin):
                     'stablePatientVolumes',
                     'REPORTING',
                     'consumptionAndPatients',
-                    'nnrtiCurrentPaed',
+                    'nnrtiPaed',
                     'warehouseFulfilment',
                     'differentOrdersOverTime',
                     'closingBalanceMatchesOpeningBalance',

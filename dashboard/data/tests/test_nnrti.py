@@ -2,7 +2,7 @@ from unittest import TestCase
 
 from nose_parameterized import parameterized
 
-from dashboard.data.nn import NNRTIADULTSCheck, NNRTICURRENTPAEDCheck
+from dashboard.data.nn import NNRTIADULTSCheck, NNRTIPAEDCheck
 from dashboard.helpers import NOT_REPORTING, YES, C_RECORDS, OPENING_BALANCE, F1_QUERY, FORMULATION, NO, \
     COMBINED_CONSUMPTION
 
@@ -233,7 +233,7 @@ class NNRTICURRENTADULTSCheckTestCase(TestCase):
         self.assertEquals(result, expected)
 
 
-class NNRTICURRENTPAEDCheckTestCase(TestCase):
+class NNRTIPAEDCheckTestCase(TestCase):
     @parameterized.expand([
         ("no data", has_no_data, NOT_REPORTING),
         ("> 0.7 < 1.429", current_paed_initial, YES),
@@ -241,6 +241,6 @@ class NNRTICURRENTPAEDCheckTestCase(TestCase):
         ("either all blank", current_paed_either_all_blank, NO),
     ])
     def test_check(self, name, data, expected):
-        check = NNRTICURRENTPAEDCheck()
+        check = NNRTIPAEDCheck()
         result = check.for_each_facility(data, check.combinations[0])
         self.assertEquals(result, expected)

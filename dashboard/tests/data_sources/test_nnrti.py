@@ -1,9 +1,9 @@
 from django.test import TestCase
 from model_mommy import mommy
 
-from dashboard.data.nn import NNRTIADULTSCheck, NNRTICURRENTPAEDCheck
+from dashboard.data.nn import NNRTIADULTSCheck, NNRTIPAEDCheck
 from dashboard.helpers import DEFAULT, DF1, NNRTI_ADULTS, DF2, FIELDS, YES, FORMULATION, VALUE, COLUMN, ROWS, \
-    FINAL_SCORE, TOTAL, NNRTI_CURRENT_PAED, OTHER
+    FINAL_SCORE, TOTAL, NNRTI_PAED, OTHER
 from dashboard.models import Score, Consumption
 from dashboard.views.data_sources import NNRTIDataSource, HEADERS
 
@@ -239,8 +239,8 @@ class NNRTIDataSourceTestCaseForCurrentAdults(TestCase):
 
 
 class NNRTIDataSourceTestCaseForCurrentPaed(TestCase):
-    test_name = NNRTI_CURRENT_PAED
-    check_class = NNRTICURRENTPAEDCheck
+    test_name = NNRTI_PAED
+    check_class = NNRTIPAEDCheck
 
     def test_correct_template_is_selected(self):
         data_source = NNRTIDataSource()

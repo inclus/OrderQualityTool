@@ -52,8 +52,8 @@ class NNRTIADULTSCheck(QCheck):
         return result
 
 
-class NNRTICURRENTPAEDCheck(NNRTIADULTSCheck):
-    test = NNRTI_CURRENT_PAED
+class NNRTIPAEDCheck(NNRTIADULTSCheck):
+    test = NNRTI_PAED
     combinations = [{
         NAME: DEFAULT,
 

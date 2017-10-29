@@ -11,7 +11,7 @@ from dashboard.data.cycles import BalancesMatchCheck, StablePatientVolumesCheck,
 from dashboard.data.free_form_report import FreeFormReport
 from dashboard.data.negatives import NegativeNumbersQualityCheck
 from dashboard.data.nn import NNRTIADULTSCheck
-from dashboard.data.nn import NNRTICURRENTPAEDCheck
+from dashboard.data.nn import NNRTIPAEDCheck
 from dashboard.data.utils import facility_has_single_order, timeit
 from dashboard.helpers import YES, get_prev_cycle, WEB, F1, F2, F3, DEFAULT, NO, NAME, C_COUNT, A_COUNT, P_COUNT, WEB_PAPER, C_RECORDS, A_RECORDS, P_RECORDS
 from dashboard.models import Score, Cycle, Consumption, AdultPatientsRecord, PAEDPatientsRecord, MultipleOrderFacility
@@ -101,7 +101,7 @@ def run_checks(report):
         GuidelineAdherenceCheckAdult2L(),
         GuidelineAdherenceCheckPaed1L(),
         NNRTIADULTSCheck(),
-        NNRTICURRENTPAEDCheck(),
+        NNRTIPAEDCheck(),
         BalancesMatchCheck(),
         OrdersOverTimeCheck(),
         StableConsumptionCheck(),

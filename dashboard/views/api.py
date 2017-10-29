@@ -267,8 +267,8 @@ class NNRTIAdultsView(OrderFormFreeOfGapsView):
     test = NNRTI_ADULTS
 
 
-class NNRTICurrentPaedView(OrderFormFreeOfGapsView):
-    test = NNRTI_CURRENT_PAED
+class NNRTIPaedView(OrderFormFreeOfGapsView):
+    test = NNRTI_PAED
 
 
 class FilterValuesView(APIView):
