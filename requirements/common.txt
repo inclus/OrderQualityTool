@@ -30,3 +30,6 @@ uwsgi
 django-dynamic-preferences==1.4
 django-analytical==2.3.0
 pandas==0.20.3
+pygogo==0.10.0
+splinter==0.7.6
+beautifulsoup4==4.6.0
