@@ -19,6 +19,13 @@ WAREHOUSE = "Warehouse"
 logger = logging.getLogger(__name__)
 CONSUMPTION = "CONSUMPTION"
 LOCATION = "Facility Index"
+MAUS = "MAUS"
+JMS = "JMS"
+NMS = "NMS"
+CONSUMPTION_REPORT = "Consumption Data Report"
+PATIENT_REPORT = "Adult/PMTCT ART Patient Report"
+PARTNERS = ((MAUS, MAUS), (JMS, JMS), (NMS, NMS))
+REPORT_TYPES = ((CONSUMPTION_REPORT, CONSUMPTION_REPORT), (PATIENT_REPORT, PATIENT_REPORT))
 
 
 class DashboardUser(AbstractEmailUser):
@@ -80,7 +87,6 @@ class Score(models.Model):
     f2_pass_count = models.IntegerField(default=0)
     f3_fail_count = models.IntegerField(default=0)
     f3_pass_count = models.IntegerField(default=0)
-
 
     class Meta:
         unique_together = ("name", "cycle", "district", "ip", "warehouse")
@@ -147,3 +153,11 @@ class MultipleOrderFacility(models.Model):
 
     def __unicode__(self):
         return "%s %s" % (self.cycle, self.name)
+
+
+class Dhis2StandardReport(models.Model):
+    name = models.CharField(max_length=256, db_index=True)
+    report_id = models.CharField(max_length=256, db_index=True)
+    partner = models.CharField(choices=PARTNERS, max_length=50)
+    report_type = models.CharField(choices=REPORT_TYPES, max_length=50)
+    org_unit_id = models.CharField(max_length=20, db_index=True)
