@@ -150,4 +150,4 @@ node_modules/
 .ropeproject
 *.sublime-workspace
 .vagrant
-data/
+/data

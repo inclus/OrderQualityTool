@@ -6,7 +6,7 @@ from django.db.models import CharField
 from jsonfield import JSONField
 from picklefield import PickledObjectField
 
-from dashboard.helpers import NOT_REPORTING, YES, NO
+from dashboard.helpers import NOT_REPORTING, YES, NO, REPORT_TYPES
 
 MOH_CENTRAL = "MOH CENTRAL"
 
@@ -22,10 +22,8 @@ LOCATION = "Facility Index"
 MAUS = "MAUS"
 JMS = "JMS"
 NMS = "NMS"
-CONSUMPTION_REPORT = "Consumption Data Report"
-PATIENT_REPORT = "Adult/PMTCT ART Patient Report"
+
 PARTNERS = ((MAUS, MAUS), (JMS, JMS), (NMS, NMS))
-REPORT_TYPES = ((CONSUMPTION_REPORT, CONSUMPTION_REPORT), (PATIENT_REPORT, PATIENT_REPORT))
 
 
 class DashboardUser(AbstractEmailUser):
@@ -161,3 +159,15 @@ class Dhis2StandardReport(models.Model):
     partner = models.CharField(choices=PARTNERS, max_length=50)
     report_type = models.CharField(choices=REPORT_TYPES, max_length=50)
     org_unit_id = models.CharField(max_length=20, db_index=True)
+
+
+class LocationToPartnerMapping(models.Model):
+    mapping = PickledObjectField()
+
+    def update(self, mapping):
+        self.objects.all().delete()
+        self.objects.create(mapping=mapping)
+
+    @classmethod
+    def get_mapping(cls):
+        return cls.objects.first().mapping
