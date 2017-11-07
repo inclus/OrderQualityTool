@@ -7,14 +7,19 @@ from dashboard.data.adherence import GuidelineAdherenceCheckAdult1L, GuidelineAd
 from dashboard.data.adherence import GuidelineAdherenceCheckAdult2L
 from dashboard.data.blanks import BlanksQualityCheck, MultipleCheck, IsReportingCheck
 from dashboard.data.consumption_patients import ConsumptionAndPatientsQualityCheck
-from dashboard.data.cycles import BalancesMatchCheck, StablePatientVolumesCheck, WarehouseFulfillmentCheck, StableConsumptionCheck, OrdersOverTimeCheck
-from dashboard.data.free_form_report import FreeFormReport
+from dashboard.data.cycles import BalancesMatchCheck, StablePatientVolumesCheck, WarehouseFulfillmentCheck, \
+    StableConsumptionCheck, OrdersOverTimeCheck
+from dashboard.data.data_import import ExcelDataImport, DataImport
+from dashboard.data.html_data_import import HtmlDataImport
 from dashboard.data.negatives import NegativeNumbersQualityCheck
 from dashboard.data.nn import NNRTIADULTSCheck
 from dashboard.data.nn import NNRTIPAEDCheck
 from dashboard.data.utils import facility_has_single_order, timeit
-from dashboard.helpers import YES, get_prev_cycle, WEB, F1, F2, F3, DEFAULT, NO, NAME, C_COUNT, A_COUNT, P_COUNT, WEB_PAPER, C_RECORDS, A_RECORDS, P_RECORDS
-from dashboard.models import Score, Cycle, Consumption, AdultPatientsRecord, PAEDPatientsRecord, MultipleOrderFacility
+from dashboard.helpers import YES, get_prev_cycle, WEB, F1, F2, F3, DEFAULT, NO, NAME, C_COUNT, A_COUNT, P_COUNT, \
+    C_RECORDS, A_RECORDS, P_RECORDS
+from dashboard.medist.tasks import fetch_reports
+from dashboard.models import Score, Cycle, Consumption, AdultPatientsRecord, PAEDPatientsRecord, MultipleOrderFacility, \
+    Dhis2StandardReport, LocationToPartnerMapping
 
 
 @timeit
@@ -79,13 +84,14 @@ def persist_multiple_order_records(report):
 
 
 @timeit
-def calculate_scores_for_checks_in_cycle(report):
-    run_checks(report)
-    persist_scores(report)
-    persist_consumption(report)
-    persist_adult_records(report)
-    persist_paed_records(report)
-    persist_multiple_order_records(report)
+def calculate_scores_for_checks_in_cycle(data_import):
+    # type: (DataImport) -> None
+    run_checks(data_import)
+    persist_scores(data_import)
+    persist_consumption(data_import)
+    persist_adult_records(data_import)
+    persist_paed_records(data_import)
+    persist_multiple_order_records(data_import)
 
 
 @timeit
@@ -113,7 +119,8 @@ def run_checks(report):
         other_facility_data = build_facility_data(facility, other_report)
         for check in checks:
             for combination in check.combinations:
-                facility['scores'][check.test][combination[NAME]] = check.for_each_facility(facility_data, combination, other_facility_data)
+                facility['scores'][check.test][combination[NAME]] = check.for_each_facility(facility_data, combination,
+                                                                                            other_facility_data)
 
 
 def build_facility_data(facility, report):
@@ -125,7 +132,6 @@ def build_facility_data(facility, report):
     facility_data[C_COUNT] = len(c_records)
     facility_data[A_COUNT] = len(a_records)
     facility_data[P_COUNT] = len(p_records)
-    facility_data[WEB_PAPER] = facility[WEB_PAPER].strip()
     facility_data[C_RECORDS] = c_records
     facility_data[A_RECORDS] = a_records
     facility_data[P_RECORDS] = p_records
@@ -138,7 +144,7 @@ def build_facility_data(facility, report):
 @timeit
 def get_report_for_other_cycle(report):
     prev_cycle_title = get_prev_cycle(report.cycle)
-    other_report = FreeFormReport(None, prev_cycle_title)
+    other_report = ExcelDataImport(None, prev_cycle_title)
     if Cycle.objects.filter(title=prev_cycle_title).exists():
         prev_cycle = Cycle.objects.get(title=prev_cycle_title)
         other_report = other_report.build_form_db(prev_cycle)
@@ -178,28 +184,18 @@ def persist_scores(report):
 
 
 @shared_task
-def import_general_report(path, cycle):
-    report = load_report(cycle, path)
-    save_report(report)
-    os.remove(path)
-    calculate_scores_for_checks_in_cycle(report)
-
-
-@timeit
-def save_report(report):
-    report.save()
-
-
-@timeit
-def load_report(cycle, path):
-    report = FreeFormReport(path, cycle).load()
-    return report
+def update_checks(ids):
+    data = Cycle.objects.filter(id__in=ids).all()
+    for cycle in data:
+        data_import = DataImport(None, cycle.title).build_form_db(cycle)
+        calculate_scores_for_checks_in_cycle(data_import)
 
 
 @shared_task
-@timeit
-def update_checks(cycle_ids):
-    data = Cycle.objects.filter(id__in=cycle_ids).all()
-    for cycle in data:
-        report = FreeFormReport(None, cycle.title).build_form_db(cycle)
-        calculate_scores_for_checks_in_cycle(report)
+def import_data_from_dhis2(period):
+    reports = Dhis2StandardReport.objects.all()
+    partner_mapping = LocationToPartnerMapping.get_mapping()
+    results = fetch_reports(reports, period)
+    data_import = HtmlDataImport(results, period).load(partner_mapping)
+    cycle = data_import.save()
+    update_checks.delay([cycle.id])

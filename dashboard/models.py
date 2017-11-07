@@ -19,11 +19,11 @@ WAREHOUSE = "Warehouse"
 logger = logging.getLogger(__name__)
 CONSUMPTION = "CONSUMPTION"
 LOCATION = "Facility Index"
-MAUS = "MAUS"
+MAUL = "MAUL"
 JMS = "JMS"
 NMS = "NMS"
 
-PARTNERS = ((MAUS, MAUS), (JMS, JMS), (NMS, NMS))
+WAREHOUSES = ((MAUL, MAUL), (JMS, JMS), (NMS, NMS))
 
 
 class DashboardUser(AbstractEmailUser):
@@ -156,7 +156,7 @@ class MultipleOrderFacility(models.Model):
 class Dhis2StandardReport(models.Model):
     name = models.CharField(max_length=256, db_index=True)
     report_id = models.CharField(max_length=256, db_index=True)
-    partner = models.CharField(choices=PARTNERS, max_length=50)
+    warehouse = models.CharField(choices=WAREHOUSES, max_length=50)
     report_type = models.CharField(choices=REPORT_TYPES, max_length=50)
     org_unit_id = models.CharField(max_length=20, db_index=True)
 

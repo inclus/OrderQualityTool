@@ -4,7 +4,7 @@ import json
 import djclick as click
 from termcolor import colored
 
-from dashboard.data.free_form_report import FreeFormReport
+from dashboard.data.data_import import ExcelDataImport
 from dashboard.helpers import *
 from dashboard.models import Score, Cycle
 from dashboard.tasks import run_checks, persist_scores
@@ -79,7 +79,7 @@ def perform_checks():
     cycle = "Sep - Oct 2015"
     data = Cycle.objects.filter(title=cycle)
     for cycle in data:
-        report = FreeFormReport(None, cycle.title).build_form_db(cycle)
+        report = ExcelDataImport(None, cycle.title).build_form_db(cycle)
         run_checks(report)
         persist_scores(report)
 

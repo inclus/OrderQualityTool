@@ -6,6 +6,8 @@ from openpyxl import load_workbook
 from dashboard.helpers import *
 from dashboard.models import Cycle
 
+
+
 logger = logging.getLogger(__name__)
 
 
@@ -17,9 +19,9 @@ def get_real_facility_name(facility_name, district_name):
         return facility_name
 
 
-class FreeFormReport():
-    def __init__(self, path, cycle):
-        self.path = path
+class DataImport():
+    def __init__(self, raw_data, cycle):
+        self.raw_data = raw_data
         self.cycle = cycle
         self.name_cache = dict()
         self.locs = []
@@ -43,17 +45,23 @@ class FreeFormReport():
         cycle.save()
         return cycle
 
-    def get_workbook(self):
-        return load_workbook(self.path, read_only=True, use_iterators=True)
+    def load(self):
+        raise NotImplementedError("you need to implement this method")
 
-    def get_value(self, row, i):
-        if i <= len(row):
-            real_value = row[i].value
-            value = real_value
-            if "_" in str(value):
-                value = real_value = value.replace("_", "-")
-            if value != "-" and value != '':
-                return real_value
+
+def get_value(row, i):
+    if i <= len(row):
+        real_value = row[i].value
+        value = real_value
+        if "_" in str(value):
+            value = real_value = value.replace("_", "-")
+        if value != "-" and value != '':
+            return real_value
+
+
+class ExcelDataImport(DataImport):
+    def get_workbook(self):
+        return load_workbook(self.raw_data, read_only=True, use_iterators=True)
 
     def load(self):
         self.workbook = self.get_workbook()
@@ -72,8 +80,8 @@ class FreeFormReport():
             if facility_key:
                 patient_record = dict()
                 patient_record[FORMULATION] = row[2].value
-                patient_record[EXISTING] = self.get_value(row, 4)
-                patient_record[NEW] = self.get_value(row, 5)
+                patient_record[EXISTING] = get_value(row, 4)
+                patient_record[NEW] = get_value(row, 5)
                 records[facility_key].append(patient_record)
             else:
                 logger.debug("%s not found" % facility_key)
@@ -88,8 +96,8 @@ class FreeFormReport():
             if facility_key:
                 patient_record = dict()
                 patient_record[FORMULATION] = row[2].value
-                patient_record[EXISTING] = self.get_value(row, 4)
-                patient_record[NEW] = self.get_value(row, 5)
+                patient_record[EXISTING] = get_value(row, 4)
+                patient_record[NEW] = get_value(row, 5)
                 records[facility_key].append(patient_record)
             else:
                 logger.debug("%s not found" % facility_key)
@@ -106,7 +114,6 @@ class FreeFormReport():
                 facility[IP] = row[3].value
                 facility[WAREHOUSE] = row[4].value
                 facility[DISTRICT] = row[5].value
-                facility[WEB_PAPER] = row[7].value
                 facility[MULTIPLE] = row[8].value
                 facility[NAME] = get_real_facility_name(row[0].value, row[5].value)
                 facility_data.append(facility)
@@ -120,15 +127,18 @@ class FreeFormReport():
             if facility_key:
                 consumption_record = dict()
                 consumption_record[FORMULATION] = row[2].value
-                consumption_record[OPENING_BALANCE] = self.get_value(row, 4)
-                consumption_record[QUANTITY_RECEIVED] = self.get_value(row, 5)
-                consumption_record[COMBINED_CONSUMPTION] = self.get_value(row, 6)
-                consumption_record[LOSES_ADJUSTMENTS] = self.get_value(row, 8)
-                consumption_record[CLOSING_BALANCE] = self.get_value(row, 9)
-                consumption_record[MONTHS_OF_STOCK_OF_HAND] = self.get_value(row, 10)
-                consumption_record[QUANTITY_REQUIRED_FOR_CURRENT_PATIENTS] = self.get_value(row, 11)
-                consumption_record[ESTIMATED_NUMBER_OF_NEW_ART_PATIENTS] = self.get_value(row, 12)
-                consumption_record[ESTIMATED_NUMBER_OF_NEW_PREGNANT_WOMEN] = self.get_value(row, 13)
-                consumption_record[PACKS_ORDERED] = self.get_value(row, 14)
+                consumption_record[OPENING_BALANCE] = get_value(row, 4)
+                consumption_record[QUANTITY_RECEIVED] = get_value(row, 5)
+                consumption_record[COMBINED_CONSUMPTION] = get_value(row, 6)
+                consumption_record[LOSES_ADJUSTMENTS] = get_value(row, 8)
+                consumption_record[CLOSING_BALANCE] = get_value(row, 9)
+                consumption_record[MONTHS_OF_STOCK_OF_HAND] = get_value(row, 10)
+                consumption_record[QUANTITY_REQUIRED_FOR_CURRENT_PATIENTS] = get_value(row, 11)
+                consumption_record[ESTIMATED_NUMBER_OF_NEW_ART_PATIENTS] = get_value(row, 12)
+                consumption_record[ESTIMATED_NUMBER_OF_NEW_PREGNANT_WOMEN] = get_value(row, 13)
+                consumption_record[PACKS_ORDERED] = get_value(row, 14)
                 records[facility_key].append(consumption_record)
         return records
+
+
+

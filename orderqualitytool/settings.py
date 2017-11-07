@@ -130,6 +130,10 @@ LOGGING = {
     }
 }
 GOOGLE_ANALYTICS_PROPERTY_ID = os.environ.get('GOOGLE_ANALYTICS_ID', 'UA-108170532-1')
+
+DHIS2_USERNAME = os.getenv("DHIS2_USERNAME")
+DHIS2_PASSWORD = os.getenv("DHIS2_PASSWORD")
+DHIS2_URL = os.getenv("DHIS2_URL")
 try:
     from local_settings import *
 except ImportError:

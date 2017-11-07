@@ -142,7 +142,7 @@ ESTIMATED_NUMBER_OF_NEW_PREGNANT_WOMEN = 'estimated_number_of_new_pregnant_women
 ESTIMATED_NUMBER_OF_NEW_ART_PATIENTS = 'estimated_number_of_new_patients'
 QUANTITY_REQUIRED_FOR_CURRENT_PATIENTS = 'quantity_required_for_current_patients'
 MONTHS_OF_STOCK_OF_HAND = 'months_of_stock_of_hand'
-DAYS_OUT_OF_STOCK='days_out_of_stock'
+DAYS_OUT_OF_STOCK = 'days_out_of_stock'
 CLOSING_BALANCE = 'closing_balance'
 LOSES_ADJUSTMENTS = 'loses_adjustments'
 COMBINED_CONSUMPTION = 'consumption'
@@ -156,7 +156,7 @@ FIELD_NAMES = {
     ESTIMATED_NUMBER_OF_NEW_PREGNANT_WOMEN: 'Estimated New Pregnant Women',
     ESTIMATED_NUMBER_OF_NEW_ART_PATIENTS: 'Estimated New ART Patients',
     QUANTITY_REQUIRED_FOR_CURRENT_PATIENTS: 'Quantity Required for current Patients',
-    MONTHS_OF_STOCK_OF_HAND: 'Months of Stock of Hand',
+    MONTHS_OF_STOCK_OF_HAND: 'Months of Stock on Hand',
     CLOSING_BALANCE: 'Closing Balance',
     LOSES_ADJUSTMENTS: 'Loses Adjustments',
     COMBINED_CONSUMPTION: 'Consumption',
@@ -228,6 +228,7 @@ C_COUNT = "consumption_count"
 A_COUNT = "adult_count"
 P_COUNT = "paed_count"
 
+
 def get_actual_result(result, combination):
     def combination_yes():
         return result.get(combination) if type(result) == dict else result
@@ -236,3 +237,13 @@ def get_actual_result(result, combination):
         return result.get(DEFAULT, None) if type(result) == dict else result
 
     return combination_yes() if combination in result else combination_no()
+
+
+PAED_PATIENT_REPORT = "Paediatric ART Patient Report"
+ADULT_PATIENT_REPORT = "Adult/PMTCT ART Patient Report"
+CONSUMPTION_REPORT = "Consumption Data Report"
+REPORT_TYPES = ((CONSUMPTION_REPORT, CONSUMPTION_REPORT), (ADULT_PATIENT_REPORT, ADULT_PATIENT_REPORT),
+                (PAED_PATIENT_REPORT, PAED_PATIENT_REPORT))
+
+HTML_PARSER = 'html.parser'
+PARTNER = "partner"

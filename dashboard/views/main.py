@@ -7,10 +7,14 @@ from django.core.files.base import ContentFile
 from django.core.files.storage import default_storage
 from django.db.models import Count, Case, When
 from django.views.generic import TemplateView, FormView
+from io import BytesIO
+
+from dashboard.data.data_import import ExcelDataImport
+from dashboard.data.utils import timeit
 from dashboard.forms import FileUploadForm
 from dashboard.helpers import YES, F3, F2, F1, sort_cycle
 from dashboard.models import Score
-from dashboard.tasks import import_general_report
+from dashboard.tasks import update_checks
 
 
 class HomeView(LoginRequiredMixin, TemplateView):
@@ -20,20 +24,26 @@ class HomeView(LoginRequiredMixin, TemplateView):
         context = super(HomeView, self).get_context_data(**kwargs)
         return context
 
+
 class AboutPageView(TemplateView):
     template_name = "about.html"
+
 
 class AboutTestPageView(TemplateView):
     template_name = "about_tests.html"
 
+
 class AboutBackground(TemplateView):
     template_name = "about_background.html"
+
 
 class AboutHowWorks(TemplateView):
     template_name = "about_works.html"
 
+
 class AboutHowUsed(TemplateView):
     template_name = "about_used.html"
+
 
 class DataImportView(LoginRequiredMixin, StaffuserRequiredMixin, FormView):
     template_name = "import.html"
@@ -48,11 +58,22 @@ class DataImportView(LoginRequiredMixin, StaffuserRequiredMixin, FormView):
     def form_valid(self, form):
         import_file = form.cleaned_data['import_file']
         cycle = form.cleaned_data['cycle']
-        path = default_storage.save('tmp/workspace.xlsx', ContentFile(import_file.read()))
-        tmp_file = os.path.join(settings.MEDIA_ROOT, path)
-        import_general_report.delay(tmp_file, cycle)
+        report = parse_excel_file(cycle, import_file)
+        cycle = save_data_import(report)
+        update_checks.delay([cycle.id])
         messages.add_message(self.request, messages.INFO, 'Successfully started import for cycle %s' % (cycle))
         return super(DataImportView, self).form_valid(form)
+
+
+@timeit
+def parse_excel_file(cycle, excel_file):
+    report = ExcelDataImport(BytesIO(excel_file.read()), cycle).load()
+    return report
+
+
+@timeit
+def save_data_import(report):
+    return report.save()
 
 
 DEFAULT = 'DEFAULT'

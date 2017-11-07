@@ -3,6 +3,7 @@ import json
 from functools import cmp_to_key
 
 import pydash
+import pygogo
 from braces.views import LoginRequiredMixin
 from django.contrib.auth.models import AnonymousUser
 from django.db.models import Count, Sum
@@ -15,7 +16,8 @@ from rest_framework.views import APIView
 
 from dashboard.helpers import *
 from dashboard.models import Score, WAREHOUSE, DISTRICT, MultipleOrderFacility, Cycle, MOH_CENTRAL
-from dashboard.serializers import ScoreSerializer
+from dashboard.serializers import ScoreSerializer, NewImportSerializer
+from dashboard.tasks import import_data_from_dhis2
 
 
 def aggregate_scores(user, test, cycles, formulation, keys, count_values, filters):
@@ -88,8 +90,10 @@ class BestPerformingDistrictsView(APIView):
 
         fm = mapping.get(formulation, mapping.get(F1))
         data = Score.objects.filter(**filters).values(name, 'cycle').annotate(count=Count('pk'),
-                                                                              best=Sum(F(fm['pass']) + F('default_pass_count')),
-                                                                              worst=Sum(F(fm['fail']) + F('default_fail_count')))
+                                                                              best=Sum(F(fm['pass']) + F(
+                                                                                  'default_pass_count')),
+                                                                              worst=Sum(F(fm['fail']) + F(
+                                                                                  'default_fail_count')))
 
         for item in data:
             item['name'] = item[name]
@@ -143,8 +147,12 @@ class ReportMetrics(APIView):
         records = [cycle['cycle'] for cycle in Score.objects.values('cycle').distinct()]
         most_recent_cycle, = sorted(records, key=cmp_to_key(sort_cycle), reverse=True)[:1]
         adh_filter = "%s%s" % (GUIDELINE_ADHERENCE, adh.replace(" ", ""))
-        reporting_scores = aggregate_scores(self.request.user, REPORTING, [most_recent_cycle], DEFAULT, {YES: 'reporting', NO: 'not_reporting', NOT_REPORTING: 'n_a'}, {YES: YES, NO: NO, NOT_REPORTING: NOT_REPORTING}, filters)
-        adherence_scores = aggregate_scores(self.request.user, adh_filter, [most_recent_cycle], DEFAULT, {YES: 'yes', NO: 'no', NOT_REPORTING: 'not_reporting'}, {YES: YES, NO: NO, NOT_REPORTING: NOT_REPORTING}, filters)
+        reporting_scores = aggregate_scores(self.request.user, REPORTING, [most_recent_cycle], DEFAULT,
+                                            {YES: 'reporting', NO: 'not_reporting', NOT_REPORTING: 'n_a'},
+                                            {YES: YES, NO: NO, NOT_REPORTING: NOT_REPORTING}, filters)
+        adherence_scores = aggregate_scores(self.request.user, adh_filter, [most_recent_cycle], DEFAULT,
+                                            {YES: 'yes', NO: 'no', NOT_REPORTING: 'not_reporting'},
+                                            {YES: YES, NO: NO, NOT_REPORTING: NOT_REPORTING}, filters)
         report_rate = "{0:.1f}".format(reporting_scores[0]['reporting']) if len(reporting_scores) > 0 else ""
         adherence = "{0:.1f}".format(adherence_scores[0]['yes']) if len(adherence_scores) > 0 else ""
         return Response({"reporting": report_rate, "adherence": adherence})
@@ -165,8 +173,11 @@ def build_filters(request):
     add_item_to_filter("warehouse", warehouse, filters)
     return filters
 
+
 class ScoresAPIView(APIView):
-    def generate_data(self, test, start, end, formulation=DEFAULT, keys={YES: 'yes', NO: 'no', NOT_REPORTING: 'not_reporting'}, count_values={YES: YES, NO: NO, NOT_REPORTING: NOT_REPORTING}):
+    def generate_data(self, test, start, end, formulation=DEFAULT,
+                      keys={YES: 'yes', NO: 'no', NOT_REPORTING: 'not_reporting'},
+                      count_values={YES: YES, NO: NO, NOT_REPORTING: NOT_REPORTING}):
         filters = build_filters(self.request)
         if formulation is None:
             formulation = DEFAULT
@@ -205,7 +216,10 @@ class FacilitiesMultipleReportingView(ScoresAPIView):
         sorted_cycles = sorted(cycles, key=cmp_to_key(sort_cycle), reverse=True)
         most_recent_cycle = sorted_cycles[0]
         cycle = request.GET.get('cycle', most_recent_cycle)
-        records = MultipleOrderFacility.objects.filter(cycle=cycle, **scores_filter).order_by('name').values('name', 'district', 'ip', 'warehouse')
+        records = MultipleOrderFacility.objects.filter(cycle=cycle, **scores_filter).order_by('name').values('name',
+                                                                                                             'district',
+                                                                                                             'ip',
+                                                                                                             'warehouse')
         return Response({"values": records})
 
 
@@ -311,5 +325,20 @@ class AccessAreasView(APIView):
 
 class AdminAccessView(APIView):
     def get(self, request):
-        is_admin = type(request.user) != AnonymousUser and (request.user.access_level == MOH_CENTRAL or request.user.is_superuser)
+        is_admin = type(request.user) != AnonymousUser and (
+            request.user.access_level == MOH_CENTRAL or request.user.is_superuser)
         return Response({"is_admin": is_admin})
+
+
+logger = pygogo.Gogo(__name__).get_structured_logger()
+
+
+class NewImportView(APIView):
+    def post(self, request):
+        serializer = NewImportSerializer(data=request.data)
+        if serializer.is_valid():
+            logger.info("launching task",
+                        extra={"task_name": "import_data_from_dhis2", "period": serializer.data["period"]})
+            import_data_from_dhis2.delay(serializer.data["period"], "akV6429SUqu")
+            return Response({"ok": True})
+        return Response({"ok": False})

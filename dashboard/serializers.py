@@ -39,3 +39,7 @@ class ScoreSerializer(ModelSerializer):
 
     class Meta:
         model = Score
+
+
+class NewImportSerializer(serializers.Serializer):
+    period = serializers.CharField()

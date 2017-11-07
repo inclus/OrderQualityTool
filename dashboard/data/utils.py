@@ -3,6 +3,7 @@ import logging
 import time
 
 import pydash
+import pygogo
 
 from dashboard.helpers import NO, NOT_REPORTING, YES, EXISTING, NEW, FORMULATION, C_RECORDS, A_RECORDS, P_RECORDS
 
@@ -10,16 +11,14 @@ TWO_CYCLE = "two_cycle"
 
 IS_INTERFACE = "is_interface"
 
-logger = logging.getLogger(__name__)
-
+logger = pygogo.Gogo(__name__).get_structured_logger()
 
 def timeit(method):
     def timed(*args, **kw):
         ts = time.time()
         result = method(*args, **kw)
         te = time.time()
-
-        print ('%r  %2.5f sec' % (method.__name__, te - ts))
+        logger.info("timer", extra={"method": method.__name__, "duration": "%2.5f" % (te - ts)})
         return result
 
     return timed

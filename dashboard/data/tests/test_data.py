@@ -5,7 +5,7 @@ from django.test import TestCase
 from dashboard.data.adherence import GuidelineAdherenceCheckAdult1L, calculate_score
 from dashboard.data.blanks import BlanksQualityCheck, IsReportingCheck, MultipleCheck
 from dashboard.data.consumption_patients import ConsumptionAndPatientsQualityCheck
-from dashboard.data.free_form_report import FreeFormReport
+from dashboard.data.data_import import ExcelDataImport
 from dashboard.data.utils import clean_name, get_patient_total, get_consumption_totals, \
     values_for_records, get_consumption_records, get_patient_records
 from dashboard.helpers import *
@@ -66,7 +66,7 @@ class DataTestCase(TestCase):
     def test_blanks(self):
         file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', 'tests', 'fixtures',
                                  "new_format.xlsx")
-        report = FreeFormReport(file_path, "May Jun").load()
+        report = ExcelDataImport(file_path, "May Jun").load()
         report.cycle = "Jul - Aug 2015"
         cases = [
             {'test': BlanksQualityCheck, 'expected': NOT_REPORTING},
