@@ -1,6 +1,3 @@
-import collections
-import json
-
 import attr
 
 TABLE_COLUMN_NEW_PREGNANT_PATIENTS = "ESTIMATED NUMBER OF NEW HIV+ PREGNANT WOMEN"
@@ -33,22 +30,43 @@ class Location(object):
     partner = attr.ib()
     warehouse = attr.ib()
 
-    def as_key(self):
-        location_dict = attr.asdict(self, dict_factory=collections.OrderedDict)
-        return json.dumps(location_dict)
+
+@attr.s(cmp=True, frozen=True)
+class RegimenLocationCombination(object):
+    location = attr.ib()
+    regimen = attr.ib()
 
 
-@attr.s
-class PatientRecord(object):
+@attr.s(cmp=True)
+class Record(object):
+    regimen = attr.ib()
+    location = attr.ib()
+    regimen_location = attr.ib()
+
+
+@attr.s(cmp=True)
+class PatientRecord(Record):
     existing = attr.ib()
     new = attr.ib()
-    regimen = attr.ib()
-    location = attr.ib(None)
+
+    def add(self, record):
+        return PatientRecord(
+            location=self.location,
+            regimen_location=self.regimen_location,
+            existing=as_int(record.existing) + as_int(self.existing),
+            new=as_int(record.new) + as_int(self.new),
+            regimen=self.regimen)
 
 
-@attr.s
-class ConsumptionRecord(object):
-    regimen = attr.ib()
+def as_int(value):
+    try:
+        return int(value)
+    except ValueError:
+        return 0
+
+
+@attr.s(cmp=True)
+class ConsumptionRecord(Record):
     opening_balance = attr.ib()
     quantity_received = attr.ib()
     consumption = attr.ib()
@@ -59,7 +77,35 @@ class ConsumptionRecord(object):
     number_of_new_art_patients = attr.ib()
     number_of_new_pregnant_women = attr.ib()
     packs_ordered = attr.ib()
-    location = attr.ib(None)
+
+    def add(self, record):
+        opening_balance = as_int(self.opening_balance) + as_int(record.opening_balance)
+        quantity_received = as_int(self.quantity_received) + as_int(record.quantity_received)
+        consumption = as_int(self.consumption) + as_int(record.consumption)
+        loses_adjustments = as_int(self.loses_adjustments) + as_int(record.loses_adjustments)
+        closing_balance = as_int(self.closing_balance) + as_int(record.closing_balance)
+        months_of_stock_on_hand = as_int(self.months_of_stock_on_hand) + as_int(record.months_of_stock_on_hand)
+        quantity_required_for_current_patients = as_int(self.quantity_required_for_current_patients) + as_int(
+            record.quantity_required_for_current_patients)
+        number_of_new_art_patients = as_int(self.number_of_new_art_patients) + as_int(record.number_of_new_art_patients)
+        number_of_new_pregnant_women = as_int(self.number_of_new_pregnant_women) + as_int(
+            record.number_of_new_pregnant_women)
+        packs_ordered = as_int(self.packs_ordered) + as_int(record.packs_ordered)
+        return ConsumptionRecord(
+            location=self.location,
+            regimen_location=self.regimen_location,
+            regimen=self.regimen,
+            opening_balance=opening_balance,
+            quantity_received=quantity_received,
+            consumption=consumption,
+            loses_adjustments=loses_adjustments,
+            closing_balance=closing_balance,
+            months_of_stock_on_hand=months_of_stock_on_hand,
+            quantity_required_for_current_patients=quantity_required_for_current_patients,
+            number_of_new_art_patients=number_of_new_art_patients,
+            number_of_new_pregnant_women=number_of_new_pregnant_women,
+            packs_ordered=packs_ordered,
+        )
 
 
 @attr.s
@@ -138,13 +184,19 @@ class DataImportRecord(object):
         )
 
     def build_patient_record(self):
+        regimen = self.data.get(TABLE_COLUMN_REGIMEN)
+        rl = RegimenLocationCombination(location=self.location, regimen=regimen)
         return PatientRecord(location=self.location,
+                             regimen_location=rl,
                              existing=self.data.get(TABLE_COLUMN_EXISTING),
                              new=self.data.get(TABLE_COLUMN_NEW),
-                             regimen=self.data.get(TABLE_COLUMN_REGIMEN))
+                             regimen=regimen)
 
     def build_consumption_record(self):
+        regimen = self.data.get("REGIMEN")
+        rl = RegimenLocationCombination(location=self.location, regimen=regimen)
         return ConsumptionRecord(location=self.location,
+                                 regimen_location=rl,
                                  opening_balance=self.get_opening_balance(),
                                  quantity_received=self.get_quantity_received(),
                                  consumption=self.get_consumption(),
@@ -155,7 +207,7 @@ class DataImportRecord(object):
                                  number_of_new_art_patients=self.get_number_of_new_art_patients(),
                                  number_of_new_pregnant_women=self.get_number_of_new_pregnant_patients(),
                                  packs_ordered=self.get_packs_ordered(),
-                                 regimen=self.data.get("REGIMEN"))
+                                 regimen=regimen)
 
 
 @attr.s

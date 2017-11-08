@@ -41,7 +41,7 @@ class TestDHIS2Scrapper(TestCase):
             fake_browser = build_fake_browser(mock_browser_class)
             DHIS2Scrapper()
             mock_browser_class.assert_called_with("phantomjs")
-            fake_browser.visit.assert_called_with("http://dhis2.web/dhis-web-commons/security/login.action")
+            fake_browser.visit.assert_called_with("http://dhis2.web/dhis-web-commons-about/about.action")
 
     @patch("dashboard.medist.scrapper.Browser", autospec=True)
     def test_that_scrapper_generates_correct_report_url(self, mock_browser_class):

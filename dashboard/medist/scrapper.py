@@ -33,7 +33,7 @@ class DHIS2Scrapper(object):
         self.base_url = base_url
 
         browser = Browser('phantomjs')
-        login_url = "%s/dhis-web-commons/security/login.action" % base_url
+        login_url = "%s/dhis-web-commons-about/about.action" % base_url
         logger.debug("login", extra={"url": login_url})
 
         browser.visit(login_url)

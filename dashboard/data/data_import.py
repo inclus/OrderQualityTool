@@ -6,8 +6,6 @@ from openpyxl import load_workbook
 from dashboard.helpers import *
 from dashboard.models import Cycle
 
-
-
 logger = logging.getLogger(__name__)
 
 
@@ -45,7 +43,7 @@ class DataImport():
         cycle.save()
         return cycle
 
-    def load(self):
+    def load(self, partner_mapping=None):
         raise NotImplementedError("you need to implement this method")
 
 
@@ -63,7 +61,7 @@ class ExcelDataImport(DataImport):
     def get_workbook(self):
         return load_workbook(self.raw_data, read_only=True, use_iterators=True)
 
-    def load(self):
+    def load(self, partner_mapping=None):
         self.workbook = self.get_workbook()
         self.locs = self.locations()
         self.ads = self.adult_patients()
@@ -139,6 +137,3 @@ class ExcelDataImport(DataImport):
                 consumption_record[PACKS_ORDERED] = get_value(row, 14)
                 records[facility_key].append(consumption_record)
         return records
-
-
-

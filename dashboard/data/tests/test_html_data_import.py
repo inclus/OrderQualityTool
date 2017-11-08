@@ -1,4 +1,5 @@
 import os
+import pprint
 
 from django.test import TestCase
 
@@ -66,15 +67,15 @@ class AdultImportTestCase(TestCase):
         records_for_first_location = self.data_import.ads[self.test_location]
         first_record = records_for_first_location[0]
         self.assertEqual(first_record.location, self.test_location)
-        self.assertEqual(first_record.regimen, "TDF/3TC/ATV/r (ADULT)")
-        self.assertEqual(first_record.existing, 2)
-        self.assertEqual(first_record.new, 1)
+        self.assertEqual(first_record.regimen, "TDF/3TC/EFV (ADULT)")
+        self.assertEqual(first_record.existing, 68)
+        self.assertEqual(first_record.new, 2)
 
         seventh_record = records_for_first_location[11]
         self.assertEqual(seventh_record.location, self.test_location)
-        self.assertEqual(seventh_record.regimen, "TDF/3TC/NVP (PMTCT)")
-        self.assertEqual(seventh_record.existing, 1)
-        self.assertEqual(seventh_record.new, 0)
+        self.assertEqual(seventh_record.regimen, "TDF/3TC/ATV/r (ADULT)")
+        self.assertEqual(seventh_record.existing, 2)
+        self.assertEqual(seventh_record.new, 1)
 
     def test_that_correct_number_of_records_are_extracted(self):
         self.assertEqual(len(self.data_import.ads), 110)
@@ -97,7 +98,7 @@ class PaedImportTestCase(TestCase):
         records_for_first_location = self.data_import.pds[self.test_location]
         first_record = records_for_first_location[0]
         self.assertEqual(first_record.location, self.test_location)
-        self.assertEqual(first_record.regimen, "ABC/3TC/EFV")
+        self.assertEqual(first_record.regimen, "AZT/3TC/EFV")
         self.assertEqual(first_record.existing, 1)
         self.assertEqual(first_record.new, 0)
 
@@ -105,6 +106,41 @@ class PaedImportTestCase(TestCase):
         self.assertEqual(seventh_record.location, self.test_location)
         self.assertEqual(seventh_record.regimen, "AZT/3TC/NVP")
         self.assertEqual(seventh_record.existing, 2)
+        self.assertEqual(seventh_record.new, 0)
+
+    def test_that_correct_number_of_records_are_extracted(self):
+        self.assertEqual(len(self.data_import.pds), 5)
+
+
+class PaedImportCombinedTestCase(TestCase):
+    def setUp(self):
+        self.test_location = Location(facility="Ongutoi HC III", subcounty="Abarilela Subcounty",
+                                      district="Amuria District",
+                                      region="Eastern Region", partner="TASO", warehouse=MAUL)
+
+        results = get_test_output_from_fixture("arv-2-paediatric-art-patient-report-maul.html")
+        results.extend(get_test_output_from_fixture("arv-2-paediatric-art-patient-report-maul.html"))
+        self.data_import = HtmlDataImport(results,
+                                          None).load(LocationToPartnerMapping.get_mapping())
+
+    def test_that_test_location_has_records(self):
+        records_for_first_location = self.data_import.pds[self.test_location]
+        self.assertEqual(len(records_for_first_location), 7)
+
+    def test_that_test_location_records_have_correct_values(self):
+        records_for_first_location = self.data_import.pds[self.test_location]
+        pp = pprint.PrettyPrinter(indent=4)
+        pp.pprint(records_for_first_location)
+        first_record = records_for_first_location[0]
+        self.assertEqual(first_record.location, self.test_location)
+        self.assertEqual(first_record.regimen, "AZT/3TC/EFV")
+        self.assertEqual(first_record.existing, 2)
+        self.assertEqual(first_record.new, 0)
+
+        seventh_record = records_for_first_location[6]
+        self.assertEqual(seventh_record.location, self.test_location)
+        self.assertEqual(seventh_record.regimen, "AZT/3TC/NVP")
+        self.assertEqual(seventh_record.existing, 4)
         self.assertEqual(seventh_record.new, 0)
 
     def test_that_correct_number_of_records_are_extracted(self):
@@ -141,6 +177,45 @@ class ConsumptionImportTestCase(TestCase):
         self.assertEqual(first_record.number_of_new_art_patients, 10)
         self.assertEqual(first_record.number_of_new_pregnant_women, 10)
         self.assertEqual(first_record.packs_ordered, 178)
+
+    def test_that_correct_number_of_records_are_extracted(self):
+        self.assertEqual(len(self.data_import.cs), 7)
+
+
+class ConsumptionCombinedImportTestCase(TestCase):
+    def setUp(self):
+        self.test_location = Location(facility="Health Initiative Association Uganda",
+                                      subcounty="Buikwe Town Council",
+                                      district="Buikwe District",
+                                      region="Central Region", partner="PHS", warehouse=MAUL)
+
+        fixture = get_test_output_from_fixture("arv-0-consumption-data-report-maul.html",
+                                               report_type=CONSUMPTION_REPORT)
+        fixture.extend(get_test_output_from_fixture("arv-0-consumption-data-report-maul.html",
+                                                    report_type=CONSUMPTION_REPORT))
+        self.data_import = HtmlDataImport(
+            fixture,
+            None).load(LocationToPartnerMapping.get_mapping())
+
+    def test_that_test_location_has_records(self):
+        records_for_first_location = self.data_import.cs[self.test_location]
+        self.assertEqual(len(records_for_first_location), 1)
+
+    def test_that_test_location_records_have_correct_values(self):
+        records_for_first_location = self.data_import.cs[self.test_location]
+        first_record = records_for_first_location[0]
+        self.assertEqual(first_record.location, self.test_location)
+        self.assertEqual(first_record.regimen,
+                         "Tenofovir/Lamivudine/Efavirenz (TDF/3TC/EFV) 300mg/300mg/600mg[Pack 30]")
+        self.assertEqual(first_record.opening_balance, 560)
+        self.assertEqual(first_record.quantity_received, 408)
+        self.assertEqual(first_record.consumption, 338)
+        self.assertEqual(first_record.loses_adjustments, 0)
+        self.assertEqual(first_record.months_of_stock_on_hand, 6)
+        self.assertEqual(first_record.quantity_required_for_current_patients, 196)
+        self.assertEqual(first_record.number_of_new_art_patients, 20)
+        self.assertEqual(first_record.number_of_new_pregnant_women, 20)
+        self.assertEqual(first_record.packs_ordered, 356)
 
     def test_that_correct_number_of_records_are_extracted(self):
         self.assertEqual(len(self.data_import.cs), 7)

@@ -1,3 +1,5 @@
+import functools
+
 import pydash
 from bs4 import BeautifulSoup
 
@@ -41,23 +43,30 @@ def by_type(report_type):
     return check_item
 
 
+def sum_records(records):
+    return functools.reduce(lambda accum, item: accum.add(item), records)
+
+
 def parse_pead_records(data_import_records):
     return pydash.chain(data_import_records).filter(by_type(PAED_PATIENT_REPORT)).map(
-        lambda item: item.build_patient_record()).group_by(lambda item: item.location).value()
+        lambda item: item.build_patient_record()).group_by(lambda item: item.regimen_location).values().map(
+        sum_records).group_by(lambda item: item.location).value()
 
 
 def parse_adult_records(data_import_records):
     return pydash.chain(data_import_records).filter(by_type(ADULT_PATIENT_REPORT)).map(
-        lambda item: item.build_patient_record()).group_by(lambda item: item.location).value()
+        lambda item: item.build_patient_record()).group_by(lambda item: item.regimen_location).values().map(
+        sum_records).group_by(lambda item: item.location).value()
 
 
 def parse_consumption_records(data_import_records):
     return pydash.chain(data_import_records).filter(by_type(CONSUMPTION_REPORT)).map(
-        lambda item: item.build_consumption_record()).group_by(lambda item: item.location).value()
+        lambda item: item.build_consumption_record()).group_by(lambda item: item.regimen_location).values().map(
+        sum_records).group_by(lambda item: item.location).value()
 
 
 class HtmlDataImport(DataImport):
-    def load(self, partner_mapping):
+    def load(self, partner_mapping=None):
         locations, all_records = extract_locations_and_import_records(self.raw_data, partner_mapping)
         self.locs = locations
         self.pds = parse_pead_records(all_records)
