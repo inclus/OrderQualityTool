@@ -50,9 +50,10 @@ class LocationImportTestCase(TestCase):
 
 class AdultImportTestCase(TestCase):
     def setUp(self):
-        self.test_location = Location(facility="AAR Acacia Clinic HC II", subcounty="Kampala Central Division",
+        self.test_location = Location(facility="AAR Acacia Clinic HC II",
                                       district="Kampala District",
-                                      region="Central Region", partner="UHMG", warehouse=JMS)
+                                      partner="UHMG",
+                                      warehouse=JMS)
 
         fixture = get_test_output_from_fixture("arv-2-adult-pmtct-art-patient-report-all-regimen-jms.html",
                                                report_type=ADULT_PATIENT_REPORT, warehouse=JMS)
@@ -67,15 +68,15 @@ class AdultImportTestCase(TestCase):
         records_for_first_location = self.data_import.ads[self.test_location]
         first_record = records_for_first_location[0]
         self.assertEqual(first_record.location, self.test_location)
-        self.assertEqual(first_record.regimen, "TDF/3TC/EFV (ADULT)")
-        self.assertEqual(first_record.existing, 68)
-        self.assertEqual(first_record.new, 2)
+        self.assertEqual(first_record.regimen, "TDF/3TC/NVP (PMTCT)")
+        self.assertEqual(first_record.existing, 1)
+        self.assertEqual(first_record.new, 0)
 
         seventh_record = records_for_first_location[11]
         self.assertEqual(seventh_record.location, self.test_location)
-        self.assertEqual(seventh_record.regimen, "TDF/3TC/ATV/r (ADULT)")
-        self.assertEqual(seventh_record.existing, 2)
-        self.assertEqual(seventh_record.new, 1)
+        self.assertEqual(seventh_record.regimen, "TDF/3TC/LPV/r (ADULT)")
+        self.assertEqual(seventh_record.existing, 5)
+        self.assertEqual(seventh_record.new, 0)
 
     def test_that_correct_number_of_records_are_extracted(self):
         self.assertEqual(len(self.data_import.ads), 110)
@@ -83,9 +84,10 @@ class AdultImportTestCase(TestCase):
 
 class PaedImportTestCase(TestCase):
     def setUp(self):
-        self.test_location = Location(facility="Ongutoi HC III", subcounty="Abarilela Subcounty",
+        self.test_location = Location(facility="Ongutoi HC III",
                                       district="Amuria District",
-                                      region="Eastern Region", partner="TASO", warehouse=MAUL)
+                                      partner="TASO",
+                                      warehouse=MAUL)
 
         self.data_import = HtmlDataImport(get_test_output_from_fixture("arv-2-paediatric-art-patient-report-maul.html"),
                                           None).load(LocationToPartnerMapping.get_mapping())
@@ -98,8 +100,8 @@ class PaedImportTestCase(TestCase):
         records_for_first_location = self.data_import.pds[self.test_location]
         first_record = records_for_first_location[0]
         self.assertEqual(first_record.location, self.test_location)
-        self.assertEqual(first_record.regimen, "AZT/3TC/EFV")
-        self.assertEqual(first_record.existing, 1)
+        self.assertEqual(first_record.regimen, "AZT/3TC/LPV/r")
+        self.assertEqual(first_record.existing, 0)
         self.assertEqual(first_record.new, 0)
 
         seventh_record = records_for_first_location[6]
@@ -114,9 +116,8 @@ class PaedImportTestCase(TestCase):
 
 class PaedImportCombinedTestCase(TestCase):
     def setUp(self):
-        self.test_location = Location(facility="Ongutoi HC III", subcounty="Abarilela Subcounty",
-                                      district="Amuria District",
-                                      region="Eastern Region", partner="TASO", warehouse=MAUL)
+        self.test_location = Location(facility="Ongutoi HC III",
+                                      district="Amuria District", partner="TASO", warehouse=MAUL)
 
         results = get_test_output_from_fixture("arv-2-paediatric-art-patient-report-maul.html")
         results.extend(get_test_output_from_fixture("arv-2-paediatric-art-patient-report-maul.html"))
@@ -133,8 +134,8 @@ class PaedImportCombinedTestCase(TestCase):
         pp.pprint(records_for_first_location)
         first_record = records_for_first_location[0]
         self.assertEqual(first_record.location, self.test_location)
-        self.assertEqual(first_record.regimen, "AZT/3TC/EFV")
-        self.assertEqual(first_record.existing, 2)
+        self.assertEqual(first_record.regimen, "AZT/3TC/LPV/r")
+        self.assertEqual(first_record.existing, 0)
         self.assertEqual(first_record.new, 0)
 
         seventh_record = records_for_first_location[6]
@@ -150,9 +151,8 @@ class PaedImportCombinedTestCase(TestCase):
 class ConsumptionImportTestCase(TestCase):
     def setUp(self):
         self.test_location = Location(facility="Health Initiative Association Uganda",
-                                      subcounty="Buikwe Town Council",
                                       district="Buikwe District",
-                                      region="Central Region", partner="PHS", warehouse=MAUL)
+                                      partner="PHS", warehouse=MAUL)
 
         self.data_import = HtmlDataImport(
             get_test_output_from_fixture("arv-0-consumption-data-report-maul.html", report_type=CONSUMPTION_REPORT),
@@ -185,9 +185,8 @@ class ConsumptionImportTestCase(TestCase):
 class ConsumptionCombinedImportTestCase(TestCase):
     def setUp(self):
         self.test_location = Location(facility="Health Initiative Association Uganda",
-                                      subcounty="Buikwe Town Council",
                                       district="Buikwe District",
-                                      region="Central Region", partner="PHS", warehouse=MAUL)
+                                      partner="PHS", warehouse=MAUL)
 
         fixture = get_test_output_from_fixture("arv-0-consumption-data-report-maul.html",
                                                report_type=CONSUMPTION_REPORT)

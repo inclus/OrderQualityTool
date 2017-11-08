@@ -24,9 +24,7 @@ TABLE_COLUMN_EXISTING = "Existing"
 @attr.s(cmp=True, frozen=True)
 class Location(object):
     facility = attr.ib()
-    subcounty = attr.ib()
     district = attr.ib()
-    region = attr.ib()
     partner = attr.ib()
     warehouse = attr.ib()
 
@@ -176,9 +174,7 @@ class DataImportRecord(object):
         partner = partner_mapping.get(facility, None)
         return Location(
             facility=facility,
-            subcounty=subcounty,
             district=district,
-            region=region,
             partner=partner,
             warehouse=self.warehouse
         )
