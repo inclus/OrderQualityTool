@@ -2,6 +2,7 @@ import os
 import pprint
 
 from django.test import TestCase
+from hamcrest import *
 
 from dashboard.data.entities import ReportOutput, Location
 from dashboard.data.html_data_import import extract_locations_and_import_records, HtmlDataImport
@@ -66,17 +67,19 @@ class AdultImportTestCase(TestCase):
 
     def test_that_test_location_records_have_correct_values(self):
         records_for_first_location = self.data_import.ads[self.test_location]
-        first_record = records_for_first_location[0]
-        self.assertEqual(first_record.location, self.test_location)
-        self.assertEqual(first_record.regimen, "TDF/3TC/EFV (PMTCT)")
-        self.assertEqual(first_record.existing, 7)
-        self.assertEqual(first_record.new, 0)
+        assert_that(records_for_first_location, has_item(all_of(
+            has_property("regimen", "TDF/3TC/EFV (PMTCT)"),
+            has_property("existing", 7),
+            has_property("new", 0),
+            has_property("location", self.test_location)
+        )))
 
-        seventh_record = records_for_first_location[11]
-        self.assertEqual(seventh_record.location, self.test_location)
-        self.assertEqual(seventh_record.regimen, "TDF/3TC/ATV/r (ADULT)")
-        self.assertEqual(seventh_record.existing, 2)
-        self.assertEqual(seventh_record.new, 1)
+        assert_that(records_for_first_location, has_item(all_of(
+            has_property("regimen", "TDF/3TC/ATV/r (ADULT)"),
+            has_property("existing", 2),
+            has_property("new", 1),
+            has_property("location", self.test_location)
+        )))
 
     def test_that_correct_number_of_records_are_extracted(self):
         self.assertEqual(len(self.data_import.ads), 110)
@@ -98,17 +101,20 @@ class PaedImportTestCase(TestCase):
 
     def test_that_test_location_records_have_correct_values(self):
         records_for_first_location = self.data_import.pds[self.test_location]
-        first_record = records_for_first_location[0]
-        self.assertEqual(first_record.location, self.test_location)
-        self.assertEqual(first_record.regimen, "ABC/3TC/NVP")
-        self.assertEqual(first_record.existing, 1)
-        self.assertEqual(first_record.new, 0)
 
-        seventh_record = records_for_first_location[6]
-        self.assertEqual(seventh_record.location, self.test_location)
-        self.assertEqual(seventh_record.regimen, "AZT/3TC/NVP")
-        self.assertEqual(seventh_record.existing, 2)
-        self.assertEqual(seventh_record.new, 0)
+        assert_that(records_for_first_location, has_item(all_of(
+            has_property("regimen", "ABC/3TC/NVP"),
+            has_property("existing", 1),
+            has_property("new", 0),
+            has_property("location", self.test_location)
+        )))
+
+        assert_that(records_for_first_location, has_item(all_of(
+            has_property("regimen", "AZT/3TC/NVP"),
+            has_property("existing", 2),
+            has_property("new", 0),
+            has_property("location", self.test_location)
+        )))
 
     def test_that_correct_number_of_records_are_extracted(self):
         self.assertEqual(len(self.data_import.pds), 5)
@@ -130,19 +136,19 @@ class PaedImportCombinedTestCase(TestCase):
 
     def test_that_test_location_records_have_correct_values(self):
         records_for_first_location = self.data_import.pds[self.test_location]
-        pp = pprint.PrettyPrinter(indent=4)
-        pp.pprint(records_for_first_location)
-        first_record = records_for_first_location[0]
-        self.assertEqual(first_record.location, self.test_location)
-        self.assertEqual(first_record.regimen, "ABC/3TC/NVP")
-        self.assertEqual(first_record.existing, 2)
-        self.assertEqual(first_record.new, 0)
+        assert_that(records_for_first_location, has_item(all_of(
+            has_property("regimen", "ABC/3TC/NVP"),
+            has_property("existing", 2),
+            has_property("new", 0),
+            has_property("location", self.test_location)
+        )))
 
-        seventh_record = records_for_first_location[6]
-        self.assertEqual(seventh_record.location, self.test_location)
-        self.assertEqual(seventh_record.regimen, "AZT/3TC/NVP")
-        self.assertEqual(seventh_record.existing, 4)
-        self.assertEqual(seventh_record.new, 0)
+        assert_that(records_for_first_location, has_item(all_of(
+            has_property("regimen", "AZT/3TC/NVP"),
+            has_property("existing", 4),
+            has_property("new", 0),
+            has_property("location", self.test_location)
+        )))
 
     def test_that_correct_number_of_records_are_extracted(self):
         self.assertEqual(len(self.data_import.pds), 5)
