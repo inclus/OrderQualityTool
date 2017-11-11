@@ -68,15 +68,15 @@ class AdultImportTestCase(TestCase):
         records_for_first_location = self.data_import.ads[self.test_location]
         first_record = records_for_first_location[0]
         self.assertEqual(first_record.location, self.test_location)
-        self.assertEqual(first_record.regimen, "TDF/3TC/NVP (PMTCT)")
-        self.assertEqual(first_record.existing, 1)
+        self.assertEqual(first_record.regimen, "TDF/3TC/EFV (PMTCT)")
+        self.assertEqual(first_record.existing, 7)
         self.assertEqual(first_record.new, 0)
 
         seventh_record = records_for_first_location[11]
         self.assertEqual(seventh_record.location, self.test_location)
-        self.assertEqual(seventh_record.regimen, "TDF/3TC/LPV/r (ADULT)")
-        self.assertEqual(seventh_record.existing, 5)
-        self.assertEqual(seventh_record.new, 0)
+        self.assertEqual(seventh_record.regimen, "TDF/3TC/ATV/r (ADULT)")
+        self.assertEqual(seventh_record.existing, 2)
+        self.assertEqual(seventh_record.new, 1)
 
     def test_that_correct_number_of_records_are_extracted(self):
         self.assertEqual(len(self.data_import.ads), 110)
@@ -100,8 +100,8 @@ class PaedImportTestCase(TestCase):
         records_for_first_location = self.data_import.pds[self.test_location]
         first_record = records_for_first_location[0]
         self.assertEqual(first_record.location, self.test_location)
-        self.assertEqual(first_record.regimen, "AZT/3TC/LPV/r")
-        self.assertEqual(first_record.existing, 0)
+        self.assertEqual(first_record.regimen, "ABC/3TC/NVP")
+        self.assertEqual(first_record.existing, 1)
         self.assertEqual(first_record.new, 0)
 
         seventh_record = records_for_first_location[6]
@@ -134,8 +134,8 @@ class PaedImportCombinedTestCase(TestCase):
         pp.pprint(records_for_first_location)
         first_record = records_for_first_location[0]
         self.assertEqual(first_record.location, self.test_location)
-        self.assertEqual(first_record.regimen, "AZT/3TC/LPV/r")
-        self.assertEqual(first_record.existing, 0)
+        self.assertEqual(first_record.regimen, "ABC/3TC/NVP")
+        self.assertEqual(first_record.existing, 2)
         self.assertEqual(first_record.new, 0)
 
         seventh_record = records_for_first_location[6]
@@ -174,8 +174,8 @@ class ConsumptionImportTestCase(TestCase):
         self.assertEqual(first_record.loses_adjustments, 0)
         self.assertEqual(first_record.months_of_stock_on_hand, 3)
         self.assertEqual(first_record.quantity_required_for_current_patients, 98)
-        self.assertEqual(first_record.number_of_new_art_patients, 10)
-        self.assertEqual(first_record.number_of_new_pregnant_women, 10)
+        self.assertEqual(first_record.estimated_number_of_new_patients, 10)
+        self.assertEqual(first_record.estimated_number_of_new_pregnant_women, 10)
         self.assertEqual(first_record.packs_ordered, 178)
 
     def test_that_correct_number_of_records_are_extracted(self):
@@ -212,8 +212,8 @@ class ConsumptionCombinedImportTestCase(TestCase):
         self.assertEqual(first_record.loses_adjustments, 0)
         self.assertEqual(first_record.months_of_stock_on_hand, 6)
         self.assertEqual(first_record.quantity_required_for_current_patients, 196)
-        self.assertEqual(first_record.number_of_new_art_patients, 20)
-        self.assertEqual(first_record.number_of_new_pregnant_women, 20)
+        self.assertEqual(first_record.estimated_number_of_new_patients, 20)
+        self.assertEqual(first_record.estimated_number_of_new_pregnant_women, 20)
         self.assertEqual(first_record.packs_ordered, 356)
 
     def test_that_correct_number_of_records_are_extracted(self):

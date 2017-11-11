@@ -2,9 +2,10 @@ from django.test import TestCase
 from nose_parameterized import parameterized
 
 from dashboard.data.consumption_patients import ConsumptionAndPatientsQualityCheck
+from dashboard.data.entities import LocationData
 from dashboard.helpers import *
 
-both_zero = {
+both_zero = LocationData.migrate_from_dict({
     'status': 'reporting',
     A_RECORDS: [
         {FORMULATION: F1_PATIENT_QUERY[0], NEW: 0, EXISTING: 0},
@@ -14,9 +15,9 @@ both_zero = {
         {FORMULATION: F1_QUERY, COMBINED_CONSUMPTION: 0}
     ]
 
-}
+})
 
-patients_blank = {
+patients_blank = LocationData.migrate_from_dict({
     'status': 'reporting',
     A_RECORDS: [
         {FORMULATION: F1_PATIENT_QUERY[0], NEW: None, EXISTING: None},
@@ -26,9 +27,9 @@ patients_blank = {
         {FORMULATION: F1_QUERY, COMBINED_CONSUMPTION: 1000}
     ]
 
-}
+})
 
-consumption_blank = {
+consumption_blank = LocationData.migrate_from_dict({
     'status': 'reporting',
     A_RECORDS: [
         {FORMULATION: F1_PATIENT_QUERY[0], NEW: 100, EXISTING: 0},
@@ -38,9 +39,9 @@ consumption_blank = {
         {FORMULATION: F1_QUERY, COMBINED_CONSUMPTION: None}
     ]
 
-}
+})
 
-patients_zero = {
+patients_zero = LocationData.migrate_from_dict({
     'status': 'reporting',
     A_RECORDS: [
         {FORMULATION: F1_PATIENT_QUERY[0], NEW: 0, EXISTING: 0},
@@ -49,9 +50,9 @@ patients_zero = {
     C_RECORDS: [
         {FORMULATION: F1_QUERY, COMBINED_CONSUMPTION: 1000}
     ]
-}
+})
 
-point_seven = {
+point_seven = LocationData.migrate_from_dict({
     'status': 'reporting',
     A_RECORDS: [
         {FORMULATION: F1_PATIENT_QUERY[0], NEW: 7.1, EXISTING: 7.143},
@@ -60,9 +61,9 @@ point_seven = {
     C_RECORDS: [
         {FORMULATION: F1_QUERY, COMBINED_CONSUMPTION: 40}
     ]
-}
+})
 
-one = {
+one = LocationData.migrate_from_dict({
     'status': 'reporting',
     A_RECORDS: [
         {FORMULATION: F1_PATIENT_QUERY[0], NEW: 5, EXISTING: 5},
@@ -71,9 +72,9 @@ one = {
     C_RECORDS: [
         {FORMULATION: F1_QUERY, COMBINED_CONSUMPTION: 40}
     ]
-}
+})
 
-one_point_four = {
+one_point_four = LocationData.migrate_from_dict({
     'status': 'reporting',
     A_RECORDS: [
         {FORMULATION: F1_PATIENT_QUERY[0], NEW: 3.499, EXISTING: 3.499},
@@ -82,9 +83,9 @@ one_point_four = {
     C_RECORDS: [
         {FORMULATION: F1_QUERY, COMBINED_CONSUMPTION: 20}
     ]
-}
+})
 
-two = {
+two = LocationData.migrate_from_dict({
     'status': 'reporting',
     A_RECORDS: [
         {FORMULATION: F1_PATIENT_QUERY[0], NEW: 2.5, EXISTING: 2.5},
@@ -93,8 +94,8 @@ two = {
     C_RECORDS: [
         {FORMULATION: F1_QUERY, COMBINED_CONSUMPTION: 40}
     ]
-}
-no_data = {}
+})
+no_data = LocationData.migrate_from_dict({})
 
 
 class ConsumptionAndPatientsQualityCheckTestCase(TestCase):

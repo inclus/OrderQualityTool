@@ -3,6 +3,7 @@ from unittest import TestCase
 from nose_parameterized import parameterized
 
 from dashboard.data.blanks import BlanksQualityCheck
+from dashboard.data.entities import LocationData
 from dashboard.helpers import *
 
 
@@ -17,7 +18,7 @@ class BlankCheckTestCase(TestCase):
         ("n/A", 0, 0, 0, NOT_REPORTING),
     ])
     def test_blank_check(self, name, c_count, a_count, p_count, expected):
-        data = {
+        data = LocationData.migrate_from_dict({
             WEB_PAPER: "-",
             C_RECORDS:
                 [
@@ -31,13 +32,13 @@ class BlankCheckTestCase(TestCase):
             C_COUNT: c_count,
             A_COUNT: a_count,
             P_COUNT: p_count
-        }
+        })
         check = BlanksQualityCheck()
         result = check.for_each_facility(data, check.combinations[0])
         self.assertEquals(result, expected)
 
     def test_should_fail_if_has_more_than_2_blanks(self):
-        data = {
+        data =  LocationData.migrate_from_dict({
             WEB_PAPER: "-",
             C_RECORDS:
                 [
@@ -50,7 +51,7 @@ class BlankCheckTestCase(TestCase):
             C_COUNT: 25,
             A_COUNT: 22,
             P_COUNT: 7
-        }
+        })
         check = BlanksQualityCheck()
         result = check.for_each_facility(data, check.combinations[0])
         self.assertEquals(result, NO)

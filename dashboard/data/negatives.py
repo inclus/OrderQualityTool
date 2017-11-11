@@ -1,6 +1,8 @@
+import attr
 import pandas
+import pydash
 
-from dashboard.data.utils import QCheck, get_consumption_records
+from dashboard.data.utils import QCheck, get_consumption_records, values_for_records
 from dashboard.helpers import *
 
 
@@ -17,12 +19,9 @@ class NegativeNumbersQualityCheck(QCheck):
               DAYS_OUT_OF_STOCK]
 
     def for_each_facility(self, data, combination, previous_cycle_data=None):
-        consumption_records = get_consumption_records(data, combination[CONSUMPTION_QUERY])
-        consumption_data_frame = pandas.DataFrame.from_dict(consumption_records)
-        test_data_frame = consumption_data_frame.loc[:, consumption_data_frame.columns.isin(self.fields)]
-        all_values_positive_or_null = ((test_data_frame >= 0) | (pandas.isnull(test_data_frame))).any(
-            axis=1)
-        if all_values_positive_or_null.empty:
+        df1_records = get_consumption_records(data, combination[CONSUMPTION_QUERY])
+        values = values_for_records(self.fields, df1_records)
+        all_cells_not_negative = pydash.every(values, lambda x: x is None or x >= 0)
+        if len(df1_records) == 0:
             return NOT_REPORTING
-        else:
-            return YES if all_values_positive_or_null.bool() else NO
+        return YES if all_cells_not_negative else NO

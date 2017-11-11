@@ -3,18 +3,14 @@ from collections import defaultdict
 
 from openpyxl import load_workbook
 
+from dashboard.data.entities import location_from_excel_row, get_real_facility_name
 from dashboard.helpers import *
 from dashboard.models import Cycle
 
 logger = logging.getLogger(__name__)
 
 
-def get_real_facility_name(facility_name, district_name):
-    if facility_name:
-        template = "_%s" % district_name
-        return facility_name.replace(template, "")
-    else:
-        return facility_name
+
 
 
 class DataImport():
@@ -106,15 +102,8 @@ class ExcelDataImport(DataImport):
         facility_data = []
         for row in location_sheet.iter_rows('B%s:J%s' % (location_sheet.min_row + 3, location_sheet.max_row)):
             if row[0].value:
-                facility = dict()
-                facility[SCORES] = defaultdict(dict)
-                facility[STATUS] = row[2].value
-                facility[IP] = row[3].value
-                facility[WAREHOUSE] = row[4].value
-                facility[DISTRICT] = row[5].value
-                facility[MULTIPLE] = row[8].value
-                facility[NAME] = get_real_facility_name(row[0].value, row[5].value)
-                facility_data.append(facility)
+                location = location_from_excel_row(row)
+                facility_data.append(location)
         return facility_data
 
     def consumption_records(self):

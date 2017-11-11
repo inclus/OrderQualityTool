@@ -17,16 +17,13 @@ class BlanksQualityCheck(QCheck):
     def for_each_facility(self, data, combination, previous_cycle_data=None):
         result = NOT_REPORTING
 
-        values = values_for_records(self.fields, data.get(C_RECORDS, []))
+        values = values_for_records(self.fields, data.c_records)
         number_of_consumption_record_blanks = len(pydash.select(
             values, lambda v: v is None))
 
-        c_count_ = data.get(C_COUNT, 0)
-        a_count_ = data.get(A_COUNT, 0)
-        p_count_ = data.get(P_COUNT, 0)
-        if c_count_ == 0 and a_count_ == 0 and p_count_ == 0:
+        if data.c_count == 0 and data.a_count == 0 and data.p_count == 0:
             return result
-        if c_count_ < 25 or a_count_ < 22 or p_count_ < 7:
+        if data.c_count < 25 or data.a_count < 22 or data.p_count < 7:
             result = NO
         elif number_of_consumption_record_blanks > 2:
             result = NO
@@ -47,5 +44,5 @@ class MultipleCheck(QCheck):
     test = MULTIPLE_ORDERS
     combinations = [{NAME: DEFAULT}]
 
-    def for_each_facility(self, facility, combination, previous_cycle_data=None):
-        return multiple_orders_score(facility)
+    def for_each_facility(self, facility_data, combination, previous_cycle_data=None):
+        return multiple_orders_score(facility_data.location)

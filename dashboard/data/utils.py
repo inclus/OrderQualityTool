@@ -2,6 +2,7 @@ import json
 import logging
 import time
 
+import attr
 import pydash
 import pygogo
 
@@ -12,6 +13,7 @@ TWO_CYCLE = "two_cycle"
 IS_INTERFACE = "is_interface"
 
 logger = pygogo.Gogo(__name__).get_structured_logger()
+
 
 def timeit(method):
     def timed(*args, **kw):
@@ -32,7 +34,8 @@ def clean_name(row):
 
 def reduce_to_values(records):
     def func(total, field):
-        total.extend(pydash.pluck(records, field))
+        as_dicts = map(attr.asdict, records)
+        total.extend(pydash.pluck(as_dicts, field))
         return total
 
     return func
@@ -76,17 +79,17 @@ class QCheck:
         raise NotImplementedError(self.test)
 
 
-def facility_not_reporting(facility):
-    return facility.get('status', '').strip().lower() != 'reporting'
+def facility_not_reporting(location_data):
+    return location_data.location.status.strip().lower() != 'reporting'
 
 
 def facility_has_single_order(facility):
-    not_multiple = facility['Multiple'].strip().lower() != 'multiple orders'
+    not_multiple = facility.multiple.strip().lower() != 'multiple orders'
     return not_multiple
 
 
 def multiple_orders_score(facility):
-    text_value = facility.get('Multiple', '').strip().lower()
+    text_value = facility.multiple.strip().lower()
     if 'multiple' in text_value:
         return NO
     elif 'not' in text_value:
@@ -101,24 +104,24 @@ def get_records_from_collection(collection, facility_name):
 
 
 def get_consumption_records(data, formulation_name):
-    return pydash.chain(data.get(C_RECORDS, [])).reject(
-        lambda x: formulation_name.strip().lower() not in x[FORMULATION].lower()
+    return pydash.chain(data.c_records).reject(
+        lambda x: formulation_name.strip().lower() not in x.regimen.lower()
     ).value()
 
 
 def get_patient_records(data, combinations, is_adult=True):
     lower_case_combinations = pydash.collect(combinations, lambda x: x.lower())
-    records = data.get(A_RECORDS, []) if is_adult else data.get(P_RECORDS, [])
+    records = data.a_records if is_adult else data.p_records
     return pydash.chain(records).select(
-        lambda x: x[FORMULATION].strip().lower() in lower_case_combinations
+        lambda x: x.regimen.strip().lower() in lower_case_combinations
     ).value()
 
 
 def filter_consumption_records(data, formulation_names):
     def filter_func(x):
         for f in formulation_names:
-            if f in x[FORMULATION]:
+            if f in x.regimen:
                 return True
         return False
 
-    return pydash.select(data.get(C_RECORDS, []), filter_func)
+    return pydash.select(data.c_records, filter_func)

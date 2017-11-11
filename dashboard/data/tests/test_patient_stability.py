@@ -2,46 +2,47 @@ from django.test import TestCase
 from nose_parameterized import parameterized
 
 from dashboard.data.cycles import StablePatientVolumesCheck
+from dashboard.data.entities import LocationData
 from dashboard.helpers import *
 
-initial = {
+initial = LocationData.migrate_from_dict({
     A_RECORDS: [
         {FORMULATION: F1_PATIENT_QUERY[0], NEW: 10, EXISTING: 10},
         {FORMULATION: F1_PATIENT_QUERY[1], NEW: 10, EXISTING: 10},
     ]
 
-}
-increased = {
+})
+increased = LocationData.migrate_from_dict({
     A_RECORDS: [
         {FORMULATION: F1_PATIENT_QUERY[0], NEW: 15, EXISTING: 15},
         {FORMULATION: F1_PATIENT_QUERY[1], NEW: 10, EXISTING: 10},
     ]
 
-}
+})
 
-doubled = {
+doubled = LocationData.migrate_from_dict({
     A_RECORDS: [
         {FORMULATION: F1_PATIENT_QUERY[0], NEW: 20, EXISTING: 20},
         {FORMULATION: F1_PATIENT_QUERY[1], NEW: 20, EXISTING: 20},
     ]
 
-}
+})
 
-zeros = {
+zeros = LocationData.migrate_from_dict({
     A_RECORDS: [
         {FORMULATION: F1_PATIENT_QUERY[0], NEW: 0, EXISTING: 0},
         {FORMULATION: F1_PATIENT_QUERY[1], NEW: 0, EXISTING: 0},
     ]
 
-}
-less_than_threshold = {
+})
+less_than_threshold = LocationData.migrate_from_dict({
     A_RECORDS: [
         {FORMULATION: F1_PATIENT_QUERY[0], NEW: 1, EXISTING: 1},
         {FORMULATION: F1_PATIENT_QUERY[1], NEW: 1, EXISTING: 1},
     ]
 
-}
-no_data = {}
+})
+no_data = LocationData.migrate_from_dict({})
 
 
 class PatientStabilityTestCase(TestCase):

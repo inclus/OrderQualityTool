@@ -1,5 +1,6 @@
 import os
 import re
+from collections import defaultdict
 from time import strptime
 
 import pydash
@@ -12,6 +13,7 @@ from dashboard.data.consumption_patients import ConsumptionAndPatientsQualityChe
 from dashboard.data.cycles import BalancesMatchCheck, StablePatientVolumesCheck, WarehouseFulfillmentCheck, \
     StableConsumptionCheck, OrdersOverTimeCheck
 from dashboard.data.data_import import ExcelDataImport, DataImport
+from dashboard.data.entities import enrich_location_data
 from dashboard.data.html_data_import import HtmlDataImport
 from dashboard.data.negatives import NegativeNumbersQualityCheck
 from dashboard.data.nn import NNRTIADULTSCheck
@@ -41,12 +43,12 @@ def persist_paed_records(report):
 
 def persist_records(locs, model, collection, cycle):
     adult_records = []
-    for facility in locs:
-        facility_name = facility.get('name', None)
+    for location in locs:
+        facility_name = location.facility
         records = collection.get(facility_name)
-        ip = facility.get('IP', None)
-        district = facility.get('District', None)
-        warehouse = facility.get('Warehouse', None)
+        ip = location.partner
+        district = location.district
+        warehouse = location.warehouse
         for r in records:
             c = model(
                 name=facility_name,
@@ -62,11 +64,11 @@ def persist_records(locs, model, collection, cycle):
 
 
 def build_mof(report):
-    def func(facility):
-        facility_name = facility.get('name', None)
-        ip = facility.get('IP', None)
-        district = facility.get('District', None)
-        warehouse = facility.get('Warehouse', None)
+    def func(location):
+        facility_name = location.facility
+        ip = location.partner
+        district = location.district
+        warehouse = location.warehouse
         return MultipleOrderFacility(
             cycle=report.cycle,
             name=facility_name,
@@ -88,8 +90,8 @@ def persist_multiple_order_records(report):
 @timeit
 def calculate_scores_for_checks_in_cycle(data_import):
     # type: (DataImport) -> None
-    run_checks(data_import)
-    persist_scores(data_import)
+    scores = run_checks(data_import)
+    persist_scores(scores, data_import.cycle)
     persist_consumption(data_import)
     persist_adult_records(data_import)
     persist_paed_records(data_import)
@@ -98,6 +100,7 @@ def calculate_scores_for_checks_in_cycle(data_import):
 
 @timeit
 def run_checks(report):
+    scores = defaultdict(lambda: defaultdict(dict))
     other_report = get_report_for_other_cycle(report)
     checks = [
         BlanksQualityCheck(),
@@ -116,31 +119,15 @@ def run_checks(report):
         WarehouseFulfillmentCheck(),
         StablePatientVolumesCheck()
     ]
-    for facility in report.locs:
-        facility_data = build_facility_data(facility, report)
-        other_facility_data = build_facility_data(facility, other_report)
+    for location in report.locs:
+        facility_data = enrich_location_data(location, report)
+        other_facility_data = enrich_location_data(location, other_report)
         for check in checks:
             for combination in check.combinations:
-                facility['scores'][check.test][combination[NAME]] = check.for_each_facility(facility_data, combination,
-                                                                                            other_facility_data)
-
-
-def build_facility_data(facility, report):
-    facility_data = {}
-    facility_name = facility[NAME]
-    c_records = report.cs[facility_name]
-    a_records = report.ads[facility_name]
-    p_records = report.pds[facility_name]
-    facility_data[C_COUNT] = len(c_records)
-    facility_data[A_COUNT] = len(a_records)
-    facility_data[P_COUNT] = len(p_records)
-    facility_data[C_RECORDS] = c_records
-    facility_data[A_RECORDS] = a_records
-    facility_data[P_RECORDS] = p_records
-    facility_data['Multiple'] = facility['Multiple']
-    facility_data['status'] = facility['status']
-    facility_data[NAME] = facility_name
-    return facility_data
+                scores[location][check.test][combination[NAME]] = check.for_each_facility(facility_data,
+                                                                                          combination,
+                                                                                          other_facility_data)
+    return scores
 
 
 @timeit
@@ -154,22 +141,22 @@ def get_report_for_other_cycle(report):
 
 
 @timeit
-def persist_scores(report):
-    scores = list()
+def persist_scores(score_cache, cycle):
+    list_of_score_obj = list()
     mapping = {
         F1: {"pass": "f1_pass_count", "fail": "f1_fail_count"},
         F2: {"pass": "f2_pass_count", "fail": "f2_fail_count"},
         F3: {"pass": "f3_pass_count", "fail": "f3_fail_count"},
         DEFAULT: {"pass": "default_pass_count", "fail": "default_fail_count"},
     }
-    for facility in report.locs:
+    for location, scores in score_cache.items():
         s = Score(
-            name=facility.get('name', None),
-            ip=facility.get('IP', None),
-            district=facility.get('District', None),
-            warehouse=facility.get('Warehouse', None),
-            cycle=report.cycle)
-        for key, value in facility['scores'].items():
+            name=location.facility,
+            ip=location.partner,
+            district=location.district,
+            warehouse=location.warehouse,
+            cycle=cycle)
+        for key, value in scores.items():
             setattr(s, key, value)
             for f, result in value.items():
                 formulation_mapping = mapping.get(f)
@@ -180,9 +167,9 @@ def persist_scores(report):
                     model_field = formulation_mapping.get("fail")
                     s.__dict__[model_field] += 1
 
-        scores.append(s)
-    Score.objects.filter(cycle=report.cycle).delete()
-    Score.objects.bulk_create(scores)
+        list_of_score_obj.append(s)
+    Score.objects.filter(cycle=cycle).delete()
+    Score.objects.bulk_create(list_of_score_obj)
 
 
 @shared_task

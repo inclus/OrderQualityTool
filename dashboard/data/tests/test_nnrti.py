@@ -2,12 +2,13 @@ from unittest import TestCase
 
 from nose_parameterized import parameterized
 
+from dashboard.data.entities import LocationData
 from dashboard.data.nn import NNRTIADULTSCheck, NNRTIPAEDCheck
 from dashboard.helpers import NOT_REPORTING, YES, C_RECORDS, OPENING_BALANCE, F1_QUERY, FORMULATION, NO, \
     COMBINED_CONSUMPTION
 
-has_no_data = {}
-current_adult_initial = {
+has_no_data = LocationData.migrate_from_dict({})
+current_adult_initial = LocationData.migrate_from_dict({
     C_RECORDS: [
         {
             COMBINED_CONSUMPTION: 10,
@@ -37,8 +38,8 @@ current_adult_initial = {
             FORMULATION: "Lopinavir/Ritonavir (LPV/r) 200mg/50mg [Pack 120]"
         },
     ]
-}
-current_adult_all_zero = {
+})
+current_adult_all_zero = LocationData.migrate_from_dict({
     C_RECORDS: [
         {
             COMBINED_CONSUMPTION: 0,
@@ -68,8 +69,8 @@ current_adult_all_zero = {
             FORMULATION: "Lopinavir/Ritonavir (LPV/r) 200mg/50mg [Pack 120]"
         },
     ]
-}
-current_adult_either_all_blank = {
+})
+current_adult_either_all_blank = LocationData.migrate_from_dict({
     C_RECORDS: [
         {
             COMBINED_CONSUMPTION: None,
@@ -99,8 +100,8 @@ current_adult_either_all_blank = {
             FORMULATION: "Lopinavir/Ritonavir (LPV/r) 200mg/50mg [Pack 120]"
         },
     ]
-}
-current_adult_2 = {
+})
+current_adult_2 = LocationData.migrate_from_dict({
     C_RECORDS: [
         {
             COMBINED_CONSUMPTION: 10,
@@ -130,9 +131,9 @@ current_adult_2 = {
             FORMULATION: "Lopinavir/Ritonavir (LPV/r) 200mg/50mg [Pack 120]"
         },
     ]
-}
+})
 
-current_paed_initial = {
+current_paed_initial = LocationData.migrate_from_dict({
     C_RECORDS: [
         {
             COMBINED_CONSUMPTION: 38,
@@ -159,8 +160,8 @@ current_paed_initial = {
             FORMULATION: "Lopinavir/Ritonavir (LPV/r) 100mg/25mg"
         }
     ]
-}
-current_paed_all_zero = {
+})
+current_paed_all_zero = LocationData.migrate_from_dict({
     C_RECORDS: [
         {
             COMBINED_CONSUMPTION: 0,
@@ -187,9 +188,9 @@ current_paed_all_zero = {
             FORMULATION: "Lopinavir/Ritonavir (LPV/r) 100mg/25mg"
         }
     ]
-}
+})
 
-current_paed_either_all_blank = {
+current_paed_either_all_blank = LocationData.migrate_from_dict({
     C_RECORDS: [
         {
             COMBINED_CONSUMPTION: None,
@@ -216,7 +217,7 @@ current_paed_either_all_blank = {
             FORMULATION: "Lopinavir/Ritonavir (LPV/r) 100mg/25mg"
         }
     ]
-}
+})
 
 
 class NNRTICURRENTADULTSCheckTestCase(TestCase):

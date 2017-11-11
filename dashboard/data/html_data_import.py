@@ -4,7 +4,7 @@ import pydash
 from bs4 import BeautifulSoup
 
 from dashboard.data.data_import import DataImport
-from dashboard.data.entities import DataImportRecord
+from dashboard.data.entities import HtmlDataImportRecord
 from dashboard.data.utils import timeit
 from dashboard.helpers import PAED_PATIENT_REPORT, ADULT_PATIENT_REPORT, CONSUMPTION_REPORT, HTML_PARSER
 
@@ -23,7 +23,7 @@ def extract_locations_and_import_records(report_outputs, partner_mapping):
 def get_locations(records):
     unique_records_by_location = pydash.uniq(records, lambda item: item.location)
     locations = pydash.map_(unique_records_by_location, lambda item: item.location)
-    return locations
+    return pydash.map_(locations, lambda item: item)
 
 
 @timeit
@@ -88,8 +88,8 @@ def parse_records_from_html(html_table_element, report, partner_mapping):
         if len(table_row_element) == len(row_with_column_names):
             items_in_row = table_row_element.find_all(TD)
             if len(items_in_row) > 0:
-                data_import_record = DataImportRecord(warehouse=report.warehouse, report_type=report.report_type,
-                                                      data=dict())
+                data_import_record = HtmlDataImportRecord(warehouse=report.warehouse, report_type=report.report_type,
+                                                          data=dict())
                 for item_index, item in enumerate(items_in_row):
                     column_name = table_column_names[item_index]
                     data_import_record.data[column_name] = try_to_get_int(item)

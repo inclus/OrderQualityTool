@@ -1,4 +1,5 @@
 import os
+from collections import defaultdict
 
 from django.test import TestCase
 
@@ -6,11 +7,10 @@ from dashboard.data.adherence import GuidelineAdherenceCheckAdult1L, calculate_s
 from dashboard.data.blanks import BlanksQualityCheck, IsReportingCheck, MultipleCheck
 from dashboard.data.consumption_patients import ConsumptionAndPatientsQualityCheck
 from dashboard.data.data_import import ExcelDataImport
+from dashboard.data.entities import enrich_location_data, LocationData, PatientRecord
 from dashboard.data.utils import clean_name, get_patient_total, get_consumption_totals, \
     values_for_records, get_consumption_records, get_patient_records
 from dashboard.helpers import *
-from dashboard.models import Score
-from dashboard.tasks import persist_scores, build_facility_data
 
 
 class FakeReport():
@@ -28,40 +28,56 @@ class DataTestCase(TestCase):
         assert clean_name(row) == "Byakabanda HC III"
 
     def test_consumption_records(self):
-        data = {}
-        data[C_RECORDS] = [{FORMULATION: "A", "openingBalance": 3},
-                           {FORMULATION: "B", "openingBalance": 3},
-                           {FORMULATION: "A", "openingBalance": 12}]
+        data = LocationData.migrate_from_dict({C_RECORDS: [{FORMULATION: "A", OPENING_BALANCE: 3},
+                                                           {FORMULATION: "B", OPENING_BALANCE: 3},
+                                                           {FORMULATION: "A", OPENING_BALANCE: 12}]})
 
         check = ConsumptionAndPatientsQualityCheck()
         records = get_consumption_records(data, "A")
-        assert records == [{FORMULATION: "A", "openingBalance": 3}, {FORMULATION: "A", "openingBalance": 12}]
+        self.assertEqual(records[0].regimen, "A")
+        self.assertEqual(records[0].opening_balance, 3)
+        self.assertEqual(records[1].regimen, "A")
+        self.assertEqual(records[1].opening_balance, 12)
 
     def test_adult_records(self):
-        data = {
+        data = LocationData.migrate_from_dict({
             A_RECORDS: [
                 {FORMULATION: "A", NEW: 3},
                 {FORMULATION: "B", NEW: 3},
                 {FORMULATION: "A", NEW: 12}]
 
-        }
+        })
         check = ConsumptionAndPatientsQualityCheck()
         records = get_patient_records(data, "A", True)
-        assert records == [{FORMULATION: "A", NEW: 3}, {FORMULATION: "A", NEW: 12}]
+        self.assertEqual(records[0].regimen, "A")
+        self.assertEqual(records[0].new, 3)
+        self.assertEqual(records[1].regimen, "A")
+        self.assertEqual(records[1].new, 12)
 
     def test_patient_totals(self):
-        assert get_patient_total([{NEW: 10, EXISTING: 12}, {NEW: None, EXISTING: 12}]) == 34
+        assert get_patient_total([
+            PatientRecord.migrate_from_dict({NEW: 10, EXISTING: 12}),
+            PatientRecord.migrate_from_dict({NEW: None, EXISTING: 12})]) == 34
 
     def test_consumption_totals(self):
-        assert get_consumption_totals([NEW], [{NEW: 10, EXISTING: 12}, {NEW: None, EXISTING: 12}]) == 10
-        assert get_consumption_totals([NEW], [{NEW: None, EXISTING: 12}, {NEW: 10, EXISTING: 12}]) == 10
-        assert get_consumption_totals([EXISTING], [{NEW: 10, EXISTING: 12}, {NEW: None, EXISTING: 12}]) == 24
+        assert get_consumption_totals([NEW], [
+            PatientRecord.migrate_from_dict({NEW: 10, EXISTING: 12}),
+            PatientRecord.migrate_from_dict({NEW: None, EXISTING: 12})]) == 10
+        assert get_consumption_totals([NEW], [
+            PatientRecord.migrate_from_dict({NEW: None, EXISTING: 12}),
+            PatientRecord.migrate_from_dict({NEW: 10, EXISTING: 12})]) == 10
+        assert get_consumption_totals([EXISTING], [
+            PatientRecord.migrate_from_dict({NEW: 10, EXISTING: 12}),
+            PatientRecord.migrate_from_dict({NEW: None, EXISTING: 12})]) == 24
         assert get_consumption_totals([EXISTING, NEW],
-                                      [{NEW: 10, EXISTING: 12}, {NEW: None, EXISTING: 12}]) == 34
+                                      [
+                                          PatientRecord.migrate_from_dict({NEW: 10, EXISTING: 12}),
+                                          PatientRecord.migrate_from_dict({NEW: None, EXISTING: 12})]) == 34
 
     def test_values_for_records(self):
-        assert values_for_records([NEW], [{NEW: 10, EXISTING: 12}, {NEW: None, EXISTING: 12}]) == [10, None]
-
+        assert values_for_records([NEW], [
+            PatientRecord.migrate_from_dict({NEW: 10, EXISTING: 12}),
+            PatientRecord.migrate_from_dict({NEW: None, EXISTING: 12})]) == [10, None]
 
     def test_blanks(self):
         file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', 'tests', 'fixtures',
@@ -75,9 +91,12 @@ class DataTestCase(TestCase):
         ]
         for case in cases:
             check = case['test']()
+            scores = defaultdict(lambda: defaultdict(dict))
             for combination in check.combinations:
-                report.locs[0]['scores'][check.test][combination[NAME]] = check.for_each_facility(build_facility_data(report.locs[0], report), combination)
-            self.assertEquals(report.locs[0]["scores"][case['test'].test][DEFAULT], case['expected'])
+                facility_data = enrich_location_data(report.locs[0], report)
+                scores[check.test][combination[NAME]] = check.for_each_facility(
+                    facility_data, combination)
+            self.assertEquals(scores[case['test'].test][DEFAULT], case['expected'])
 
 
 class GuidelineAdherenceAdult1LTestCase(TestCase):
@@ -126,7 +145,7 @@ class GuidelineAdherenceAdult1LTestCase(TestCase):
         self.assertEqual(result, NOT_REPORTING)
 
     def test_adherence_filter(self):
-        data = {
+        data = LocationData.migrate_from_dict({
             C_RECORDS: [
                 {
                     FORMULATION: "Tenofovir/Lamivudine (TDF/3TC) 300mg/300mg [Pack 30]",
@@ -150,9 +169,7 @@ class GuidelineAdherenceAdult1LTestCase(TestCase):
                 },
                 {FORMULATION: "A", "openingBalance": 12}],
             STATUS: REPORTING
-        }
+        })
         check = GuidelineAdherenceCheckAdult1L()
         result = check.for_each_facility(data, check.combinations[0])
         self.assertEqual(result, YES)
-
-

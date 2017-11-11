@@ -1,4 +1,8 @@
+from collections import defaultdict
+
 import attr
+
+from dashboard.helpers import *
 
 TABLE_COLUMN_NEW_PREGNANT_PATIENTS = "ESTIMATED NUMBER OF NEW HIV+ PREGNANT WOMEN"
 TABLE_COLUMN_NEW_PATIENTS = "ESTIMATED NUMBER OF NEW ART PATIENTS"
@@ -27,6 +31,19 @@ class Location(object):
     district = attr.ib()
     partner = attr.ib()
     warehouse = attr.ib()
+    multiple = attr.ib(attr.Factory(lambda: ""))
+    status = attr.ib(attr.Factory(lambda: ""))
+
+    @staticmethod
+    def migrate_from_dict(data):
+        return Location(
+            facility=data.get("name", ""),
+            partner=data.get("IP", ""),
+            district=data.get("District", ""),
+            warehouse=data.get("Warehouse", ""),
+            multiple=data.get("Multiple", ""),
+            status=data.get("status", ""),
+        )
 
 
 @attr.s(cmp=True, frozen=True)
@@ -55,11 +72,21 @@ class PatientRecord(Record):
             new=as_int(record.new) + as_int(self.new),
             regimen=self.regimen)
 
+    @staticmethod
+    def migrate_from_dict(data):
+        return PatientRecord(
+            location=None,
+            regimen_location=None,
+            existing=data.get(EXISTING),
+            regimen=data.get(FORMULATION),
+            new=data.get(NEW),
+        )
+
 
 def as_int(value):
     try:
         return int(value)
-    except ValueError:
+    except (ValueError, TypeError):
         return 0
 
 
@@ -72,9 +99,29 @@ class ConsumptionRecord(Record):
     closing_balance = attr.ib()
     months_of_stock_on_hand = attr.ib()
     quantity_required_for_current_patients = attr.ib()
-    number_of_new_art_patients = attr.ib()
-    number_of_new_pregnant_women = attr.ib()
+    estimated_number_of_new_patients = attr.ib()
+    estimated_number_of_new_pregnant_women = attr.ib()
     packs_ordered = attr.ib()
+    days_out_of_stock = attr.ib()
+
+    @staticmethod
+    def migrate_from_dict(data):
+        return ConsumptionRecord(
+            location=None,
+            regimen_location=None,
+            regimen=data.get(FORMULATION),
+            opening_balance=data.get(OPENING_BALANCE),
+            quantity_received=data.get(QUANTITY_RECEIVED),
+            consumption=data.get(COMBINED_CONSUMPTION),
+            loses_adjustments=data.get(LOSES_ADJUSTMENTS),
+            closing_balance=data.get(CLOSING_BALANCE),
+            months_of_stock_on_hand=data.get(MONTHS_OF_STOCK_OF_HAND),
+            quantity_required_for_current_patients=data.get(QUANTITY_REQUIRED_FOR_CURRENT_PATIENTS),
+            estimated_number_of_new_patients=data.get(ESTIMATED_NUMBER_OF_NEW_ART_PATIENTS),
+            estimated_number_of_new_pregnant_women=data.get(ESTIMATED_NUMBER_OF_NEW_PREGNANT_WOMEN),
+            days_out_of_stock=data.get(DAYS_OUT_OF_STOCK),
+            packs_ordered=data.get(PACKS_ORDERED),
+        )
 
     def add(self, record):
         opening_balance = as_int(self.opening_balance) + as_int(record.opening_balance)
@@ -85,10 +132,12 @@ class ConsumptionRecord(Record):
         months_of_stock_on_hand = as_int(self.months_of_stock_on_hand) + as_int(record.months_of_stock_on_hand)
         quantity_required_for_current_patients = as_int(self.quantity_required_for_current_patients) + as_int(
             record.quantity_required_for_current_patients)
-        number_of_new_art_patients = as_int(self.number_of_new_art_patients) + as_int(record.number_of_new_art_patients)
-        number_of_new_pregnant_women = as_int(self.number_of_new_pregnant_women) + as_int(
-            record.number_of_new_pregnant_women)
+        estimated_number_of_new_patients = as_int(self.estimated_number_of_new_patients) + as_int(
+            record.estimated_number_of_new_patients)
+        number_of_new_pregnant_women = as_int(self.estimated_number_of_new_pregnant_women) + as_int(
+            record.estimated_number_of_new_pregnant_women)
         packs_ordered = as_int(self.packs_ordered) + as_int(record.packs_ordered)
+        days_out_of_stock = as_int(self.days_out_of_stock) + as_int(record.days_out_of_stock)
         return ConsumptionRecord(
             location=self.location,
             regimen_location=self.regimen_location,
@@ -100,14 +149,15 @@ class ConsumptionRecord(Record):
             closing_balance=closing_balance,
             months_of_stock_on_hand=months_of_stock_on_hand,
             quantity_required_for_current_patients=quantity_required_for_current_patients,
-            number_of_new_art_patients=number_of_new_art_patients,
-            number_of_new_pregnant_women=number_of_new_pregnant_women,
+            estimated_number_of_new_patients=estimated_number_of_new_patients,
+            estimated_number_of_new_pregnant_women=number_of_new_pregnant_women,
             packs_ordered=packs_ordered,
+            days_out_of_stock=days_out_of_stock,
         )
 
 
 @attr.s
-class DataImportRecord(object):
+class HtmlDataImportRecord(object):
     warehouse = attr.ib()
     report_type = attr.ib()
     data = attr.ib()
@@ -160,17 +210,13 @@ class DataImportRecord(object):
 
     def build_location(self, partner_mapping):
         facility = self.get_facility()
-        subcounty = self.get_subcounty()
         district = self.get_district()
-        region = self.get_region()
 
         if self.has_facility_without_region():
             location_spread = self.get_facility().split("/")
             if len(location_spread) > 5:
                 facility = location_spread[5]
-                subcounty = location_spread[4]
                 district = location_spread[3]
-                region = location_spread[2]
         partner = partner_mapping.get(facility, None)
         return Location(
             facility=facility,
@@ -200,9 +246,10 @@ class DataImportRecord(object):
                                  closing_balance=self.get_closing_balance(),
                                  months_of_stock_on_hand=self.get_months_of_stock_on_hand(),
                                  quantity_required_for_current_patients=self.get_quantity_required_for_current_patients(),
-                                 number_of_new_art_patients=self.get_number_of_new_art_patients(),
-                                 number_of_new_pregnant_women=self.get_number_of_new_pregnant_patients(),
+                                 estimated_number_of_new_patients=self.get_number_of_new_art_patients(),
+                                 estimated_number_of_new_pregnant_women=self.get_number_of_new_pregnant_patients(),
                                  packs_ordered=self.get_packs_ordered(),
+                                 days_out_of_stock=None,
                                  regimen=regimen)
 
 
@@ -210,3 +257,94 @@ class DataImportRecord(object):
 class ReportOutput(object):
     report = attr.ib()
     output = attr.ib()
+
+
+@attr.s
+class LocationData(object):
+    location = attr.ib()
+    c_count = attr.ib()
+    a_count = attr.ib()
+    p_count = attr.ib()
+    a_records = attr.ib()
+    c_records = attr.ib()
+    p_records = attr.ib()
+
+    @staticmethod
+    def migrate_from_dict(data):
+        c_records = map(ConsumptionRecord.migrate_from_dict, data.get(C_RECORDS, []))
+        a_records = map(PatientRecord.migrate_from_dict, data.get(A_RECORDS, []))
+        p_records = map(PatientRecord.migrate_from_dict, data.get(P_RECORDS, []))
+        location = Location.migrate_from_dict(data)
+        c_count = data.get(C_COUNT, len(c_records))
+        a_count = data.get(A_COUNT,len(a_records))
+        p_count = data.get(P_COUNT,len(p_records))
+        return LocationData(
+            location=location,
+            c_records=c_records,
+            a_records=a_records,
+            p_records=p_records,
+            c_count=c_count,
+            a_count=a_count,
+            p_count=p_count
+        )
+
+
+def get_real_facility_name(facility_name, district_name):
+    if facility_name:
+        template = "_%s" % district_name
+        return facility_name.replace(template, "")
+    else:
+        return facility_name
+
+
+def location_from_excel_row(row):
+    partner = row[3].value
+    warehouse = row[4].value
+    district = row[5].value
+    facility = get_real_facility_name(row[0].value, row[5].value)
+    multiple = row[8].value
+    status = row[2].value
+    return Location(facility=facility, district=district, partner=partner,
+                    warehouse=warehouse, multiple=multiple, status=status)
+
+
+def enrich_location_data(location, report):
+    c_records = report.cs[location]
+    a_records = report.ads[location]
+    p_records = report.pds[location]
+
+    return LocationData(
+        location=location,
+        c_count=len(c_records),
+        a_count=len(a_records),
+        p_count=len(p_records),
+        c_records=c_records,
+        p_records=p_records,
+        a_records=a_records
+    )
+
+# data = {
+#             C_RECORDS: [
+#                 {
+#                     FORMULATION: "Tenofovir/Lamivudine (TDF/3TC) 300mg/300mg [Pack 30]",
+#                     "estimated_number_of_new_pregnant_women": 4,
+#                     "estimated_number_of_new_patients": 4
+#                 },
+#                 {
+#                     FORMULATION: "Tenofovir/Lamivudine/Efavirenz (TDF/3TC/EFV) 300mg/300mg/600mg[Pack 30]",
+#                     "estimated_number_of_new_pregnant_women": 4,
+#                     "estimated_number_of_new_patients": 4
+#                 },
+#                 {
+#                     FORMULATION: "Zidovudine/Lamivudine (AZT/3TC) 300mg/150mg [Pack 60]",
+#                     "estimated_number_of_new_pregnant_women": 1,
+#                     "estimated_number_of_new_patients": 1
+#                 },
+#                 {
+#                     FORMULATION: "Zidovudine/Lamivudine/Nevirapine (AZT/3TC/NVP) 300mg/150mg/200mg [Pack 60]",
+#                     "estimated_number_of_new_pregnant_women": 1,
+#                     "estimated_number_of_new_patients": 1
+#                 },
+#                 {FORMULATION: "A", "openingBalance": 12}],
+#             STATUS: REPORTING
+#         }
