@@ -5,7 +5,6 @@ from django.test import TestCase
 
 from dashboard.data.adherence import GuidelineAdherenceCheckAdult1L, calculate_score
 from dashboard.data.blanks import BlanksQualityCheck, IsReportingCheck, MultipleCheck
-from dashboard.data.consumption_patients import ConsumptionAndPatientsQualityCheck
 from dashboard.data.data_import import ExcelDataImport
 from dashboard.data.entities import enrich_location_data, LocationData, PatientRecord
 from dashboard.data.utils import clean_name, get_patient_total, get_consumption_totals, \
@@ -32,7 +31,6 @@ class DataTestCase(TestCase):
                                                            {FORMULATION: "B", OPENING_BALANCE: 3},
                                                            {FORMULATION: "A", OPENING_BALANCE: 12}]})
 
-        check = ConsumptionAndPatientsQualityCheck()
         records = get_consumption_records(data, "A")
         self.assertEqual(records[0].regimen, "A")
         self.assertEqual(records[0].opening_balance, 3)
@@ -47,7 +45,6 @@ class DataTestCase(TestCase):
                 {FORMULATION: "A", NEW: 12}]
 
         })
-        check = ConsumptionAndPatientsQualityCheck()
         records = get_patient_records(data, "A", True)
         self.assertEqual(records[0].regimen, "A")
         self.assertEqual(records[0].new, 3)

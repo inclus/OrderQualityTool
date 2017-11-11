@@ -11,7 +11,7 @@ from dashboard.data import partner_mapping
 def create_default_mapping(apps, schema_editor):
     path_to_fixture = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'data', 'tests', 'fixtures',
                                    'partner_mapping.xlsx')
-    with open(path_to_fixture, "r") as fixture_file:
+    with open(path_to_fixture, "rb") as fixture_file:
         mapping = partner_mapping.load_file(fixture_file)
         model = apps.get_registered_model("dashboard", "LocationToPartnerMapping")
         model.objects.all().delete()

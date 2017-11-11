@@ -1,4 +1,5 @@
 import attr
+import pydash
 
 from dashboard.helpers import *
 
@@ -269,9 +270,9 @@ class LocationData(object):
 
     @staticmethod
     def migrate_from_dict(data):
-        c_records = map(ConsumptionRecord.migrate_from_dict, data.get(C_RECORDS, []))
-        a_records = map(PatientRecord.migrate_from_dict, data.get(A_RECORDS, []))
-        p_records = map(PatientRecord.migrate_from_dict, data.get(P_RECORDS, []))
+        c_records = pydash.map_(data.get(C_RECORDS, []), ConsumptionRecord.migrate_from_dict)
+        a_records = pydash.map_(data.get(A_RECORDS, []), PatientRecord.migrate_from_dict)
+        p_records = pydash.map_(data.get(P_RECORDS, []), PatientRecord.migrate_from_dict)
         location = Location.migrate_from_dict(data)
         c_count = data.get(C_COUNT, len(c_records))
         a_count = data.get(A_COUNT,len(a_records))
