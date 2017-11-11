@@ -1,5 +1,3 @@
-import attr
-import pandas
 import pydash
 
 from dashboard.data.utils import QCheck, get_consumption_records, values_for_records

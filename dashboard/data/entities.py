@@ -1,5 +1,3 @@
-from collections import defaultdict
-
 import attr
 
 from dashboard.helpers import *

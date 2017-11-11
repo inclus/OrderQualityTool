@@ -1,12 +1,11 @@
 import json
-import logging
 import time
 
 import attr
 import pydash
 import pygogo
 
-from dashboard.helpers import NO, NOT_REPORTING, YES, EXISTING, NEW, FORMULATION, C_RECORDS, A_RECORDS, P_RECORDS
+from dashboard.helpers import NO, NOT_REPORTING, YES, EXISTING, NEW
 
 TWO_CYCLE = "two_cycle"
 

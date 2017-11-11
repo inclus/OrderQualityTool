@@ -3,8 +3,8 @@ from nose_parameterized import parameterized
 
 from dashboard.data.cycles import OrdersOverTimeCheck
 from dashboard.data.entities import LocationData
-from dashboard.helpers import C_RECORDS, FORMULATION, F1_QUERY, OPENING_BALANCE, ESTIMATED_NUMBER_OF_NEW_ART_PATIENTS, \
-    COMBINED_CONSUMPTION, YES, NOT_REPORTING, NO, DAYS_OUT_OF_STOCK
+from dashboard.helpers import C_RECORDS, FORMULATION, F1_QUERY, OPENING_BALANCE, COMBINED_CONSUMPTION, YES, \
+    NOT_REPORTING, NO, DAYS_OUT_OF_STOCK
 
 one_zero = LocationData.migrate_from_dict(
     {C_RECORDS: [{FORMULATION: F1_QUERY, OPENING_BALANCE: 12, DAYS_OUT_OF_STOCK: 0, COMBINED_CONSUMPTION: 4}]})
