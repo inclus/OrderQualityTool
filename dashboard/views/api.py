@@ -74,9 +74,7 @@ class BestPerformingDistrictsView(APIView):
         formulation = request.GET.get('formulation', F1)
         level = request.GET.get('level', 'district').lower()
         name = levels.get(level, 'district')
-        records = [cycle['title'] for cycle in Cycle.objects.values('title').distinct()]
-        cycles = sorted(records, key=cmp_to_key(sort_cycle), reverse=True)[:1]
-        most_recent_cycle = cycles[0] if len(cycles) > 0 else None
+        most_recent_cycle = get_most_recent_cycle(Cycle, 'title')
         cycle = request.GET.get('cycle', most_recent_cycle)
 
         if cycle:
@@ -132,20 +130,28 @@ class WorstPerformingDistrictsCSVView(BestPerformingDistrictsCSVView):
 
 class CyclesView(APIView):
     def get(self, request):
-        records = [cycle['cycle'] for cycle in Score.objects.values('cycle').distinct()]
-        most_recent_cycle, = sorted(records, key=cmp_to_key(sort_cycle), reverse=True)[:1]
-        month = to_date(most_recent_cycle)
-        cycles = generate_cycles(now().replace(years=-2), month)
-        cycles.reverse()
-        return Response({"values": cycles, "most_recent_cycle": most_recent_cycle})
+        most_recent_cycle = get_most_recent_cycle()
+        if most_recent_cycle:
+            month = to_date(most_recent_cycle)
+            cycles = generate_cycles(now().replace(years=-2), month)
+            cycles.reverse()
+            return Response({"values": cycles, "most_recent_cycle": most_recent_cycle})
+        return Response({"values": [], "most_recent_cycle": most_recent_cycle})
+
+
+def get_most_recent_cycle(model=Score, field='cycle'):
+    records = [cycle[field] for cycle in model.objects.values(field).distinct()]
+    sorted_cyles = sorted(records, key=cmp_to_key(sort_cycle), reverse=True)
+    if len(sorted_cyles) > 0:
+        most_recent_cycle, = sorted_cyles[:1]
+        return most_recent_cycle
 
 
 class ReportMetrics(APIView):
     def get(self, request):
         filters = build_filters(self.request)
         adh = self.request.GET.get("adh", "Adult 1L")
-        records = [cycle['cycle'] for cycle in Score.objects.values('cycle').distinct()]
-        most_recent_cycle, = sorted(records, key=cmp_to_key(sort_cycle), reverse=True)[:1]
+        most_recent_cycle = get_most_recent_cycle()
         adh_filter = "%s%s" % (GUIDELINE_ADHERENCE, adh.replace(" ", ""))
         reporting_scores = aggregate_scores(self.request.user, REPORTING, [most_recent_cycle], DEFAULT,
                                             {YES: 'reporting', NO: 'not_reporting', NOT_REPORTING: 'n_a'},
@@ -212,15 +218,16 @@ class FacilitiesMultipleReportingView(ScoresAPIView):
                 scores_filter[access_level.lower()] = access_area
         if request.user.is_superuser:
             scores_filter = filters
-        cycles = [cycle['cycle'] for cycle in MultipleOrderFacility.objects.values('cycle').distinct()]
-        sorted_cycles = sorted(cycles, key=cmp_to_key(sort_cycle), reverse=True)
-        most_recent_cycle = sorted_cycles[0]
-        cycle = request.GET.get('cycle', most_recent_cycle)
-        records = MultipleOrderFacility.objects.filter(cycle=cycle, **scores_filter).order_by('name').values('name',
-                                                                                                             'district',
-                                                                                                             'ip',
-                                                                                                             'warehouse')
-        return Response({"values": records})
+
+        most_recent_cycle = get_most_recent_cycle(MultipleOrderFacility)
+        if most_recent_cycle:
+            cycle = request.GET.get('cycle', most_recent_cycle)
+            records = MultipleOrderFacility.objects.filter(cycle=cycle, **scores_filter).order_by('name').values('name',
+                                                                                                                 'district',
+                                                                                                                 'ip',
+                                                                                                                 'warehouse')
+            return Response({"values": records})
+        return Response({"values": []})
 
 
 class OrderFormFreeOfGapsView(ScoresAPIView):
