@@ -21,7 +21,7 @@ def extract_locations_and_import_records(report_outputs, partner_mapping):
     locations = get_locations(records)
     return locations, records
 
-
+@timeit
 def get_locations(records):
     grouped_by_location = pydash.group_by(records, lambda item: item.location)
     return list(grouped_by_location.keys())
