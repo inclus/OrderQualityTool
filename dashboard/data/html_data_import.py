@@ -33,9 +33,12 @@ def get_all_records(report_outputs, partner_mapping):
     import_records = []
     for report_output in report_outputs:
         if report_output and report_output.output:
-            html_table_element = BeautifulSoup(report_output.output, HTML_PARSER)
-            records_for_output = parse_records_from_html(html_table_element, report_output.report, partner_mapping)
-            import_records.extend(records_for_output)
+            try:
+                html_table_element = BeautifulSoup(report_output.output, HTML_PARSER)
+                records_for_output = parse_records_from_html(html_table_element, report_output.report, partner_mapping)
+                import_records.extend(records_for_output)
+            except Exception as e:
+                logger.error("exception", extra={"exception": e, "report": report_output.report})
         else:
             logger.info("no output for report", extra={"output": report_output.report})
 
@@ -86,9 +89,12 @@ def parse_records_from_html(html_table_element, report, partner_mapping):
     data_import_records = []
     table_column_names = []
     row_with_column_names = html_table_element.find(id=TR_ROTATED)
-    for item in row_with_column_names:
-        if item and item.text:
-            table_column_names.append(item.text)
+    if row_with_column_names:
+        for item in row_with_column_names:
+            if item and item.text:
+                table_column_names.append(item.text)
+    else:
+        logger.info("report has not columns", extra={"report": report, "html": html_table_element})
 
     for table_row_element in html_table_element.find_all(TR):
         if len(table_row_element) == len(row_with_column_names) and table_row_element != row_with_column_names:
