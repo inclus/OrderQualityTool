@@ -50,9 +50,12 @@ class LocationImportTestCase(TestCase):
         locations, records = extract_locations_and_import_records(
             get_test_output_from_fixture("arv-2-paediatric-art-patient-report-maul.html"),
             LocationToPartnerMapping.get_mapping())
-        first_location = locations[0]
-        self.assertEqual(first_location.facility, "Ococia (Orungo) St. Clare HC III")
-        self.assertEqual(first_location.warehouse, "MAUL")
+        assert_that(locations, has_item(
+            all_of(
+                has_property("facility", "Ococia (Orungo) St. Clare HC III"),
+                has_property("warehouse", "MAUL"),
+            )
+        ))
 
 
 class AdultImportTestCase(TestCase):
