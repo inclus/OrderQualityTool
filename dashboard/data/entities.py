@@ -48,14 +48,20 @@ class Location(object):
 @attr.s(cmp=True, frozen=True)
 class RegimenLocationCombination(object):
     location = attr.ib()
-    regimen = attr.ib()
+    formulation = attr.ib()
 
 
 @attr.s(cmp=True)
 class Record(object):
-    regimen = attr.ib()
+    formulation = attr.ib()
     location = attr.ib()
     regimen_location = attr.ib()
+
+    def as_dict_for_model(self):
+        record = attr.asdict(self)
+        del record["location"]
+        del record["regimen_location"]
+        return record
 
 
 @attr.s(cmp=True)
@@ -69,15 +75,15 @@ class PatientRecord(Record):
             regimen_location=self.regimen_location,
             existing=as_int(record.existing) + as_int(self.existing),
             new=as_int(record.new) + as_int(self.new),
-            regimen=self.regimen)
+            formulation=self.formulation)
 
     @staticmethod
-    def migrate_from_dict(data):
+    def migrate_from_dict(data, location=None, regimen_location=None):
         return PatientRecord(
-            location=None,
-            regimen_location=None,
+            location=location,
+            regimen_location=regimen_location,
             existing=data.get(EXISTING),
-            regimen=data.get(FORMULATION),
+            formulation=data.get(FORMULATION),
             new=data.get(NEW),
         )
 
@@ -104,17 +110,17 @@ class ConsumptionRecord(Record):
     days_out_of_stock = attr.ib()
 
     @staticmethod
-    def migrate_from_dict(data):
+    def migrate_from_dict(data, location=None, regimen_location=None):
         return ConsumptionRecord(
-            location=None,
-            regimen_location=None,
-            regimen=data.get(FORMULATION),
+            location=location,
+            regimen_location=regimen_location,
+            formulation=data.get(FORMULATION),
             opening_balance=data.get(OPENING_BALANCE),
             quantity_received=data.get(QUANTITY_RECEIVED),
             consumption=data.get(COMBINED_CONSUMPTION),
             loses_adjustments=data.get(LOSES_ADJUSTMENTS),
             closing_balance=data.get(CLOSING_BALANCE),
-            months_of_stock_on_hand=data.get(MONTHS_OF_STOCK_OF_HAND),
+            months_of_stock_on_hand=data.get(MONTHS_OF_STOCK_ON_HAND),
             quantity_required_for_current_patients=data.get(QUANTITY_REQUIRED_FOR_CURRENT_PATIENTS),
             estimated_number_of_new_patients=data.get(ESTIMATED_NUMBER_OF_NEW_ART_PATIENTS),
             estimated_number_of_new_pregnant_women=data.get(ESTIMATED_NUMBER_OF_NEW_PREGNANT_WOMEN),
@@ -140,7 +146,7 @@ class ConsumptionRecord(Record):
         return ConsumptionRecord(
             location=self.location,
             regimen_location=self.regimen_location,
-            regimen=self.regimen,
+            formulation=self.formulation,
             opening_balance=opening_balance,
             quantity_received=quantity_received,
             consumption=consumption,
@@ -225,17 +231,17 @@ class HtmlDataImportRecord(object):
         )
 
     def build_patient_record(self):
-        regimen = self.data.get(TABLE_COLUMN_REGIMEN)
-        rl = RegimenLocationCombination(location=self.location, regimen=regimen)
+        formulation = self.data.get(TABLE_COLUMN_REGIMEN)
+        rl = RegimenLocationCombination(location=self.location, formulation=formulation)
         return PatientRecord(location=self.location,
                              regimen_location=rl,
                              existing=self.data.get(TABLE_COLUMN_EXISTING),
                              new=self.data.get(TABLE_COLUMN_NEW),
-                             regimen=regimen)
+                             formulation=formulation)
 
     def build_consumption_record(self):
-        regimen = self.data.get("REGIMEN")
-        rl = RegimenLocationCombination(location=self.location, regimen=regimen)
+        formulation = self.data.get("REGIMEN")
+        rl = RegimenLocationCombination(location=self.location, formulation=formulation)
         return ConsumptionRecord(location=self.location,
                                  regimen_location=rl,
                                  opening_balance=self.get_opening_balance(),
@@ -249,7 +255,41 @@ class HtmlDataImportRecord(object):
                                  estimated_number_of_new_pregnant_women=self.get_number_of_new_pregnant_patients(),
                                  packs_ordered=self.get_packs_ordered(),
                                  days_out_of_stock=None,
-                                 regimen=regimen)
+                                 formulation=formulation)
+
+
+@attr.s
+class ExcelDataImportRecord(object):
+    data = attr.ib()
+    location = attr.ib(None)
+
+    def build_location(self):
+        facility = self.data.get(NAME)
+        district = self.data.get(DISTRICT)
+        partner = self.data.get(IP)
+        warehouse = self.data.get(WAREHOUSE)
+        status = self.data.get(STATUS)
+        multiple = self.data.get(MULTIPLE)
+
+        return Location(
+            facility=facility,
+            district=district,
+            partner=partner,
+            warehouse=warehouse,
+            status=status,
+            multiple=multiple,
+        )
+
+    def build_patient_record(self):
+        formulation = self.data.get(FORMULATION)
+        rl = RegimenLocationCombination(location=self.location, formulation=formulation)
+        return PatientRecord.migrate_from_dict(self.data, location=self.location,
+                                               regimen_location=rl)
+
+    def build_consumption_record(self):
+        formulation = self.data.get(FORMULATION)
+        rl = RegimenLocationCombination(location=self.location, formulation=formulation)
+        return ConsumptionRecord.migrate_from_dict(self.data, self.location, rl)
 
 
 @attr.s
@@ -275,8 +315,8 @@ class LocationData(object):
         p_records = pydash.map_(data.get(P_RECORDS, []), PatientRecord.migrate_from_dict)
         location = Location.migrate_from_dict(data)
         c_count = data.get(C_COUNT, len(c_records))
-        a_count = data.get(A_COUNT,len(a_records))
-        p_count = data.get(P_COUNT,len(p_records))
+        a_count = data.get(A_COUNT, len(a_records))
+        p_count = data.get(P_COUNT, len(p_records))
         return LocationData(
             location=location,
             c_records=c_records,
@@ -296,21 +336,10 @@ def get_real_facility_name(facility_name, district_name):
         return facility_name
 
 
-def location_from_excel_row(row):
-    partner = row[3].value
-    warehouse = row[4].value
-    district = row[5].value
-    facility = get_real_facility_name(row[0].value, row[5].value)
-    multiple = row[8].value
-    status = row[2].value
-    return Location(facility=facility, district=district, partner=partner,
-                    warehouse=warehouse, multiple=multiple, status=status)
-
-
 def enrich_location_data(location, report):
-    c_records = report.cs[location]
-    a_records = report.ads[location]
-    p_records = report.pds[location]
+    c_records = report.cs.get(location, [])
+    a_records = report.ads.get(location, [])
+    p_records = report.pds.get(location, [])
 
     return LocationData(
         location=location,
@@ -321,29 +350,3 @@ def enrich_location_data(location, report):
         p_records=p_records,
         a_records=a_records
     )
-
-# data = {
-#             C_RECORDS: [
-#                 {
-#                     FORMULATION: "Tenofovir/Lamivudine (TDF/3TC) 300mg/300mg [Pack 30]",
-#                     "estimated_number_of_new_pregnant_women": 4,
-#                     "estimated_number_of_new_patients": 4
-#                 },
-#                 {
-#                     FORMULATION: "Tenofovir/Lamivudine/Efavirenz (TDF/3TC/EFV) 300mg/300mg/600mg[Pack 30]",
-#                     "estimated_number_of_new_pregnant_women": 4,
-#                     "estimated_number_of_new_patients": 4
-#                 },
-#                 {
-#                     FORMULATION: "Zidovudine/Lamivudine (AZT/3TC) 300mg/150mg [Pack 60]",
-#                     "estimated_number_of_new_pregnant_women": 1,
-#                     "estimated_number_of_new_patients": 1
-#                 },
-#                 {
-#                     FORMULATION: "Zidovudine/Lamivudine/Nevirapine (AZT/3TC/NVP) 300mg/150mg/200mg [Pack 60]",
-#                     "estimated_number_of_new_pregnant_women": 1,
-#                     "estimated_number_of_new_patients": 1
-#                 },
-#                 {FORMULATION: "A", "openingBalance": 12}],
-#             STATUS: REPORTING
-#         }

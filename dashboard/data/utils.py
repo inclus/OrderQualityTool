@@ -104,7 +104,7 @@ def get_records_from_collection(collection, facility_name):
 
 def get_consumption_records(data, formulation_name):
     return pydash.chain(data.c_records).reject(
-        lambda x: formulation_name.strip().lower() not in x.regimen.lower()
+        lambda x: formulation_name.strip().lower() not in x.formulation.lower()
     ).value()
 
 
@@ -112,14 +112,14 @@ def get_patient_records(data, combinations, is_adult=True):
     lower_case_combinations = pydash.collect(combinations, lambda x: x.lower())
     records = data.a_records if is_adult else data.p_records
     return pydash.chain(records).select(
-        lambda x: x.regimen.strip().lower() in lower_case_combinations
+        lambda x: x.formulation.strip().lower() in lower_case_combinations
     ).value()
 
 
 def filter_consumption_records(data, formulation_names):
     def filter_func(x):
         for f in formulation_names:
-            if f in x.regimen:
+            if f in x.formulation:
                 return True
         return False
 

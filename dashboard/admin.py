@@ -65,7 +65,7 @@ class ConsumptionAdmin(ModelAdmin):
         'consumption',
         'loses_adjustments',
         'closing_balance',
-        'months_of_stock_of_hand',
+        'months_of_stock_on_hand',
         'quantity_required_for_current_patients',
         'estimated_number_of_new_patients',
         'estimated_number_of_new_pregnant_women'

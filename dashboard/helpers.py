@@ -141,7 +141,7 @@ PACKS_ORDERED = 'packs_ordered'
 ESTIMATED_NUMBER_OF_NEW_PREGNANT_WOMEN = 'estimated_number_of_new_pregnant_women'
 ESTIMATED_NUMBER_OF_NEW_ART_PATIENTS = 'estimated_number_of_new_patients'
 QUANTITY_REQUIRED_FOR_CURRENT_PATIENTS = 'quantity_required_for_current_patients'
-MONTHS_OF_STOCK_OF_HAND = 'months_of_stock_of_hand'
+MONTHS_OF_STOCK_ON_HAND = 'months_of_stock_on_hand'
 DAYS_OUT_OF_STOCK = 'days_out_of_stock'
 CLOSING_BALANCE = 'closing_balance'
 LOSES_ADJUSTMENTS = 'loses_adjustments'
@@ -156,7 +156,7 @@ FIELD_NAMES = {
     ESTIMATED_NUMBER_OF_NEW_PREGNANT_WOMEN: 'Estimated New Pregnant Women',
     ESTIMATED_NUMBER_OF_NEW_ART_PATIENTS: 'Estimated New ART Patients',
     QUANTITY_REQUIRED_FOR_CURRENT_PATIENTS: 'Quantity Required for current Patients',
-    MONTHS_OF_STOCK_OF_HAND: 'Months of Stock on Hand',
+    MONTHS_OF_STOCK_ON_HAND: 'Months of Stock on Hand',
     CLOSING_BALANCE: 'Closing Balance',
     LOSES_ADJUSTMENTS: 'Loses Adjustments',
     COMBINED_CONSUMPTION: 'Consumption',

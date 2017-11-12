@@ -7,9 +7,14 @@ from dashboard.data.adherence import GuidelineAdherenceCheckAdult1L, calculate_s
 from dashboard.data.blanks import BlanksQualityCheck, IsReportingCheck, MultipleCheck
 from dashboard.data.data_import import ExcelDataImport
 from dashboard.data.entities import enrich_location_data, LocationData, PatientRecord
+from dashboard.data.html_data_import import HtmlDataImport
+from dashboard.data.tests.test_html_data_import import get_test_output_from_fixture
 from dashboard.data.utils import clean_name, get_patient_total, get_consumption_totals, \
     values_for_records, get_consumption_records, get_patient_records
 from dashboard.helpers import *
+from dashboard.models import Score, Consumption, PAEDPatientsRecord, AdultPatientsRecord, MultipleOrderFacility, \
+    LocationToPartnerMapping
+from dashboard.tasks import calculate_scores_for_checks_in_cycle
 
 
 class FakeReport():
@@ -32,9 +37,9 @@ class DataTestCase(TestCase):
                                                            {FORMULATION: "A", OPENING_BALANCE: 12}]})
 
         records = get_consumption_records(data, "A")
-        self.assertEqual(records[0].regimen, "A")
+        self.assertEqual(records[0].formulation, "A")
         self.assertEqual(records[0].opening_balance, 3)
-        self.assertEqual(records[1].regimen, "A")
+        self.assertEqual(records[1].formulation, "A")
         self.assertEqual(records[1].opening_balance, 12)
 
     def test_adult_records(self):
@@ -46,9 +51,9 @@ class DataTestCase(TestCase):
 
         })
         records = get_patient_records(data, "A", True)
-        self.assertEqual(records[0].regimen, "A")
+        self.assertEqual(records[0].formulation, "A")
         self.assertEqual(records[0].new, 3)
-        self.assertEqual(records[1].regimen, "A")
+        self.assertEqual(records[1].formulation, "A")
         self.assertEqual(records[1].new, 12)
 
     def test_patient_totals(self):
@@ -94,6 +99,36 @@ class DataTestCase(TestCase):
                 scores[check.test][combination[NAME]] = check.for_each_facility(
                     facility_data, combination)
             self.assertEquals(scores[case['test'].test][DEFAULT], case['expected'])
+
+    def test_full_excel_import(self):
+        file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', 'tests', 'fixtures',
+                                 "new_format.xlsx")
+        report = ExcelDataImport(file_path, "May Jun").load()
+        test_cycle = "Jul - Aug 2015"
+        report.cycle = test_cycle
+        self.assertEqual(len(report.locs), 24)
+        calculate_scores_for_checks_in_cycle(report)
+        self.assertEqual(len(Score.objects.filter(cycle=test_cycle)), 24)
+        self.assertEqual(len(AdultPatientsRecord.objects.filter(cycle=test_cycle)), 44)
+        self.assertEqual(len(PAEDPatientsRecord.objects.filter(cycle=test_cycle)), 28)
+        self.assertEqual(len(Consumption.objects.filter(cycle=test_cycle)), 41)
+        self.assertEqual(len(MultipleOrderFacility.objects.filter(cycle=test_cycle)), 5)
+
+    def test_full_html_import(self):
+        fixture = get_test_output_from_fixture("arv-0-consumption-data-report-maul.html",
+                                               report_type=CONSUMPTION_REPORT)
+        fixture.extend(get_test_output_from_fixture("arv-0-consumption-data-report-maul.html",
+                                                    report_type=CONSUMPTION_REPORT))
+        report = HtmlDataImport(fixture, "May Jun").load(LocationToPartnerMapping.get_mapping())
+        test_cycle = "Jul - Aug 2015"
+        report.cycle = test_cycle
+        self.assertEqual(len(report.locs), 6)
+        calculate_scores_for_checks_in_cycle(report)
+        self.assertEqual(len(Score.objects.filter(cycle=test_cycle)), 6)
+        self.assertEqual(len(AdultPatientsRecord.objects.filter(cycle=test_cycle)), 0)
+        self.assertEqual(len(PAEDPatientsRecord.objects.filter(cycle=test_cycle)), 0)
+        self.assertEqual(len(Consumption.objects.filter(cycle=test_cycle)), 126)
+        self.assertEqual(len(MultipleOrderFacility.objects.filter(cycle=test_cycle)), 0)
 
 
 class GuidelineAdherenceAdult1LTestCase(TestCase):

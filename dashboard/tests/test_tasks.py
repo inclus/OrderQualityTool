@@ -3,7 +3,7 @@ from collections import defaultdict
 from django.test import TestCase
 from mock import patch, call
 
-from dashboard.data.entities import Location
+from dashboard.data.entities import Location, PatientRecord, ConsumptionRecord
 from dashboard.data.tests.test_data import FakeReport
 from dashboard.models import Score, Consumption, AdultPatientsRecord, PAEDPatientsRecord, Cycle, MultipleOrderFacility
 from dashboard.tasks import persist_scores, persist_consumption, persist_adult_records, persist_paed_records, \
@@ -36,22 +36,16 @@ class TaskTestCase(TestCase):
         report.ads = defaultdict(list)
         report.pds = defaultdict(list)
         report.cycle = "May - Jun 2015"
-        report.locs = [Location.migrate_from_dict({
-            'name': 'location_one',
-            'IP': 'ip_one',
-            'District': 'district_one',
-            'Warehouse': 'warehouse_one',
-            'Multiple': '',
-            'status': '',
-            'Web/Paper': '',
-            'scores': defaultdict(dict)
-        })]
+        location = Location.migrate_from_dict(
+            {'name': 'location_one', 'IP': 'ip_one', 'District': 'district_one', 'Warehouse': 'warehouse_one',
+             'Multiple': '', 'status': '', 'Web/Paper': '', 'scores': defaultdict(dict)})
+        report.locs = [location]
         report.cs = {
-            'location_one': [
-                {
+            location: [
+                ConsumptionRecord.migrate_from_dict({
                     'opening_balance': 20,
                     'closing_balance': 12,
-                }
+                })
             ]
         }
         self.assertEqual(Consumption.objects.count(), 0)
@@ -70,22 +64,16 @@ class TaskTestCase(TestCase):
         report.ads = defaultdict(list)
         report.pds = defaultdict(list)
         report.cycle = "May - Jun 2015"
-        report.locs = [Location.migrate_from_dict({
-            'name': 'location_one',
-            'IP': 'ip_one',
-            'District': 'district_one',
-            'Warehouse': 'warehouse_one',
-            'Multiple': '',
-            'status': '',
-            'Web/Paper': '',
-            'scores': defaultdict(dict)
-        })]
+        location = Location.migrate_from_dict(
+            {'name': 'location_one', 'IP': 'ip_one', 'District': 'district_one', 'Warehouse': 'warehouse_one',
+             'Multiple': '', 'status': '', 'Web/Paper': '', 'scores': defaultdict(dict)})
+        report.locs = [location]
         report.ads = {
-            'location_one': [
-                {
+            location: [
+                PatientRecord.migrate_from_dict({
                     'new': 20,
                     'existing': 12,
-                }
+                })
             ]
         }
         self.assertEqual(AdultPatientsRecord.objects.count(), 0)
@@ -104,22 +92,16 @@ class TaskTestCase(TestCase):
         report.ads = defaultdict(list)
         report.pds = defaultdict(list)
         report.cycle = "May - Jun 2015"
-        report.locs = [Location.migrate_from_dict({
-            'name': 'location_one',
-            'IP': 'ip_one',
-            'District': 'district_one',
-            'Warehouse': 'warehouse_one',
-            'Multiple': '',
-            'status': '',
-            'Web/Paper': '',
-            'scores': defaultdict(dict)
-        })]
+        location_one = Location.migrate_from_dict(
+            {'name': 'location_one', 'IP': 'ip_one', 'District': 'district_one', 'Warehouse': 'warehouse_one',
+             'Multiple': '', 'status': '', 'Web/Paper': '', 'scores': defaultdict(dict)})
+        report.locs = [location_one]
         report.pds = {
-            'location_one': [
-                {
+            location_one: [
+                PatientRecord.migrate_from_dict({
                     'new': 20,
                     'existing': 12,
-                }
+                })
             ]
         }
         self.assertEqual(PAEDPatientsRecord.objects.count(), 0)

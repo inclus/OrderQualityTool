@@ -1,9 +1,9 @@
-import os
 import re
 from collections import defaultdict
-from time import strptime
 
+import attr
 import pydash
+import pygogo
 from celery import shared_task
 
 from dashboard.data.adherence import GuidelineAdherenceCheckAdult1L, GuidelineAdherenceCheckPaed1L
@@ -19,11 +19,12 @@ from dashboard.data.negatives import NegativeNumbersQualityCheck
 from dashboard.data.nn import NNRTIADULTSCheck
 from dashboard.data.nn import NNRTIPAEDCheck
 from dashboard.data.utils import facility_has_single_order, timeit
-from dashboard.helpers import YES, get_prev_cycle, WEB, F1, F2, F3, DEFAULT, NO, NAME, C_COUNT, A_COUNT, P_COUNT, \
-    C_RECORDS, A_RECORDS, P_RECORDS
+from dashboard.helpers import YES, get_prev_cycle, WEB, F1, F2, F3, DEFAULT, NO, NAME
 from dashboard.medist.tasks import fetch_reports
 from dashboard.models import Score, Cycle, Consumption, AdultPatientsRecord, PAEDPatientsRecord, MultipleOrderFacility, \
     Dhis2StandardReport, LocationToPartnerMapping
+
+logger = pygogo.Gogo(__name__).get_structured_logger()
 
 
 @timeit
@@ -45,20 +46,22 @@ def persist_records(locs, model, collection, cycle):
     adult_records = []
     for location in locs:
         facility_name = location.facility
-        records = collection.get(facility_name)
+        records = collection.get(location, [])
         ip = location.partner
         district = location.district
         warehouse = location.warehouse
         for r in records:
+            record_as_dict = r.as_dict_for_model()
             c = model(
                 name=facility_name,
                 ip=ip,
                 district=district,
                 warehouse=warehouse,
                 cycle=cycle,
-                **r
+                **record_as_dict
             )
             adult_records.append(c)
+    logger.info("saving records", extra={"cycle": cycle, "model": model.__name__, "count": len(adult_records)})
     model.objects.filter(cycle=cycle).delete()
     model.objects.bulk_create(adult_records)
 

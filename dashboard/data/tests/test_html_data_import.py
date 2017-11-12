@@ -1,5 +1,4 @@
 import os
-import pprint
 
 from django.test import TestCase
 from hamcrest import *
@@ -68,14 +67,14 @@ class AdultImportTestCase(TestCase):
     def test_that_test_location_records_have_correct_values(self):
         records_for_first_location = self.data_import.ads[self.test_location]
         assert_that(records_for_first_location, has_item(all_of(
-            has_property("regimen", "TDF/3TC/EFV (PMTCT)"),
+            has_property("formulation", "TDF/3TC/EFV (PMTCT)"),
             has_property("existing", 7),
             has_property("new", 0),
             has_property("location", self.test_location)
         )))
 
         assert_that(records_for_first_location, has_item(all_of(
-            has_property("regimen", "TDF/3TC/ATV/r (ADULT)"),
+            has_property("formulation", "TDF/3TC/ATV/r (ADULT)"),
             has_property("existing", 2),
             has_property("new", 1),
             has_property("location", self.test_location)
@@ -103,14 +102,14 @@ class PaedImportTestCase(TestCase):
         records_for_first_location = self.data_import.pds[self.test_location]
 
         assert_that(records_for_first_location, has_item(all_of(
-            has_property("regimen", "ABC/3TC/NVP"),
+            has_property("formulation", "ABC/3TC/NVP"),
             has_property("existing", 1),
             has_property("new", 0),
             has_property("location", self.test_location)
         )))
 
         assert_that(records_for_first_location, has_item(all_of(
-            has_property("regimen", "AZT/3TC/NVP"),
+            has_property("formulation", "AZT/3TC/NVP"),
             has_property("existing", 2),
             has_property("new", 0),
             has_property("location", self.test_location)
@@ -137,14 +136,14 @@ class PaedImportCombinedTestCase(TestCase):
     def test_that_test_location_records_have_correct_values(self):
         records_for_first_location = self.data_import.pds[self.test_location]
         assert_that(records_for_first_location, has_item(all_of(
-            has_property("regimen", "ABC/3TC/NVP"),
+            has_property("formulation", "ABC/3TC/NVP"),
             has_property("existing", 2),
             has_property("new", 0),
             has_property("location", self.test_location)
         )))
 
         assert_that(records_for_first_location, has_item(all_of(
-            has_property("regimen", "AZT/3TC/NVP"),
+            has_property("formulation", "AZT/3TC/NVP"),
             has_property("existing", 4),
             has_property("new", 0),
             has_property("location", self.test_location)
@@ -172,7 +171,7 @@ class ConsumptionImportTestCase(TestCase):
         records_for_first_location = self.data_import.cs[self.test_location]
         first_record = records_for_first_location[0]
         self.assertEqual(first_record.location, self.test_location)
-        self.assertEqual(first_record.regimen,
+        self.assertEqual(first_record.formulation,
                          "Tenofovir/Lamivudine/Efavirenz (TDF/3TC/EFV) 300mg/300mg/600mg[Pack 30]")
         self.assertEqual(first_record.opening_balance, 280)
         self.assertEqual(first_record.quantity_received, 204)
@@ -185,7 +184,7 @@ class ConsumptionImportTestCase(TestCase):
         self.assertEqual(first_record.packs_ordered, 178)
 
     def test_that_correct_number_of_records_are_extracted(self):
-        self.assertEqual(len(self.data_import.cs), 7)
+        self.assertEqual(len(self.data_import.cs), 6)
 
 
 class ConsumptionCombinedImportTestCase(TestCase):
@@ -210,7 +209,7 @@ class ConsumptionCombinedImportTestCase(TestCase):
         records_for_first_location = self.data_import.cs[self.test_location]
         first_record = records_for_first_location[0]
         self.assertEqual(first_record.location, self.test_location)
-        self.assertEqual(first_record.regimen,
+        self.assertEqual(first_record.formulation,
                          "Tenofovir/Lamivudine/Efavirenz (TDF/3TC/EFV) 300mg/300mg/600mg[Pack 30]")
         self.assertEqual(first_record.opening_balance, 560)
         self.assertEqual(first_record.quantity_received, 408)
@@ -223,4 +222,4 @@ class ConsumptionCombinedImportTestCase(TestCase):
         self.assertEqual(first_record.packs_ordered, 356)
 
     def test_that_correct_number_of_records_are_extracted(self):
-        self.assertEqual(len(self.data_import.cs), 7)
+        self.assertEqual(len(self.data_import.cs), 6)
