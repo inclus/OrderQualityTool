@@ -59,6 +59,7 @@ class DHIS2Scrapper(object):
             PERIOD: period
         }
         url = "%(base_url)s/dhis-web-reporting/generateHtmlReport.action?uid=%(report_id)s&pe=%(period)s&ou=%(org_unit)s" % query
+        query["url"] = url
         logger.info("open report", extra=query)
         self.browser.visit(url)
         return get_html_table(self.browser.html, report_id)

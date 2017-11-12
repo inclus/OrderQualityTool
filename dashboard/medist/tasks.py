@@ -15,7 +15,7 @@ def fetch_reports(reports, periods):
             if report_id:
                 report_html = scrapper.get_standard_report(report_id, period, report.org_unit_id)
                 if report_html:
-                    results.append(ReportOutput(output=report_html, report=report))
+                    results.append(ReportOutput(output=str(report_html), report=report))
             else:
                 logger.info("Report has no id", extra=report)
     return results

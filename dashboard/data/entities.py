@@ -222,7 +222,7 @@ class HtmlDataImportRecord(object):
             if len(location_spread) > 5:
                 facility = location_spread[5]
                 district = location_spread[3]
-        partner = partner_mapping.get(facility, None)
+        partner = partner_mapping.get(facility, "Unknown")
         return Location(
             facility=facility,
             district=district,

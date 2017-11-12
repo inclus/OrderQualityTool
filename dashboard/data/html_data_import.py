@@ -1,6 +1,7 @@
 import functools
 
 import pydash
+import pygogo
 from bs4 import BeautifulSoup
 
 from dashboard.data.data_import import DataImport
@@ -8,6 +9,7 @@ from dashboard.data.entities import HtmlDataImportRecord
 from dashboard.data.utils import timeit
 from dashboard.helpers import PAED_PATIENT_REPORT, ADULT_PATIENT_REPORT, CONSUMPTION_REPORT, HTML_PARSER
 
+logger = pygogo.Gogo(__name__).get_structured_logger()
 TR = "tr"
 TD = "td"
 TR_ROTATED = "tr_rotated"
@@ -30,9 +32,13 @@ def get_locations(records):
 def get_all_records(report_outputs, partner_mapping):
     import_records = []
     for report_output in report_outputs:
-        html_table_element = BeautifulSoup(report_output.output, HTML_PARSER)
-        records_for_output = parse_records_from_html(html_table_element, report_output.report, partner_mapping)
-        import_records.extend(records_for_output)
+        if report_output and report_output.output:
+            html_table_element = BeautifulSoup(report_output.output, HTML_PARSER)
+            records_for_output = parse_records_from_html(html_table_element, report_output.report, partner_mapping)
+            import_records.extend(records_for_output)
+        else:
+            logger.info("no output for report", extra={"output": report_output.report})
+
     return import_records
 
 
