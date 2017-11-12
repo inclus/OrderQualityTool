@@ -32,12 +32,19 @@ class LocationImportTestCase(TestCase):
         locations, records = extract_locations_and_import_records(
             get_test_output_from_fixture("arv-2-paediatric-art-patient-report-maul.html"),
             LocationToPartnerMapping.get_mapping())
-        first_location = locations[0]
-        self.assertEqual(first_location.facility, "Ococia (Orungo) St. Clare HC III")
-        self.assertEqual(first_location.partner, "Unknown")
-        third_location = locations[2]
-        self.assertEqual(third_location.facility, "St. Francis Acumet HC III")
-        self.assertEqual(third_location.partner, "TASO")
+        assert_that(locations, has_item(
+            all_of(
+                has_property("facility", "Ococia (Orungo) St. Clare HC III"),
+                has_property("partner", "Unknown"),
+            )
+        ))
+
+        assert_that(locations, has_item(
+            all_of(
+                has_property("facility", "St. Francis Acumet HC III"),
+                has_property("partner", "TASO"),
+            )
+        ))
 
     def test_that_location_has_warehouse(self):
         locations, records = extract_locations_and_import_records(

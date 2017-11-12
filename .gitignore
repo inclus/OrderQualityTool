@@ -151,3 +151,4 @@ node_modules/
 *.sublime-workspace
 .vagrant
 /data
+.env

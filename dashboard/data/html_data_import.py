@@ -23,9 +23,8 @@ def extract_locations_and_import_records(report_outputs, partner_mapping):
 
 
 def get_locations(records):
-    unique_records_by_location = pydash.uniq(records, lambda item: item.location)
-    locations = pydash.map_(unique_records_by_location, lambda item: item.location)
-    return pydash.map_(locations, lambda item: item)
+    grouped_by_location = pydash.group_by(records, lambda item: item.location)
+    return list(grouped_by_location.keys())
 
 
 @timeit
