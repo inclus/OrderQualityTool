@@ -181,34 +181,34 @@ class HtmlDataImportRecord(object):
         return self.data.get(TABLE_COLUMN_DISTRICT)
 
     def get_opening_balance(self):
-        return self.data.get(TABLE_COLUMN_OPENING_BALANCE)
+        return as_number(self.data.get(TABLE_COLUMN_OPENING_BALANCE))
 
     def get_quantity_received(self):
-        return self.data.get(TABLE_COLUMN_RECEIVED)
+        return as_number(self.data.get(TABLE_COLUMN_RECEIVED))
 
     def get_consumption(self):
-        return self.data.get(TABLE_COLUMN_ART_CONSUMPTION)
+        return as_number(self.data.get(TABLE_COLUMN_ART_CONSUMPTION))
 
     def get_loses_adjustments(self):
-        return self.data.get(TABLE_COLUMN_LOSES_ADJUSTMENTS)
+        return as_number(self.data.get(TABLE_COLUMN_LOSES_ADJUSTMENTS))
 
     def get_closing_balance(self):
-        return self.data.get(TABLE_COLUMN_CLOSING_BALANCE)
+        return as_number(self.data.get(TABLE_COLUMN_CLOSING_BALANCE))
 
     def get_months_of_stock_on_hand(self):
-        return self.data.get(TABLE_COLUMN_MONTHS_OF_STOCK_ON_HAND)
+        return as_number(self.data.get(TABLE_COLUMN_MONTHS_OF_STOCK_ON_HAND))
 
     def get_quantity_required_for_current_patients(self):
-        return self.data.get(TABLE_COLUMN_QUANTITY_REQUIRED_FOR_CURRENT_PATIENTS)
+        return as_number(self.data.get(TABLE_COLUMN_QUANTITY_REQUIRED_FOR_CURRENT_PATIENTS))
 
     def get_number_of_new_art_patients(self):
-        return self.data.get(TABLE_COLUMN_NEW_PATIENTS)
+        return as_number(self.data.get(TABLE_COLUMN_NEW_PATIENTS))
 
     def get_number_of_new_pregnant_patients(self):
-        return self.data.get(TABLE_COLUMN_NEW_PREGNANT_PATIENTS)
+        return as_number(self.data.get(TABLE_COLUMN_NEW_PREGNANT_PATIENTS))
 
     def get_packs_ordered(self):
-        return self.data.get(TABLE_COLUMN_PACKS_ORDERED)
+        return as_number(self.data.get(TABLE_COLUMN_PACKS_ORDERED))
 
     def has_facility_without_region(self):
         return TABLE_COLUMN_REGION not in self.data and TABLE_COLUMN_FACILITY in self.data
@@ -235,8 +235,8 @@ class HtmlDataImportRecord(object):
         rl = RegimenLocationCombination(location=self.location, formulation=formulation)
         return PatientRecord(location=self.location,
                              regimen_location=rl,
-                             existing=self.data.get(TABLE_COLUMN_EXISTING),
-                             new=self.data.get(TABLE_COLUMN_NEW),
+                             existing=as_number(self.data.get(TABLE_COLUMN_EXISTING)),
+                             new=as_number(self.data.get(TABLE_COLUMN_NEW)),
                              formulation=formulation)
 
     def build_consumption_record(self):
