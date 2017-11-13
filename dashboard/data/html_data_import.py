@@ -21,6 +21,7 @@ def extract_locations_and_import_records(report_outputs, partner_mapping):
     locations = get_locations(records)
     return locations, records
 
+
 @timeit
 def get_locations(records):
     grouped_by_location = pydash.group_by(records, lambda item: item.location)
@@ -32,12 +33,9 @@ def get_all_records(report_outputs, partner_mapping):
     import_records = []
     for report_output in report_outputs:
         if report_output and report_output.output:
-            try:
-                html_table_element = BeautifulSoup(report_output.output, HTML_PARSER)
-                records_for_output = parse_records_from_html(html_table_element, report_output.report, partner_mapping)
-                import_records.extend(records_for_output)
-            except Exception as e:
-                logger.error("exception", extra={"exception": e, "report": report_output.report})
+            html_table_element = BeautifulSoup(report_output.output, HTML_PARSER)
+            records_for_output = parse_records_from_html(html_table_element, report_output.report, partner_mapping)
+            import_records.extend(records_for_output)
         else:
             logger.info("no output for report", extra={"output": report_output.report})
 
