@@ -44,9 +44,16 @@ def values_for_records(fields, records):
     return pydash.reduce_(fields, reduce_to_values(records), [])
 
 
+def as_float(value):
+    try:
+        return float(value)
+    except ValueError as e:
+        return 0.0
+
+
 def get_consumption_totals(fields, records):
     return pydash.chain(values_for_records(fields, records)).reject(
-        lambda x: x is None).map(float).sum().value()
+        lambda x: x is None).map(as_float).sum().value()
 
 
 def get_patient_total(records):

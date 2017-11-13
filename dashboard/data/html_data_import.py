@@ -103,14 +103,14 @@ def parse_records_from_html(html_table_element, report, partner_mapping):
                                                           data=dict())
                 for item_index, item in enumerate(items_in_row):
                     column_name = table_column_names[item_index]
-                    data_import_record.data[column_name] = try_to_get_int(item)
+                    data_import_record.data[column_name] = try_to_get_number(item)
                 data_import_record.location = data_import_record.build_location(partner_mapping)
                 data_import_records.append(data_import_record)
 
     return data_import_records
 
 
-def try_to_get_int(item):
+def try_to_get_number(item):
     try:
         return int(item.get_text())
     except ValueError as e:

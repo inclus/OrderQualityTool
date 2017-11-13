@@ -73,8 +73,8 @@ class PatientRecord(Record):
         return PatientRecord(
             location=self.location,
             regimen_location=self.regimen_location,
-            existing=as_int(record.existing) + as_int(self.existing),
-            new=as_int(record.new) + as_int(self.new),
+            existing=as_number(record.existing) + as_number(self.existing),
+            new=as_number(record.new) + as_number(self.new),
             formulation=self.formulation)
 
     @staticmethod
@@ -88,7 +88,7 @@ class PatientRecord(Record):
         )
 
 
-def as_int(value):
+def as_number(value):
     try:
         return int(value)
     except (ValueError, TypeError):
@@ -129,20 +129,20 @@ class ConsumptionRecord(Record):
         )
 
     def add(self, record):
-        opening_balance = as_int(self.opening_balance) + as_int(record.opening_balance)
-        quantity_received = as_int(self.quantity_received) + as_int(record.quantity_received)
-        consumption = as_int(self.consumption) + as_int(record.consumption)
-        loses_adjustments = as_int(self.loses_adjustments) + as_int(record.loses_adjustments)
-        closing_balance = as_int(self.closing_balance) + as_int(record.closing_balance)
-        months_of_stock_on_hand = as_int(self.months_of_stock_on_hand) + as_int(record.months_of_stock_on_hand)
-        quantity_required_for_current_patients = as_int(self.quantity_required_for_current_patients) + as_int(
+        opening_balance = as_number(self.opening_balance) + as_number(record.opening_balance)
+        quantity_received = as_number(self.quantity_received) + as_number(record.quantity_received)
+        consumption = as_number(self.consumption) + as_number(record.consumption)
+        loses_adjustments = as_number(self.loses_adjustments) + as_number(record.loses_adjustments)
+        closing_balance = as_number(self.closing_balance) + as_number(record.closing_balance)
+        months_of_stock_on_hand = as_number(self.months_of_stock_on_hand) + as_number(record.months_of_stock_on_hand)
+        quantity_required_for_current_patients = as_number(self.quantity_required_for_current_patients) + as_number(
             record.quantity_required_for_current_patients)
-        estimated_number_of_new_patients = as_int(self.estimated_number_of_new_patients) + as_int(
+        estimated_number_of_new_patients = as_number(self.estimated_number_of_new_patients) + as_number(
             record.estimated_number_of_new_patients)
-        number_of_new_pregnant_women = as_int(self.estimated_number_of_new_pregnant_women) + as_int(
+        number_of_new_pregnant_women = as_number(self.estimated_number_of_new_pregnant_women) + as_number(
             record.estimated_number_of_new_pregnant_women)
-        packs_ordered = as_int(self.packs_ordered) + as_int(record.packs_ordered)
-        days_out_of_stock = as_int(self.days_out_of_stock) + as_int(record.days_out_of_stock)
+        packs_ordered = as_number(self.packs_ordered) + as_number(record.packs_ordered)
+        days_out_of_stock = as_number(self.days_out_of_stock) + as_number(record.days_out_of_stock)
         return ConsumptionRecord(
             location=self.location,
             regimen_location=self.regimen_location,
