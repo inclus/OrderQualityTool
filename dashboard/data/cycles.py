@@ -1,7 +1,7 @@
 import pydash
 
 from dashboard.data.utils import values_for_records, facility_not_reporting, get_consumption_records, \
-    get_patient_records, QCheck
+    get_patient_records, QCheck, as_float
 from dashboard.helpers import *
 
 THRESHOLD = "threshold"
@@ -162,10 +162,8 @@ class StablePatientVolumesCheck(StableConsumptionCheck):
         if not data_is_sufficient:
             return NOT_REPORTING
 
-        current_population = pydash.chain(values_for_records(self.fields, current_records)).reject(
-            lambda x: x is None).sum().value()
-        prev_population = pydash.chain(values_for_records(self.fields, prev_records)).reject(
-            lambda x: x is None).sum().value()
+        current_population = self.calculate_sum(current_records)
+        prev_population = self.calculate_sum(prev_records)
 
         threshold = combination[THRESHOLD]
 
@@ -177,3 +175,7 @@ class StablePatientVolumesCheck(StableConsumptionCheck):
             else:
                 result = NO
         return result
+
+    def calculate_sum(self, current_records):
+        return pydash.chain(values_for_records(self.fields, current_records)).reject(
+            lambda x: x is None).map(as_float).sum().value()

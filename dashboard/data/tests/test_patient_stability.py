@@ -12,6 +12,14 @@ initial = LocationData.migrate_from_dict({
     ]
 
 })
+
+has_string = LocationData.migrate_from_dict({
+    A_RECORDS: [
+        {FORMULATION: F1_PATIENT_QUERY[0], NEW: 10, EXISTING: 10},
+        {FORMULATION: F1_PATIENT_QUERY[1], NEW: '', EXISTING: 10},
+    ]
+
+})
 increased = LocationData.migrate_from_dict({
     A_RECORDS: [
         {FORMULATION: F1_PATIENT_QUERY[0], NEW: 15, EXISTING: 15},
@@ -48,6 +56,7 @@ no_data = LocationData.migrate_from_dict({})
 class PatientStabilityTestCase(TestCase):
     @parameterized.expand([
         ("population same", initial, initial, YES),
+        ("population same has_string", has_string, initial, YES),
         ("population increased", increased, initial, YES),
         ("population to zero", zeros, initial, NO),
         ("population from zero", initial, zeros, NO),
