@@ -26,7 +26,7 @@ class DataImportViewTestCase(WebTest):
         file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'fixtures', name)
         return file_path
 
-    @patch('dashboard.views.main.update_checks.delay')
+    @patch('dashboard.views.main.update_checks.apply_async')
     def test_valid_form_starts_import_process(self, mock_method):
         user = DashboardUser.objects.create_superuser("a@a.com", "secret")
         cycle_title = 'Jan - Feb %s' % now().format("YYYY")
@@ -42,7 +42,7 @@ class DataImportViewTestCase(WebTest):
         self.assertEqual(len(cycles_count), 1)
         first_cycle = cycles_count[0]
         self.assertEqual(first_cycle.title, cycle_title)
-        mock_method.assert_called_with([first_cycle.id])
+        mock_method.assert_called_with(args=[[first_cycle.id]], priority=1)
 
 
 class FacilitiesReportingView(WebTest):
@@ -264,3 +264,19 @@ class ScoreDetailsViewTestCase(WebTest):
         self.assertEqual(200, response.status_code)
         response_data = response.context
         self.assertEqual(False, response_data["has_result"])
+
+
+class Dhis2ImporViewTestCase(WebTest):
+    @patch('dashboard.views.api.import_data_from_dhis2.apply_async')
+    def test_that_it_schedules_the_import_task(self, mock_method):
+        url = reverse("dhis2-import")
+        response = self.app.post_json(url, params={"period": "May - Jun 2017"})
+        self.assertEqual(200, response.status_code)
+        mock_method.assert_called_with(args=["May - Jun 2017"], priority=2)
+
+    @patch('dashboard.views.api.import_data_from_dhis2.apply_async')
+    def test_that_it_does_not_schedule_the_import_task_without_period(self, mock_method):
+        url = reverse("dhis2-import")
+        response = self.app.post_json(url, params={"period": ""})
+        self.assertEqual(200, response.status_code)
+        mock_method.assert_not_called()

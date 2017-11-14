@@ -228,4 +228,4 @@ def _dhis2_import(bi_monthly_cycle):
     results = fetch_reports(reports, periods)
     data_import = HtmlDataImport(results, bi_monthly_cycle).load(partner_mapping)
     cycle = data_import.save()
-    update_checks.delay([cycle.id])
+    update_checks.apply_async(args=[[cycle.id]], priority=1)

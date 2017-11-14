@@ -346,6 +346,6 @@ class NewImportView(APIView):
         if serializer.is_valid():
             logger.info("launching task",
                         extra={"task_name": "import_data_from_dhis2", "period": serializer.data["period"]})
-            import_data_from_dhis2.delay(serializer.data["period"])
+            import_data_from_dhis2.apply_async(args=[serializer.data["period"]], priority=2)
             return Response({"ok": True})
         return Response({"ok": False})

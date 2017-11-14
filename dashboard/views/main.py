@@ -56,7 +56,7 @@ class DataImportView(LoginRequiredMixin, StaffuserRequiredMixin, FormView):
         cycle = form.cleaned_data['cycle']
         report = parse_excel_file(cycle, import_file)
         cycle = save_data_import(report)
-        update_checks.delay([cycle.id])
+        update_checks.apply_async(args=[[cycle.id]], priority=1)
         messages.add_message(self.request, messages.INFO, 'Successfully started import for cycle %s' % (cycle))
         return super(DataImportView, self).form_valid(form)
 

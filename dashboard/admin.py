@@ -89,7 +89,7 @@ class PatientAdmin(ModelAdmin):
 
 
 def run_tests(model_admin, request, queryset):
-    update_checks.delay([c.id for c in queryset.all()])
+    update_checks.apply_async(args=[[c.id for c in queryset.all()]], priority=1)
 
 
 run_tests.short_description = "Run quality tests for these cycles"
