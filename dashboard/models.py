@@ -154,11 +154,14 @@ class MultipleOrderFacility(models.Model):
 
 
 class Dhis2StandardReport(models.Model):
-    name = models.CharField(max_length=256, db_index=True)
-    report_id = models.CharField(max_length=256, db_index=True)
-    warehouse = models.CharField(choices=WAREHOUSES, max_length=50)
-    report_type = models.CharField(choices=REPORT_TYPES, max_length=50)
-    org_unit_id = models.CharField(max_length=20, db_index=True)
+    name = models.CharField(max_length=256, db_index=True, blank=False)
+    report_id = models.CharField(max_length=256, db_index=True, blank=False)
+    warehouse = models.CharField(choices=WAREHOUSES, max_length=50, blank=False)
+    report_type = models.CharField(choices=REPORT_TYPES, max_length=50, blank=False)
+    org_unit_id = models.CharField(max_length=20, db_index=True, blank=False)
+
+    def __unicode__(self):
+        return "%s" % self.name
 
 
 class LocationToPartnerMapping(models.Model):
