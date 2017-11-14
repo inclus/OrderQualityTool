@@ -3,6 +3,7 @@ import functools
 import pydash
 import pygogo
 from bs4 import BeautifulSoup
+from django.forms import model_to_dict
 
 from dashboard.data.data_import import DataImport
 from dashboard.data.entities import HtmlDataImportRecord
@@ -91,7 +92,8 @@ def parse_records_from_html(html_table_element, report, partner_mapping):
             if item and item.text:
                 table_column_names.append(item.text)
     else:
-        logger.info("report has not columns", extra={"report": report, "html": html_table_element})
+        logger.info("report has no columns",
+                    extra={"report": model_to_dict(report), "html": str(html_table_element)})
 
     for table_row_element in html_table_element.find_all(TR):
         if len(table_row_element) == len(row_with_column_names) and table_row_element != row_with_column_names:
