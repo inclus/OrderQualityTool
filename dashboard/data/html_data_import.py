@@ -91,21 +91,21 @@ def parse_records_from_html(html_table_element, report, partner_mapping):
         for item in row_with_column_names:
             if item and item.text:
                 table_column_names.append(item.text)
+        for table_row_element in html_table_element.find_all(TR):
+            if len(table_row_element) == len(row_with_column_names) and table_row_element != row_with_column_names:
+                items_in_row = table_row_element.find_all(TD)
+                if len(items_in_row) > 0:
+                    data_import_record = HtmlDataImportRecord(warehouse=report.warehouse,
+                                                              report_type=report.report_type,
+                                                              data=dict())
+                    for item_index, item in enumerate(items_in_row):
+                        column_name = table_column_names[item_index]
+                        data_import_record.data[column_name] = try_to_get_number(item)
+                    data_import_record.location = data_import_record.build_location(partner_mapping)
+                    data_import_records.append(data_import_record)
     else:
         logger.info("report has no columns",
                     extra={"report": model_to_dict(report), "html": str(html_table_element)})
-
-    for table_row_element in html_table_element.find_all(TR):
-        if len(table_row_element) == len(row_with_column_names) and table_row_element != row_with_column_names:
-            items_in_row = table_row_element.find_all(TD)
-            if len(items_in_row) > 0:
-                data_import_record = HtmlDataImportRecord(warehouse=report.warehouse, report_type=report.report_type,
-                                                          data=dict())
-                for item_index, item in enumerate(items_in_row):
-                    column_name = table_column_names[item_index]
-                    data_import_record.data[column_name] = try_to_get_number(item)
-                data_import_record.location = data_import_record.build_location(partner_mapping)
-                data_import_records.append(data_import_record)
 
     return data_import_records
 
