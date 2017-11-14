@@ -1,10 +1,12 @@
 import json
+
 from arrow import now
 from django.core.urlresolvers import reverse
 from django_webtest import WebTest
 from model_mommy import mommy
-from dashboard.models import DashboardUser, IIP, DISTRICT, WAREHOUSE, Score
+
 from dashboard.helpers import DEFAULT, YES, NO
+from dashboard.models import DashboardUser, IIP, DISTRICT, WAREHOUSE, Score
 
 
 class RankingsAccessViewTestCase(WebTest):

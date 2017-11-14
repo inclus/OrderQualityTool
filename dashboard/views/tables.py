@@ -1,13 +1,16 @@
-from django.db.models import Q
 import csv
+
+from django.db.models import Q
 from django.http import HttpResponse
 from django.shortcuts import render_to_response
 from django.views.generic import View
 from django_datatables_view.base_datatable_view import BaseDatatableView
+
 from dashboard.helpers import *
 from dashboard.models import Score
-from dashboard.views.data_sources import NegativesCheckDataSource, ConsumptionAndPatientsDataSource, TwoCycleDataSource, ClosingBalanceMatchesOpeningBalanceDataSource, StableConsumptionDataSource, StablePatientVolumesDataSource, WarehouseFulfillmentDataSource, GuidelineAdherenceDataSource, NNRTIDataSource
-
+from dashboard.views.data_sources import NegativesCheckDataSource, ConsumptionAndPatientsDataSource, TwoCycleDataSource, \
+    ClosingBalanceMatchesOpeningBalanceDataSource, StableConsumptionDataSource, StablePatientVolumesDataSource, \
+    WarehouseFulfillmentDataSource, GuidelineAdherenceDataSource, NNRTIDataSource
 
 TEST_DATA = {
     ORDER_FORM_FREE_OF_NEGATIVE_NUMBERS: NegativesCheckDataSource,

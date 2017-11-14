@@ -1,9 +1,11 @@
-from django_webtest import WebTest
-from django.core.urlresolvers import reverse
-from nose_parameterized import parameterized
-from dashboard.models import Score, DashboardUser
 import random
+
+from django.core.urlresolvers import reverse
+from django_webtest import WebTest
 from model_mommy import mommy
+from nose_parameterized import parameterized
+
+from dashboard.models import Score, DashboardUser
 
 
 class ReportViewTestCase(WebTest):

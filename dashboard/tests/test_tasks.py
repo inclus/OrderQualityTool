@@ -1,13 +1,12 @@
 from collections import defaultdict
 
 from django.test import TestCase
-from mock import patch, call
 
 from dashboard.data.entities import Location, PatientRecord, ConsumptionRecord
 from dashboard.data.tests.test_data import FakeReport
 from dashboard.models import Score, Consumption, AdultPatientsRecord, PAEDPatientsRecord, Cycle, MultipleOrderFacility
 from dashboard.tasks import persist_scores, persist_consumption, persist_adult_records, persist_paed_records, \
-    get_report_for_other_cycle, calculate_scores_for_checks_in_cycle, persist_multiple_order_records
+    get_report_for_other_cycle, persist_multiple_order_records
 
 
 class TaskTestCase(TestCase):

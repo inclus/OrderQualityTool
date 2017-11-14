@@ -1,5 +1,7 @@
 from django.test import TestCase
+
 from dashboard.views.data_sources import GuidelineAdherenceDataSource
+
 
 class AdherenceDataSourceTestCase(TestCase):
 

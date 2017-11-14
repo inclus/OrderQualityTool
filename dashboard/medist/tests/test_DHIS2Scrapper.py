@@ -1,5 +1,4 @@
 from django.test import TestCase
-
 from mock import patch, mock
 from nose_parameterized import parameterized
 

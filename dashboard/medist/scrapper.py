@@ -2,8 +2,8 @@ import pygogo
 from bs4 import BeautifulSoup
 from splinter import Browser
 
-from dashboard.helpers import HTML_PARSER
 from dashboard.data.html_data_import import TR, TD
+from dashboard.helpers import HTML_PARSER
 
 logger = pygogo.Gogo(__name__).get_structured_logger()
 

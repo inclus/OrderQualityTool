@@ -1,13 +1,14 @@
 import json
+
 from django.core.urlresolvers import reverse
 from django_webtest import WebTest
-from mock import MagicMock, patch
+from mock import patch
+
 from dashboard.helpers import *
 from dashboard.models import Score
 from dashboard.views.api import OrderFormFreeOfNegativeNumbersView, DifferentOrdersOverTimeView, ClosingBalanceView, \
     ConsumptionAndPatientsView, StableConsumptionView, WarehouseFulfilmentView, StablePatientVolumesView, \
     GuideLineAdherenceView, OrderFormFreeOfGapsView
-
 
 
 class OrderFormFreeOfNegativesViewTestCase(WebTest):

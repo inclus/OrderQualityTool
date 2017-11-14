@@ -2,11 +2,9 @@ import json
 import os
 from json import loads
 
-import arrow
-from arrow import now
 from django.core.urlresolvers import reverse
 from django_webtest import WebTest
-from mock import patch, ANY
+from mock import patch
 from webtest import Upload
 
 from dashboard.helpers import *

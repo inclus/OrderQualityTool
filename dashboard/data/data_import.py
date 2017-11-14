@@ -3,7 +3,7 @@ from collections import defaultdict
 
 from openpyxl import load_workbook
 
-from dashboard.data.entities import get_real_facility_name, PatientRecord, ExcelDataImportRecord
+from dashboard.data.entities import get_real_facility_name, ExcelDataImportRecord
 from dashboard.helpers import *
 from dashboard.models import Cycle
 

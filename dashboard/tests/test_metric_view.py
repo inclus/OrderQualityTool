@@ -1,8 +1,10 @@
 import json
-from django_webtest import WebTest
-from dashboard.models import Score
-from dashboard.helpers import *
+
 from django.core.urlresolvers import reverse
+from django_webtest import WebTest
+
+from dashboard.helpers import *
+from dashboard.models import Score
 
 
 class ReportMetricTestCase(WebTest):

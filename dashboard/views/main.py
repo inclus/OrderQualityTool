@@ -1,18 +1,14 @@
-import os
 from functools import cmp_to_key
-from braces.views import LoginRequiredMixin, StaffuserRequiredMixin
-from django.conf import settings
-from django.contrib import messages
-from django.core.files.base import ContentFile
-from django.core.files.storage import default_storage
-from django.db.models import Count, Case, When
-from django.views.generic import TemplateView, FormView
 from io import BytesIO
+
+from braces.views import LoginRequiredMixin, StaffuserRequiredMixin
+from django.contrib import messages
+from django.views.generic import TemplateView, FormView
 
 from dashboard.data.data_import import ExcelDataImport
 from dashboard.data.utils import timeit
 from dashboard.forms import FileUploadForm
-from dashboard.helpers import YES, F3, F2, F1, sort_cycle
+from dashboard.helpers import F3, F2, F1, sort_cycle
 from dashboard.models import Score
 from dashboard.tasks import update_checks
 
