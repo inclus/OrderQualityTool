@@ -81,6 +81,9 @@ class HtmlDataImport(DataImport):
         self.cs = parse_consumption_records(all_records)
         return self
 
+    def __str__(self):
+        return "HtmlDataImport %s" % self.cycle
+
 
 @timeit
 def parse_records_from_html(html_table_element, report, partner_mapping):

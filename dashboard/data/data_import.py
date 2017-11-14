@@ -39,6 +39,9 @@ class DataImport():
     def load(self, partner_mapping=None):
         raise NotImplementedError("you need to implement this method")
 
+    def __str__(self):
+        return "DataImport %s" % self.cycle
+
 
 def get_value(row, i):
     if i <= len(row):
@@ -58,6 +61,9 @@ def build_cache_by_facility(locations):
 
 
 class ExcelDataImport(DataImport):
+    def __str__(self):
+        return "ExcelDataImport %s" % self.cycle
+
     def get_workbook(self):
         return load_workbook(self.raw_data, read_only=True, use_iterators=True)
 

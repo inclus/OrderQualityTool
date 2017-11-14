@@ -217,6 +217,11 @@ def parse_periods_from_bi_monthly_cycle(bi_monthly_cycle):
 
 @shared_task
 def import_data_from_dhis2(bi_monthly_cycle):
+    _dhis2_import(bi_monthly_cycle)
+
+
+@timeit
+def _dhis2_import(bi_monthly_cycle):
     periods = parse_periods_from_bi_monthly_cycle(bi_monthly_cycle)
     reports = Dhis2StandardReport.objects.all()
     partner_mapping = LocationToPartnerMapping.get_mapping()

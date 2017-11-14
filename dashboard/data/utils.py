@@ -19,7 +19,11 @@ def timeit(method):
         ts = time.time()
         result = method(*args, **kw)
         te = time.time()
-        logger.info("timer", extra={"method": method.__name__, "duration": "%2.5f" % (te - ts)})
+        logger.info("timer",
+                    extra={
+                        "method": method.__name__,
+                        "duration": "%2.5f" % (te - ts),
+                        "extra": [str(a)[:30] for a in args]})
         return result
 
     return timed
