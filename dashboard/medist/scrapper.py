@@ -33,23 +33,28 @@ class DHIS2Scrapper(object):
         self.base_url = base_url
 
         browser = Browser('phantomjs')
-        login_url = "%s/dhis-web-commons-about/about.action" % base_url
+        about_page_path = "dhis-web-commons-about/about.action"
+        login_url = "%s/%s" % (base_url, about_page_path)
         logger.debug("login", extra={"url": login_url})
 
         browser.visit(login_url)
+        self.browser = browser
+        login_path = "dhis-web-commons/security/login.action"
+        if login_path in browser.url:
+            browser.fill(USERNAME_FIELD, username)
+            browser.fill(PASSWORD_FIELD, password)
+            button = browser.find_by_css('input.button')
+            button.click()
+            log_context = {"login_url": login_url, "username": username, "browser_url": browser.url}
+            login_succeeded = len(browser.find_by_text('Log out')) > 0
+            if login_succeeded:
+                logger.debug("login success", extra=log_context)
 
-        browser.fill(USERNAME_FIELD, username)
-        browser.fill(PASSWORD_FIELD, password)
-        button = browser.find_by_css('input.button')
-        button.click()
-        log_context = {"login_url": login_url, "username": username, "browser_url": browser.url}
-        login_succeeded = len(browser.find_by_text('Log out')) > 0
-        if login_succeeded:
-            logger.debug("login success", extra=log_context)
-            self.browser = browser
+            else:
+                logger.debug("login failed", extra=log_context)
+                raise Exception("dhis2 login failed")
         else:
-            logger.debug("login failed", extra=log_context)
-            raise Exception("dhis2 login failed")
+            logger.debug("no login redirect", extra={"browser_url": browser.url})
 
     def get_standard_report(self, report_id, period, org_unit):
         query = {
