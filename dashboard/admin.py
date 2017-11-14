@@ -132,6 +132,9 @@ class ScoreAdmin(ModelAdmin):
 class CycleAdmin(ModelAdmin):
     actions = [run_tests]
 
+    def get_queryset(self, request):
+        return super(CycleAdmin, self).get_queryset(request).defer("state")
+
 
 admin_site = QdbSite()
 admin_site.register(Group, GroupAdmin)
