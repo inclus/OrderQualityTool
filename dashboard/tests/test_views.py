@@ -254,7 +254,7 @@ class ScoreDetailsViewTestCase(WebTest):
         self.assertEqual(200, response.status_code)
         response_data = response.context
         self.assertEqual(True, response_data["has_result"])
-        self.assertEqual(TEST_NAMES[MULTIPLE_ORDERS], response_data["result"]["test"])
+        self.assertEqual(get_test_name(MULTIPLE_ORDERS), response_data["result"]["test"])
         self.assertEqual('Pass', response_data["result"]["result"])
 
     def test_has_no_result_if_column_is_less_than_4(self):

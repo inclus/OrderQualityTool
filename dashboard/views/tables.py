@@ -152,7 +152,7 @@ class ScoreDetailsView(View):
                 response_data['data'] = data_source.load(score, test, combination)
             result = getattr(score, test, None)
             actual_result = get_actual_result(result, combination)
-            result_data = {'test': TEST_NAMES.get(test, None), 'result': scores.get(actual_result), 'has_combination': len(result) > 1}
+            result_data = {'test': get_test_name(test), 'result': scores.get(actual_result), 'has_combination': len(result) > 1}
             response_data['result'] = result_data
         response_data['detail'] = {'id': id, 'column': column, 'test': score.name}
         return response_data, template_name, score, combination

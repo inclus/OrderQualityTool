@@ -1,5 +1,5 @@
 orderqualitytool:
-  restart: always
+  restart: "no"
   build: ./
   ports:
     - "9000:9000"
@@ -14,7 +14,7 @@ orderqualitytool:
   command: uwsgi --http :9000 --module orderqualitytool.wsgi:application --static-map /static=/usr/src/app/asset_files
 
 postgres:
-  restart: always
+  restart: "no"
   image: postgres:latest
   volumes:
     - ./data/postgresql:/var/lib/postgresql
@@ -22,13 +22,13 @@ postgres:
     - "5432:5432"
 
 redis:
-  restart: always
+  restart: "no"
   image: redis:latest
   ports:
     - "6379:6379"
 
 celery:
-  restart: always
+  restart: "no"
   build: ./
   links:
     - postgres:postgres
@@ -39,7 +39,7 @@ celery:
   command: celery worker --app=orderqualitytool.celery --concurrency=3
 
 flower:
-  restart: always
+  restart: "no"
   build: ./
   ports:
     - "5555:5555"

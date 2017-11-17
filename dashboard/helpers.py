@@ -1,5 +1,6 @@
 import arrow
 from arrow import Arrow, now
+from dynamic_preferences.registries import global_preferences_registry
 
 
 class CustomArrow(Arrow):
@@ -182,26 +183,31 @@ F3_PATIENT_QUERY = ["ABC/3TC/EFV", "AZT/3TC/EFV"]
 F2_PATIENT_QUERY = ["ABC/3TC/LPV/r", "ABC/3TC/EFV", "ABC/3TC/NVP"]
 
 F1_PATIENT_QUERY = ["TDF/3TC/EFV (PMTCT)", "TDF/3TC/EFV (ADULT)"]
-## test_names
 
-TEST_NAMES = {
-    ORDER_FORM_FREE_OF_GAPS: "NO BLANKS: If the facility reported, is the whole order form free of blanks?",
-    ORDER_FORM_FREE_OF_NEGATIVE_NUMBERS: "NO NEGATIVES: Order free of negative inputs?",
-    DIFFERENT_ORDERS_OVER_TIME: "NON-REPEATING ORDERS: Does the facility avoid repeating the same orders in consecutive cycles?",
-    CLOSING_BALANCE_MATCHES_OPENING_BALANCE: "OPENING = CLOSING: Opening balance = Closing balance from the previous cycle?",
-    CONSUMPTION_AND_PATIENTS: "VOLUME TALLY: Consumption and patient volumes within 30%?",
-    STABLE_CONSUMPTION: "STABLE CONSUMPTION: Consumption changes by less than 50% vs previous cycle?",
-    WAREHOUSE_FULFILMENT: "WAREHOUSE FULFILMENT: Volume delivered = Volume ordered in previous cycle?",
-    STABLE_PATIENT_VOLUMES: "STABLE PATIENTS: Patient volumes change by less than 50% vs. previous cycle?",
-    GUIDELINE_ADHERENCE_PAED_1L: "GUIDELINE ADHERENCE (PAED 1L): 80%+ estimated new patients on ABC formulations?",
-    GUIDELINE_ADHERENCE_ADULT_2L: "GUIDELINE ADHERENCE (ADULT 2L): 73%+ estimated new patients on ATV/r formulations?",
-    GUIDELINE_ADHERENCE_ADULT_1L: "GUIDELINE ADHERENCE (ADULT 1L): 80%+ estimated new patients on TDF formulations?",
-    REPORTING: "REPORTING",
-    WEB_BASED: "WEB_BASED",
-    MULTIPLE_ORDERS: "DUPLICATE ORDERS: Facilities that submitted more than one order over the cycle",
-    NNRTI_PAED: "NRTI vs NNRTI/PI patient volumes (PAED): Differ by <30%?",
-    NNRTI_ADULTS: "NRTI and INSTI/NNRTI/PI patient volumes (ADULT): Differ by <30%?"
-}
+
+def get_test_name(test):
+    global_preferences = global_preferences_registry.manager()
+    adult_2l_ratio = global_preferences.get('Quality_Tests__Guideline_Adherence_Adult_2L_Ratio', 0.80) * 100
+    names = {
+        ORDER_FORM_FREE_OF_GAPS: "NO BLANKS: If the facility reported, is the whole order form free of blanks?",
+        ORDER_FORM_FREE_OF_NEGATIVE_NUMBERS: "NO NEGATIVES: Order free of negative inputs?",
+        DIFFERENT_ORDERS_OVER_TIME: "NON-REPEATING ORDERS: Does the facility avoid repeating the same orders in consecutive cycles?",
+        CLOSING_BALANCE_MATCHES_OPENING_BALANCE: "OPENING = CLOSING: Opening balance = Closing balance from the previous cycle?",
+        CONSUMPTION_AND_PATIENTS: "VOLUME TALLY: Consumption and patient volumes within 30%?",
+        STABLE_CONSUMPTION: "STABLE CONSUMPTION: Consumption changes by less than 50% vs previous cycle?",
+        WAREHOUSE_FULFILMENT: "WAREHOUSE FULFILMENT: Volume delivered = Volume ordered in previous cycle?",
+        STABLE_PATIENT_VOLUMES: "STABLE PATIENTS: Patient volumes change by less than 50% vs. previous cycle?",
+        GUIDELINE_ADHERENCE_PAED_1L: "GUIDELINE ADHERENCE (PAED 1L): 80%+ estimated new patients on ABC formulations?",
+        GUIDELINE_ADHERENCE_ADULT_2L: (
+            "GUIDELINE ADHERENCE (ADULT 2L): {0}%+ estimated new patients on ATV/r formulations?".format(adult_2l_ratio)),
+        GUIDELINE_ADHERENCE_ADULT_1L: "GUIDELINE ADHERENCE (ADULT 1L): 80%+ estimated new patients on TDF formulations?",
+        REPORTING: "REPORTING",
+        WEB_BASED: "WEB_BASED",
+        MULTIPLE_ORDERS: "DUPLICATE ORDERS: Facilities that submitted more than one order over the cycle",
+        NNRTI_PAED: "NRTI vs NNRTI/PI patient volumes (PAED): Differ by <30%?",
+        NNRTI_ADULTS: "NRTI and INSTI/NNRTI/PI patient volumes (ADULT): Differ by <30%?"
+    }
+    return names.get(test, None)
 
 
 def get_prev_cycle(cycle):

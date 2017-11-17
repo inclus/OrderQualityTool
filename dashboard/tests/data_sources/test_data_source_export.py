@@ -38,7 +38,7 @@ class NegativesCheckDataSourceTestCase(TestCase):
     def test_should_show_check_name(self):
         data_source = NegativesCheckDataSource()
         generated_data = data_source.as_array(self.score, ORDER_FORM_FREE_OF_NEGATIVE_NUMBERS, F1)
-        self.assertEquals(generated_data[1][1], TEST_NAMES.get(ORDER_FORM_FREE_OF_NEGATIVE_NUMBERS))
+        self.assertEquals(generated_data[1][1], get_test_name(ORDER_FORM_FREE_OF_NEGATIVE_NUMBERS))
         self.assertEquals(generated_data[2][0], "")
         self.assertEquals(generated_data[3], ["", "Facility", "District", "Warehouse", "IP", "Cycle", "Formulation", "Result"])
         self.assertEquals(generated_data[4], ["", self.score.name, self.score.district, self.score.warehouse, self.score.ip, self.score.cycle, F1, YES])
@@ -66,7 +66,7 @@ class ConsumptionAndPatientsDataSourceExportTestCase(TestCase):
     def test_should_show_check_name(self):
         data_source = ConsumptionAndPatientsDataSource()
         generated_data = data_source.as_array(self.score, CONSUMPTION_AND_PATIENTS, F1)
-        self.assertEquals(generated_data[1][1], TEST_NAMES.get(CONSUMPTION_AND_PATIENTS))
+        self.assertEquals(generated_data[1][1], get_test_name(CONSUMPTION_AND_PATIENTS))
         self.assertEquals(generated_data[2][0], "")
         self.assertEquals(generated_data[3], ["", "Facility", "District", "Warehouse", "IP", "Cycle", "Formulation", "Result"])
         self.assertEquals(generated_data[4], ["", self.score.name, self.score.district, self.score.warehouse, self.score.ip, self.score.cycle, F1, YES])

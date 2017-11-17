@@ -53,7 +53,7 @@ class CheckDataSource(object):
         row = []
         data = self.get_context(score, test, combination)
         result = getattr(score, test, None)
-        name_row = ["", TEST_NAMES.get(test, None)]
+        name_row = ["", get_test_name(test)]
         row.append([""])
         row.append(name_row)
         row.append([""])
@@ -495,7 +495,7 @@ class StablePatientVolumesDataSource(TwoCycleDataSource):
         row = []
         data = self.get_context(score, test, combination)
         result = getattr(score, test, None)
-        name_row = ["", TEST_NAMES.get(test, None)]
+        name_row = ["", get_test_name(test)]
         row.append([""])
         row.append(name_row)
         row.append([""])
