@@ -1,0 +1,92 @@
+<div>
+    <div class="row well">
+        <div class="col-md-1">
+            <select class="form-control" id="exampleSelect1">
+                <option>SUM</option>
+                <option>AVG</option>
+            </select>
+        </div>
+        <div class="col-md-1">
+            <label for="" class="text-center">OF FIELDS</label>
+        </div>
+
+        <div class="col-md-4">
+            <ui-select multiple ng-model="ctrl.selected_consumption_fields" theme="bootstrap" ng-disabled="ctrl.disabled" close-on-select="false"
+                title="Select a field">
+                <ui-select-match placeholder="Select field">{{$item}}</ui-select-match>
+                <ui-select-choices position="down" repeat="color in ctrl.consumption_fields | filter:$select.search">
+                    {{ color }}
+                </ui-select-choices>
+            </ui-select>
+        </div>
+
+
+        <div class="col-md-2">
+            <label for="" class="text-center">FOR FORMULATIONS</label>
+        </div>
+        <div class="col-md-4">
+            <ui-select multiple ng-model="ctrl.selected_formulations" theme="bootstrap" ng-disabled="ctrl.disabled" close-on-select="false"
+                title="Select a field">
+                <ui-select-match placeholder="Select formulations">{{$item}}</ui-select-match>
+                <ui-select-choices position="down" repeat="color in ctrl.formulations | filter:$select.search">
+                    {{ color }}
+                </ui-select-choices>
+            </ui-select>
+        </div>
+    </div>
+    <div class="row form-group">
+
+        <div class="col-md-2">
+            <div class="text-center">IS</div>
+        </div>
+        <div class="col-md-5">
+            <select class="form-control" id="exampleSelect1">
+                <option>GREATER THAN</option>
+                <option>LESS THAN</option>
+                <option>EQUAL TO</option>
+            </select>
+        </div>
+        <div class="col-md-5">
+            <select class="form-control" id="exampleSelect1">
+                <option>80%</option>
+                <option>70%</option>
+            </select>
+        </div>
+
+    </div>
+    <div class="row well">
+        <div class="col-md-1">
+            <select class="form-control" id="exampleSelect1">
+                <option>SUM</option>
+                <option>AVG</option>
+            </select>
+        </div>
+        <div class="col-md-1">
+            <label for="" class="text-center">OF FIELDS</label>
+        </div>
+
+        <div class="col-md-4">
+            <ui-select multiple ng-model="ctrl.field2_consumption_fields" theme="bootstrap" ng-disabled="ctrl.disabled" close-on-select="false"
+                title="Select a field">
+                <ui-select-match placeholder="Select field">{{$item}}</ui-select-match>
+                <ui-select-choices position="down" repeat="color in ctrl.consumption_fields | filter:$select.search">
+                    {{ color }}
+                </ui-select-choices>
+            </ui-select>
+        </div>
+
+
+        <div class="col-md-2">
+            <label for="" class="text-center">FOR FORMULATIONS</label>
+        </div>
+        <div class="col-md-4">
+            <ui-select multiple ng-model="ctrl.field2_formulations" theme="bootstrap" ng-disabled="ctrl.disabled" close-on-select="false"
+                title="Select a field">
+                <ui-select-match placeholder="Select formulations">{{$item}}</ui-select-match>
+                <ui-select-choices position="down" repeat="color in ctrl.formulations | filter:$select.search">
+                    {{ color }}
+                </ui-select-choices>
+            </ui-select>
+        </div>
+    </div>
+</div>

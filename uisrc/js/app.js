@@ -1,5 +1,7 @@
 var angular = require('angular');
 require("angular-ui-router");
+require("ui-select/dist/select");
+require("ui-select/dist/select.css");
 require("angular-chart.js");
 require("angular-bootstrap");
 require("checklist-model");
@@ -13,11 +15,12 @@ require("c3");
 
 var services = angular.module("services", []);
 require("./services/report.service");
-var dashboard = angular.module("dashboard", ["ui.router", "chart.js", "ui.bootstrap", "checklist-model", "angularChart", "ngTable", "services"]);
+var dashboard = angular.module("dashboard", ["ui.router", "chart.js", "ui.bootstrap", "checklist-model", "angularChart", "ngTable", "services", 'ui.select']);
 require("./controllers/home.controller");
 require("./controllers/guideline.adherence.controller");
 require("./controllers/main.check.controller");
 require("./controllers/report.rate.controller");
+require("./controllers/checks.controller");
 
 
 dashboard.config(["$stateProvider", "$urlRouterProvider",
@@ -38,6 +41,11 @@ dashboard.config(["$stateProvider", "$urlRouterProvider",
             }).state("home.addTests", {
                 url: "/addTests",
                 template: require("../views/addTests.html")
+            }).state("manageTests", {
+                url: "/manageTests",
+                controller: "ManageChecksController",
+                controllerAs: "ctrl",
+                template: require("../views/manageTests.html")
             });
     }
 ]);

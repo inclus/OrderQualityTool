@@ -8,6 +8,7 @@ from braces.views import LoginRequiredMixin
 from django.contrib.auth.models import AnonymousUser
 from django.db.models import Count, Sum
 from django.db.models.expressions import F
+from django.forms import model_to_dict
 from django.http import HttpResponse
 from rest_framework import filters
 from rest_framework.generics import ListAPIView
@@ -15,7 +16,8 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from dashboard.helpers import *
-from dashboard.models import Score, WAREHOUSE, DISTRICT, MultipleOrderFacility, Cycle, MOH_CENTRAL
+from dashboard.models import Score, WAREHOUSE, DISTRICT, MultipleOrderFacility, Cycle, MOH_CENTRAL, Consumption, \
+    AdultPatientsRecord, PAEDPatientsRecord
 from dashboard.serializers import ScoreSerializer, NewImportSerializer
 from dashboard.tasks import import_data_from_dhis2
 
@@ -349,3 +351,37 @@ class NewImportView(APIView):
             import_data_from_dhis2.apply_async(args=[serializer.data["period"]], priority=2)
             return Response({"ok": True})
         return Response({"ok": False})
+
+
+class ListFormulations(APIView):
+    def get(self, request):
+        all_values = []
+        distinct_values_from_consumption = Consumption.objects.order_by().values_list('formulation').distinct()
+        distinct_values_from_adult = AdultPatientsRecord.objects.order_by().values_list('formulation').distinct()
+        distinct_values_from_paed = PAEDPatientsRecord.objects.order_by().values_list('formulation').distinct()
+        all_values.extend(distinct_values_from_consumption)
+        all_values.extend(distinct_values_from_adult)
+        all_values.extend(distinct_values_from_paed)
+        return Response({"values": pydash.chain(all_values).flatten().uniq().sort().value()})
+
+
+class ListPatientFields(APIView):
+    def get(self, request):
+        all_fields = []
+        fields_from_adult = model_to_dict(AdultPatientsRecord()).keys()
+        fields_from_paed = model_to_dict(PAEDPatientsRecord()).keys()
+        all_fields.extend(fields_from_adult)
+        all_fields.extend(fields_from_paed)
+        return Response(
+            {"values": pydash.chain(all_fields).without(
+                "id", "ip", "formulation", "warehouse", "notes", "name", "district",
+                "cycle").uniq().sort().value()})
+
+
+class ListConsumptionFields(APIView):
+    def get(self, request):
+        fields = model_to_dict(Consumption()).keys()
+        return Response(
+            {"values": pydash.chain(fields).without(
+                "id", "ip", "formulation", "warehouse", "notes", "name", "district",
+                "cycle").uniq().sort().value()})
