@@ -13,10 +13,13 @@ class GuidelineAdherenceCheckAdult1L(QCheck):
         self.test = GUIDELINE_ADHERENCE_ADULT_1L
         self.combinations = [{
             NAME: DEFAULT,
-            DF2: ["Zidovudine/Lamivudine (AZT/3TC) 300mg/150mg [Pack 60]",
-                  "Zidovudine/Lamivudine/Nevirapine (AZT/3TC/NVP) 300mg/150mg/200mg [Pack 60]"],
-            DF1: ["Tenofovir/Lamivudine (TDF/3TC) 300mg/300mg [Pack 30]",
-                  "Tenofovir/Lamivudine/Efavirenz (TDF/3TC/EFV) 300mg/300mg/600mg[Pack 30]"],
+            DF2: [
+                "AZT/3TC",
+                "ABC/3TC",
+            ],
+            DF1: [
+                "TDF/3TC",
+            ],
             RATIO: global_preferences['Quality_Tests__Guideline_Adherence_Adult_1L_Ratio'],
             # RATIO: 0.80,
             FIELDS: [ESTIMATED_NUMBER_OF_NEW_ART_PATIENTS, ESTIMATED_NUMBER_OF_NEW_PREGNANT_WOMEN]
