@@ -10,7 +10,7 @@ from dashboard.helpers import *
 from dashboard.models import Score
 from dashboard.views.data_sources import NegativesCheckDataSource, ConsumptionAndPatientsDataSource, TwoCycleDataSource, \
     ClosingBalanceMatchesOpeningBalanceDataSource, StableConsumptionDataSource, StablePatientVolumesDataSource, \
-    WarehouseFulfillmentDataSource, GuidelineAdherenceDataSource, NNRTIDataSource
+    WarehouseFulfillmentDataSource, GuidelineAdherenceDataSource, NNRTIDataSource, get_test_name
 
 TEST_DATA = {
     ORDER_FORM_FREE_OF_NEGATIVE_NUMBERS: NegativesCheckDataSource,

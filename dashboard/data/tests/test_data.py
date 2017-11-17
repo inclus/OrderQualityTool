@@ -181,13 +181,13 @@ class GuidelineAdherenceAdult1LTestCase(TestCase):
             C_RECORDS: [
                 {
                     FORMULATION: "Tenofovir/Lamivudine (TDF/3TC) 300mg/300mg [Pack 30]",
-                    "estimated_number_of_new_pregnant_women": 4,
-                    "estimated_number_of_new_patients": 4
+                    "estimated_number_of_new_pregnant_women": 9,
+                    "estimated_number_of_new_patients": 9
                 },
                 {
                     FORMULATION: "Tenofovir/Lamivudine/Efavirenz (TDF/3TC/EFV) 300mg/300mg/600mg[Pack 30]",
-                    "estimated_number_of_new_pregnant_women": 4,
-                    "estimated_number_of_new_patients": 4
+                    "estimated_number_of_new_pregnant_women": 9,
+                    "estimated_number_of_new_patients": 9
                 },
                 {
                     FORMULATION: "Zidovudine/Lamivudine (AZT/3TC) 300mg/150mg [Pack 60]",

@@ -3,7 +3,7 @@ from model_mommy import mommy
 
 from dashboard.helpers import *
 from dashboard.models import Score, Consumption, AdultPatientsRecord, PAEDPatientsRecord
-from dashboard.views.data_sources import NegativesCheckDataSource, ConsumptionAndPatientsDataSource
+from dashboard.views.data_sources import NegativesCheckDataSource, ConsumptionAndPatientsDataSource, get_test_name
 
 
 def generate_values():

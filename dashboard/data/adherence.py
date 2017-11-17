@@ -8,16 +8,19 @@ global_preferences = global_preferences_registry.manager()
 
 
 class GuidelineAdherenceCheckAdult1L(QCheck):
-    test = GUIDELINE_ADHERENCE_ADULT_1L
-    combinations = [{
-        NAME: DEFAULT,
-        DF2: ["Zidovudine/Lamivudine (AZT/3TC) 300mg/150mg [Pack 60]",
-              "Zidovudine/Lamivudine/Nevirapine (AZT/3TC/NVP) 300mg/150mg/200mg [Pack 60]"],
-        DF1: ["Tenofovir/Lamivudine (TDF/3TC) 300mg/300mg [Pack 30]",
-              "Tenofovir/Lamivudine/Efavirenz (TDF/3TC/EFV) 300mg/300mg/600mg[Pack 30]"],
-        RATIO: 0.80,
-        FIELDS: [ESTIMATED_NUMBER_OF_NEW_ART_PATIENTS, ESTIMATED_NUMBER_OF_NEW_PREGNANT_WOMEN]
-    }]
+    def __init__(self):
+        QCheck.__init__(self)
+        self.test = GUIDELINE_ADHERENCE_ADULT_1L
+        self.combinations = [{
+            NAME: DEFAULT,
+            DF2: ["Zidovudine/Lamivudine (AZT/3TC) 300mg/150mg [Pack 60]",
+                  "Zidovudine/Lamivudine/Nevirapine (AZT/3TC/NVP) 300mg/150mg/200mg [Pack 60]"],
+            DF1: ["Tenofovir/Lamivudine (TDF/3TC) 300mg/300mg [Pack 30]",
+                  "Tenofovir/Lamivudine/Efavirenz (TDF/3TC/EFV) 300mg/300mg/600mg[Pack 30]"],
+            RATIO: global_preferences['Quality_Tests__Guideline_Adherence_Adult_1L_Ratio'],
+            # RATIO: 0.80,
+            FIELDS: [ESTIMATED_NUMBER_OF_NEW_ART_PATIENTS, ESTIMATED_NUMBER_OF_NEW_PREGNANT_WOMEN]
+        }]
 
     def for_each_facility(self, data, combination, previous_cycle_data=None):
         ratio = combination[RATIO]

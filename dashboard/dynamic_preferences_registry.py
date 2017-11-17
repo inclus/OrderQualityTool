@@ -11,3 +11,11 @@ class GuidelineAdherenceCheckAdult2LRatio(FloatPreference):
     verbose_name = 'Guideline Adherence Adult 2L Ratio'
     name = 'Guideline_Adherence_Adult_2L_Ratio'
     default = 0.80
+
+
+@global_preferences_registry.register
+class GuidelineAdherenceCheckAdult1LRatio(FloatPreference):
+    section = quality_tests
+    verbose_name = 'Guideline Adherence Adult 1L Ratio'
+    name = 'Guideline_Adherence_Adult_1L_Ratio'
+    default = 0.90

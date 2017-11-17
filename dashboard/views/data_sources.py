@@ -1,6 +1,7 @@
 from collections import defaultdict
 
 import pydash
+from dynamic_preferences.registries import global_preferences_registry
 
 from dashboard.data.adherence import GuidelineAdherenceCheckAdult1L, GuidelineAdherenceCheckAdult2L, \
     GuidelineAdherenceCheckPaed1L
@@ -10,8 +11,13 @@ from dashboard.data.cycles import OrdersOverTimeCheck, BalancesMatchCheck, Stabl
 from dashboard.data.negatives import NegativeNumbersQualityCheck
 from dashboard.data.nn import NNRTIADULTSCheck, NNRTIPAEDCheck
 from dashboard.helpers import *
+from dashboard.helpers import ORDER_FORM_FREE_OF_GAPS, ORDER_FORM_FREE_OF_NEGATIVE_NUMBERS, DIFFERENT_ORDERS_OVER_TIME, \
+    CLOSING_BALANCE_MATCHES_OPENING_BALANCE, CONSUMPTION_AND_PATIENTS, STABLE_CONSUMPTION, WAREHOUSE_FULFILMENT, \
+    STABLE_PATIENT_VOLUMES, GUIDELINE_ADHERENCE_PAED_1L, GUIDELINE_ADHERENCE_ADULT_2L, GUIDELINE_ADHERENCE_ADULT_1L, \
+    REPORTING, WEB_BASED, MULTIPLE_ORDERS, NNRTI_PAED, NNRTI_ADULTS
 from dashboard.models import Consumption, AdultPatientsRecord, PAEDPatientsRecord
 
+global_preferences = global_preferences_registry.manager()
 CHECK = "check"
 IS_HEADER = "isHeader"
 HEADERS = "headers"
@@ -75,7 +81,8 @@ class CheckDataSource(object):
 def get_negatives_data(score, test, combination):
     check = NegativeNumbersQualityCheck()
     formulation_query = query_map.get(combination)
-    consumption_records = Consumption.objects.filter(name=score.name, district=score.district, cycle=score.cycle, formulation__icontains=formulation_query)
+    consumption_records = Consumption.objects.filter(name=score.name, district=score.district, cycle=score.cycle,
+                                                     formulation__icontains=formulation_query)
     tables = []
     for consumption in consumption_records:
         formulation_data = {NAME: consumption.formulation}
@@ -209,9 +216,11 @@ def get_consumption_and_patients(score, test, combination_name):
     check = ConsumptionAndPatientsQualityCheck()
     check_combination = get_combination(check.combinations, combination_name)
     formulation_query = check_combination.get(CONSUMPTION_QUERY)
-    consumption_records = Consumption.objects.filter(name=score.name, district=score.district, cycle=score.cycle, formulation__icontains=formulation_query)
+    consumption_records = Consumption.objects.filter(name=score.name, district=score.district, cycle=score.cycle,
+                                                     formulation__icontains=formulation_query)
     model = AdultPatientsRecord if check_combination.get(IS_ADULT, False) else PAEDPatientsRecord
-    patient_records = model.objects.filter(name=score.name, district=score.district, cycle=score.cycle, formulation__in=check_combination.get(PATIENT_QUERY))
+    patient_records = model.objects.filter(name=score.name, district=score.district, cycle=score.cycle,
+                                           formulation__in=check_combination.get(PATIENT_QUERY))
 
     return {
         "main_title": "RAW ORDER DATA",
@@ -247,7 +256,8 @@ class ConsumptionAndPatientsDataSource(CheckDataSource):
         for n in range(size):
             header_row = [""]
 
-            consumption_records, no_consumption_records = append_values_for_header(consumption, header_row, n, no_consumption_tables)
+            consumption_records, no_consumption_records = append_values_for_header(consumption, header_row, n,
+                                                                                   no_consumption_tables)
             add_blank_column(header_row)
             patient_records, no_patient_records = append_values_for_header(patients, header_row, n, no_patient_tables)
 
@@ -312,7 +322,8 @@ class TwoCycleDataSource(CheckDataSource):
 
     def get_queryset(self, check_combination, cycle, score):
         formulation_query = check_combination.get(CONSUMPTION_QUERY)
-        records = Consumption.objects.filter(name=score.name, district=score.district, cycle=cycle, formulation__icontains=formulation_query)
+        records = Consumption.objects.filter(name=score.name, district=score.district, cycle=cycle,
+                                             formulation__icontains=formulation_query)
         return records
 
     def build_rows(self, check, consumption_records):
@@ -334,9 +345,11 @@ class TwoCycleDataSource(CheckDataSource):
         for n in range(size):
             header_row = [""]
 
-            prev_records, no_prev_records = append_values_for_header(previous_cycle, header_row, n, no_previous_cycle_tables, "rows", "cycle")
+            prev_records, no_prev_records = append_values_for_header(previous_cycle, header_row, n,
+                                                                     no_previous_cycle_tables, "rows", "cycle")
             add_blank_column(header_row)
-            current_records, no_current_records = append_values_for_header(current_cycle, header_row, n, no_current_cycle_tables, "rows", "cycle")
+            current_records, no_current_records = append_values_for_header(current_cycle, header_row, n,
+                                                                           no_current_cycle_tables, "rows", "cycle")
 
             add_blank_row(row)
             row.append(header_row)
@@ -355,7 +368,8 @@ class TwoCycleDataSource(CheckDataSource):
 def get_table_for_cycle(cycle, check, combination, score, fields):
     check_combination = get_combination(check.combinations, combination)
     formulation_query = check_combination.get(CONSUMPTION_QUERY)
-    consumption_records = Consumption.objects.filter(name=score.name, district=score.district, cycle=cycle, formulation__icontains=formulation_query)
+    consumption_records = Consumption.objects.filter(name=score.name, district=score.district, cycle=cycle,
+                                                     formulation__icontains=formulation_query)
     tables = [
         {"cycle": cycle}
     ]
@@ -394,9 +408,11 @@ class ClosingBalanceMatchesOpeningBalanceDataSource(CheckDataSource):
         for n in range(size):
             header_row = [""]
 
-            prev_records, no_prev_records = append_values_for_header(previous_cycle, header_row, n, no_previous_cycle_tables, "rows", "cycle")
+            prev_records, no_prev_records = append_values_for_header(previous_cycle, header_row, n,
+                                                                     no_previous_cycle_tables, "rows", "cycle")
             add_blank_column(header_row)
-            current_records, no_current_records = append_values_for_header(current_cycle, header_row, n, no_current_cycle_tables, "rows", "cycle")
+            current_records, no_current_records = append_values_for_header(current_cycle, header_row, n,
+                                                                           no_current_cycle_tables, "rows", "cycle")
 
             add_blank_row(row)
             row.append(header_row)
@@ -588,9 +604,12 @@ class GuidelineAdherenceDataSource(CheckDataSource):
         return "check/adherence.html"
 
     checks = {
-        GUIDELINE_ADHERENCE_ADULT_1L: {RESULTS_TITLE: "TDF Based as % of the Total", DF1: "TDF-based regimens", DF2: "AZT-based regimens", CHECK: GuidelineAdherenceCheckAdult1L},
-        GUIDELINE_ADHERENCE_ADULT_2L: {RESULTS_TITLE: "ATV/r Based as % of the Total", DF1: "ATV/r-based regimens", DF2: "LPV/r-based regimens", CHECK: GuidelineAdherenceCheckAdult2L},
-        GUIDELINE_ADHERENCE_PAED_1L: {RESULTS_TITLE: "ABC Based as % of the Total", DF1: "ABC-based regimens", DF2: "AZT-based regimens", CHECK: GuidelineAdherenceCheckPaed1L},
+        GUIDELINE_ADHERENCE_ADULT_1L: {RESULTS_TITLE: "TDF Based as % of the Total", DF1: "TDF-based regimens",
+                                       DF2: "AZT-based regimens", CHECK: GuidelineAdherenceCheckAdult1L},
+        GUIDELINE_ADHERENCE_ADULT_2L: {RESULTS_TITLE: "ATV/r Based as % of the Total", DF1: "ATV/r-based regimens",
+                                       DF2: "LPV/r-based regimens", CHECK: GuidelineAdherenceCheckAdult2L},
+        GUIDELINE_ADHERENCE_PAED_1L: {RESULTS_TITLE: "ABC Based as % of the Total", DF1: "ABC-based regimens",
+                                      DF2: "AZT-based regimens", CHECK: GuidelineAdherenceCheckPaed1L},
     }
 
     def as_array(self, score, test, combination):
@@ -643,7 +662,8 @@ class GuidelineAdherenceDataSource(CheckDataSource):
             field_names = [FIELD_NAMES.get(f) for f in check_combination.get(FIELDS)]
             table = {NAME: check_data.get(part), ROWS: [], HEADERS: field_names}
             formulation_query = check_combination.get(part)
-            consumption_records = Consumption.objects.filter(name=score.name, district=score.district, cycle=score.cycle, formulation__in=formulation_query)
+            consumption_records = Consumption.objects.filter(name=score.name, district=score.district,
+                                                             cycle=score.cycle, formulation__in=formulation_query)
             totals = defaultdict(int)
             for record in consumption_records:
                 row = {COLUMN: record.formulation}
@@ -711,7 +731,8 @@ class NNRTIDataSource(CheckDataSource):
             formulation_query = check_config[part]
             if has_other and part == DF2:
                 formulation_query = check_config.get(OTHER) + formulation_query
-            consumption_records = Consumption.objects.filter(name=score.name, district=score.district, cycle=score.cycle, formulation__in=formulation_query)
+            consumption_records = Consumption.objects.filter(name=score.name, district=score.district,
+                                                             cycle=score.cycle, formulation__in=formulation_query)
             part_total = 0
             for record in consumption_records:
                 row = {COLUMN: record.formulation}
@@ -815,3 +836,30 @@ class NNRTIDataSource(CheckDataSource):
         row.append(["", "%f %%" % data.get("FINAL_SCORE")])
         row.append(["", "DIFFERENCE (ABSOLUTE)"])
         return row
+
+
+def get_test_name(test):
+    adult_2l_ratio = global_preferences.get('Quality_Tests__Guideline_Adherence_Adult_2L_Ratio') * 100
+    adult_1l_ratio = global_preferences.get('Quality_Tests__Guideline_Adherence_Adult_1L_Ratio') * 100
+    names = {
+        ORDER_FORM_FREE_OF_GAPS: "NO BLANKS: If the facility reported, is the whole order form free of blanks?",
+        ORDER_FORM_FREE_OF_NEGATIVE_NUMBERS: "NO NEGATIVES: Order free of negative inputs?",
+        DIFFERENT_ORDERS_OVER_TIME: "NON-REPEATING ORDERS: Does the facility avoid repeating the same orders in consecutive cycles?",
+        CLOSING_BALANCE_MATCHES_OPENING_BALANCE: "OPENING = CLOSING: Opening balance = Closing balance from the previous cycle?",
+        CONSUMPTION_AND_PATIENTS: "VOLUME TALLY: Consumption and patient volumes within 30%?",
+        STABLE_CONSUMPTION: "STABLE CONSUMPTION: Consumption changes by less than 50% vs previous cycle?",
+        WAREHOUSE_FULFILMENT: "WAREHOUSE FULFILMENT: Volume delivered = Volume ordered in previous cycle?",
+        STABLE_PATIENT_VOLUMES: "STABLE PATIENTS: Patient volumes change by less than 50% vs. previous cycle?",
+        GUIDELINE_ADHERENCE_PAED_1L: "GUIDELINE ADHERENCE (PAED 1L): 80%+ estimated new patients on ABC formulations?",
+        GUIDELINE_ADHERENCE_ADULT_2L: (
+            "GUIDELINE ADHERENCE (ADULT 2L): {0}%+ estimated new patients on ATV/r formulations?".format(
+                adult_2l_ratio)),
+        GUIDELINE_ADHERENCE_ADULT_1L: (
+            "GUIDELINE ADHERENCE (ADULT 1L): {0}%+ estimated new patients on TDF formulations?".format(adult_1l_ratio)),
+        REPORTING: "REPORTING",
+        WEB_BASED: "WEB_BASED",
+        MULTIPLE_ORDERS: "DUPLICATE ORDERS: Facilities that submitted more than one order over the cycle",
+        NNRTI_PAED: "NRTI vs NNRTI/PI patient volumes (PAED): Differ by <30%?",
+        NNRTI_ADULTS: "NRTI and INSTI/NNRTI/PI patient volumes (ADULT): Differ by <30%?"
+    }
+    return names.get(test, None)

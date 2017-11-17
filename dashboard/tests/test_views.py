@@ -9,6 +9,7 @@ from webtest import Upload
 
 from dashboard.helpers import *
 from dashboard.models import Cycle, Score, DashboardUser, MultipleOrderFacility
+from dashboard.views.data_sources import get_test_name
 
 
 class HomeViewTestCase(WebTest):
