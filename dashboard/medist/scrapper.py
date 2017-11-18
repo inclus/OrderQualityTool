@@ -45,13 +45,15 @@ class DHIS2Scrapper(object):
             browser.fill(PASSWORD_FIELD, password)
             button = browser.find_by_css('input.button')
             button.click()
-            log_context = {"login_url": login_url, "username": username, "browser_url": browser.url}
             login_succeeded = len(browser.find_by_text('Log out')) > 0
             if login_succeeded:
-                logger.debug("login success", extra=log_context)
+                logger.debug("login success",
+                             extra={"login_url": login_url, "username": username, "browser_url": browser.url})
 
             else:
-                logger.debug("login failed", extra=log_context)
+                current_html = browser.html
+                logger.debug("login failed",
+                             extra={"login_url": login_url, "username": username, "browser_url": browser.url, "html": current_html})
                 raise Exception("dhis2 login failed")
         else:
             logger.debug("no login redirect", extra={"browser_url": browser.url})
