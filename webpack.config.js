@@ -3,6 +3,7 @@
 //js
 var path = require('path');
 var webpack = require('webpack')
+var CompressionPlugin = require("compression-webpack-plugin")
 module.exports = {
   entry: {
     app: "./uisrc/entry.js"
@@ -40,7 +41,8 @@ module.exports = {
       'window.$': 'jquery',
       'jQuery': 'jquery'
     }),
-    new webpack.NoEmitOnErrorsPlugin()
+    new webpack.NoEmitOnErrorsPlugin(),
+    new CompressionPlugin()
   ],
   resolve: {
     alias: {
