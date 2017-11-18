@@ -63,6 +63,7 @@ class AdultImportTestCase(TestCase):
         self.test_location = Location(facility="AAR Acacia Clinic HC II",
                                       district="Kampala District",
                                       partner="UHMG",
+                                      status="reporting",
                                       warehouse=JMS)
 
         fixture = get_test_output_from_fixture("arv-2-adult-pmtct-art-patient-report-all-regimen-jms.html",
@@ -99,6 +100,7 @@ class PaedImportTestCase(TestCase):
         self.test_location = Location(facility="Ongutoi HC III",
                                       district="Amuria District",
                                       partner="TASO",
+                                      status="reporting",
                                       warehouse=MAUL)
 
         self.data_import = HtmlDataImport(get_test_output_from_fixture("arv-2-paediatric-art-patient-report-maul.html"),
@@ -132,6 +134,7 @@ class PaedImportTestCase(TestCase):
 class PaedImportCombinedTestCase(TestCase):
     def setUp(self):
         self.test_location = Location(facility="Ongutoi HC III",
+                                      status="reporting",
                                       district="Amuria District", partner="TASO", warehouse=MAUL)
 
         results = get_test_output_from_fixture("arv-2-paediatric-art-patient-report-maul.html")
@@ -167,6 +170,7 @@ class ConsumptionImportTestCase(TestCase):
     def setUp(self):
         self.test_location = Location(facility="Health Initiative Association Uganda",
                                       district="Buikwe District",
+                                      status="reporting",
                                       partner="PHS", warehouse=MAUL)
 
         self.data_import = HtmlDataImport(
@@ -201,6 +205,7 @@ class ConsumptionCombinedImportTestCase(TestCase):
     def setUp(self):
         self.test_location = Location(facility="Health Initiative Association Uganda",
                                       district="Buikwe District",
+                                      status="reporting",
                                       partner="PHS", warehouse=MAUL)
 
         fixture = get_test_output_from_fixture("arv-0-consumption-data-report-maul.html",

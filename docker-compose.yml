@@ -11,7 +11,7 @@ orderqualitytool:
     - postgres:postgres
   env_file: .env
   #command: /usr/local/bin/gunicorn orderqualitytool.wsgi:application -w 2 -b :9000
-  command: uwsgi --http :9000 --module orderqualitytool.wsgi:application --static-map /static=/usr/src/app/asset_files
+  command: uwsgi --http :9000 --module orderqualitytool.wsgi:application --static-map /static=/usr/src/app/asset_files --static-gzip-all
 
 postgres:
   restart: "no"

@@ -227,6 +227,7 @@ class HtmlDataImportRecord(object):
             facility=facility,
             district=district,
             partner=partner,
+            status="reporting",
             warehouse=self.warehouse
         )
 

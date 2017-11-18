@@ -119,6 +119,9 @@ class ScoreAdmin(ModelAdmin):
                     'orderFormFreeOfNegativeNumbers',
                     'nnrtiAdults',
                     'stableConsumption',
+                    'guidelineAdherenceAdult1L',
+                    'guidelineAdherenceAdult2L',
+                    'guidelineAdherencePaed1L',
                     )
     list_filter = ('cycle',)
 
