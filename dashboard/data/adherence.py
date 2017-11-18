@@ -56,15 +56,17 @@ class GuidelineAdherenceCheckAdult2L(GuidelineAdherenceCheckAdult1L):
 
 
 class GuidelineAdherenceCheckPaed1L(GuidelineAdherenceCheckAdult1L):
-    test = GUIDELINE_ADHERENCE_PAED_1L
-    combinations = [{
-        NAME: 'DEFAULT',
-        DF2: ["Zidovudine/Lamivudine/Nevirapine (AZT/3TC/NVP) 60mg/30mg/50mg [Pack 60]",
-              "Zidovudine/Lamivudine (AZT/3TC) 60mg/30mg [Pack 60]"],
-        DF1: ["Abacavir/Lamivudine (ABC/3TC) 60mg/30mg [Pack 60]"],
-        RATIO: 0.80,
-        FIELDS: [ESTIMATED_NUMBER_OF_NEW_ART_PATIENTS]
-    }]
+    def __init__(self):
+        GuidelineAdherenceCheckAdult1L.__init__(self)
+        self.test = GUIDELINE_ADHERENCE_PAED_1L
+        self.combinations = [{
+            NAME: 'DEFAULT',
+            DF2: ["Zidovudine/Lamivudine/Nevirapine (AZT/3TC/NVP) 60mg/30mg/50mg [Pack 60]",
+                  "Zidovudine/Lamivudine (AZT/3TC) 60mg/30mg [Pack 60]"],
+            DF1: ["Abacavir/Lamivudine (ABC/3TC) 60mg/30mg [Pack 60]"],
+            RATIO: 0.80,
+            FIELDS: [ESTIMATED_NUMBER_OF_NEW_ART_PATIENTS]
+        }]
 
 
 def calculate_score(df1_count, df2_count, sum_df1, sum_df2, ratio,
