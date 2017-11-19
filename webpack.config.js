@@ -4,9 +4,20 @@
 var path = require('path');
 var webpack = require('webpack')
 var CompressionPlugin = require("compression-webpack-plugin")
+var WriteFilePlugin = require('write-file-webpack-plugin');
+
+var isDevServer = process.argv.find(v => v.includes('livereload'));
+
+var entryFiles = ["./uisrc/entry.js"];
+if (isDevServer){
+  console.log('Dev server')
+  entryFiles.push("webpack-dev-server/client?http://localhost:3030")
+  entryFiles.push('webpack/hot/only-dev-server')
+}
+
 module.exports = {
   entry: {
-    app: "./uisrc/entry.js"
+    app: entryFiles
   },
   output: {
     path: path.join(__dirname, "dashboard/static/dist"),
@@ -41,8 +52,10 @@ module.exports = {
       'window.$': 'jquery',
       'jQuery': 'jquery'
     }),
+    new webpack.HotModuleReplacementPlugin(),
     new webpack.NoEmitOnErrorsPlugin(),
-    new CompressionPlugin()
+    new CompressionPlugin(),
+    new WriteFilePlugin()
   ],
   resolve: {
     alias: {
