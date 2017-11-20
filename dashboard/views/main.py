@@ -3,13 +3,17 @@ from io import BytesIO
 
 from braces.views import LoginRequiredMixin, StaffuserRequiredMixin
 from django.contrib import messages
+from django.http import HttpResponse
 from django.views.generic import TemplateView, FormView
+from openpyxl import Workbook
+from openpyxl.writer.excel import save_virtual_workbook
 
 from dashboard.data.data_import import ExcelDataImport
+from dashboard.data.partner_mapping import load_file
 from dashboard.data.utils import timeit
-from dashboard.forms import FileUploadForm
+from dashboard.forms import FileUploadForm, MappingUploadForm
 from dashboard.helpers import F3, F2, F1, sort_cycle
-from dashboard.models import Score
+from dashboard.models import Score, LocationToPartnerMapping
 from dashboard.tasks import update_checks
 
 
@@ -59,6 +63,45 @@ class DataImportView(LoginRequiredMixin, StaffuserRequiredMixin, FormView):
         update_checks.apply_async(args=[[cycle.id]], priority=1)
         messages.add_message(self.request, messages.INFO, 'Successfully started import for cycle %s' % (cycle))
         return super(DataImportView, self).form_valid(form)
+
+
+class PartnerMappingImportPage(LoginRequiredMixin, StaffuserRequiredMixin, FormView):
+    template_name = "partner-mapping.html"
+    form_class = MappingUploadForm
+    success_url = '/import/mapping'
+
+    def get_context_data(self, **kwargs):
+        context = super(PartnerMappingImportPage, self).get_context_data(**kwargs)
+        context['title'] = "Update the Cycle Mapping"
+        return context
+
+    def form_valid(self, form):
+        import_file = form.cleaned_data['import_file']
+        mapping = load_file(import_file)
+        LocationToPartnerMapping.objects.all().delete()
+        LocationToPartnerMapping.objects.create(mapping=mapping)
+        messages.add_message(self.request, messages.INFO, 'Successfully updated the partner mapping')
+        return super(PartnerMappingImportPage, self).form_valid(form)
+
+
+def download_mapping(request):
+    excel_data = [
+        ['Name', 'IP']
+    ]
+
+    for location, partner in LocationToPartnerMapping.get_mapping().items():
+        excel_data.append([location, partner])
+
+    wb = Workbook()
+    ws = wb.active
+    for line in excel_data:
+        ws.append(line)
+
+    response = HttpResponse(save_virtual_workbook(wb),
+                            content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response['Content-Disposition'] = 'attachment; filename=partner_mapping.xlsx'
+
+    return response
 
 
 @timeit

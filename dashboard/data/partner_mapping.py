@@ -60,6 +60,6 @@ def load_file(mapping_file):
     only_sheet = workbook.get_active_sheet()
     mapping = FormattedKeyDict()
     for row in only_sheet.iter_rows(
-                    'A%s:E%s' % (only_sheet.min_row + 1, only_sheet.max_row)):
-        mapping[row[1].value] = row[3].value
+                    'A%s:B%s' % (only_sheet.min_row + 1, only_sheet.max_row)):
+        mapping[row[0].value] = row[1].value
     return mapping

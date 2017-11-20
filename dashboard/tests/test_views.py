@@ -8,7 +8,7 @@ from mock import patch
 from webtest import Upload
 
 from dashboard.helpers import *
-from dashboard.models import Cycle, Score, DashboardUser, MultipleOrderFacility
+from dashboard.models import Cycle, Score, DashboardUser, MultipleOrderFacility, LocationToPartnerMapping
 from dashboard.views.data_sources import get_test_name
 
 
@@ -281,3 +281,22 @@ class Dhis2ImporViewTestCase(WebTest):
         response = self.app.post_json(url, params={"period": ""})
         self.assertEqual(200, response.status_code)
         mock_method.assert_not_called()
+
+
+class PartnerMappingImportViewTestCase(WebTest):
+    def get_fixture_path(self, name):
+        file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'fixtures', name)
+        return file_path
+
+    def test_that_you_can_update_the_mapping_when_you_upload_the_file(self):
+        user = DashboardUser.objects.create_superuser("a@a.com", "secret")
+        current_mapping = LocationToPartnerMapping.get_mapping()
+        self.assertEqual(len(current_mapping), 2312)
+        url = '/import/mapping/'
+        import_page = self.app.get(url, user=user)
+        form = import_page.form
+        form['import_file'] = Upload(self.get_fixture_path("partner_mapping_sample.xlsx"))
+        form.submit()
+
+        new_mapping = LocationToPartnerMapping.get_mapping()
+        self.assertEqual(len(new_mapping), 8)

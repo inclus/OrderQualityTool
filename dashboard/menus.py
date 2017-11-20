@@ -26,8 +26,12 @@ Menu.add_item("main", MenuItem("TESTS",
                                reverse("about.tests"),
                                weight=10))
 
-Menu.add_item("main", MenuItem("IMPORT FILES",
-                               reverse("import"),
+# Menu.add_item("main", MenuItem("IMPORT FILES",
+#                                reverse("import"),
+#                                check=user_is_admin,
+#                                weight=20))
+Menu.add_item("main", MenuItem("PARTNER MAPPING",
+                               reverse("update_partner_mapping"),
                                check=user_is_admin,
                                weight=20))
 
