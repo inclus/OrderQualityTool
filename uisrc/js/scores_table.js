@@ -188,7 +188,6 @@ $(document).ready(function() {
     _.forEach(["#cycle_select", "#formulation_select"], function(id) {
         var firstValue = $(id + " option:first").val();
         $(id).val(firstValue).trigger('change');
-        console.log("--id", id, firstValue);
     });
 
     $(tableId).on("click", "td", function(e) {
