@@ -1,5 +1,4 @@
-{% extends "layout.html" %}
-{% load bootstrap3 %}
+{% extends "admin/base_site.html" %}
 {% block content %}
 <div class="container">
     <div class="row">
@@ -11,12 +10,8 @@
     <div class="row">
         <form action="" method="post" class="form" enctype='multipart/form-data'>
             {% csrf_token %}
-            {% bootstrap_form form %}
-            {% buttons %}
             <button type="submit" class="btn btn-primary">Submit
-            </button>
-            {% endbuttons %}
         </form>
     </div>
 </div>
-{% endblock content %}
+{% endblock %}
