@@ -52,7 +52,7 @@ class DataImportView(LoginRequiredMixin, StaffuserRequiredMixin, FormView):
 
     def get_context_data(self, **kwargs):
         context = super(DataImportView, self).get_context_data(**kwargs)
-        context['title'] = "Upload New Cycle"
+        context['title'] = "Import Data For Cycle"
         return context
 
     def form_valid(self, form):
@@ -72,7 +72,7 @@ class PartnerMappingImportPage(LoginRequiredMixin, StaffuserRequiredMixin, FormV
 
     def get_context_data(self, **kwargs):
         context = super(PartnerMappingImportPage, self).get_context_data(**kwargs)
-        context['title'] = "Update the Cycle Mapping"
+        context['title'] = "Update the Partner to Facility Mapping"
         return context
 
     def form_valid(self, form):
