@@ -79,7 +79,7 @@ angular.module('dashboard').controller('HomeController', ['$scope', 'ReportServi
                 }, {
                     filterDelay: 0,
                     counts: [],
-                    data: data.values
+                    dataset: data.values
                 });
             });
         };
@@ -92,7 +92,7 @@ angular.module('dashboard').controller('HomeController', ['$scope', 'ReportServi
                 }, {
                     filterDelay: 0,
                     counts: [],
-                    data: data.values
+                    dataset: data.values
                 });
             });
         };
