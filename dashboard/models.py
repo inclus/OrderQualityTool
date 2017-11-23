@@ -42,6 +42,7 @@ class DashboardUser(AbstractEmailUser):
 
     class Meta:
         app_label = 'dashboard'
+        verbose_name_plural = "Users"
 
 
 class Cycle(models.Model):
@@ -113,6 +114,9 @@ class Consumption(models.Model):
     def __unicode__(self):
         return "%s %s" % (self.cycle, self.formulation)
 
+    class Meta:
+        verbose_name_plural = "Consumption Records"
+
 
 class AdultPatientsRecord(models.Model):
     name = models.CharField(max_length=256, db_index=True)
@@ -127,6 +131,8 @@ class AdultPatientsRecord(models.Model):
     def __unicode__(self):
         return "%s %s" % (self.cycle, self.formulation)
 
+    class Meta:
+        verbose_name_plural = "Adult Patient Records"
 
 class PAEDPatientsRecord(models.Model):
     name = models.CharField(max_length=256, db_index=True)
@@ -137,6 +143,9 @@ class PAEDPatientsRecord(models.Model):
     existing = models.FloatField(null=True, blank=True)
     new = models.FloatField(null=True, blank=True)
     formulation = models.CharField(max_length=256, null=True, blank=True)
+
+    class Meta:
+        verbose_name_plural = "Paed Patient Records"
 
     def __unicode__(self):
         return "%s %s" % (self.cycle, self.formulation)
@@ -151,6 +160,8 @@ class MultipleOrderFacility(models.Model):
 
     def __unicode__(self):
         return "%s %s" % (self.cycle, self.name)
+    class Meta:
+        verbose_name_plural = "Facilities with Multiple Orders"
 
 
 class Dhis2StandardReport(models.Model):
@@ -162,6 +173,8 @@ class Dhis2StandardReport(models.Model):
 
     def __unicode__(self):
         return "%s" % self.name
+    class Meta:
+        verbose_name_plural = "DHIS2 Standard Reports"
 
 
 class LocationToPartnerMapping(models.Model):
