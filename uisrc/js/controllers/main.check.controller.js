@@ -8,14 +8,6 @@ angular.module('dashboard').controller('MainChecksController', ['$scope',
             "testNumber": 3,
             "template": "/static/views/chart.html"
         }, {
-            "url": "facilitiesMultiple",
-            "desc": "MULTIPLE ORDERS: Submitted more than one order during the cycle?",
-            "hasRegimen": false,
-            "hasChart": false,
-            "hasCycle": true,
-            "testNumber": 4,
-            "template": "/static/views/table.html"
-        }, {
             "url": "orderFormFreeOfNegativeNumbers",
             "desc": "NO NEGATIVES: Order free of negative inputs?",
             "hasRegimen": true,
