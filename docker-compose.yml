@@ -3,9 +3,6 @@ orderqualitytool:
   build: ./
   ports:
     - "9000:9000"
-  volumes:
-    - ./data/assets:/usr/src/app/asset_files
-    - ./data/tmp:/usr/src/app/tmp
   links:
     - redis:redis
     - postgres:postgres
