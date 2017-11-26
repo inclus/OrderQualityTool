@@ -302,22 +302,3 @@ class PartnerMappingImportViewTestCase(WebTest):
         self.assertEqual(len(new_mapping), 8)
 
 
-class ManageTestsViewTestCase(WebTest):
-
-    def test_that_admin_can_access_manage_tests_page(self):
-        user = DashboardUser.objects.create_superuser("a@a.com", "secret")
-        url = '/tests/manage'
-        response = self.app.get(url, user=user)
-        self.assertEqual(response.status_code, 200)
-
-    def test_that_staff_user_can_access_manage_tests_page(self):
-        user = DashboardUser.objects.create_user("a@a.com", "secret", is_staff=True)
-        url = '/tests/manage'
-        response = self.app.get(url, user=user)
-        self.assertEqual(response.status_code, 200)
-
-    def test_that_random_user_can_not_access_manage_tests_page(self):
-        user = DashboardUser.objects.create_user("a@a.com", "secret")
-        url = '/tests/manage'
-        response = self.app.get(url, user=user)
-        self.assertEqual(response.status_code, 302)
