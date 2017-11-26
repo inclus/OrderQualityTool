@@ -134,6 +134,7 @@ class AdultPatientsRecord(models.Model):
     class Meta:
         verbose_name_plural = "Adult Patient Records"
 
+
 class PAEDPatientsRecord(models.Model):
     name = models.CharField(max_length=256, db_index=True)
     cycle = models.CharField(max_length=256, db_index=True)
@@ -160,6 +161,7 @@ class MultipleOrderFacility(models.Model):
 
     def __unicode__(self):
         return "%s %s" % (self.cycle, self.name)
+
     class Meta:
         verbose_name_plural = "Facilities with Multiple Orders"
 
@@ -173,6 +175,7 @@ class Dhis2StandardReport(models.Model):
 
     def __unicode__(self):
         return "%s" % self.name
+
     class Meta:
         verbose_name_plural = "DHIS2 Standard Reports"
 
@@ -187,3 +190,20 @@ class LocationToPartnerMapping(models.Model):
     @classmethod
     def get_mapping(cls):
         return cls.objects.first().mapping
+
+
+class FacilityTest(models.Model):
+    name = models.CharField(max_length=255)
+    created = models.DateTimeField(auto_now_add=True, editable=False)
+    last_updated = models.DateTimeField(auto_now=True, editable=False)
+    definition = models.TextField()
+    description = models.TextField()
+
+    class Meta:
+        ordering = ('-created',)
+
+    def __unicode__(self):
+        return u'%s' % self.name
+
+    class Meta:
+        verbose_name_plural = "Facility Test"
