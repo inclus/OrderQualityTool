@@ -117,6 +117,13 @@ def save_data_import(report):
 
 DEFAULT = 'DEFAULT'
 
+class ManageTestsView(LoginRequiredMixin, StaffuserRequiredMixin, TemplateView):
+    template_name = "manage_tests.html"
+
+    def get_context_data(self, **kwargs):
+        context = super(ManageTestsView, self).get_context_data(**kwargs)
+        context['title'] = "Manage Tests"
+        return context
 
 class ReportsView(LoginRequiredMixin, TemplateView):
     template_name = "scores_table.html"

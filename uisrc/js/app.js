@@ -20,7 +20,6 @@ require("./controllers/home.controller");
 require("./controllers/guideline.adherence.controller");
 require("./controllers/main.check.controller");
 require("./controllers/report.rate.controller");
-require("./controllers/checks.controller");
 
 
 dashboard.config(["$stateProvider", "$urlRouterProvider",
@@ -38,9 +37,6 @@ dashboard.config(["$stateProvider", "$urlRouterProvider",
             }).state("home.guidlineAdherenceRate", {
                 url: "/guidlineAdherenceRate",
                 template: require("../views/guidlineAdherenceRate.html")
-            }).state("home.addTests", {
-                url: "/addTests",
-                template: require("../views/addTests.html")
             }).state("manageTests", {
                 url: "/manageTests",
                 controller: "ManageChecksController",

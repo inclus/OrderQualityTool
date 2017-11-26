@@ -9,15 +9,20 @@ var WriteFilePlugin = require('write-file-webpack-plugin');
 var isDevServer = process.argv.find(v => v.includes('livereload'));
 
 var entryFiles = ["./uisrc/entry.js"];
+var manageTestsFiles = ["./uisrc/manageTests.js"];
 if (isDevServer){
   console.log('Dev server')
   entryFiles.push("webpack-dev-server/client?http://localhost:3030")
+  manageTestsFiles.push("webpack-dev-server/client?http://localhost:3030")
   entryFiles.push('webpack/hot/only-dev-server')
+  manageTestsFiles.push('webpack/hot/only-dev-server')
 }
 
 module.exports = {
   entry: {
-    app: entryFiles
+    app: entryFiles,
+    manageTests: manageTestsFiles,
+
   },
   output: {
     path: path.join(__dirname, "dashboard/static/dist"),
