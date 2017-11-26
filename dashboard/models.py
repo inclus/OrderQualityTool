@@ -198,6 +198,7 @@ class FacilityTest(models.Model):
     last_updated = models.DateTimeField(auto_now=True, editable=False)
     definition = models.TextField()
     description = models.TextField()
+    short_description = models.TextField()
 
     class Meta:
         ordering = ('-created',)
@@ -206,4 +207,4 @@ class FacilityTest(models.Model):
         return u'%s' % self.name
 
     class Meta:
-        verbose_name_plural = "Facility Test"
+        verbose_name_plural = "Facility Tests"
