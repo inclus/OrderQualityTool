@@ -9,7 +9,7 @@ from dynamic_preferences.admin import GlobalPreferenceAdmin
 from dynamic_preferences.models import GlobalPreferenceModel
 
 from dashboard.models import DashboardUser, Consumption, Cycle, AdultPatientsRecord, PAEDPatientsRecord, \
-    Score, MultipleOrderFacility, Dhis2StandardReport
+    Score, MultipleOrderFacility, Dhis2StandardReport, FacilityTest
 from dashboard.tasks import update_checks
 
 
@@ -150,3 +150,4 @@ admin_site.register(Cycle, CycleAdmin)
 admin_site.register(MultipleOrderFacility)
 admin_site.register(GlobalPreferenceModel, GlobalPreferenceAdmin)
 admin_site.register(Dhis2StandardReport)
+admin_site.register(FacilityTest)
