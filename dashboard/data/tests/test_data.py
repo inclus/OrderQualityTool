@@ -1,6 +1,7 @@
 import os
 from collections import defaultdict
 
+from django.contrib.admin.models import LogEntry
 from django.test import TestCase
 
 from dashboard.data.adherence import GuidelineAdherenceCheckAdult1L, calculate_score
@@ -113,6 +114,9 @@ class DataTestCase(TestCase):
         self.assertEqual(len(PAEDPatientsRecord.objects.filter(cycle=test_cycle)), 28)
         self.assertEqual(len(Consumption.objects.filter(cycle=test_cycle)), 41)
         self.assertEqual(len(MultipleOrderFacility.objects.filter(cycle=test_cycle)), 5)
+        entries = LogEntry.objects.all()
+        self.assertEqual(len(entries), 1)
+        self.assertEqual(entries[0].change_message, "Completed Import for cycle Jul - Aug 2015 from source excel upload")
 
     def test_full_html_import(self):
         fixture = get_test_output_from_fixture("arv-0-consumption-data-report-maul.html",
@@ -123,12 +127,18 @@ class DataTestCase(TestCase):
         test_cycle = "Jul - Aug 2015"
         report.cycle = test_cycle
         self.assertEqual(len(report.locs), 6)
+        entries = LogEntry.objects.all()
+        self.assertEqual(len(entries), 0)
+
         calculate_scores_for_checks_in_cycle(report)
         self.assertEqual(len(Score.objects.filter(cycle=test_cycle)), 6)
         self.assertEqual(len(AdultPatientsRecord.objects.filter(cycle=test_cycle)), 0)
         self.assertEqual(len(PAEDPatientsRecord.objects.filter(cycle=test_cycle)), 0)
         self.assertEqual(len(Consumption.objects.filter(cycle=test_cycle)), 126)
         self.assertEqual(len(MultipleOrderFacility.objects.filter(cycle=test_cycle)), 0)
+        entries = LogEntry.objects.all()
+        self.assertEqual(len(entries), 1)
+        self.assertEqual(entries[0].change_message, "Completed Import for cycle Jul - Aug 2015 from source dhis2")
 
 
 class GuidelineAdherenceAdult1LTestCase(TestCase):

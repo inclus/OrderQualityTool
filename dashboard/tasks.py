@@ -5,6 +5,7 @@ import attr
 import pydash
 import pygogo
 from celery import shared_task
+from django.contrib.admin.models import LogEntry, CHANGE
 
 from dashboard.data.adherence import GuidelineAdherenceCheckAdult1L, GuidelineAdherenceCheckPaed1L
 from dashboard.data.adherence import GuidelineAdherenceCheckAdult2L
@@ -22,7 +23,7 @@ from dashboard.data.utils import facility_has_single_order, timeit
 from dashboard.helpers import YES, get_prev_cycle, WEB, F1, F2, F3, DEFAULT, NO, NAME
 from dashboard.medist.tasks import fetch_reports
 from dashboard.models import Score, Cycle, Consumption, AdultPatientsRecord, PAEDPatientsRecord, MultipleOrderFacility, \
-    Dhis2StandardReport, LocationToPartnerMapping
+    Dhis2StandardReport, LocationToPartnerMapping, DashboardUser
 
 logger = pygogo.Gogo(__name__).get_structured_logger()
 
@@ -90,6 +91,23 @@ def persist_multiple_order_records(report):
     MultipleOrderFacility.objects.bulk_create(all)
 
 
+def add_log_entry(data_import):
+    cycle = data_import.cycle
+    source = "import"
+    user, created = DashboardUser.objects.get_or_create(email='background_worker@service', is_active=False)
+    if type(data_import) == HtmlDataImport:
+        source = "dhis2"
+
+    if type(data_import) == ExcelDataImport:
+        source = "excel upload"
+
+    LogEntry.objects.create(
+        user_id=user.id,
+        action_flag=CHANGE,
+        change_message="Completed Import for cycle %s from source %s" % (cycle, source),
+    )
+
+
 @timeit
 def calculate_scores_for_checks_in_cycle(data_import):
     # type: (DataImport) -> None
@@ -99,6 +117,7 @@ def calculate_scores_for_checks_in_cycle(data_import):
     persist_adult_records(data_import)
     persist_paed_records(data_import)
     persist_multiple_order_records(data_import)
+    add_log_entry(data_import)
 
 
 @timeit
