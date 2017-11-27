@@ -192,6 +192,10 @@ class LocationToPartnerMapping(models.Model):
         return cls.objects.first().mapping
 
 
+FACILITY_ONLY = "FACILITY_ONLY"
+FACILITY_AND_SAMPLE_FORMULATION = "FACILITY_AND_SAMPLE_FORMULATION"
+
+
 class FacilityTest(models.Model):
     name = models.CharField(max_length=255)
     created = models.DateTimeField(auto_now_add=True, editable=False)
@@ -199,6 +203,9 @@ class FacilityTest(models.Model):
     definition = models.TextField()
     description = models.TextField()
     short_description = models.TextField()
+    test_type = models.CharField(max_length=255,
+                                 choices=((FACILITY_ONLY, FACILITY_ONLY),
+                                          (FACILITY_AND_SAMPLE_FORMULATION, FACILITY_AND_SAMPLE_FORMULATION)))
 
     class Meta:
         ordering = ('-created',)
