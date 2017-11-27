@@ -28,6 +28,14 @@ class LocationImportTestCase(TestCase):
             LocationToPartnerMapping.get_mapping())
         self.assertEqual(len(locations), 5)
 
+    def test_that_locations_are_unique_by_name_and_district_only(self):
+        outputs = get_test_output_from_fixture("uniq.html", report_type=CONSUMPTION_REPORT, warehouse=MAUL)
+        outputs.extend(get_test_output_from_fixture("uniq.html", report_type=CONSUMPTION_REPORT, warehouse=JMS))
+        locations, records = extract_locations_and_import_records(
+            outputs,
+            LocationToPartnerMapping.get_mapping())
+        self.assertEqual(len(locations), 1)
+
     def test_that_location_has_implementing_partner(self):
         locations, records = extract_locations_and_import_records(
             get_test_output_from_fixture("arv-2-paediatric-art-patient-report-maul.html"),

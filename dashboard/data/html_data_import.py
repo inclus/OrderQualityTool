@@ -2,7 +2,7 @@ import functools
 
 import pydash
 import pygogo
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup, NavigableString
 from django.forms import model_to_dict
 
 from dashboard.data.data_import import DataImport
@@ -89,10 +89,12 @@ class HtmlDataImport(DataImport):
 def parse_records_from_html(html_table_element, report, partner_mapping):
     data_import_records = []
     table_column_names = []
-    row_with_column_names = html_table_element.find(id=TR_ROTATED)
-    if row_with_column_names:
+    rows_with_tr_rotated = html_table_element.find_all(id=TR_ROTATED)
+
+    if len(rows_with_tr_rotated) > 0:
+        row_with_column_names = rows_with_tr_rotated[0]
         for item in row_with_column_names:
-            if item and item.text:
+            if type(item) != NavigableString and item and item.text:
                 table_column_names.append(item.text)
         for table_row_element in html_table_element.find_all(TR):
             if len(table_row_element) == len(row_with_column_names) and table_row_element != row_with_column_names:

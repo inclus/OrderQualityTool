@@ -28,10 +28,10 @@ TABLE_COLUMN_EXISTING = "Existing"
 class Location(object):
     facility = attr.ib()
     district = attr.ib()
-    partner = attr.ib()
-    warehouse = attr.ib()
-    multiple = attr.ib(attr.Factory(lambda: ""))
-    status = attr.ib(attr.Factory(lambda: ""))
+    partner = attr.ib(cmp=False)
+    warehouse = attr.ib(cmp=False)
+    multiple = attr.ib(attr.Factory(lambda: ""), cmp=False)
+    status = attr.ib(attr.Factory(lambda: ""), cmp=False)
 
     @staticmethod
     def migrate_from_dict(data):
