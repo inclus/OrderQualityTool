@@ -116,7 +116,6 @@ class DataTestCase(TestCase):
         self.assertEqual(len(MultipleOrderFacility.objects.filter(cycle=test_cycle)), 5)
         entries = LogEntry.objects.all()
         self.assertEqual(len(entries), 1)
-        self.assertEqual(entries[0].change_message, "Completed Import for cycle Jul - Aug 2015 from source excel upload")
 
     def test_full_html_import(self):
         fixture = get_test_output_from_fixture("arv-0-consumption-data-report-maul.html",
@@ -138,7 +137,6 @@ class DataTestCase(TestCase):
         self.assertEqual(len(MultipleOrderFacility.objects.filter(cycle=test_cycle)), 0)
         entries = LogEntry.objects.all()
         self.assertEqual(len(entries), 1)
-        self.assertEqual(entries[0].change_message, "Completed Import for cycle Jul - Aug 2015 from source dhis2")
 
 
 class GuidelineAdherenceAdult1LTestCase(TestCase):

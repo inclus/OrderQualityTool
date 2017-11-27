@@ -93,18 +93,18 @@ def persist_multiple_order_records(report):
 
 def add_log_entry(data_import):
     cycle = data_import.cycle
-    source = "import"
+    source = ""
     user, created = DashboardUser.objects.get_or_create(email='background_worker@service', is_active=False)
     if type(data_import) == HtmlDataImport:
-        source = "dhis2"
+        source = "from dhis2"
 
     if type(data_import) == ExcelDataImport:
-        source = "excel upload"
+        source = "from excel upload"
 
     LogEntry.objects.create(
         user_id=user.id,
         action_flag=CHANGE,
-        change_message="Completed Import for cycle %s from source %s" % (cycle, source),
+        change_message="Completed Import for cycle %s %s" % (cycle, source),
     )
 
 
