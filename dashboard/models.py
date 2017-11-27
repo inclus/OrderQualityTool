@@ -7,6 +7,7 @@ from jsonfield import JSONField
 from picklefield import PickledObjectField
 
 from dashboard.helpers import NOT_REPORTING, YES, NO, REPORT_TYPES
+from dashboard.widget import TestDefinitionWidget, TestDefinitionField
 
 MOH_CENTRAL = "MOH CENTRAL"
 
@@ -200,7 +201,7 @@ class FacilityTest(models.Model):
     name = models.CharField(max_length=255)
     created = models.DateTimeField(auto_now_add=True, editable=False)
     last_updated = models.DateTimeField(auto_now=True, editable=False)
-    definition = models.TextField()
+    definition = TestDefinitionField()
     description = models.TextField()
     short_description = models.TextField()
     test_type = models.CharField(max_length=255,
