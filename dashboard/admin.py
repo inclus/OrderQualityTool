@@ -1,12 +1,14 @@
 from admirarchy.utils import HierarchicalModelAdmin
 from custom_user.forms import EmailUserChangeForm, EmailUserCreationForm
 from django.contrib.admin import AdminSite, ModelAdmin
+from django.contrib.admin.models import LogEntry
 from django.contrib.auth.admin import GroupAdmin, UserAdmin
 from django.contrib.auth.models import Group
 from django.utils.translation import ugettext_lazy
 from django.utils.translation import ugettext_lazy as _
 from dynamic_preferences.admin import GlobalPreferenceAdmin
 from dynamic_preferences.models import GlobalPreferenceModel
+from logentry_admin.admin import LogEntryAdmin
 
 from dashboard.models import DashboardUser, Consumption, Cycle, AdultPatientsRecord, PAEDPatientsRecord, \
     Score, MultipleOrderFacility, Dhis2StandardReport, FacilityTest
@@ -151,3 +153,4 @@ admin_site.register(MultipleOrderFacility)
 admin_site.register(GlobalPreferenceModel, GlobalPreferenceAdmin)
 admin_site.register(Dhis2StandardReport)
 admin_site.register(FacilityTest)
+admin_site.register(LogEntry, LogEntryAdmin)

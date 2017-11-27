@@ -34,3 +34,4 @@ pygogo==0.10.0
 splinter==0.7.6
 beautifulsoup4==4.6.0
 attrs==17.2.0
+django-logentry-admin==1.0.2
