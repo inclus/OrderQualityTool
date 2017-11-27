@@ -13,7 +13,7 @@ from dashboard.data.partner_mapping import load_file
 from dashboard.data.utils import timeit
 from dashboard.forms import FileUploadForm, MappingUploadForm
 from dashboard.helpers import F3, F2, F1, sort_cycle
-from dashboard.models import Score, LocationToPartnerMapping
+from dashboard.models import Score, LocationToPartnerMapping, FacilityTest
 from dashboard.tasks import update_checks
 
 
@@ -31,6 +31,11 @@ class AboutPageView(TemplateView):
 
 class AboutTestPageView(TemplateView):
     template_name = "about_tests.html"
+
+    def get_context_data(self, **kwargs):
+        context = super(AboutTestPageView, self).get_context_data(**kwargs)
+        context['tests'] = FacilityTest.objects.all()
+        return context
 
 
 class AboutBackground(TemplateView):
@@ -116,6 +121,7 @@ def save_data_import(report):
 
 
 DEFAULT = 'DEFAULT'
+
 
 class ReportsView(LoginRequiredMixin, TemplateView):
     template_name = "scores_table.html"
