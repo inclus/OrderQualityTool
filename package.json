@@ -43,6 +43,7 @@
     "angular-chart.js": "~0.8.5",
     "angular-mocks": "~1.4.8",
     "angular-sanitize": "^1.6.6",
+    "angular-selector": "^1.6.1",
     "angular-ui-router": "~0.2.15",
     "angular-ui-router-tabs": "~1.7.0",
     "bootstrap": "3.3.7",

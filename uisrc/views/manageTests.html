@@ -11,47 +11,39 @@
                 <div class="group-text">
                     <label for="" class="text-center">FROM THE</label>
                 </div>
-                <select class="form-control">
-                    <option>Patient Records</option>
-                    <option>Consumption Records</option>
+                <select name="mods" class="form-control" ng-model="definitionGroup.model">
+                    <option value="Patient Records">Patient Records</option>
+                    <option value="Consumption Records">Consumption Records</option>
                 </select>
             </div>
             <div class="group-control">
                 <div class="group-text">
                     <label for="" class="text-center">IN THE</label>
                 </div>
-                <select class="form-control">
-                    <option>Current Cycle</option>
-                    <option>Previous Cycle</option>
-                    <option>Next Cycle</option>
+                <select name="cycles" class="form-control" ng-model="definitionGroup.cycle">
+                    <option value="Current Cycle">Current Cycle</option>
+                    <option value="Previous Cycle">Previous Cycle</option>
+                    <option value="Next Cycle">Next Cycle</option>
                 </select>
             </div>
             <div class="group-dynamic-control">
                 <div class="group-text">
                     <label for="" class="text-center">FOR FIELDS</label>
                 </div>
-                <ui-select id="group-{{$index}}" multiple ng-model="definitionGroup.selected_consumption_fields" theme="selectize"
-                    close-on-select="false" title="Select a field">
-                    <ui-select-match placeholder="Select field">{{$item}}</ui-select-match>
-                    <ui-select-choices position="down" repeat="value in ctrl.consumption_fields | filter:$select.search">
-                        {{ value }}
-                    </ui-select-choices>
-                </ui-select>
+                <select selector multi="true" model="definitionGroup.selected_consumption_fields" options="ctrl.consumption_fields"></select>
+
             </div>
 
             <div class="group-dynamic-control">
                 <div class="group-text">
                     <label for="" class="text-center">IN FORMULATIONS</label>
                 </div>
-                <ui-select multiple ng-model="definitionGroup.selected_formulations" theme="selectize" close-on-select="false"
-                    title="Select a field">
-                    <ui-select-match placeholder="Select formulations">{{$item}}</ui-select-match>
-                    <ui-select-choices position="down" repeat="value in ctrl.formulations | filter:$select.search">
-                        {{ value }}
-                    </ui-select-choices>
-                </ui-select>
+                <select selector multi="true" model="definitionGroup.selected_formulations" options="ctrl.formulations"></select>
             </div>
         </div>
 
+    </div>
+    <div class="row">
+        <textarea name="definition" id="id_definition" cols="40" rows="10" class="vLargeTextField">{{ctrl.definition|json}}</textarea>
     </div>
 </div>

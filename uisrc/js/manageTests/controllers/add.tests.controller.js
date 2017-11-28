@@ -1,23 +1,26 @@
-module.exports = ["$scope", "$http", function ($scope, $http) {
+module.exports = ["$scope", "$http", "$q", function ($scope, $http, $q) {
     var ctrl = this;
-    ctrl.definition = {};
-    $http.get("/api/fields/consumption").then(function (data) {
-        ctrl.consumption_fields = data.data.values;
-    })
 
-    $http.get("/api/fields/patients").then(function (data) {
-        ctrl.patient_fields = data.data.values;
-    })
-
-    $http.get("/api/formulations").then(function (data) {
-        ctrl.formulations = data.data.values;
-    })
     var newGroup = function () {
         return { selected_consumption_fields: [], selected_formulations: [] };
     };
-    ctrl.definition.groups = [newGroup()];
+
     ctrl.addGroup = function () {
         ctrl.definition.groups.push(newGroup());
     };
+    $q.all([$http.get("/api/fields/consumption"), $http.get("/api/fields/patients"), $http.get("/api/formulations")]).then(
+        function (data) {
+            ctrl.consumption_fields = data[0].data.values;
+            ctrl.patient_fields = data[1].data.values;
+            ctrl.formulations = data[2].data.values;
+
+            if (ctrl.value) {
+                ctrl.definition = JSON.parse(ctrl.value);
+            } else {
+                ctrl.definition = {};
+                ctrl.definition.groups = [newGroup()];
+            }
+        });
+
 }];
 

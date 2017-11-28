@@ -1,16 +1,19 @@
 var angular = require('angular');
 require("angular-ui-router");
-require("ui-select/dist/select");
-require("ui-select/dist/select.css");
+require("angular-selector/dist/angular-selector");
+require("angular-selector/dist/angular-selector.css");
 
-var manageTestsModule = angular.module("manageTests", ["ui.router", 'ui.select']);
+var manageTestsModule = angular.module("manageTests", ["selector"]);
 
 var addTestController = require("./controllers/add.tests.controller");
 
 manageTestsModule.component('addTests', {
   template: require("../../views/manageTests.html"),
   controller: addTestController,
-  controllerAs: "ctrl"
+  controllerAs: "ctrl",
+  bindings: {
+    value: '@'
+  }
 });
 
 
