@@ -34,7 +34,7 @@ module.exports = ["$scope", "metadataService", function ($scope, metadataService
 
         if (ctrl.value) {
             var definition = JSON.parse(ctrl.value);
-            for (let index = 0; index < definition.groups.length; index++) {
+            for (var index = 0; index < definition.groups.length; index++) {
                 var group = definition.groups[index];
                 ctrl.setFields(index, group.model);
             }
