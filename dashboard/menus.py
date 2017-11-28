@@ -30,3 +30,7 @@ Menu.add_item("main", MenuItem("USERS",
                                reverse("users"),
                                check=user_is_super_user,
                                weight=20))
+Menu.add_item("main", MenuItem("ADMIN",
+                               "/admin",
+                               check=user_is_admin,
+                               weight=20))
