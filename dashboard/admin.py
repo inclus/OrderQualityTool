@@ -10,6 +10,7 @@ from dynamic_preferences.admin import GlobalPreferenceAdmin
 from dynamic_preferences.models import GlobalPreferenceModel
 from logentry_admin.admin import LogEntryAdmin
 
+from dashboard.forms import TestDefinitionForm
 from dashboard.models import DashboardUser, Consumption, Cycle, AdultPatientsRecord, PAEDPatientsRecord, \
     Score, MultipleOrderFacility, Dhis2StandardReport, FacilityTest
 from dashboard.tasks import update_checks

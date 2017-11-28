@@ -7,18 +7,10 @@ var manageTestsModule = angular.module("manageTests", ["ui.router", 'ui.select']
 
 var addTestController = require("./controllers/add.tests.controller");
 
-manageTestsModule.controller("AddTests", addTestController);
+manageTestsModule.component('addTests', {
+  template: require("../../views/manageTests.html"),
+  controller: addTestController,
+  controllerAs: "ctrl"
+});
 
-manageTestsModule.config(["$stateProvider", "$urlRouterProvider",
-    function($stateProvider, $urlRouterProvider) {
-        //$urlRouterProvider.otherwise("/reportingRate");
-        $stateProvider
-            .state("addTests", {
-                url: "/",
-                template: require("../../views/manageTests.html"),
-                controller: "AddTests",
-                controllerAs: "ctrl"
-            });
-    }
-]);
 
