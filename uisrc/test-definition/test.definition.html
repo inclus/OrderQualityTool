@@ -1,0 +1,78 @@
+<div class="edit-definition">
+    <div class="row">
+        <a href="#" ng-click="ctrl.addGroup()" class="addlink">
+            Add Group
+        </a>
+    </div>
+
+    <div class="row-vertical group-container" ng-repeat="definitionGroup in ctrl.definition.groups">
+        <div class="row">
+                <input type="text" class="vTextField" ng-model="definitionGroup.name" />
+                <a href="#" ng-click="ctrl.removeGroup(group)" class="deletelink">
+                        Remove Group
+                    </a>
+        </div>
+        <div class="group">
+            <div class="group-control">
+                <div class="group-text">
+                    <label for="" class="text-center">FROM THE</label>
+                </div>
+                <select name="mods" class="form-control" ng-model="definitionGroup.model" ng-change="ctrl.setFields($index, definitionGroup.model)">
+                    <option value="Adult Patient Records">Adult Patient Records</option>
+                    <option value="Paed Patient Records">Paed Patient Records</option>
+                    <option value="Consumption Records">Consumption Records</option>
+                </select>
+            </div>
+            <div class="group-control">
+                <div class="group-text">
+                    <label for="" class="text-center">IN THE</label>
+                </div>
+                <select name="cycles" class="form-control" ng-model="definitionGroup.cycle">
+                    <option value="Current Cycle">Current Cycle</option>
+                    <option value="Previous Cycle">Previous Cycle</option>
+                    <option value="Next Cycle">Next Cycle</option>
+                </select>
+            </div>
+            <div class="group-dynamic-control">
+                <div class="group-text">
+                    <label for="" class="text-center">FOR FIELDS</label>
+                </div>
+                <select selector multi="true" model="definitionGroup.selected_fields" options="ctrl.fields[$index]"></select>
+
+            </div>
+
+            <div class="group-dynamic-control">
+                <div class="group-text">
+                    <label for="" class="text-center">IN FORMULATIONS</label>
+                </div>
+                <select selector multi="true" model="definitionGroup.selected_formulations" options="ctrl.formulations"></select>
+            </div>
+        </div>
+    </div>
+    <div class="row-vertical">
+        <fieldset>
+            <legend>Comparison</legend>
+            <div class="row">
+                <a href="#" class="tag" ng-repeat="group in ctrl.definition.groups">{{group.name}}</a>
+                <a href="#" class="tag">></a>
+                <a href="#" class="tag"><</a>
+                <a href="#" class="tag">>=</a>
+                <a href="#" class="tag"><=</a>
+                <a href="#" class="tag">=</a>
+                <a href="#" class="tag">
+                    fraction of
+                </a>
+                <a href="#" class="tag">
+                        constant
+                    </a>
+
+            </div>
+            <div class="row">
+                
+            </div>
+        </fieldset>
+    </div>
+    <div class="row">
+        <textarea name="definition" hidden id="id_definition" cols="40" rows="10" class="vLargeTextField">{{ctrl.definition|json}}</textarea>
+    </div>
+</div>
