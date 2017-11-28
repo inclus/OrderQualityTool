@@ -9,6 +9,8 @@ from picklefield import PickledObjectField
 from dashboard.helpers import NOT_REPORTING, YES, NO, REPORT_TYPES
 from dashboard.widget import TestDefinitionWidget, TestDefinitionField
 
+from dashboard.data.partner_mapping import FormattedKeyDict
+
 MOH_CENTRAL = "MOH CENTRAL"
 
 IIP = "IP"
@@ -190,7 +192,7 @@ class LocationToPartnerMapping(models.Model):
 
     @classmethod
     def get_mapping(cls):
-        return cls.objects.first().mapping
+        return FormattedKeyDict(cls.objects.first().mapping)
 
 
 FACILITY_ONLY = "FACILITY_ONLY"
