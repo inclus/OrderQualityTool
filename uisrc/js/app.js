@@ -37,11 +37,9 @@ dashboard.config(["$stateProvider", "$urlRouterProvider",
             }).state("home.guidlineAdherenceRate", {
                 url: "/guidlineAdherenceRate",
                 template: require("../views/guidlineAdherenceRate.html")
-            }).state("manageTests", {
-                url: "/manageTests",
-                controller: "ManageChecksController",
-                controllerAs: "ctrl",
-                template: require("../views/manageTests.html")
+            }).state("home.addTests", {
+                url: "/addTests",
+                template: require("../views/addTests.html")
             });
     }
 ]);
