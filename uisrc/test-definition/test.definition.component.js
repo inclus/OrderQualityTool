@@ -10,6 +10,8 @@ module.exports = ["$scope", "metadataService", function ($scope, metadataService
         };
     };
 
+    ctrl.newGroup = newGroup;
+
     ctrl.addGroup = function () {
         var group = newGroup();
         ctrl.definition.groups.push(newGroup());
@@ -52,4 +54,6 @@ module.exports = ["$scope", "metadataService", function ($scope, metadataService
             ctrl.definition.model = "Consumption Records";
         }
     })
+
+    return ctrl;
 }];

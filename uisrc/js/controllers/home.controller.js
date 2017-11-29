@@ -98,6 +98,7 @@ angular.module('dashboard').controller('HomeController', ['$scope', 'ReportServi
         };
 
         $scope.$watch('selectedCycle', function(cycle) {
+            console.log('selected the cycle', cycle)
             if (cycle) {
                 updateWorstList();
                 updateBestList();
@@ -124,6 +125,7 @@ angular.module('dashboard').controller('HomeController', ['$scope', 'ReportServi
         setupMetrics();
 
         $scope.$watchGroup(['selectedIp', 'selectedWarehouse', 'selectedDistrict'], function(data){
+            console.log(data, "changes -------------------")
             if(data[0] && data[1] && data[2]){
               setupMetrics();
             }
