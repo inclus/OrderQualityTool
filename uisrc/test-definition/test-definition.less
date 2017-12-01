@@ -6,6 +6,14 @@
   label.selector-input {
     width: 100% !important;
   }
+
+  .ng-touched.ng-invalid {
+    border: 1px solid red;
+  }
+
+  .ng-touched.ng-valid {
+    border: 1px solid green;
+  }
 }
 
 .group {
@@ -15,6 +23,7 @@
   flex-direction: row;
   justify-content: center;
 }
+
 .group-control {
   flex: 1;
 }
@@ -24,17 +33,30 @@
   display: flex;
   flex-direction: column;
 }
-.group-text{
+
+.group-text {
   width: 100%;
 }
+
 .group-container {
   padding-bottom: 10px;
   padding-top: 10px;
   margin-bottom: 10px;
   border-top: 1px solid #eee;
 }
+
 .row {
   display: flex;
+
+}
+
+
+.with-space-between {
+  justify-content: space-between;
+}
+
+.with-space-around {
+  justify-content: space-around;
 }
 
 .row-vertical {
@@ -42,25 +64,22 @@
   flex-direction: column;
 }
 
-.tag {
-  background: #eee;
-  border-radius: 5px;
-  color: #999;
-  display: inline-block;
-  height: 26px;
-  line-height: 26px;
-  padding: 0 20px 0 23px;
-  position: relative;
-  margin: 0 10px 10px 0;
-  text-decoration: none;
-  -webkit-transition: color 0.2s;
+span.operator {
+  font-size: 2em;
 }
 
-.tag:hover {
-  background-color: #0987d6;
-  color: white;
+.comparison-container {
+  input {
+    font-size: 2em;
+  }
+  label {
+    color: red;
+    width: 50%;
+  }
 }
 
-.tag:hover::after {
-   border-left-color: #0987d6; 
+
+.selector-container.multiple .selector-values>li {
+  background-color: #447e9b;
+  border: 1px solid #447e9b;
 }

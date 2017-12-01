@@ -1,23 +1,28 @@
-<div class="edit-definition">
+<div class="edit-definition" ng-form name="cf">
     <div class="row">
-        <a href="#" ng-click="ctrl.addGroup()" class="addlink">
-            Add Group
-        </a>
+        <div class="object-tools">
+            <a href="#" ng-click="ctrl.addGroup()" class="addlink">
+                Add Group
+            </a>
+        </div>
     </div>
 
     <div class="row-vertical group-container" ng-repeat="definitionGroup in ctrl.definition.groups">
-        <div class="row">
-                <input type="text" class="vTextField" ng-model="definitionGroup.name" />
-                <a href="#" ng-click="ctrl.removeGroup(group)" class="deletelink">
-                        Remove Group
-                    </a>
+        <div class="row with-space-between">
+            <h3>{{ definitionGroup.name }}</h3>
+            <div class="object-tools">
+                <a href="#" ng-click="ctrl.removeGroup(definitionGroup)" class="deletelink">
+                    Remove Group ({{ definitionGroup.name }})
+                </a>
+            </div>
         </div>
         <div class="group">
             <div class="group-control">
                 <div class="group-text">
                     <label for="" class="text-center">FROM THE</label>
                 </div>
-                <select name="mods" class="form-control" ng-model="definitionGroup.model" ng-change="ctrl.setFields($index, definitionGroup.model)">
+                <select name="mods" class="form-control" ng-model="definitionGroup.model"
+                        ng-change="ctrl.setFields($index, definitionGroup.model)" ng-required>
                     <option value="Adult Patient Records">Adult Patient Records</option>
                     <option value="Paed Patient Records">Paed Patient Records</option>
                     <option value="Consumption Records">Consumption Records</option>
@@ -27,7 +32,7 @@
                 <div class="group-text">
                     <label for="" class="text-center">IN THE</label>
                 </div>
-                <select name="cycles" class="form-control" ng-model="definitionGroup.cycle">
+                <select name="cycles" class="form-control" ng-model="definitionGroup.cycle" ng-required>
                     <option value="Current Cycle">Current Cycle</option>
                     <option value="Previous Cycle">Previous Cycle</option>
                     <option value="Next Cycle">Next Cycle</option>
@@ -37,7 +42,8 @@
                 <div class="group-text">
                     <label for="" class="text-center">FOR FIELDS</label>
                 </div>
-                <select selector multi="true" model="definitionGroup.selected_fields" options="ctrl.fields[$index]"></select>
+                <select selector multi="true" model="definitionGroup.selected_fields"
+                        options="ctrl.fields[$index]"></select>
 
             </div>
 
@@ -45,34 +51,42 @@
                 <div class="group-text">
                     <label for="" class="text-center">IN FORMULATIONS</label>
                 </div>
-                <select selector multi="true" model="definitionGroup.selected_formulations" options="ctrl.formulations"></select>
+                <select selector multi="true" model="definitionGroup.selected_formulations"
+                        options="ctrl.formulations"></select>
             </div>
         </div>
     </div>
-    <div class="row-vertical">
+    <div class="row-vertical" ng-show="ctrl.definition.groups.length > 0">
         <fieldset>
             <legend>Comparison</legend>
-            <div class="row">
-                <a href="#" class="tag" ng-repeat="group in ctrl.definition.groups">{{group.name}}</a>
-                <a href="#" class="tag">&gt</a>
-                <a href="#" class="tag">&lt</a>
-                <a href="#" class="tag">&gt=</a>
-                <a href="#" class="tag">&lt=</a>
-                <a href="#" class="tag">=</a>
-                <a href="#" class="tag">
-                    fraction of
-                </a>
-                <a href="#" class="tag">
-                        constant
-                    </a>
 
-            </div>
             <div class="row">
-                
+                <div>
+                    <p>Valid Operators</p>
+                    <span class="operator">&gt</span>,
+                    <span class="operator">&lt</span>,
+                    <span class="operator">&gt=</span>,
+                    <span class="operator">&lt=</span>,
+                    <span class="operator">==</span>,
+                    <span class="operator">*</span>,
+                    <span class="operator" ng-repeat="group in ctrl.definition.groups">{{ group.name }}</span>
+                </div>
+            </div>
+
+            <div class="row comparison-container" >
+                <input type="text" name="comparison" ng-pattern="ctrl.main_regex"
+                       ng-model="definitionGroup.comparison"/>
+                <label for="comparison" ng-show="cf.comparison.$invalid">Please Enter a valid comparison
+                    expression</label>
+                <div class="object-tools">
+                    <a href="#" ng-show="definitionGroup.comparison" class="historyLink">Preview</a>
+                </div>
+
             </div>
         </fieldset>
     </div>
     <div class="row">
-        <textarea name="definition" hidden id="id_definition" cols="40" rows="10" class="vLargeTextField">{{ctrl.definition|json}}</textarea>
+        <textarea name="definition" hidden id="id_definition" cols="40" rows="10"
+                  class="vLargeTextField">{{ ctrl.definition|json }}</textarea>
     </div>
 </div>

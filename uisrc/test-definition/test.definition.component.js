@@ -6,9 +6,11 @@ module.exports = ["$scope", "metadataService", function ($scope, metadataService
         return {
             selected_consumption_fields: [],
             selected_formulations: [],
-            name: "Group " + next_group_number
+            name: "G" + next_group_number
         };
     };
+
+    ctrl.main_regex = /^(G\d) (>|<|(?:<=)|(?:>=)|==|\*) ((?:\d+\.?\d*|\.\d+)|G\d) ?(?: ?(\s|>|<|<=|>=|==) ?((?:\d+\.?\d*|\.\d*)|G\d)?)?$/g;
 
     ctrl.newGroup = newGroup;
 
@@ -29,7 +31,7 @@ module.exports = ["$scope", "metadataService", function ($scope, metadataService
         if (model == "Consumption Records") {
             ctrl.fields[index] = ctrl.consumption_fields;
         }
-    }
+    };
 
     metadataService.getAllFields().then(function (data) {
         ctrl.fields = [];
