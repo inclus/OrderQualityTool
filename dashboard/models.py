@@ -6,10 +6,9 @@ from django.db.models import CharField
 from jsonfield import JSONField
 from picklefield import PickledObjectField
 
-from dashboard.helpers import NOT_REPORTING, YES, NO, REPORT_TYPES
-from dashboard.widget import TestDefinitionWidget, TestDefinitionField
-
 from dashboard.data.partner_mapping import FormattedKeyDict
+from dashboard.helpers import NOT_REPORTING, YES, NO, REPORT_TYPES
+from dashboard.widget import TestDefinitionField
 
 MOH_CENTRAL = "MOH CENTRAL"
 
@@ -193,10 +192,6 @@ class LocationToPartnerMapping(models.Model):
     @classmethod
     def get_mapping(cls):
         return FormattedKeyDict(cls.objects.first().mapping)
-
-
-FACILITY_ONLY = "FACILITY_ONLY"
-FACILITY_AND_SAMPLE_FORMULATION = "FACILITY_AND_SAMPLE_FORMULATION"
 
 
 class FacilityTest(models.Model):
