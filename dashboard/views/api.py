@@ -335,7 +335,7 @@ class AccessAreasView(APIView):
 class AdminAccessView(APIView):
     def get(self, request):
         is_admin = type(request.user) != AnonymousUser and (
-            request.user.access_level == MOH_CENTRAL or request.user.is_superuser)
+                request.user.access_level == MOH_CENTRAL or request.user.is_superuser)
         return Response({"is_admin": is_admin})
 
 
@@ -353,15 +353,27 @@ class NewImportView(APIView):
         return Response({"ok": False})
 
 
-class ListFormulations(APIView):
+class ListAdultFormulations(APIView):
+    def get(self, request):
+        all_values = []
+        distinct_values_from_adult = AdultPatientsRecord.objects.order_by().values_list('formulation').distinct()
+        all_values.extend(distinct_values_from_adult)
+        return Response({"values": pydash.chain(all_values).flatten().uniq().sort().value()})
+
+
+class ListPaedFormulations(APIView):
+    def get(self, request):
+        all_values = []
+        distinct_values_from_paed = PAEDPatientsRecord.objects.order_by().values_list('formulation').distinct()
+        all_values.extend(distinct_values_from_paed)
+        return Response({"values": pydash.chain(all_values).flatten().uniq().sort().value()})
+
+
+class ListConsumptionFormulations(APIView):
     def get(self, request):
         all_values = []
         distinct_values_from_consumption = Consumption.objects.order_by().values_list('formulation').distinct()
-        distinct_values_from_adult = AdultPatientsRecord.objects.order_by().values_list('formulation').distinct()
-        distinct_values_from_paed = PAEDPatientsRecord.objects.order_by().values_list('formulation').distinct()
         all_values.extend(distinct_values_from_consumption)
-        all_values.extend(distinct_values_from_adult)
-        all_values.extend(distinct_values_from_paed)
         return Response({"values": pydash.chain(all_values).flatten().uniq().sort().value()})
 
 

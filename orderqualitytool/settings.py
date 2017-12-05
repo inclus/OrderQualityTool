@@ -92,7 +92,7 @@ RAVEN_CONFIG = {
     'dsn': os.environ.get('SENTRY_DSN', None),
 }
 
-redis_url = os.environ.get('REDIS_CACHE_URL', 'redis://redis:6379/0')
+redis_url = os.environ.get('REDIS_CACHE_URL', 'redis://localhost:6379/0')
 
 BROKER_URL = redis_url
 CELERY_RESULT_BACKEND = redis_url

@@ -29,13 +29,13 @@ describe('TestDefinitionController', function () {
             {test: "G1 * 5.192 > 10", match: true},
             {test: "G1 * 0.192 > 10", match: true},
             {test: "G1 * 0.192 >= 10", match: true},
+            {test: "G1 > 0.434 * 10", match: true},
             {test: "G1 < G2", match: true},
             {test: "G1 <= G2", match: true},
             {test: "G1 <= G101", match: false},
             {test: "G1 < 5", match: true},
             {test: "G1 < 5", match: true},
             {test: "G1 < 5", match: true},
-            {test: "G0 < 5", match: false},
         ];
         scenarios.forEach(function (scenario) {
             var test = 'should check input' + scenario.test;

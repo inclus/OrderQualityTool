@@ -5,6 +5,7 @@ import dashboard.views.api
 import dashboard.views.main
 import dashboard.views.tables
 import dashboard.views.upload_users
+import dashboard.views.definition
 
 
 urlpatterns = [
@@ -37,7 +38,9 @@ urlpatterns = [
     url(r'^api/test/ranking/best/csv$', dashboard.views.api.BestPerformingDistrictsCSVView.as_view(), name='ranking_best_csv'),
     url(r'^api/test/ranking/worst/csv$', dashboard.views.api.WorstPerformingDistrictsCSVView.as_view(), name='ranking_worst_csv'),
     url(r'^api/cycles$', dashboard.views.api.CyclesView.as_view(), name='cycles'),
-    url(r'^api/formulations', dashboard.views.api.ListFormulations.as_view(), name='formulations'),
+    url(r'^api/formulations/adult', dashboard.views.api.ListAdultFormulations.as_view(), name='formulations_adult'),
+    url(r'^api/formulations/paed', dashboard.views.api.ListPaedFormulations.as_view(), name='formulations_paed'),
+    url(r'^api/formulations/consumption', dashboard.views.api.ListConsumptionFormulations.as_view(), name='formulations_consumption'),
     url(r'^api/fields/consumption', dashboard.views.api.ListConsumptionFields.as_view(), name='consumption_fields'),
     url(r'^api/fields/patients', dashboard.views.api.ListPatientFields.as_view(), name='patient_fields'),
     url(r'^api/test/metrics', dashboard.views.api.ReportMetrics.as_view(), name='metrics'),
@@ -51,4 +54,5 @@ urlpatterns = [
     url(r'^api/tables/export/csv$', dashboard.views.tables.TableCSVExportView.as_view(), name='export-table'),
     url(r'^api/access/admin$', dashboard.views.api.AdminAccessView.as_view(), name='admin-view'),
     url(r'^api/import/dhis2$', dashboard.views.api.NewImportView.as_view(), name='dhis2-import'),
+    url(r'^api/tests/preview', dashboard.views.definition.PreviewDefinitionView.as_view(), name='preview-definition'),
 ]
