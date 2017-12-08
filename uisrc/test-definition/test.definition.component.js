@@ -1,3 +1,25 @@
+var models = {
+    adult: "Adult",
+    paed: "Paed",
+    consumption: "Consumption"
+};
+
+function isAdult(model) {
+    return model.id === models.adult;
+}
+
+function isAdultOrPaed(model) {
+    return model.id === models.adult || model.id === models.paed;
+}
+
+function isPaed(model) {
+    return model.id === models.paed;
+}
+
+function isConsumption(model) {
+    return model.id === models.consumption;
+}
+
 module.exports = ["$scope", "metadataService", "ngDialog", function ($scope, metadataService, ngDialog) {
     var ctrl = this;
     ctrl.testTypes = [
@@ -15,9 +37,9 @@ module.exports = ["$scope", "metadataService", "ngDialog", function ($scope, met
     ];
 
     ctrl.models = [
-        {id: "Adult", name: "Adult Records"},
-        {id: "Paed", name: "Paed Records"},
-        {id: "Consumption", name: "Consumption Records"}
+        {id: models.adult, name: "Adult Records"},
+        {id: models.paed, name: "Paed Records"},
+        {id: models.consumption, name: "Consumption Records"}
     ];
     var newGroup = function () {
         var next_group_number = ctrl.definition.groups.length + 1;
@@ -82,23 +104,20 @@ module.exports = ["$scope", "metadataService", "ngDialog", function ($scope, met
         if (!model) {
             return;
         }
-        if (model.id === "Adult" || model.id === "Paed") {
+        if (isAdultOrPaed(model)) {
             ctrl.fields[index] = ctrl.patient_fields;
-
         }
-        if (model.id === "Adult") {
+        if (isAdult(model)) {
             ctrl.formulations[index] = ctrl.formulations_adult;
         }
-        if (model.id === "Paed") {
+        if (isPaed(model)) {
             ctrl.formulations[index] = ctrl.formulations_paed;
 
         }
-        if (model.id === "Consumption") {
+        if (isConsumption(model)) {
             ctrl.fields[index] = ctrl.consumption_fields;
             ctrl.formulations[index] = ctrl.formulations_consumption;
         }
-
-
     };
 
     function init() {
