@@ -19,6 +19,7 @@ if (isDevServer){
 }
 
 module.exports = {
+  devtool: 'inline-source-map',
   entry: {
     app: entryFiles,
     "test.definition": testDefinitionEntryFiles,
