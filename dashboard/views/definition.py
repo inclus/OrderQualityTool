@@ -137,6 +137,8 @@ def as_float_or_1(value):
 
 
 def as_number(value):
+    if not value:
+        return False, None
     try:
         return True, float(value)
     except ValueError as e:
@@ -145,11 +147,13 @@ def as_number(value):
 
 def factor_values(fields, factors):
     def _p(values):
+        values = list(values)
         for index, field in enumerate(fields):
             factor = as_float_or_1(factors.get(field, 1))
-            is_numerical, numerical_value = as_number(values[index])
+            print(values, "--------------")
+            is_numerical, numerical_value = as_number(values[index + 1])
             if numerical_value:
-                values[index] = numerical_value * factor
+                values[index + 1] = numerical_value * factor
         return values
 
     return _p
