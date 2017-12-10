@@ -48,7 +48,22 @@
                     <label for="" class="text-center">FOR FIELDS</label>
                 </div>
                 <select selector multi="true" model="definitionGroup.selected_fields"
-                        options="ctrl.fields[$index]"></select>
+                        options="ctrl.fields[$index]" c></select>
+                <div class="checkbox-row">
+                    <input ng-model="definitionGroup.has_factors" id="id_is_advanced" name="is_advanced"
+                           ng-change="ctrl.setMultiplicationFactors(definitionGroup.has_factors, definitionGroup)"
+                           type="checkbox"><label
+                        class="vCheckboxLabel" for="id_is_advanced">Include Mutliplication Factors</label>
+                </div>
+                <div ng-show="definitionGroup.has_factors">
+                    <h5>Multiplication Factors</h5>
+                    <div class="factor-container" ng-repeat="value in definitionGroup.selected_fields track by $index">
+                        <span for="" class="factor-label">{{ value }}</span>
+                        <strong class="factor-label">*</strong>
+                        <input class="factor-input" ng-model="definitionGroup.factors[value]"/>
+                    </div>
+                </div>
+
             </div>
 
             <div class="group-dynamic-control">

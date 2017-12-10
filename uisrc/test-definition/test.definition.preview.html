@@ -4,19 +4,37 @@
             ng-options="option.name for option in locations track by option.name + option.district"></select>
     <select name="selected_cycle" ng-model="cycle" id="preview_cycles" ng-change="update(location, location)"
             ng-options="option for option in location.cycles track by option"></select>
-    <div ng-repeat="group in groups">
-        <h3>
-            {{ group.name }}
-        </h3>
-        <table>
-            <tr>
-                <th>Formulation</th>
-                <th ng-repeat="header in group.headers track by $index">{{ header }}</th>
-            </tr>
-            <tr ng-repeat="value in group.values">
-                <td ng-repeat="item in value track by $index">{{ item }}</td>
-            </tr>
-        </table>
+    <div class="preview-groups-container">
+        <div ng-repeat="group in groups" class="preview-group">
+            <h3>
+                {{ group.name }}
+            </h3>
+            <table>
+                <tr>
+                    <th>Formulation</th>
+                    <th ng-repeat="header in group.headers track by $index">{{ header }}</th>
+                </tr>
+                <tr ng-repeat="value in group.values">
+                    <td ng-repeat="item in value track by $index">{{ item }}</td>
+                </tr>
+            </table>
+
+            <div ng-show="group.has_factors">
+                <h3>
+                    Calculated Values for {{ group.name }}
+                </h3>
+                <table>
+                    <tr>
+                        <th>Formulation</th>
+                        <th ng-repeat="header in group.headers track by $index">{{ header }}</th>
+                    </tr>
+                    <tr ng-repeat="value in group.factored_values">
+                        <td ng-repeat="item in value track by $index">{{ item }}</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
     </div>
+
 
 </div>

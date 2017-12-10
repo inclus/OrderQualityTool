@@ -53,6 +53,16 @@ module.exports = ["$scope", "metadataService", "ngDialog", function ($scope, met
         };
     };
 
+    ctrl.setMultiplicationFactors = function (has_factors, group) {
+        console.log(has_factors, group, "==================")
+        if (has_factors && !group.factors) {
+            group.factors = {};
+            group.selected_fields.forEach(function (field) {
+                group.factors[field] = 1
+            })
+        }
+    };
+
     ctrl.newGroup = newGroup;
     ctrl.previewDefinition = function (definition) {
         ngDialog.open({

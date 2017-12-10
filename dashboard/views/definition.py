@@ -37,6 +37,8 @@ class DefinitionGroup(object):
     selected_fields = attr.ib()
     selected_formulations = attr.ib()
     aggregation = attr.ib()
+    has_factors = attr.ib()
+    factors = attr.ib()
 
     @staticmethod
     def from_dict(data):
@@ -47,6 +49,8 @@ class DefinitionGroup(object):
             aggregation=DefinitionOption.from_dict(data.get('aggregation')),
             selected_fields=data.get('selected_fields'),
             selected_formulations=data.get('selected_formulations'),
+            has_factors=data.get('has_factors'),
+            factors=data.get('factors'),
         )
 
 
@@ -77,6 +81,8 @@ class GroupSerializer(serializers.Serializer):
     selected_fields = serializers.ListField(child=serializers.CharField())
     selected_formulations = serializers.ListField(child=serializers.CharField())
     aggregation = OptionField()
+    has_factors = serializers.BooleanField(required=False)
+    factors = serializers.DictField(required=False)
 
 
 class SampleSerializer(serializers.Serializer):
@@ -123,6 +129,38 @@ class DefinitionSerializer(serializers.Serializer):
         return {"locations": locations}
 
 
+def as_float_or_1(value):
+    try:
+        return float(value)
+    except ValueError as e:
+        return 1
+
+
+def as_number(value):
+    try:
+        return True, float(value)
+    except ValueError as e:
+        return False, None
+
+
+def factor_values(fields, factors):
+    def _p(values):
+        for index, field in enumerate(fields):
+            factor = as_float_or_1(factors.get(field, 1))
+            is_numerical, numerical_value = as_number(values[index])
+            if numerical_value:
+                values[index] = numerical_value * factor
+        return values
+
+    return _p
+
+
+def get_factored_values(has_factors, fields, factors, values):
+    if has_factors:
+        return py_(values).map(factor_values(fields, factors)).value()
+    return None
+
+
 class DefinitionSampleSerializer(DefinitionSerializer):
     sample = SampleSerializer()
 
@@ -130,21 +168,17 @@ class DefinitionSampleSerializer(DefinitionSerializer):
         definition = Definition.from_dict(self.validated_data)
         data = {}
         data['groups'] = list()
-        print(definition, "----")
+        data['factored_groups'] = list()
         sample_location = definition.sample.get('location')
         sample_cycle = definition.sample.get('cycle')
-        data['sample_location'] = sample_location
-        data['sample_cycle'] = sample_cycle
         for group in definition.groups:
             model = group.model.as_model()
             if model:
                 for_group = self.get_values_for_group(group, model, sample_cycle, sample_location)
                 data['groups'].append(for_group)
-
         return data
 
     def get_values_for_group(self, group, model, sample_cycle, sample_location):
-        print(sample_location, '==================================')
         values = model.objects.filter(
             name=sample_location['name'],
             cycle=sample_cycle,
@@ -152,7 +186,13 @@ class DefinitionSampleSerializer(DefinitionSerializer):
             formulation__in=group.selected_formulations
         ).values_list(
             'formulation', *group.selected_fields)
-        return {'name': group.name, 'values': values, 'headers': group.selected_fields}
+        return {
+            'name': group.name,
+            'values': values,
+            'headers': group.selected_fields,
+            "has_factors": group.has_factors,
+            "factored_values": get_factored_values(group.has_factors, group.selected_fields, group.factors, values)
+        }
 
 
 class PreviewDefinitionView(APIView):
