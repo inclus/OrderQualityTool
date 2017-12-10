@@ -53,12 +53,10 @@ module.exports = ["$scope", "metadataService", "ngDialog", function ($scope, met
         };
     };
 
-    ctrl.main_regex = /^(G\d) (>|<|(?:<=)|(?:>=)|==|\*) ((?:\d+\.?\d*|\.\d+)|G\d) ?(?: ?(\s|>|<|<=|>=|==) ?((?:\d+\.?\d*|\.\d*)|G\d)?)?$/g;
-
     ctrl.newGroup = newGroup;
     ctrl.previewDefinition = function (definition) {
         ngDialog.open({
-            template: require('./preview.html'),
+            template: require('./test.definition.preview.html'),
             plain: true,
             closeByDocument: false,
             controller: ["$scope", "locations", function Ctrl($scope, locations) {

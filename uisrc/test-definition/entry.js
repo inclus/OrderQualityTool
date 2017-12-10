@@ -1,2 +1,2 @@
 require("./app.js");
-require("./test-definition.less");
+require("./test.definition.less");
