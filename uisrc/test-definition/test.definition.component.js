@@ -57,37 +57,32 @@ module.exports = ["$scope", "metadataService", "ngDialog", function ($scope, met
 
     ctrl.newGroup = newGroup;
     ctrl.previewDefinition = function (definition) {
-        metadataService.previewDefinition(definition).then(function (preview) {
-            ngDialog.open({
-                template: require('./preview.html'),
-                plain: true,
-                closeByDocument: false,
-                controller: ["$scope", "preview", function Ctrl($scope, preview) {
-                    var init = function (thePreview) {
-                        $scope.cycle = thePreview.sample_cycle;
-                        $scope.location = thePreview.sample_location;
-                        $scope.cycles = thePreview.cycles;
-                        $scope.locations = thePreview.locations;
-                        $scope.groups = thePreview.groups;
-                    };
-                    init(preview);
-
-                    $scope.update = function (cycle, location) {
-
-                        definition.sample = {cycle: cycle, location: location};
-                        metadataService.previewDefinition(definition).then(function (preview) {
-                            init(preview);
-                        })
-                    }
-
-                }],
-                resolve: {
-                    preview: function getPreview() {
-                        return preview;
-                    }
+        ngDialog.open({
+            template: require('./preview.html'),
+            plain: true,
+            closeByDocument: false,
+            controller: ["$scope", "locations", function Ctrl($scope, locations) {
+                $scope.locations = locations;
+                $scope.update = function (location, cycle) {
+                    definition.sample = {cycle: cycle, location: location};
+                    metadataService.previewDefinition(definition).then(function (preview) {
+                        $scope.groups = preview.groups;
+                    })
                 }
-            });
-        })
+                if (locations.length > 0) {
+                    $scope.location = locations[0];
+                    $scope.cycle = locations[0].cycles[0];
+                    $scope.update($scope.location, $scope.cycle);
+                }
+
+
+            }],
+            resolve: {
+                locations: function getLocations() {
+                    return metadataService.getLocations(definition);
+                }
+            }
+        });
     };
     ctrl.addGroup = function () {
         var group = newGroup();

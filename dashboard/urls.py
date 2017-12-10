@@ -54,5 +54,6 @@ urlpatterns = [
     url(r'^api/tables/export/csv$', dashboard.views.tables.TableCSVExportView.as_view(), name='export-table'),
     url(r'^api/access/admin$', dashboard.views.api.AdminAccessView.as_view(), name='admin-view'),
     url(r'^api/import/dhis2$', dashboard.views.api.NewImportView.as_view(), name='dhis2-import'),
-    url(r'^api/tests/preview', dashboard.views.definition.PreviewDefinitionView.as_view(), name='preview-definition'),
+    url(r'^api/tests/preview$', dashboard.views.definition.PreviewDefinitionView.as_view(), name='preview-definition'),
+    url(r'^api/tests/preview/locations$', dashboard.views.definition.PreviewLocationsView.as_view(), name='preview-locations'),
 ]

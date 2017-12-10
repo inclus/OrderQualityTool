@@ -1,9 +1,9 @@
 <div>
-    <select name="selected_cycle" ng-model="cycle" id="preview_cycles" ng-change="update(cycle, location)"
-            ng-options="option for option in cycles track by option"></select>
     <select name="selected_location" ng-model="location" id="preview_location"
-            ng-change="update(cycle, location)"
-            ng-options="option for option in locations track by option"></select>
+            ng-change="update(location, cycle)"
+            ng-options="option.name for option in locations track by option.name + option.district"></select>
+    <select name="selected_cycle" ng-model="cycle" id="preview_cycles" ng-change="update(location, location)"
+            ng-options="option for option in location.cycles track by option"></select>
     <div ng-repeat="group in groups">
         <h3>
             {{ group.name }}
@@ -11,10 +11,10 @@
         <table>
             <tr>
                 <th>Formulation</th>
-                <th ng-repeat="header in group.headers">{{ header }}</th>
+                <th ng-repeat="header in group.headers track by $index">{{ header }}</th>
             </tr>
             <tr ng-repeat="value in group.values">
-                <td ng-repeat="item in value">{{ item }}</td>
+                <td ng-repeat="item in value track by $index">{{ item }}</td>
             </tr>
         </table>
     </div>

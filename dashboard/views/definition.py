@@ -1,6 +1,7 @@
 from collections import defaultdict
 
 import attr
+from pydash import py_
 from rest_framework import serializers
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -79,60 +80,77 @@ class GroupSerializer(serializers.Serializer):
 
 
 class SampleSerializer(serializers.Serializer):
-    location = serializers.ListField(child=serializers.CharField())
+    location = serializers.DictField()
     cycle = serializers.CharField(required=False)
+
+
+def build_field_filters(selected_fields):
+    filter_kwargs = {}
+    for field in selected_fields:
+        filter_kwargs[field + "__isnull"] = False
+    return filter_kwargs
+
+
+def as_loc(items):
+    if len(items) > 0:
+        print(items, "-------")
+        return {
+            "name": items[0]['name'],
+            "district": items[0]['district'],
+            "cycles": [item['cycle'] for item in items]
+        }
+    else:
+        return None
 
 
 class DefinitionSerializer(serializers.Serializer):
     groups = serializers.ListField(child=GroupSerializer())
     type = serializers.CharField()
-    sample = SampleSerializer(required=False)
 
-    def get_preview_params(self, definition):
-        locations = cycles = raw_locations = []
+    def get_locations_and_cycles_with_data(self):
+        definition = Definition.from_dict(self.validated_data)
+        raw_locations = []
         for group in definition.groups:
             model = group.model.as_model()
             if model:
-                base_queryset = model.objects.filter(formulation__in=group.selected_formulations)
+                field_filters = build_field_filters(group.selected_fields)
+                base_queryset = model.objects.filter(formulation__in=group.selected_formulations, **field_filters)
                 raw_locations.extend(
-                    base_queryset.order_by('name').values_list(
-                        'name', 'district').distinct())
-                locations = list(set(raw_locations))
-                cycles = base_queryset.order_by(
-                    'cycle').values_list('cycle', flat=True).distinct()
-        return {"locations": locations, "cycles": cycles}
+                    base_queryset.order_by('name').values(
+                        'name', 'district', 'cycle').distinct())
+        locations = py_(raw_locations).uniq().group_by('name').map(as_loc).sort_by("name").value()
+        print(locations)
+        return {"locations": locations}
+
+
+class DefinitionSampleSerializer(DefinitionSerializer):
+    sample = SampleSerializer()
 
     def fetch_data(self):
         definition = Definition.from_dict(self.validated_data)
-        preview = self.get_preview_params(definition)
-        data = preview
+        data = {}
         data['groups'] = list()
-        locations = preview.get('locations', [])
-        cycles = preview.get('cycles', [])
-        if len(locations) > 0 and len(cycles) > 0:
-            data['locations'] = locations
-            if definition.sample:
-                print(definition, "----")
-                sample_location = definition.sample.get('location')
-                sample_cycle = definition.sample.get('cycle')
-            else:
-                sample_location = locations[0]
-                sample_cycle = cycles[0]
-            data['sample_location'] = sample_location
-            data['sample_cycle'] = sample_cycle
-            data['definition'] = attr.asdict(definition)
-            for group in definition.groups:
-                model = group.model.as_model()
-                if model:
-                    for_group = self.get_values_for_group(group, model, sample_cycle, sample_location)
-                    data['groups'].append(for_group)
+        print(definition, "----")
+        sample_location = definition.sample.get('location')
+        sample_cycle = definition.sample.get('cycle')
+        data['sample_location'] = sample_location
+        data['sample_cycle'] = sample_cycle
+        for group in definition.groups:
+            model = group.model.as_model()
+            if model:
+                for_group = self.get_values_for_group(group, model, sample_cycle, sample_location)
+                data['groups'].append(for_group)
 
         return data
 
     def get_values_for_group(self, group, model, sample_cycle, sample_location):
         print(sample_location, '==================================')
-        values = model.objects.filter(name=sample_location[0], cycle=sample_cycle, district=sample_location[1],
-                                      formulation__in=group.selected_formulations).values_list(
+        values = model.objects.filter(
+            name=sample_location['name'],
+            cycle=sample_cycle,
+            district=sample_location['district'],
+            formulation__in=group.selected_formulations
+        ).values_list(
             'formulation', *group.selected_fields)
         return {'name': group.name, 'values': values, 'headers': group.selected_fields}
 
@@ -141,8 +159,19 @@ class PreviewDefinitionView(APIView):
     authentication_classes = []
 
     def post(self, request):
-        serializer = DefinitionSerializer(data=request.data)
+        serializer = DefinitionSampleSerializer(data=request.data)
         if serializer.is_valid():
             return Response(serializer.fetch_data())
         else:
-            return Response(serializer.errors)
+            return Response(data=serializer.errors, status=400)
+
+
+class PreviewLocationsView(APIView):
+    authentication_classes = []
+
+    def post(self, request):
+        serializer = DefinitionSerializer(data=request.data)
+        if serializer.is_valid():
+            return Response(serializer.get_locations_and_cycles_with_data())
+        else:
+            return Response(data=serializer.errors, status=400)

@@ -301,4 +301,3 @@ class PartnerMappingImportViewTestCase(WebTest):
         new_mapping = LocationToPartnerMapping.get_mapping()
         self.assertEqual(len(new_mapping), 8)
 
-

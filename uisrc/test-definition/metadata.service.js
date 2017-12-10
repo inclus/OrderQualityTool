@@ -8,6 +8,10 @@ module.exports = ["$http", "$q", function ($http, $q) {
         return response.data;
     };
 
+    var parseLocationsResponse = function (response) {
+        return response.data.locations;
+    };
+
     self.getConsumptionFields = function () {
         return $http.get("/api/fields/consumption").then(parseDjangoResponse);
     };
@@ -15,7 +19,9 @@ module.exports = ["$http", "$q", function ($http, $q) {
     self.previewDefinition = function (definition) {
         return $http.post("/api/tests/preview", definition).then(parsePreviewResponse);
     };
-
+    self.getLocations = function (definition) {
+        return $http.post("/api/tests/preview/locations", definition).then(parseLocationsResponse);
+    };
     self.getPatientFields = function () {
         return $http.get("/api/fields/patients").then(parseDjangoResponse);
     };
