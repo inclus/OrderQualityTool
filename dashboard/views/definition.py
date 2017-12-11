@@ -6,7 +6,7 @@ from rest_framework import serializers
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from dashboard.models import AdultPatientsRecord, PAEDPatientsRecord, Consumption
+from dashboard.models import AdultPatientsRecord, PAEDPatientsRecord, Consumption, TracingFormulations
 
 
 @attr.s(cmp=True, frozen=True)
@@ -219,3 +219,16 @@ class PreviewLocationsView(APIView):
             return Response(serializer.get_locations_and_cycles_with_data())
         else:
             return Response(data=serializer.errors, status=400)
+
+
+class ConsumptionTracingFormulationView(APIView):
+    model = "Consumption"
+
+    def get(self, request):
+        tracers = [{"name": tracer.name, "formulations": tracer.formulations} for tracer in
+                   TracingFormulations.objects.filter(model=self.model)]
+        return Response(data=tracers)
+
+
+class PatientTracingFormulationView(ConsumptionTracingFormulationView):
+    model = "Patients"

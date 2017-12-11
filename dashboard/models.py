@@ -1,6 +1,7 @@
 import logging
 
 from custom_user.models import AbstractEmailUser
+from django.contrib.postgres.fields import ArrayField
 from django.db import models
 from django.db.models import CharField
 from jsonfield import JSONField
@@ -210,3 +211,15 @@ class FacilityTest(models.Model):
 
     class Meta:
         verbose_name_plural = "Facility Tests"
+
+
+class TracingFormulations(models.Model):
+    name = models.CharField(max_length=255)
+    model = models.CharField(max_length=255)
+    formulations = JSONField()
+
+    class Meta:
+        verbose_name_plural = "Tracing Formulations"
+
+    def __unicode__(self):
+        return u'%s %s' % (self.name, self.model)

@@ -23,8 +23,8 @@ function isConsumption(model) {
 module.exports = ["$scope", "metadataService", "ngDialog", function ($scope, metadataService, ngDialog) {
     var ctrl = this;
     ctrl.testTypes = [
-        {id: "FacilityOnly", name: "Facility Only"},
-        {id: "FacilityAndSampleFormulation", name: "Facility And Sample Formulation"}
+        {id: "FacilityTwoGroups", name: "Facility with 2 Groups of data"},
+        {id: "FacilityTwoGroupsAndTracingFormulation", name: "Facility with 2 Groups And Tracing Formulation"}
     ];
     ctrl.cycles = [
         {id: "Current", name: "Current Cycle"},

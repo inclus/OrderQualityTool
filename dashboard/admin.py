@@ -12,7 +12,7 @@ from logentry_admin.admin import LogEntryAdmin
 
 from dashboard.forms import TestDefinitionForm
 from dashboard.models import DashboardUser, Consumption, Cycle, AdultPatientsRecord, PAEDPatientsRecord, \
-    Score, MultipleOrderFacility, Dhis2StandardReport, FacilityTest
+    Score, MultipleOrderFacility, Dhis2StandardReport, FacilityTest, TracingFormulations
 from dashboard.tasks import update_checks
 
 
@@ -154,4 +154,5 @@ admin_site.register(MultipleOrderFacility)
 admin_site.register(GlobalPreferenceModel, GlobalPreferenceAdmin)
 admin_site.register(Dhis2StandardReport)
 admin_site.register(FacilityTest)
+admin_site.register(TracingFormulations)
 admin_site.register(LogEntry, LogEntryAdmin)
