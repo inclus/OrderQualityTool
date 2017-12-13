@@ -1,60 +1,130 @@
-var models = {
-    adult: "Adult",
-    paed: "Paed",
-    consumption: "Consumption"
+var _ = require('lodash');
+ModelHelper = {
+    getFields: function (id, meta_data) {
+        var key = "fields_" + id.toLowerCase();
+        if (meta_data && key in meta_data) {
+            return meta_data[key];
+        }
+        return [];
+    },
+    getFormulations: function (id, meta_data) {
+        var key = "formulations_" + id.toLowerCase();
+        if (meta_data && key in meta_data) {
+            return meta_data[key];
+        }
+        return [];
+    }
 };
 
-function isAdult(model) {
-    return model.id === models.adult;
-}
+var newModel = function (id, name, meta_data) {
+    return Object.create({}, {
+        id: {
+            value: id,
+            writable: true,
+            enumerable: true
+        },
+        name: {
+            value: name,
+            writable: true,
+            enumerable: true
+        },
+        fields: {
+            value: ModelHelper.getFields(id, meta_data),
+            enumerable: true
+        },
+        formulations: {
+            value: ModelHelper.getFormulations(id, meta_data),
+            enumerable: true
+        }
+    })
+};
 
-function isAdultOrPaed(model) {
-    return model.id === models.adult || model.id === models.paed;
-}
+var BaseTest = Object.create(null);
 
-function isPaed(model) {
-    return model.id === models.paed;
-}
+BaseTest.prototype = {
+    newGroup:
+        function (group_number) {
+            return {
+                cycle: this.cycles[0],
+                model: this.models[0],
+                aggregation: this.calculations[0],
+                selected_consumption_fields: [],
+                selected_formulations: [],
+                name: "G" + group_number
+            }
 
-function isConsumption(model) {
-    return model.id === models.consumption;
-}
+        }
+};
+var FacilityTest = function (meta_data) {
+    return Object.create(BaseTest.prototype, {
+        id: {
+            value: "FacilityTwoGroups",
+            writable: true,
+            enumerable: true
+        },
+        name: {
+            value: "Facility with 2 Groups of data",
+            writable: true,
+            enumerable: true
+        },
+        cycles: {
+            value:
+                [
+                    {id: "Current", name: "Current Cycle"},
+                    {id: "Next", name: "Next Cycle"},
+                    {id: "Previous", name: "Previous Cycle"}
+                ],
+            enumerable: true
+
+        },
+        calculations: {
+            value: [
+                {id: "SUM", name: "Sum"},
+                {id: "AVG", name: "Average"}
+            ],
+            enumerable: true
+
+        },
+        models: {
+            value: [
+                newModel("Adult", "Adult Records", meta_data),
+                newModel("Paed", "Paed Records", meta_data),
+                newModel("Consumption", "Consumption Records", meta_data)
+            ],
+            enumerable: true
+        }
+
+    })
+};
+
+var newTest = function (meta_data, id, name) {
+    return Object.create(FacilityTest(meta_data), {
+        id: {
+            value: id,
+            writable: true,
+            enumerable: true
+        },
+        name: {
+            value: name,
+            writable: true,
+            enumerable: true
+        }
+    })
+};
+
+var FacilityTestWithTracingFormulation = function (meta_data) {
+    return newTest(meta_data, "FacilityTwoGroupsAndTracingFormulation", "Facility with 2 Groups And Tracing Formulation")
+};
+
+var buildType = function (meta_data, type_data) {
+    return newTest(meta_data, type_data.id, type_data.name)
+};
+
 
 module.exports = ["$scope", "metadataService", "ngDialog", function ($scope, metadataService, ngDialog) {
     var ctrl = this;
-    ctrl.testTypes = [
-        {id: "FacilityTwoGroups", name: "Facility with 2 Groups of data"},
-        {id: "FacilityTwoGroupsAndTracingFormulation", name: "Facility with 2 Groups And Tracing Formulation"}
-    ];
-    ctrl.cycles = [
-        {id: "Current", name: "Current Cycle"},
-        {id: "Next", name: "Next Cycle"},
-        {id: "Previous", name: "Previous Cycle"},
-    ];
-    ctrl.calculations = [
-        {id: "SUM", name: "Sum"},
-        {id: "AVG", name: "Average"}
-    ];
-
-    ctrl.models = [
-        {id: models.adult, name: "Adult Records"},
-        {id: models.paed, name: "Paed Records"},
-        {id: models.consumption, name: "Consumption Records"}
-    ];
-    var newGroup = function () {
-        var next_group_number = ctrl.definition.groups.length + 1;
-        return {
-            cycle: ctrl.cycles[0],
-            model: ctrl.models[0],
-            aggregation: ctrl.calculations[0],
-            selected_consumption_fields: [],
-            selected_formulations: [],
-            name: "G" + next_group_number
-        };
-    };
 
     ctrl.setMultiplicationFactors = function (has_factors, group) {
-        console.log(has_factors, group, "==================")
         if (has_factors && !group.factors) {
             group.factors = {};
             group.selected_fields.forEach(function (field) {
@@ -63,7 +133,6 @@ module.exports = ["$scope", "metadataService", "ngDialog", function ($scope, met
         }
     };
 
-    ctrl.newGroup = newGroup;
     ctrl.previewDefinition = function (definition) {
         ngDialog.open({
             template: require('./test.definition.preview.html'),
@@ -76,7 +145,7 @@ module.exports = ["$scope", "metadataService", "ngDialog", function ($scope, met
                     metadataService.previewDefinition(definition).then(function (preview) {
                         $scope.groups = preview.groups;
                     })
-                }
+                };
                 if (locations.length > 0) {
                     $scope.location = locations[0];
                     $scope.cycle = locations[0].cycles[0];
@@ -92,70 +161,39 @@ module.exports = ["$scope", "metadataService", "ngDialog", function ($scope, met
             }
         });
     };
-    ctrl.addGroup = function () {
-        var group = newGroup();
-        ctrl.definition.groups.push(group);
-        var lastIndex = ctrl.definition.groups.length - 1;
-        ctrl.setFields(lastIndex, group.model)
-    };
-
-    ctrl.removeGroup = function (group) {
-        ctrl.definition.groups.pop(group);
-    };
-
-    ctrl.setFields = function (index, model) {
-        if (!model) {
-            return;
-        }
-        if (isAdultOrPaed(model)) {
-            ctrl.fields[index] = ctrl.patient_fields;
-        }
-        if (isAdult(model)) {
-            ctrl.formulations[index] = ctrl.formulations_adult;
-        }
-        if (isPaed(model)) {
-            ctrl.formulations[index] = ctrl.formulations_paed;
-
-        }
-        if (isConsumption(model)) {
-            ctrl.fields[index] = ctrl.consumption_fields;
-            ctrl.formulations[index] = ctrl.formulations_consumption;
-        }
-    };
-
-    function init() {
-        metadataService.getAllFields().then(function (data) {
-            ctrl.fields = [];
-            ctrl.formulations = [];
-            ctrl.consumption_fields = data.consumption_fields;
-            ctrl.patient_fields = data.patient_fields;
-            ctrl.formulations_adult = data.formulations_adult;
-            ctrl.formulations_paed = data.formulations_paed;
-            ctrl.formulations_consumption = data.formulations_consumption;
 
 
-            if (ctrl.value) {
-                var definition = JSON.parse(ctrl.value);
-                for (var index = 0; index < definition.groups.length; index++) {
-                    var group = definition.groups[index];
-                    ctrl.setFields(index, group.model);
-                }
-                ctrl.definition = definition;
-
-            } else {
-                ctrl.definition = {type: ctrl.testTypes[0], operatorConstant: 1};
-                ctrl.definition.groups = [];
-                ctrl.addGroup();
-                ctrl.addGroup();
-            }
+    var build_from_value = function (meta_data) {
+        var definition = JSON.parse(ctrl.value);
+        definition.type = buildType(meta_data, definition.type);
+        definition.groups.forEach(function (group) {
+            group.model = newModel(group.model.id, group.model.name, meta_data);
         });
-    }
+        ctrl.definition = definition;
+    };
+
 
     ctrl.reset = function () {
-        ctrl.definition = {type: ctrl.testTypes[0], operatorConstant: 1.0};
-        ctrl.definition.groups = [];
-        ctrl.addGroup();
-        ctrl.addGroup();
+        ctrl.definition = {type: FacilityTest(ctrl.meta_data), operatorConstant: 1.0};
+        var testType = ctrl.definition.type;
+        ctrl.definition.groups = [
+            testType.newGroup(1, ctrl.meta_data),
+            testType.newGroup(2, ctrl.meta_data)];
+    };
+
+    var init = function () {
+        metadataService.getAllFields().then(function (meta_data) {
+            ctrl.meta_data = meta_data;
+            ctrl.testTypes = [
+                FacilityTest(meta_data),
+                FacilityTestWithTracingFormulation(meta_data)
+            ];
+            if (ctrl.value) {
+                build_from_value(meta_data);
+            } else {
+                ctrl.reset();
+            }
+        });
     };
 
     init();

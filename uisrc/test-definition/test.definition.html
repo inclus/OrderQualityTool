@@ -24,15 +24,15 @@
                     <label for="" class="text-center">Compute The</label>
                 </div>
                 <select name="aggregation" id="aggregation" required
-                        ng-options="option.name for option in ctrl.calculations track by option.id"
+                        ng-options="option.name for option in ctrl.definition.type.calculations track by option.id"
                         ng-model="definitionGroup.aggregation"></select>
             </div>
             <div class="group-control">
                 <div class="group-text">
                     <label for="" class="text-center">FROM THE</label>
                 </div>
-                <select name="mods" id="mods-select" required ng-change="ctrl.setFields($index, definitionGroup.model)"
-                        ng-options="option.name for option in ctrl.models track by option.id"
+                <select name="mods" id="mods-select" required
+                        ng-options="group.name for group in ctrl.definition.type.models track by group.id"
                         ng-model="definitionGroup.model"></select>
             </div>
             <div class="group-control">
@@ -40,7 +40,7 @@
                     <label for="" class="text-center">IN THE</label>
                 </div>
                 <select name="cycles" id="cycles" required
-                        ng-options="option.name for option in ctrl.cycles track by option.id"
+                        ng-options="option.name for option in ctrl.definition.type.cycles track by option.id"
                         ng-model="definitionGroup.cycle"></select>
             </div>
             <div class="group-dynamic-control">
@@ -48,12 +48,12 @@
                     <label for="" class="text-center">FOR FIELDS</label>
                 </div>
                 <select selector multi="true" model="definitionGroup.selected_fields"
-                        options="ctrl.fields[$index]" c></select>
+                        options="definitionGroup.model.fields"></select>
                 <div class="checkbox-row">
                     <input ng-model="definitionGroup.has_factors" id="id_is_advanced" name="is_advanced"
                            ng-change="ctrl.setMultiplicationFactors(definitionGroup.has_factors, definitionGroup)"
                            type="checkbox"><label
-                        class="vCheckboxLabel" for="id_is_advanced">Include Mutliplication Factors</label>
+                        class="vCheckboxLabel" for="id_is_advanced">Include Multiplication Factors</label>
                 </div>
                 <div ng-show="definitionGroup.has_factors">
                     <h5>Multiplication Factors</h5>
@@ -71,7 +71,7 @@
                     <label for="" class="text-center">IN FORMULATIONS</label>
                 </div>
                 <select selector multi="true" model="definitionGroup.selected_formulations"
-                        options="ctrl.formulations[$index]"></select>
+                        options="definitionGroup.model.formulations"></select>
             </div>
         </div>
     </div>
@@ -116,7 +116,7 @@
 
     </div>
     <div class="row">
-        <textarea name="definition" hidden id="id_definition" cols="40" rows="10"
+        <textarea name="definition" id="id_definition" cols="40" rows="10"
                   class="vLargeTextField">{{ ctrl.definition|json }}</textarea>
     </div>
 </div>

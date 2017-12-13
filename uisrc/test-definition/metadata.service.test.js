@@ -72,8 +72,9 @@ describe('metadataService', function () {
         expect(data.formulations_consumption).toEqual(["consump_a", "consump_b"])
         expect(data.formulations_paed).toEqual(["paed_a", "paed_b"])
         expect(data.formulations_adult).toEqual(["adult_a", "adult_b"])
-        expect(data.consumption_fields).toEqual(["closing_balance", "opening_balance"])
-        expect(data.patient_fields).toEqual(["new", "existing"])
+        expect(data.fields_consumption).toEqual(["closing_balance", "opening_balance"])
+        expect(data.fields_adult).toEqual(["new", "existing"])
+        expect(data.fields_paed).toEqual(["new", "existing"])
       })
       httpBackend.flush();
     });

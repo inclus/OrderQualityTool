@@ -32,8 +32,9 @@ module.exports = ["$http", "$q", function ($http, $q) {
         return $q.all([self.getConsumptionFields(), self.getPatientFields(), self.getFormulations('adult'), self.getFormulations('paed'), self.getFormulations('consumption')]).then(
             function (data) {
                 var output = {};
-                output.consumption_fields = data[0];
-                output.patient_fields = data[1];
+                output.fields_consumption = data[0];
+                output.fields_adult = data[1];
+                output.fields_paed = data[1];
                 output.formulations_adult = data[2];
                 output.formulations_paed = data[3];
                 output.formulations_consumption = data[4];
