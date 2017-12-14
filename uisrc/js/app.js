@@ -1,4 +1,4 @@
-var angular = require('angular');
+var angular = require("angular");
 require("angular-ui-router");
 require("ui-select/dist/select");
 require("ui-select/dist/select.css");
@@ -15,7 +15,7 @@ require("c3");
 
 var services = angular.module("services", []);
 require("./services/report.service");
-var dashboard = angular.module("dashboard", ["ui.router", "chart.js", "ui.bootstrap", "checklist-model", "angularChart", "ngTable", "services", 'ui.select']);
+var dashboard = angular.module("dashboard", ["ui.router", "chart.js", "ui.bootstrap", "checklist-model", "angularChart", "ngTable", "services", "ui.select"]);
 require("./controllers/home.controller");
 require("./controllers/guideline.adherence.controller");
 require("./controllers/main.check.controller");

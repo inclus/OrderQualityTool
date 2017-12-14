@@ -1,10 +1,10 @@
-var $ = require('jquery');
-var _ = require('lodash');
-require('datatables.net');
-require('multiple-select');
-require('select2');
-require('jsrender');
-require("bootstrap/dist/js/bootstrap")
+var $ = require("jquery");
+var _ = require("lodash");
+require("datatables.net");
+require("multiple-select");
+require("select2");
+require("jsrender");
+require("bootstrap/dist/js/bootstrap");
 require("datatables.net-bs/js/dataTables.bootstrap");
 require("datatables.net-fixedcolumns/js/dataTables.fixedColumns");
 require("datatables.net-buttons/js/dataTables.buttons");
@@ -187,7 +187,7 @@ $(document).ready(function() {
 
     _.forEach(["#cycle_select", "#formulation_select"], function(id) {
         var firstValue = $(id + " option:first").val();
-        $(id).val(firstValue).trigger('change');
+        $(id).val(firstValue).trigger("change");
     });
 
     $(tableId).on("click", "td", function(e) {

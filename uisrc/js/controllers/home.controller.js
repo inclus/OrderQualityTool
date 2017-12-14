@@ -1,4 +1,4 @@
-angular.module('dashboard').controller('HomeController', ['$scope', 'ReportService', '$httpParamSerializer', 'NgTableParams',
+angular.module("dashboard").controller("HomeController", ["$scope", "ReportService", "$httpParamSerializer", "NgTableParams",
     function($scope, ReportService, $httpParamSerializer, NgTableParams) {
         $scope.formulation = "TDF/3TC/EFV";
         $scope.isAdmin = false;
@@ -36,7 +36,7 @@ angular.module('dashboard').controller('HomeController', ['$scope', 'ReportServi
             $scope.endCycle = $scope.selectedCycle = data.most_recent_cycle;
         });
 
-        $scope.$watch('startCycle', function(start) {
+        $scope.$watch("startCycle", function(start) {
             if (start) {
                 var pos = _.findIndex($scope.cycles, function(item) {
                     return item == start;
@@ -59,7 +59,7 @@ angular.module('dashboard').controller('HomeController', ['$scope', 'ReportServi
                 cycle: $scope.selectedCycle
             });
             var url = "/api/test/ranking/best/csv?" + query;
-            downloadURL(url, 'best.csv');
+            downloadURL(url, "best.csv");
         };
 
         $scope.downloadWorst = function() {
@@ -68,7 +68,7 @@ angular.module('dashboard').controller('HomeController', ['$scope', 'ReportServi
                 cycle: $scope.selectedCycle
             });
             var url = "/api/test/ranking/worst/csv?" + query;
-            downloadURL(url, 'worst.csv');
+            downloadURL(url, "worst.csv");
         };
 
         var updateWorstList = function() {
@@ -97,19 +97,19 @@ angular.module('dashboard').controller('HomeController', ['$scope', 'ReportServi
             });
         };
 
-        $scope.$watch('selectedCycle', function(cycle) {
-            console.log('selected the cycle', cycle)
+        $scope.$watch("selectedCycle", function(cycle) {
+            console.log("selected the cycle", cycle);
             if (cycle) {
                 updateWorstList();
                 updateBestList();
             }
         });
 
-        $scope.$watch('bestPerforming', function() {
+        $scope.$watch("bestPerforming", function() {
             updateBestList();
         });
 
-        $scope.$watch('worstPerforming', function() {
+        $scope.$watch("worstPerforming", function() {
             updateWorstList();
         });
         var setupMetrics = function(guidelineType){
@@ -120,12 +120,12 @@ angular.module('dashboard').controller('HomeController', ['$scope', 'ReportServi
           });
         };
 
-        $scope.$on('GUIDELINE_TYPE', function(event, data) { setupMetrics(data); });
+        $scope.$on("GUIDELINE_TYPE", function(event, data) { setupMetrics(data); });
 
         setupMetrics();
 
-        $scope.$watchGroup(['selectedIp', 'selectedWarehouse', 'selectedDistrict'], function(data){
-            console.log(data, "changes -------------------")
+        $scope.$watchGroup(["selectedIp", "selectedWarehouse", "selectedDistrict"], function(data){
+            console.log(data, "changes -------------------");
             if(data[0] && data[1] && data[2]){
               setupMetrics();
             }

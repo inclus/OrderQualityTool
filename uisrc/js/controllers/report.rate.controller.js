@@ -1,4 +1,4 @@
-angular.module('dashboard').controller('ReportingRateController', ['$scope', 'ReportService',
+angular.module("dashboard").controller("ReportingRateController", ["$scope", "ReportService",
     function($scope, ReportService) {
         var setUpScope = function(data) {
                 var values = data.values;
@@ -6,7 +6,7 @@ angular.module('dashboard').controller('ReportingRateController', ['$scope', 'Re
                     data: values,
                     chart: {
                         legend: {
-                          position: 'right'
+                          position: "right"
                         },
 
                         grid: {
@@ -30,23 +30,23 @@ angular.module('dashboard').controller('ReportingRateController', ['$scope', 'Re
                     },
                     dimensions: {
                         cycle: {
-                            axis: 'x',
-                            type: 'line'
+                            axis: "x",
+                            type: "line"
                         },
                         reporting: {
-                            axis: 'y',
-                            type: 'line',
-                            name: 'Reporting',
-                            color: '#27ae60',
-                            dataType: 'numeric',
+                            axis: "y",
+                            type: "line",
+                            name: "Reporting",
+                            color: "#27ae60",
+                            dataType: "numeric",
                             displayFormat: d3.format(".1f")
                         },
                         not_reporting: {
-                            axis: 'y',
-                            type: 'line',
-                            name: 'Not Reporting',
-                            color: 'Red',
-                            dataType: 'numeric',
+                            axis: "y",
+                            type: "line",
+                            name: "Not Reporting",
+                            color: "Red",
+                            dataType: "numeric",
                             displayFormat: d3.format(".1f")
                         }
                     }
@@ -54,14 +54,14 @@ angular.module('dashboard').controller('ReportingRateController', ['$scope', 'Re
             };
 
         var update = function(start, end) {
-            ReportService.getDataForTest('submittedOrder', {
+            ReportService.getDataForTest("submittedOrder", {
                 start: start,
                 end: end
             }).then(setUpScope);
         };
 
         var updateWithLocation = function(start, end) {
-            ReportService.getDataForTest('submittedOrder', {
+            ReportService.getDataForTest("submittedOrder", {
                 start: start,
                 end: end,
                 ip: $scope.selectedIp.ip,
@@ -70,19 +70,19 @@ angular.module('dashboard').controller('ReportingRateController', ['$scope', 'Re
             }).then(setUpScope);
         };
 
-        $scope.$watch('startCycle', function(start) {
+        $scope.$watch("startCycle", function(start) {
             if (start) {
                 update($scope.startCycle, $scope.endCycle);
             }
         }, true);
 
-        $scope.$watch('endCycle', function(end) {
+        $scope.$watch("endCycle", function(end) {
             if (end) {
                 update($scope.startCycle, $scope.endCycle);
             }
         }, true);
 
-        $scope.$watchGroup(['selectedIp', 'selectedWarehouse', 'selectedDistrict'], function(data){
+        $scope.$watchGroup(["selectedIp", "selectedWarehouse", "selectedDistrict"], function(data){
             if(data[0] && data[1] && data[2]){
                 updateWithLocation($scope.startCycle, $scope.endCycle);
             }

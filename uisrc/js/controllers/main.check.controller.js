@@ -1,4 +1,4 @@
-angular.module('dashboard').controller('MainChecksController', ['$scope',
+angular.module("dashboard").controller("MainChecksController", ["$scope",
     function($scope) {
         $scope.tests = [{
             "url": "orderFormFreeOfGaps",
@@ -87,14 +87,14 @@ angular.module('dashboard').controller('MainChecksController', ['$scope',
 
     }
 ]);
-angular.module('dashboard').controller('MultipleOrdersController', ['$scope', 'ReportService', 'NgTableParams',
+angular.module("dashboard").controller("MultipleOrdersController", ["$scope", "ReportService", "NgTableParams",
     function($scope, ReportService, NgTableParams) {
         var updateData = function() {
             var district = $scope.selectedDistrict ? $scope.selectedDistrict.district : "";
             var ip = $scope.selectedIp ? $scope.selectedIp.ip : "";
             var warehouse = $scope.selectedWarehouse ? $scope.selectedWarehouse.warehouse : "";
-            ReportService.getDataForTest('facilitiesMultiple', {
-                'cycle': $scope.selectedCycle,
+            ReportService.getDataForTest("facilitiesMultiple", {
+                "cycle": $scope.selectedCycle,
                 district: district,
                 ip: ip,
                 warehouse: warehouse
@@ -113,11 +113,11 @@ angular.module('dashboard').controller('MultipleOrdersController', ['$scope', 'R
 
         updateData();
 
-        $scope.$watch('selectedCycle', function() {
+        $scope.$watch("selectedCycle", function() {
             updateData();
         }, true);
 
-        $scope.$watchGroup(['selectedIp', 'selectedWarehouse', 'selectedDistrict'], function(data){
+        $scope.$watchGroup(["selectedIp", "selectedWarehouse", "selectedDistrict"], function(data){
             if(data[0] && data[1] && data[2]){
               updateData();
             }
@@ -126,7 +126,7 @@ angular.module('dashboard').controller('MultipleOrdersController', ['$scope', 'R
 
     }
 ]);
-angular.module('dashboard').controller('LineChartController', ['$scope', 'ReportService',
+angular.module("dashboard").controller("LineChartController", ["$scope", "ReportService",
     function($scope, ReportService) {
         var update = function(start, end) {
             var test = $scope.selectedTest.url;
@@ -150,7 +150,7 @@ angular.module('dashboard').controller('LineChartController', ['$scope', 'Report
                     data: values,
                     chart: {
                         legend: {
-                          position: 'right'
+                          position: "right"
                         },
                         grid:{
                           y:{
@@ -173,31 +173,31 @@ angular.module('dashboard').controller('LineChartController', ['$scope', 'Report
                     },
                     dimensions: {
                         cycle: {
-                            axis: 'x',
-                            type: 'line'
+                            axis: "x",
+                            type: "line"
                         },
                         yes: {
-                            axis: 'y',
-                            type: 'line',
-                            name: 'Pass',
-                            color: '#27ae60',
-                            dataType: 'numeric',
+                            axis: "y",
+                            type: "line",
+                            name: "Pass",
+                            color: "#27ae60",
+                            dataType: "numeric",
                             displayFormat: d3.format(".1f")
                         },
                         no: {
-                            axis: 'y',
-                            type: 'line',
-                            name: 'Fail',
-                            color: 'red',
-                            dataType: 'numeric',
+                            axis: "y",
+                            type: "line",
+                            name: "Fail",
+                            color: "red",
+                            dataType: "numeric",
                             displayFormat: d3.format(".1f")
                         },
                         not_reporting: {
-                            axis: 'y',
-                            type: 'line',
-                            color: 'gray',
-                            name: 'Insufficient Data',
-                            dataType: 'numeric',
+                            axis: "y",
+                            type: "line",
+                            color: "gray",
+                            name: "Insufficient Data",
+                            dataType: "numeric",
                             displayFormat: d3.format(".1f")
                         }
                     }
@@ -206,35 +206,35 @@ angular.module('dashboard').controller('LineChartController', ['$scope', 'Report
 
 
         };
-        $scope.$watch('startCycle', function(start) {
+        $scope.$watch("startCycle", function(start) {
             if (start && $scope.selectedTest) {
                 update($scope.startCycle, $scope.endCycle);
             }
 
         }, true);
 
-        $scope.$watch('endCycle', function(end) {
+        $scope.$watch("endCycle", function(end) {
             if (end && $scope.selectedTest) {
                 update($scope.startCycle, $scope.endCycle);
             }
 
         }, true);
 
-        $scope.$watch('selectedTest', function(test) {
+        $scope.$watch("selectedTest", function(test) {
             if (test) {
                 update($scope.startCycle, $scope.endCycle);
             }
 
         }, true);
 
-        $scope.$watch('selectedRegimen', function(regimen) {
+        $scope.$watch("selectedRegimen", function(regimen) {
             if (regimen) {
                 update($scope.startCycle, $scope.endCycle);
             }
 
         }, true);
 
-        $scope.$watchGroup(['selectedIp', 'selectedWarehouse', 'selectedDistrict'], function(data){
+        $scope.$watchGroup(["selectedIp", "selectedWarehouse", "selectedDistrict"], function(data){
             if(data[0] && data[1] && data[2]){
               update($scope.startCycle, $scope.endCycle);
             }

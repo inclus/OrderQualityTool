@@ -2,6 +2,7 @@
     <div class="row">
         <h3>Test type</h3>
         <select name="test-type" id="test-type" required
+                ng-change="ctrl.setInitialModel(ctrl.definition.type)"
                 ng-options="option.name for option in ctrl.testTypes track by option.id"
                 ng-model="ctrl.definition.type"></select>
         <div class="object-tools">
@@ -32,7 +33,7 @@
                     <label for="" class="text-center">FROM THE</label>
                 </div>
                 <select name="mods" id="mods-select" required
-                        ng-options="group.name for group in ctrl.definition.type.models track by group.id"
+                        ng-options="model.name for model in ctrl.definition.type.models"
                         ng-model="definitionGroup.model"></select>
             </div>
             <div class="group-control">
@@ -70,7 +71,8 @@
                 <div class="group-text">
                     <label for="" class="text-center">IN FORMULATIONS</label>
                 </div>
-                <select selector multi="true" model="definitionGroup.selected_formulations"
+                <select selector disable="definitionGroup.model.disabled" multi="true"
+                        model="definitionGroup.selected_formulations"
                         options="definitionGroup.model.formulations"></select>
             </div>
         </div>

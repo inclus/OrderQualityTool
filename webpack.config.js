@@ -10,19 +10,19 @@ var isDevServer = process.argv.find(v => v.includes('livereload'));
 
 var entryFiles = ["./uisrc/entry.js"];
 var testDefinitionEntryFiles = ["./uisrc/test-definition/entry"];
-if (isDevServer){
-  console.log('Dev server')
-  entryFiles.push("webpack-dev-server/client?http://localhost:3030")
-  testDefinitionEntryFiles.push("webpack-dev-server/client?http://localhost:3030")
-  entryFiles.push('webpack/hot/only-dev-server')
-  testDefinitionEntryFiles.push('webpack/hot/only-dev-server')
+if (isDevServer) {
+    console.log('Dev server')
+    entryFiles.push("webpack-dev-server/client?http://localhost:3030")
+    testDefinitionEntryFiles.push("webpack-dev-server/client?http://localhost:3030")
+    entryFiles.push('webpack/hot/only-dev-server')
+    testDefinitionEntryFiles.push('webpack/hot/only-dev-server')
 }
 
 module.exports = {
-  devtool: 'inline-source-map',
-  entry: {
-    app: entryFiles,
-    "test.definition": testDefinitionEntryFiles,
+    devtool: 'inline-source-map',
+    entry: {
+        app: entryFiles,
+        "test.definition": testDefinitionEntryFiles,
 
   },
   output: {
@@ -50,7 +50,14 @@ module.exports = {
     {
       test: /\.(html)$/,
       loader: 'html-loader'
-    }]
+    }, {
+            test: /\.js$/,
+            exclude: /node_modules/,
+            loader: 'eslint-loader',
+            options: {
+                fix: true
+            }
+        }]
   },
   plugins: [
     new webpack.ProvidePlugin({

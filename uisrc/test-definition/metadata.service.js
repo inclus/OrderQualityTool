@@ -4,6 +4,10 @@ module.exports = ["$http", "$q", function ($http, $q) {
         return response.data.values;
     };
 
+    var parseTracingResponse = function (response) {
+        return response.data;
+    };
+
     var parsePreviewResponse = function (response) {
         return response.data;
     };
@@ -22,23 +26,43 @@ module.exports = ["$http", "$q", function ($http, $q) {
     self.getLocations = function (definition) {
         return $http.post("/api/tests/preview/locations", definition).then(parseLocationsResponse);
     };
+
     self.getPatientFields = function () {
         return $http.get("/api/fields/patients").then(parseDjangoResponse);
     };
+
     self.getFormulations = function (extra) {
         return $http.get("/api/formulations/" + extra).then(parseDjangoResponse);
     };
+
+    self.getTracingFormulations = function (model) {
+        return $http.get("/api/tests/tracing/" + model).then(parseTracingResponse);
+    };
+
     self.getAllFields = function () {
-        return $q.all([self.getConsumptionFields(), self.getPatientFields(), self.getFormulations('adult'), self.getFormulations('paed'), self.getFormulations('consumption')]).then(
+
+        return $q.all(
+            [
+                self.getConsumptionFields(),
+                self.getPatientFields(),
+                self.getFormulations("adult"),
+                self.getFormulations("paed"),
+                self.getFormulations("consumption"),
+                self.getTracingFormulations("patients"),
+                self.getTracingFormulations("consumption")
+            ]).then(
             function (data) {
                 var output = {};
-                output.fields_consumption = data[0];
-                output.fields_adult = data[1];
-                output.fields_paed = data[1];
-                output.formulations_adult = data[2];
-                output.formulations_paed = data[3];
-                output.formulations_consumption = data[4];
-                return output
+                output.fieldsConsumption = data[0];
+                output.fieldsAdult = data[1];
+                output.fieldsPaed = data[1];
+                output.formulationsAdult = data[2];
+                output.formulationsPaed = data[3];
+                output.formulationsConsumption = data[4];
+                output.tracingAdult = data[5];
+                output.tracingPaed = data[5];
+                output.tracingConsumption = data[6];
+                return output;
             });
     };
 

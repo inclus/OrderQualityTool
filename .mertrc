@@ -1,0 +1,7 @@
+root: "/Users/ja4mo/space/chai/OrderQualityTool"
+layout:
+  -
+    - workon chai && python manage.py runserver
+    - workon chai && npm run dev
+  -
+    - workon chai && git status && charm .

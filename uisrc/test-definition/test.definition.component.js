@@ -1,23 +1,38 @@
-var _ = require('lodash');
+var _ = require("lodash");
 ModelHelper = {
-    getFields: function (id, meta_data) {
-        var key = "fields_" + id.toLowerCase();
-        if (meta_data && key in meta_data) {
-            return meta_data[key];
+    getFields: function (id, metaData) {
+        var key = "fields" + id;
+        if (metaData && key in metaData) {
+            return metaData[key];
         }
         return [];
     },
-    getFormulations: function (id, meta_data) {
-        var key = "formulations_" + id.toLowerCase();
-        if (meta_data && key in meta_data) {
-            return meta_data[key];
+    getFormulations: function (id, metaData) {
+        var key = "formulations" + id;
+        if (metaData && key in metaData) {
+            return metaData[key];
+        }
+        return [];
+    },
+    getInitialFormulations: function (id, metaData) {
+        var key = "tracing" + id;
+        if (metaData && key in metaData) {
+            return metaData[key][0].formulations;
         }
         return [];
     }
 };
 
-var newModel = function (id, name, meta_data) {
-    return Object.create({}, {
+var definitionModel = {
+    initializeFormulations: function (formulations) {
+        if (formulations && formulations.length === 0) {
+            formulations = this.initialFormulations;
+        }
+    }
+};
+
+var newModel = function (id, name, metaData) {
+    return Object.create(definitionModel, {
         id: {
             value: id,
             writable: true,
@@ -29,33 +44,53 @@ var newModel = function (id, name, meta_data) {
             enumerable: true
         },
         fields: {
-            value: ModelHelper.getFields(id, meta_data),
+            value: ModelHelper.getFields(id, metaData),
             enumerable: true
         },
         formulations: {
-            value: ModelHelper.getFormulations(id, meta_data),
+            value: ModelHelper.getFormulations(id, metaData),
+            enumerable: true
+        },
+        initialFormulations: {
+            value: [],
+            writable: true,
             enumerable: true
         }
-    })
+    });
+};
+
+var newTracingModel = function (id, name, meta_data) {
+    return Object.create(newModel(id, name, meta_data), {
+        disabled: {
+            value: true,
+            writable: true,
+            enumerable: true
+        },
+        initialFormulations: {
+            value: ModelHelper.getInitialFormulations(id, meta_data),
+            writable: true,
+            enumerable: true
+        }
+    });
 };
 
 var BaseTest = Object.create(null);
 
 BaseTest.prototype = {
     newGroup:
-        function (group_number) {
+        function (groupNumber) {
             return {
                 cycle: this.cycles[0],
                 model: this.models[0],
                 aggregation: this.calculations[0],
                 selected_consumption_fields: [],
                 selected_formulations: [],
-                name: "G" + group_number
-            }
+                name: "G" + groupNumber
+            };
 
         }
 };
-var FacilityTest = function (meta_data) {
+var FacilityTest = function (metaData) {
     return Object.create(BaseTest.prototype, {
         id: {
             value: "FacilityTwoGroups",
@@ -87,37 +122,48 @@ var FacilityTest = function (meta_data) {
         },
         models: {
             value: [
-                newModel("Adult", "Adult Records", meta_data),
-                newModel("Paed", "Paed Records", meta_data),
-                newModel("Consumption", "Consumption Records", meta_data)
+                newModel("Adult", "Adult Records", metaData),
+                newModel("Paed", "Paed Records", metaData),
+                newModel("Consumption", "Consumption Records", metaData)
             ],
-            enumerable: true
+            enumerable: true,
+            writable: true
         }
 
-    })
+    });
 };
 
-var newTest = function (meta_data, id, name) {
-    return Object.create(FacilityTest(meta_data), {
+var FacilityTestWithTracingFormulation = function (metaData) {
+    return Object.create(FacilityTest(metaData), {
         id: {
-            value: id,
+            value: "FacilityTwoGroupsAndTracingFormulation",
             writable: true,
             enumerable: true
         },
         name: {
-            value: name,
+            value: "Facility with 2 Groups And Tracing Formulation",
+            writable: true,
+            enumerable: true
+        },
+        models: {
+            value: [
+                newTracingModel("Adult", "Adult Records", metaData),
+                newTracingModel("Paed", "Paed Records", metaData),
+                newTracingModel("Consumption", "Consumption Records", metaData)
+            ],
             writable: true,
             enumerable: true
         }
-    })
+    });
 };
 
-var FacilityTestWithTracingFormulation = function (meta_data) {
-    return newTest(meta_data, "FacilityTwoGroupsAndTracingFormulation", "Facility with 2 Groups And Tracing Formulation")
-};
-
-var buildType = function (meta_data, type_data) {
-    return newTest(meta_data, type_data.id, type_data.name)
+var getTypeFromJson = function (metaData, typeData) {
+    if (typeData.id === "FacilityTwoGroups") {
+        return FacilityTest(meta_data);
+    }
+    if (typeData.id === "FacilityTwoGroupsAndTracingFormulation") {
+        return FacilityTestWithTracingFormulation(meta_data);
+    }
 };
 
 
@@ -128,14 +174,14 @@ module.exports = ["$scope", "metadataService", "ngDialog", function ($scope, met
         if (has_factors && !group.factors) {
             group.factors = {};
             group.selected_fields.forEach(function (field) {
-                group.factors[field] = 1
-            })
+                group.factors[field] = 1;
+            });
         }
     };
 
     ctrl.previewDefinition = function (definition) {
         ngDialog.open({
-            template: require('./test.definition.preview.html'),
+            template: require("./test.definition.preview.html"),
             plain: true,
             closeByDocument: false,
             controller: ["$scope", "locations", function Ctrl($scope, locations) {
@@ -144,7 +190,7 @@ module.exports = ["$scope", "metadataService", "ngDialog", function ($scope, met
                     definition.sample = {cycle: cycle, location: location};
                     metadataService.previewDefinition(definition).then(function (preview) {
                         $scope.groups = preview.groups;
-                    })
+                    });
                 };
                 if (locations.length > 0) {
                     $scope.location = locations[0];
@@ -163,15 +209,26 @@ module.exports = ["$scope", "metadataService", "ngDialog", function ($scope, met
     };
 
 
-    var build_from_value = function (meta_data) {
+    var build_from_value = function (metaData) {
         var definition = JSON.parse(ctrl.value);
-        definition.type = buildType(meta_data, definition.type);
-        definition.groups.forEach(function (group) {
-            group.model = newModel(group.model.id, group.model.name, meta_data);
-        });
+        definition.type = getTypeFromJson(metaData, definition.type);
+        if (definition.groups) {
+            definition.groups.forEach(function (group) {
+                group.model = newModel(group.model.id, group.model.name, metaData);
+            });
+        }
         ctrl.definition = definition;
     };
 
+    ctrl.setInitialModel = function (testType) {
+        console.log("initialModel", testType, ctrl.definition.groups);
+        if (ctrl.definition.groups) {
+            ctrl.definition.groups.forEach(function (group) {
+                group.model = testType.models[0];
+                group.selected_formulations = group.model.initialFormulations;
+            });
+        }
+    };
 
     ctrl.reset = function () {
         ctrl.definition = {type: FacilityTest(ctrl.meta_data), operatorConstant: 1.0};
@@ -182,14 +239,14 @@ module.exports = ["$scope", "metadataService", "ngDialog", function ($scope, met
     };
 
     var init = function () {
-        metadataService.getAllFields().then(function (meta_data) {
-            ctrl.meta_data = meta_data;
+        metadataService.getAllFields().then(function (metaData) {
+            ctrl.meta_data = metaData;
             ctrl.testTypes = [
-                FacilityTest(meta_data),
-                FacilityTestWithTracingFormulation(meta_data)
+                FacilityTest(metaData),
+                FacilityTestWithTracingFormulation(metaData)
             ];
             if (ctrl.value) {
-                build_from_value(meta_data);
+                build_from_value(metaData);
             } else {
                 ctrl.reset();
             }

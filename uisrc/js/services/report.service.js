@@ -1,17 +1,17 @@
-angular.module('services').service('ReportService', ['$http',
+angular.module("services").service("ReportService", ["$http",
     function($http) {
         var handleResponse = function(response) {
             return response.data;
         };
         var getCycles = function() {
-            return $http.get('/api/cycles').then(handleResponse);
+            return $http.get("/api/cycles").then(handleResponse);
         };
 
         var getMetrics = function(guideline_type, d, i, w) {
           var district = d ? d.district : "";
           var ip = i ? i.ip : "";
           var warehouse = w ? w.warehouse : "";
-          return $http.get('/api/test/metrics', {params: {
+          return $http.get("/api/test/metrics", {params: {
             adh: guideline_type,
             district: district,
             ip:ip,
@@ -20,7 +20,7 @@ angular.module('services').service('ReportService', ['$http',
         };
 
         var getBestRankings = function(level, selectedCycle, formulation) {
-            return $http.get('/api/test/ranking/best', {
+            return $http.get("/api/test/ranking/best", {
                 params: {
                     level: level,
                     cycle: selectedCycle,
@@ -30,7 +30,7 @@ angular.module('services').service('ReportService', ['$http',
         };
 
         var getWorstRankings = function(level, selectedCycle, formulation) {
-            return $http.get('/api/test/ranking/worst', {
+            return $http.get("/api/test/ranking/worst", {
                 params: {
                     level: level,
                     cycle: selectedCycle,
@@ -40,27 +40,27 @@ angular.module('services').service('ReportService', ['$http',
         };
 
         var getDataForTest = function(test, params) {
-            return $http.get('/api/test/' + test, {
+            return $http.get("/api/test/" + test, {
                 params: params
             }).then(handleResponse);
         };
 
         var getScores = function(params) {
-            return $http.get('/api/scores/', {
+            return $http.get("/api/scores/", {
                 params: params
             }).then(handleResponse);
         };
 
         var getFilters = function() {
-            return $http.get('/api/filters/').then(handleResponse);
+            return $http.get("/api/filters/").then(handleResponse);
         };
 
         var getRankingsAccess = function() {
-            return $http.get('/api/rankingsAccess/').then(handleResponse);
+            return $http.get("/api/rankingsAccess/").then(handleResponse);
         };
 
         var getAdminStatus = function(){
-            return $http.get('/api/access/admin').then(handleResponse);
+            return $http.get("/api/access/admin").then(handleResponse);
         };
 
         return {
@@ -75,4 +75,4 @@ angular.module('services').service('ReportService', ['$http',
             "getAdminStatus": getAdminStatus,
         };
     }
-])
+]);
