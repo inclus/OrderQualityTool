@@ -1,5 +1,5 @@
 Django==1.9.13
-psycopg2==2.7
+psycopg2==2.7.3.2
 django-braces==1.8.1
 django-password-reset==0.8.1
 django-bootstrap3==6.2.2
