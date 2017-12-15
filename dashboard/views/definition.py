@@ -1,4 +1,3 @@
-from collections import defaultdict
 
 import attr
 from pydash import py_
@@ -6,6 +5,7 @@ from rest_framework import serializers
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from dashboard.data.user_defined import UserDefinedFacilityCheck
 from dashboard.models import AdultPatientsRecord, PAEDPatientsRecord, Consumption, TracingFormulations
 
 
@@ -111,7 +111,7 @@ def as_loc(items):
 
 class DefinitionSerializer(serializers.Serializer):
     groups = serializers.ListField(child=GroupSerializer())
-    type = serializers.CharField()
+    type = serializers.DictField()
 
     def get_locations_and_cycles_with_data(self):
         definition = Definition.from_dict(self.validated_data)
@@ -129,74 +129,30 @@ class DefinitionSerializer(serializers.Serializer):
         return {"locations": locations}
 
 
-def as_float_or_1(value):
-    try:
-        return float(value)
-    except ValueError as e:
-        return 1
 
 
-def as_number(value):
-    if not value:
-        return False, None
-    try:
-        return True, float(value)
-    except ValueError as e:
-        return False, None
+
+testTypes = {
+    "FacilityTwoGroups": UserDefinedFacilityCheck
+}
 
 
-def factor_values(fields, factors):
-    def _p(values):
-        values = list(values)
-        for index, field in enumerate(fields):
-            factor = as_float_or_1(factors.get(field, 1))
-            print(values, "--------------")
-            is_numerical, numerical_value = as_number(values[index + 1])
-            if numerical_value:
-                values[index + 1] = numerical_value * factor
-        return values
 
-    return _p
-
-
-def get_factored_values(has_factors, fields, factors, values):
-    if has_factors:
-        return py_(values).map(factor_values(fields, factors)).value()
-    return None
 
 
 class DefinitionSampleSerializer(DefinitionSerializer):
     sample = SampleSerializer()
 
-    def fetch_data(self):
+    def get_preview_data(self):
         definition = Definition.from_dict(self.validated_data)
-        data = {}
-        data['groups'] = list()
-        data['factored_groups'] = list()
-        sample_location = definition.sample.get('location')
-        sample_cycle = definition.sample.get('cycle')
-        for group in definition.groups:
-            model = group.model.as_model()
-            if model:
-                for_group = self.get_values_for_group(group, model, sample_cycle, sample_location)
-                data['groups'].append(for_group)
-        return data
+        testType = self.validated_data['type']['id']
+        check = testTypes.get(testType)
+        if check:
+            return check(definition).get_preview_data()
+        return {}
 
-    def get_values_for_group(self, group, model, sample_cycle, sample_location):
-        values = model.objects.filter(
-            name=sample_location['name'],
-            cycle=sample_cycle,
-            district=sample_location['district'],
-            formulation__in=group.selected_formulations
-        ).values_list(
-            'formulation', *group.selected_fields)
-        return {
-            'name': group.name,
-            'values': values,
-            'headers': group.selected_fields,
-            "has_factors": group.has_factors,
-            "factored_values": get_factored_values(group.has_factors, group.selected_fields, group.factors, values)
-        }
+
+
 
 
 class PreviewDefinitionView(APIView):
@@ -205,7 +161,7 @@ class PreviewDefinitionView(APIView):
     def post(self, request):
         serializer = DefinitionSampleSerializer(data=request.data)
         if serializer.is_valid():
-            return Response(serializer.fetch_data())
+            return Response(serializer.get_preview_data())
         else:
             return Response(data=serializer.errors, status=400)
 

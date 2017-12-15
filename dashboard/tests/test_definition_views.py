@@ -36,7 +36,7 @@ class PreviewLocationsViewTestCase(WebTest):
             cycle="cycle3"
         )
         response = self.app.post_json(url, user="testuser", params={
-            "type": "Facility",
+            "type": {"id": "Facility"},
             "groups": [
                 {
                     "name": "G1",
