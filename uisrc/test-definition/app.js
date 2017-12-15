@@ -10,8 +10,10 @@ var testDefinitionModule = angular.module("testDefinition", ["selector", "ngDial
 
 var testDefinitionController = require("./test.definition.component");
 var metadataService = require("./metadata.service");
+var previewService = require("./preview.service");
 
 testDefinitionModule.service("metadataService", metadataService);
+testDefinitionModule.service("previewService", previewService);
 testDefinitionModule.component("testDefinition", {
     template: require("./test.definition.html"),
     controller: testDefinitionController,

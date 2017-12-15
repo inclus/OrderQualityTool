@@ -15,6 +15,6 @@
         "no-plusplus": 1,
         "no-alert": 2,  
         "complexity": 2,
-        "camelcase": 1
+//        "camelcase": 1
     }
 }

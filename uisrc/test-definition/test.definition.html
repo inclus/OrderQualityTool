@@ -33,7 +33,7 @@
                     <label for="" class="text-center">FROM THE</label>
                 </div>
                 <select name="mods" id="mods-select" required
-                        ng-options="model.name for model in ctrl.definition.type.models"
+                        ng-options="model.name for model in ctrl.definition.type.models track by model.id"
                         ng-model="definitionGroup.model"></select>
             </div>
             <div class="group-control">
@@ -71,9 +71,18 @@
                 <div class="group-text">
                     <label for="" class="text-center">IN FORMULATIONS</label>
                 </div>
-                <select selector disable="definitionGroup.model.disabled" multi="true"
+                <select ng-show="!definitionGroup.model.hasTrace" selector multi="true"
                         model="definitionGroup.selected_formulations"
                         options="definitionGroup.model.formulations"></select>
+                <div ng-show="definitionGroup.model.hasTrace">
+                    <div ng-repeat="trace in definitionGroup.model.tracingFormulations">
+                        <h4>{{ trace.name }}</h4>
+                        <p ng-repeat="formulation in trace.formulations">
+                            {{ formulation }}
+                        </p>
+                    </div>
+
+                </div>
             </div>
         </div>
     </div>
@@ -115,10 +124,9 @@
                 Preview
             </a>
         </div>
-
     </div>
     <div class="row">
-        <textarea name="definition" id="id_definition" cols="40" rows="10"
+        <textarea hidden hname="definition" id="id_definition" cols="40" rows="10"
                   class="vLargeTextField">{{ ctrl.definition|json }}</textarea>
     </div>
 </div>
