@@ -2,7 +2,7 @@
     <select name="selected_location" ng-model="location" id="preview_location"
             ng-change="update(location, cycle)"
             ng-options="option.name for option in locations track by option.name + option.district"></select>
-    <select name="selected_cycle" ng-model="cycle" id="preview_cycles" ng-change="update(location, location)"
+    <select name="selected_cycle" ng-model="cycle" id="preview_cycles" ng-change="update(location, cycle)"
             ng-options="option for option in location.cycles track by option"></select>
     <div class="preview-groups-container">
         <div ng-repeat="group in groups" class="preview-group">
