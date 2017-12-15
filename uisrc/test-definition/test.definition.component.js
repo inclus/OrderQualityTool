@@ -15,14 +15,6 @@ var testDefinitionController = ["$scope", "metadataService", "previewService", f
         preview.show(definition);
     };
 
-    ctrl.setInitialModel = function (testType) {
-        if (ctrl.definition.groups) {
-            ctrl.definition.groups.forEach(function (group) {
-                group.model = testType.models[0];
-            });
-        }
-    };
-
     ctrl.reset = function () {
         ctrl.definition = {type: testTypes.FacilityTest(ctrl.metaData), operatorConstant: 1.0};
         var testType = ctrl.definition.type;

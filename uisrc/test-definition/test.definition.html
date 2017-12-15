@@ -2,7 +2,6 @@
     <div class="row">
         <h3>Test type</h3>
         <select name="test-type" id="test-type" required
-                ng-change="ctrl.setInitialModel(ctrl.definition.type)"
                 ng-options="option.name for option in ctrl.testTypes track by option.id"
                 ng-model="ctrl.definition.type"></select>
         <div class="object-tools">
@@ -33,7 +32,7 @@
                     <label for="" class="text-center">FROM THE</label>
                 </div>
                 <select name="mods" id="mods-select" required
-                        ng-options="model.name for model in ctrl.definition.type.models track by model.id"
+                        ng-options="model.name for model in ctrl.definition.type.models track by model.selectId"
                         ng-model="definitionGroup.model"></select>
             </div>
             <div class="group-control">
@@ -126,7 +125,7 @@
         </div>
     </div>
     <div class="row">
-        <textarea hidden hname="definition" id="id_definition" cols="40" rows="10"
+        <textarea name="definition" id="id_definition" cols="40" rows="10"
                   class="vLargeTextField">{{ ctrl.definition|json }}</textarea>
     </div>
 </div>

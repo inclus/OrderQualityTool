@@ -22,52 +22,23 @@ ModelHelper = {
     }
 };
 
-var newModel = function (id, name, metaData) {
-    return Object.create({}, {
-        id: {
-            value: id,
-            writable: true,
-            enumerable: true
-        },
-        name: {
-            value: name,
-            writable: true,
-            enumerable: true
-        },
-        fields: {
-            value: ModelHelper.getFields(id, metaData),
-            enumerable: true
-        },
-        formulations: {
-            value: ModelHelper.getFormulations(id, metaData),
-            enumerable: true
-        },
-        hasTrace: {
-            value: false,
-            writable: true,
-            enumerable: true
-        },
-        tracingFormulations: {
-            value: [],
-            writable: true,
-            enumerable: true
-        }
-    });
+var newModel = function (id, name, metaData, typeId) {
+    return {
+        id: id,
+        name: name,
+        selectId: typeId + id,
+        fields: ModelHelper.getFields(id, metaData),
+        formulations: ModelHelper.getFormulations(id, metaData),
+        hasTrace: false
+    };
 };
 
-var newTracingModel = function (id, name, metaData) {
-    return Object.create(newModel(id, name, metaData), {
-        hasTrace: {
-            value: true,
-            enumerable: true
-        },
-        tracingFormulations: {
-            value: ModelHelper.getTracingFormulations(id, metaData),
-            enumerable: true
-        }
-    });
+var newTracingModel = function (id, name, metaData, typeId) {
+    var model = newModel(id, name, metaData, typeId);
+    model.hasTrace = true;
+    model.tracingFormulations = ModelHelper.getTracingFormulations(id, metaData);
+    return model;
 };
-
 module.exports = {
     newTracingModel: newTracingModel,
     newModel: newModel

@@ -1,91 +1,57 @@
 var models = require("./models");
 var BaseTest = Object.create(null);
 
-BaseTest.prototype = {
-    newGroup:
-        function (groupNumber) {
-            return {
-                cycle: this.cycles[0],
-                model: this.models[0],
-                aggregation: this.calculations[0],
-                selected_fields: [],
-                selected_formulations: [],
-                name: "G" + groupNumber
-            };
+FacilityTest = function (metaData) {
+    return {
+        newGroup:
+            function (groupNumber) {
+                return {
+                    cycle: this.cycles[0],
+                    model: this.models[0],
+                    aggregation: this.calculations[0],
+                    selected_fields: [],
+                    selected_formulations: [],
+                    name: "G" + groupNumber
+                };
 
+            },
+        getGroups: function (metaData) {
+            return [
+                this.newGroup(1, metaData),
+                this.newGroup(2, metaData)
+            ];
         },
-    getGroups: function (metaData) {
-        return [
-            this.newGroup(1, metaData),
-            this.newGroup(2, metaData)
-        ];
-    }
-};
-var FacilityTest = function (metaData) {
-    return Object.create(BaseTest.prototype, {
-        id: {
-            value: "FacilityTwoGroups",
-            writable: true,
-            enumerable: true
-        },
-        name: {
-            value: "Facility with 2 Groups of data",
-            writable: true,
-            enumerable: true
-        },
-        cycles: {
-            value:
-                [
-                    {id: "Current", name: "Current Cycle"},
-                    {id: "Next", name: "Next Cycle"},
-                    {id: "Previous", name: "Previous Cycle"}
-                ],
-            enumerable: true
-
-        },
-        calculations: {
-            value: [
+        id: "FacilityTwoGroups",
+        name: "Facility with 2 Groups of data",
+        cycles:
+            [
+                {id: "Current", name: "Current Cycle"},
+                {id: "Next", name: "Next Cycle"},
+                {id: "Previous", name: "Previous Cycle"}],
+        calculations:
+            [
                 {id: "SUM", name: "Sum"},
                 {id: "AVG", name: "Average"}
             ],
-            enumerable: true
-
-        },
-        models: {
-            value: [
-                models.newModel("Adult", "Adult Records", metaData),
-                models.newModel("Paed", "Paed Records", metaData),
-                models.newModel("Consumption", "Consumption Records", metaData)
-            ],
-            enumerable: true,
-            writable: true
-        }
-
-    });
+        models:
+            [
+                models.newModel("Adult", "Adult Records", metaData, "FacilityTwoGroups"),
+                models.newModel("Paed", "Paed Records", metaData, "FacilityTwoGroups"),
+                models.newModel("Consumption", "Consumption Records", metaData, "FacilityTwoGroups")
+            ]
+    };
 };
 
 var FacilityTestWithTracingFormulation = function (metaData) {
-    return Object.create(FacilityTest(metaData), {
-        id: {
-            value: "FacilityTwoGroupsAndTracingFormulation",
-            writable: true,
-            enumerable: true
-        },
-        name: {
-            value: "Facility with 2 Groups And Tracing Formulation",
-            writable: true,
-            enumerable: true
-        },
-        models: {
-            value: [
-                models.newTracingModel("Adult", "Adult Records", metaData),
-                models.newTracingModel("Paed", "Paed Records", metaData),
-                models.newTracingModel("Consumption", "Consumption Records", metaData)
-            ],
-            writable: true,
-            enumerable: true
-        }
-    });
+    var test = FacilityTest(metaData);
+    test.id = "FacilityTwoGroupsAndTracingFormulation";
+    test.name = "Facility with 2 Groups And Tracing Formulation";
+    test.models = [
+        models.newTracingModel("Adult", "Adult Records", metaData, "FacilityTwoGroupsAndTracingFormulation"),
+        models.newTracingModel("Paed", "Paed Records", metaData, "FacilityTwoGroupsAndTracingFormulation"),
+        models.newTracingModel("Consumption", "Consumption Records", metaData, "FacilityTwoGroupsAndTracingFormulation")
+    ];
+    return test;
 };
 
 var getTypeFromJson = function (metaData, typeData) {
@@ -100,11 +66,6 @@ var getTypeFromJson = function (metaData, typeData) {
 var buildDefinition = function (inputValue, metaData) {
     var definition = JSON.parse(inputValue);
     definition.type = getTypeFromJson(metaData, definition.type);
-    if (definition.groups) {
-        definition.groups.forEach(function (group) {
-            group.model = models.newModel(group.model.id, group.model.name, metaData);
-        });
-    }
     return definition;
 };
 
