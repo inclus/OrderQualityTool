@@ -4,6 +4,7 @@ import time
 import attr
 import pydash
 import pygogo
+import sys
 
 from dashboard.helpers import NO, NOT_REPORTING, YES, EXISTING, NEW
 
@@ -14,16 +15,21 @@ IS_INTERFACE = "is_interface"
 logger = pygogo.Gogo(__name__).get_structured_logger()
 
 
+def should_log_time():
+    return 'test' not in sys.argv
+
+
 def timeit(method):
     def timed(*args, **kw):
         ts = time.time()
         result = method(*args, **kw)
         te = time.time()
-        logger.info("timer",
-                    extra={
-                        "method": method.__name__,
-                        "duration": "%2.5f" % (te - ts),
-                        "extra": [str(a)[:30] for a in args]})
+        if should_log_time():
+            logger.info("timer",
+                        extra={
+                            "method": method.__name__,
+                            "duration": "%2.5f" % (te - ts),
+                            "extra": [str(a)[:30] for a in args]})
         return result
 
     return timed
