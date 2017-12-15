@@ -1,17 +1,19 @@
-var previewController = ["$scope", "locations", function Ctrl($scope, locations) {
-    $scope.locations = locations;
-    $scope.update = function (location, cycle) {
-        definition.sample = {cycle: cycle, location: location};
-        metadataService.previewDefinition(definition).then(function (preview) {
-            $scope.groups = preview.groups;
-        });
-    };
-    if (locations.length > 0) {
-        $scope.location = locations[0];
-        $scope.cycle = locations[0].cycles[0];
-        $scope.update($scope.location, $scope.cycle);
-    }
-}];
+var previewController = function (definition) {
+    return ["$scope", "locations", "metadataService", function Ctrl($scope, locations, metadataService) {
+        $scope.locations = locations;
+        $scope.update = function (location, cycle) {
+            definition.sample = {cycle: cycle, location: location};
+            metadataService.previewDefinition(definition).then(function (preview) {
+                $scope.groups = preview.groups;
+            });
+        };
+        if (locations.length > 0) {
+            $scope.location = locations[0];
+            $scope.cycle = locations[0].cycles[0];
+            $scope.update($scope.location, $scope.cycle);
+        }
+    }];
+};
 
 var previewService = ["ngDialog", "metadataService", function (ngDialog, metadataService) {
     var self = this;
@@ -22,7 +24,7 @@ var previewService = ["ngDialog", "metadataService", function (ngDialog, metadat
             template: require("./test.definition.preview.html"),
             plain: true,
             closeByDocument: false,
-            controller: previewController,
+            controller: previewController(definition),
             resolve: {
                 locations: function getLocations() {
                     return metadataService.getLocations(definition);
