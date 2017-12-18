@@ -4,7 +4,7 @@ from rest_framework import serializers
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from dashboard.data.user_defined import UserDefinedFacilityCheck
+from dashboard.data.user_defined import UserDefinedFacilityCheck, UserDefinedFacilityTracedCheck
 from dashboard.models import AdultPatientsRecord, PAEDPatientsRecord, Consumption, TracingFormulations
 
 
@@ -18,6 +18,21 @@ class DefinitionOption(object):
         return DefinitionOption(
             id=data.get('id', ''),
             name=data.get('name', ''),
+        )
+
+
+@attr.s(cmp=True, frozen=True)
+class GroupModel(DefinitionOption):
+    tracing_formulations = attr.ib()
+    has_trace = attr.ib()
+
+    @staticmethod
+    def from_dict(data):
+        return GroupModel(
+            id=data.get('id', ''),
+            name=data.get('name', ''),
+            tracing_formulations=data.get('tracingFormulations', []),
+            has_trace=data.get('hasTrace', False),
         )
 
     def as_model(self):
@@ -42,7 +57,7 @@ class DefinitionGroup(object):
     @staticmethod
     def from_dict(data):
         return DefinitionGroup(
-            model=DefinitionOption.from_dict(data.get('model')),
+            model=GroupModel.from_dict(data.get('model')),
             name=data.get('name'),
             cycle=DefinitionOption.from_dict(data.get('cycle')),
             aggregation=DefinitionOption.from_dict(data.get('aggregation')),
@@ -73,8 +88,12 @@ class OptionField(serializers.Serializer):
     name = serializers.CharField()
 
 
+class GroupModelField(OptionField):
+    tracingFormulations = serializers.ListField(child=serializers.DictField(), required=False)
+
+
 class GroupSerializer(serializers.Serializer):
-    model = OptionField()
+    model = GroupModelField()
     cycle = OptionField()
     name = serializers.CharField()
     selected_fields = serializers.ListField(child=serializers.CharField())
@@ -109,7 +128,8 @@ class DefinitionSerializer(serializers.Serializer):
 
 
 testTypes = {
-    "FacilityTwoGroups": UserDefinedFacilityCheck
+    "FacilityTwoGroups": UserDefinedFacilityCheck,
+    "FacilityTwoGroupsAndTracingFormulation": UserDefinedFacilityTracedCheck,
 }
 
 

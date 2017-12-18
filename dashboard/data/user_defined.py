@@ -40,11 +40,11 @@ def get_factored_values(fields, factors, values):
 
 
 def sum_aggregation(values):
-    return py_(values).sum().value()
+    return py_(values).reject(lambda x: x is None).sum().value()
 
 
 def avg_aggregation(values):
-    return py_(values).avg().value()
+    return py_(values).reject(lambda x: x is None).avg().value()
 
 
 available_aggregations = {"SUM": sum_aggregation, "AVG": avg_aggregation}
@@ -96,7 +96,7 @@ class UserDefinedFacilityCheck(object):
             name=sample_location['name'],
             cycle=sample_cycle,
             district=sample_location['district'],
-            formulation__in=group.selected_formulations
+            formulation__in=self.get_formulations(group)
         ).values_list(
             'formulation', *group.selected_fields)
 
@@ -110,6 +110,9 @@ class UserDefinedFacilityCheck(object):
             "factored_values": factored_values,
             "result": self.aggregate_values(group, factored_values)
         }
+
+    def get_formulations(self, group):
+        return group.selected_formulations
 
     def aggregate_values(self, group, values):
         aggregation = available_aggregations.get(group.aggregation.id)
@@ -125,9 +128,16 @@ class UserDefinedFacilityCheck(object):
             model = group.model.as_model()
             if model:
                 field_filters = build_field_filters(group.selected_fields)
-                base_queryset = model.objects.filter(formulation__in=group.selected_formulations, **field_filters)
+                base_queryset = model.objects.filter(formulation__in=self.get_formulations(group), **field_filters)
                 raw_locations.extend(
                     base_queryset.order_by('name').values(
-                        'name', 'district', 'cycle').distinct()[:50])
+                        'name', 'district', 'cycle').distinct())
         locations = py_(raw_locations).uniq().group_by('name').map(as_loc).sort_by("name").value()
         return {"locations": locations}
+
+
+class UserDefinedFacilityTracedCheck(UserDefinedFacilityCheck):
+
+    def get_formulations(self, group):
+        formulations = group.model.tracing_formulations[0].get('formulations')
+        return formulations
