@@ -106,6 +106,7 @@ class GroupSerializer(serializers.Serializer):
 class SampleSerializer(serializers.Serializer):
     location = serializers.DictField()
     cycle = serializers.CharField(required=False)
+    tracer = serializers.DictField(required=False)
 
 
 class DefinitionSerializer(serializers.Serializer):

@@ -83,20 +83,21 @@ class UserDefinedFacilityCheck(object):
         data['factored_groups'] = list()
         sample_location = self.definition.sample.get('location')
         sample_cycle = self.definition.sample.get('cycle')
+        sample_tracer = self.definition.sample.get('tracer')
         for group in self.definition.groups:
             model = group.model.as_model()
             if model:
-                for_group = self.get_values_for_group(group, model, sample_cycle, sample_location)
+                for_group = self.get_values_for_group(group, model, sample_cycle, sample_location, sample_tracer)
                 data['groups'].append(for_group)
         return data
 
     @timeit
-    def get_values_for_group(self, group, model, sample_cycle, sample_location):
+    def get_values_for_group(self, group, model, sample_cycle, sample_location, sample_tracer):
         values = model.objects.filter(
             name=sample_location['name'],
             cycle=sample_cycle,
             district=sample_location['district'],
-            formulation__in=self.get_formulations(group)
+            formulation__in=self.get_formulations(group, sample_tracer)
         ).values_list(
             'formulation', *group.selected_fields)
 
@@ -111,7 +112,7 @@ class UserDefinedFacilityCheck(object):
             "result": self.aggregate_values(group, factored_values)
         }
 
-    def get_formulations(self, group):
+    def get_formulations(self, group, sample_tracer=None):
         return group.selected_formulations
 
     def aggregate_values(self, group, values):
@@ -128,7 +129,8 @@ class UserDefinedFacilityCheck(object):
             model = group.model.as_model()
             if model:
                 field_filters = build_field_filters(group.selected_fields)
-                base_queryset = model.objects.filter(formulation__in=self.get_formulations(group), **field_filters)
+                base_queryset = model.objects.filter(formulation__in=self.get_formulations(group),
+                                                     **field_filters)
                 raw_locations.extend(
                     base_queryset.order_by('name').values(
                         'name', 'district', 'cycle').distinct())
@@ -138,6 +140,8 @@ class UserDefinedFacilityCheck(object):
 
 class UserDefinedFacilityTracedCheck(UserDefinedFacilityCheck):
 
-    def get_formulations(self, group):
-        formulations = group.model.tracing_formulations[0].get('formulations')
-        return formulations
+    def get_formulations(self, group, sample_tracer=None):
+        if sample_tracer and "name" in sample_tracer:
+            return py_(group.model.tracing_formulations).filter(
+                {"name": sample_tracer.get("name")}).first().value().get('formulations')
+        return group.model.tracing_formulations[0].get('formulations')

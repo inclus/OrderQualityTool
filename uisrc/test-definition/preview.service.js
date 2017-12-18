@@ -1,11 +1,14 @@
 var previewController = function (definition) {
     return ["$scope", "locations", "metadataService", function Ctrl($scope, locations, metadataService) {
         $scope.locations = locations;
-        $scope.update = function (location, cycle) {
-            definition.sample = {cycle: cycle, location: location};
-            metadataService.previewDefinition(definition).then(function (preview) {
-                $scope.groups = preview.groups;
-            });
+        $scope.definition = definition;
+        $scope.update = function (location, cycle, tracer) {
+            if (location && cycle) {
+                definition.sample = {cycle: cycle, location: location, tracer: tracer};
+                metadataService.previewDefinition(definition).then(function (preview) {
+                    $scope.groups = preview.groups;
+                });
+            }
         };
         if (locations.length > 0) {
             $scope.location = locations[0];

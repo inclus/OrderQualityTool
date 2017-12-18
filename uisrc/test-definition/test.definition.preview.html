@@ -1,9 +1,11 @@
 <div>
     <select name="selected_location" ng-model="location" id="preview_location"
-            ng-change="update(location, cycle)"
+            ng-change="update(location, cycle, tracer)"
             ng-options="option.name for option in locations track by option.name + option.district"></select>
-    <select name="selected_cycle" ng-model="cycle" id="preview_cycles" ng-change="update(location, cycle)"
+    <select name="selected_cycle" ng-model="cycle" id="preview_cycles" ng-change="update(location, cycle, tracer)"
             ng-options="option for option in location.cycles track by option"></select>
+    <select ng-show="definition.groups[0].model.hasTrace" name="selected_tracer" ng-model="tracer" id="preview_cycles" ng-change="update(location, cycle, tracer)"
+            ng-options="tracer.name for tracer in definition.groups[0].model.tracingFormulations track by tracer.name"></select>
     <div class="preview-groups-container">
         <div ng-repeat="group in groups" class="preview-group">
             <h3>
