@@ -9,6 +9,6 @@ urlpatterns = [
     url(r'^', include(dashboard_urls)),
     url(r'^', include(auth_urls)),
     url(r'^', include('password_reset.urls')),
-    url(r'^monitoring/', include('django_prometheus.urls')),
+    url(r'^', include('django_prometheus.urls')),
 
 ]
