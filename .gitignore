@@ -154,3 +154,4 @@ node_modules/
 .env
 .tmp
 coverage
+test_sqlite.db

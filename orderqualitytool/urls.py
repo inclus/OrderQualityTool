@@ -8,5 +8,7 @@ urlpatterns = [
     url(r'^admin/', include(admin_site.urls)),
     url(r'^', include(dashboard_urls)),
     url(r'^', include(auth_urls)),
-    url(r'^', include('password_reset.urls'))
+    url(r'^', include('password_reset.urls')),
+    url(r'^monitoring/', include('django_prometheus.urls')),
+
 ]
