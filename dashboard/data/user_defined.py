@@ -1,5 +1,7 @@
 from pydash import py_
 
+from dashboard.data.utils import timeit
+
 
 def as_float_or_1(value):
     try:
@@ -57,7 +59,6 @@ def build_field_filters(selected_fields):
 
 def as_loc(items):
     if len(items) > 0:
-        print(items, "-------")
         return {
             "name": items[0]['name'],
             "district": items[0]['district'],
@@ -75,6 +76,7 @@ class UserDefinedFacilityCheck(object):
     def get_result_for_group(self, group):
         pass
 
+    @timeit
     def get_preview_data(self):
         data = {}
         data['groups'] = list()
@@ -88,6 +90,7 @@ class UserDefinedFacilityCheck(object):
                 data['groups'].append(for_group)
         return data
 
+    @timeit
     def get_values_for_group(self, group, model, sample_cycle, sample_location):
         values = model.objects.filter(
             name=sample_location['name'],
@@ -115,6 +118,7 @@ class UserDefinedFacilityCheck(object):
             return aggregation(all_values)
         return None
 
+    @timeit
     def get_locations_and_cycles(self):
         raw_locations = []
         for group in self.definition.groups:

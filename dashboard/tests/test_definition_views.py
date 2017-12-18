@@ -50,7 +50,6 @@ class PreviewLocationsViewTestCase(WebTest):
         })
         json_response = response.content.decode('utf8')
         self.assertEqual(200, response.status_code)
-        print(json_response)
         locations = loads(json_response).get('locations', [])
         self.assertEqual(2, len(locations))
         self.assertEqual(locations[0], {"name": "loc1", "district": "dis1", "cycles": ["cycle1", "cycle2"]})
