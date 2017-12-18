@@ -48,6 +48,25 @@ def avg_aggregation(values):
 available_aggregations = {"SUM": sum_aggregation, "AVG": avg_aggregation}
 
 
+def build_field_filters(selected_fields):
+    filter_kwargs = {}
+    for field in selected_fields:
+        filter_kwargs[field + "__isnull"] = False
+    return filter_kwargs
+
+
+def as_loc(items):
+    if len(items) > 0:
+        print(items, "-------")
+        return {
+            "name": items[0]['name'],
+            "district": items[0]['district'],
+            "cycles": [item['cycle'] for item in items]
+        }
+    else:
+        return None
+
+
 class UserDefinedFacilityCheck(object):
 
     def __init__(self, definition):
@@ -95,3 +114,16 @@ class UserDefinedFacilityCheck(object):
             all_values = py_(values).map(lambda x: x[1:]).flatten_deep().value()
             return aggregation(all_values)
         return None
+
+    def get_locations_and_cycles(self):
+        raw_locations = []
+        for group in self.definition.groups:
+            model = group.model.as_model()
+            if model:
+                field_filters = build_field_filters(group.selected_fields)
+                base_queryset = model.objects.filter(formulation__in=group.selected_formulations, **field_filters)
+                raw_locations.extend(
+                    base_queryset.order_by('name').values(
+                        'name', 'district', 'cycle').distinct()[:50])
+        locations = py_(raw_locations).uniq().group_by('name').map(as_loc).sort_by("name").value()
+        return {"locations": locations}

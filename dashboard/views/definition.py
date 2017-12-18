@@ -1,4 +1,3 @@
-
 import attr
 from pydash import py_
 from rest_framework import serializers
@@ -90,46 +89,23 @@ class SampleSerializer(serializers.Serializer):
     cycle = serializers.CharField(required=False)
 
 
-def build_field_filters(selected_fields):
-    filter_kwargs = {}
-    for field in selected_fields:
-        filter_kwargs[field + "__isnull"] = False
-    return filter_kwargs
-
-
-def as_loc(items):
-    if len(items) > 0:
-        print(items, "-------")
-        return {
-            "name": items[0]['name'],
-            "district": items[0]['district'],
-            "cycles": [item['cycle'] for item in items]
-        }
-    else:
-        return None
-
-
 class DefinitionSerializer(serializers.Serializer):
     groups = serializers.ListField(child=GroupSerializer())
     type = serializers.DictField()
 
-    def get_locations_and_cycles_with_data(self):
+    def get_check(self):
         definition = Definition.from_dict(self.validated_data)
-        raw_locations = []
-        for group in definition.groups:
-            model = group.model.as_model()
-            if model:
-                field_filters = build_field_filters(group.selected_fields)
-                base_queryset = model.objects.filter(formulation__in=group.selected_formulations, **field_filters)
-                raw_locations.extend(
-                    base_queryset.order_by('name').values(
-                        'name', 'district', 'cycle').distinct())
-        locations = py_(raw_locations).uniq().group_by('name').map(as_loc).sort_by("name").value()
-        print(locations)
-        return {"locations": locations}
+        testType = self.validated_data['type']['id']
+        check_class = testTypes.get(testType)
+        if check_class:
+            return check_class(definition)
+        return None
 
-
-
+    def get_locations_and_cycles_with_data(self):
+        check = self.get_check()
+        if check:
+            return check.get_locations_and_cycles()
+        return {}
 
 
 testTypes = {
@@ -137,22 +113,14 @@ testTypes = {
 }
 
 
-
-
-
 class DefinitionSampleSerializer(DefinitionSerializer):
     sample = SampleSerializer()
 
     def get_preview_data(self):
-        definition = Definition.from_dict(self.validated_data)
-        testType = self.validated_data['type']['id']
-        check = testTypes.get(testType)
+        check = self.get_check()
         if check:
-            return check(definition).get_preview_data()
+            return check.get_preview_data()
         return {}
-
-
-
 
 
 class PreviewDefinitionView(APIView):

@@ -1,6 +1,6 @@
 from django.test import TestCase
 
-from dashboard.views.definition import build_field_filters
+from dashboard.data.user_defined import build_field_filters
 
 
 class TestBuild_field_filters(TestCase):
