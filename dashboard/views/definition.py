@@ -8,6 +8,26 @@ from dashboard.data.user_defined import UserDefinedFacilityCheck, UserDefinedFac
 from dashboard.models import AdultPatientsRecord, PAEDPatientsRecord, Consumption, TracingFormulations
 
 
+def less_than(group1, group2):
+    return group1 < group2
+
+
+def greater_than(group1, group2):
+    return group1 > group2
+
+
+def greater_than_equal_to(group1, group2):
+    return group1 >= group2
+
+
+def less_than_equal_to(group1, group2):
+    return group1 <= group2
+
+
+def equal_to(group1, group2):
+    return group1 == group2
+
+
 @attr.s(cmp=True, frozen=True)
 class DefinitionOption(object):
     id = attr.ib()
@@ -73,13 +93,27 @@ class Definition(object):
     groups = attr.ib()
     type = attr.ib()
     sample = attr.ib()
+    operator = attr.ib()
+    operator_constant = attr.ib()
+
+    def get_operator(self):
+        known_operators = {
+            "LessThan": less_than,
+            "GreaterThan": greater_than,
+            "LessThanOrEqualTo": less_than_equal_to,
+            "GreaterThanOrEqualTo": greater_than_equal_to,
+            "EqualTo": equal_to,
+        }
+        return known_operators.get(self.operator)
 
     @staticmethod
     def from_dict(data):
         return Definition(
             groups=map(DefinitionGroup.from_dict, data.get('groups', [])),
             type=data.get('type'),
-            sample=data.get('sample')
+            sample=data.get('sample'),
+            operator=data.get('operator'),
+            operator_constant=data.get('operatorConstant'),
         )
 
 
@@ -112,6 +146,8 @@ class SampleSerializer(serializers.Serializer):
 class DefinitionSerializer(serializers.Serializer):
     groups = serializers.ListField(child=GroupSerializer())
     type = serializers.DictField()
+    operator = serializers.CharField(required=False)
+    operatorConstant = serializers.CharField(required=False)
 
     def get_check(self):
         definition = Definition.from_dict(self.validated_data)

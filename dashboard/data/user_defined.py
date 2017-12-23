@@ -84,33 +84,37 @@ class UserDefinedFacilityCheck(object):
         sample_location = self.definition.sample.get('location')
         sample_cycle = self.definition.sample.get('cycle')
         sample_tracer = self.definition.sample.get('tracer')
+        groups = []
         for group in self.definition.groups:
-            model = group.model.as_model()
-            if model:
-                for_group = self.get_values_for_group(group, model, sample_cycle, sample_location, sample_tracer)
-                data['groups'].append(for_group)
+            for_group = self.get_values_for_group(group, sample_cycle, sample_location, sample_tracer)
+            groups.append(for_group)
+        data['groups'] = groups
+        data['result'] = self.compare_results(groups)
+
         return data
 
     @timeit
-    def get_values_for_group(self, group, model, sample_cycle, sample_location, sample_tracer):
-        values = model.objects.filter(
-            name=sample_location['name'],
-            cycle=sample_cycle,
-            district=sample_location['district'],
-            formulation__in=self.get_formulations(group, sample_tracer)
-        ).values_list(
-            'formulation', *group.selected_fields)
+    def get_values_for_group(self, group, sample_cycle, sample_location, sample_tracer):
+        model = group.model.as_model()
+        if model:
+            values = model.objects.filter(
+                name=sample_location['name'],
+                cycle=sample_cycle,
+                district=sample_location['district'],
+                formulation__in=self.get_formulations(group, sample_tracer)
+            ).values_list(
+                'formulation', *group.selected_fields)
 
-        factored_values = get_factored_values(group.selected_fields, group.factors, values)
-        return {
-            "name": group.name,
-            "aggregation": group.aggregation.name,
-            "values": values,
-            "headers": group.selected_fields,
-            "has_factors": group.has_factors,
-            "factored_values": factored_values,
-            "result": self.aggregate_values(group, factored_values)
-        }
+            factored_values = get_factored_values(group.selected_fields, group.factors, values)
+            return {
+                "name": group.name,
+                "aggregation": group.aggregation.name,
+                "values": values,
+                "headers": group.selected_fields,
+                "has_factors": group.has_factors,
+                "factored_values": factored_values,
+                "result": self.aggregate_values(group, factored_values)
+            }
 
     def get_formulations(self, group, sample_tracer=None):
         return group.selected_formulations
@@ -136,6 +140,22 @@ class UserDefinedFacilityCheck(object):
                         'name', 'district', 'cycle').distinct())
         locations = py_(raw_locations).uniq().group_by('name').map(as_loc).sort_by("name").value()
         return {"locations": locations}
+
+    def compare_results(self, groups):
+        operator = self.definition.get_operator()
+        operator_constant = self.definition.operator_constant
+        if not operator_constant:
+            operator_constant = 1.0
+
+        operator_constant = as_float_or_1(operator_constant)
+
+        if operator:
+            group1_result = groups[0].get('result')
+            group2_result = groups[1].get('result')
+            factored_result = group2_result * operator_constant
+            result = "YES" if operator(group1_result, factored_result) else "NO"
+            return {"DEFAULT": result}
+        return {"DEFAULT": "N\A"}
 
 
 class UserDefinedFacilityTracedCheck(UserDefinedFacilityCheck):

@@ -1,3 +1,5 @@
+from collections import defaultdict
+
 from dashboard.models import AdultPatientsRecord, PAEDPatientsRecord, Consumption
 
 
@@ -9,29 +11,35 @@ class FakeDefinition(object):
         def formulations(self, *formulations):
             def f(group):
                 group['selected_formulations'] = formulations
+                return group
 
             return self.on_group(f)
 
         def aggregation(self, id):
             def f(group):
                 group['aggregation'] = {"id": id, "name": id}
+                return group
 
             return self.on_group(f)
 
         def fields(self, *fields):
             def f(group):
                 group['selected_fields'] = fields
+                return group
 
             return self.on_group(f)
 
         def on_group(self, f):
-            group = self.data['groups'][0]
-            f(group)
+            groups = self.data.get('groups', [])
+            for index, group in enumerate(groups):
+                if group:
+                    self.data['groups'][index] = f(group)
             return self
 
         def model(self, name):
             def f(group):
                 group['model'] = {"id": ("%s" % name), "name": ("%s Records" % name)}
+                return group
 
             return self.on_group(f)
 
@@ -47,38 +55,53 @@ class FakeDefinition(object):
                 if len(factors) > 0:
                     group['has_factors'] = True
                     group['factors'] = factors
+                return group
 
             return self.on_group(f)
 
-        def sample(self, location=None, cycle="cycle1"):
+        def is_greater_than(self, ratio):
+            self.data["operator"] = "GreaterThan"
+            self.data["operatorConstant"] = ratio
+            return self
+
+        def is_less_than(self, ratio=1):
+            self.data["operator"] = "LessThan"
+            self.data["operatorConstant"] = ratio
+            return self
+
+        def sample(self, location=None, cycle="cycle1", tracer=None):
             if location is None:
                 location = {"name": "loc1", "district": "dis1"}
-            self.data["sample"] = {"location": location, "cycle": cycle}
+            sample = {"location": location, "cycle": cycle}
+            if tracer:
+                sample['tracer'] = tracer
+            self.data["sample"] = sample
             return self
 
         def tracing_formulations(self, *formulations):
             def f(group):
-                group['model']['tracingFormulations'] = [{"formulations": formulations}]
+                group['model']['tracingFormulations'] = [{"formulations": formulations, "name": "trace1"}]
+                return group
 
             return self.on_group(f)
 
-    def single(self):
+    def initial(self):
+        group1 = {"name": "G1", "cycle": {"id": "current", "name": "current"}, }
+        group2 = {"name": "G2", "cycle": {"id": "current", "name": "current"}, }
         data = {
             "groups": [
-                {
-                    "name": "G1",
-                    "cycle": {"id": "current", "name": "current"},
-                }
+                group1,
+                group2
             ]
         }
         return self.Builder(data).type("FacilityTwoGroups").aggregation("SUM").formulations("form_a", "form_b").fields(
             "new", "existing").model("Adult")
 
     def sampled(self, **kwargs):
-        return self.single().sample(**kwargs)
+        return self.initial().sample(**kwargs)
 
     def traced(self, **kwargs):
-        return self.single().type("FacilityTwoGroupsAndTracingFormulation").sample(
+        return self.initial().type("FacilityTwoGroupsAndTracingFormulation").sample(
             **kwargs)
 
 

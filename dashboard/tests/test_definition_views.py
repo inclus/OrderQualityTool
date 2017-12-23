@@ -13,7 +13,8 @@ class PreviewLocationsViewTestCase(WebTest):
         gen_adult_record(cycle="cycle2")
         gen_adult_record(name="loc2", cycle="cycle2")
         gen_adult_record(name="loc3", cycle="cycle3", existing=None, new=None)
-        response = self.app.post_json(url, user="testuser", params=FakeDefinition().single().get())
+        params = FakeDefinition().initial().get()
+        response = self.app.post_json(url, user="testuser", params=params)
         json_response = response.content.decode('utf8')
         self.assertEqual(200, response.status_code)
         locations = loads(json_response).get('locations', [])
@@ -39,7 +40,7 @@ class PreviewViewTestCase(WebTest):
     url = "/api/tests/preview"
 
     def test_that_a_sample_is_required(self):
-        response = self.app.post_json(self.url, user="testuser", params=FakeDefinition().single().get(),
+        response = self.app.post_json(self.url, user="testuser", params=FakeDefinition().initial().get(),
                                       expect_errors=True)
         json_response = loads(response.content.decode('utf8'))
         self.assertEqual(400, response.status_code)
@@ -50,7 +51,6 @@ class PreviewViewTestCase(WebTest):
         params = FakeDefinition().sampled().model('Paed').factors(existing=2, new=5).get()
         response = self.app.post_json(self.url, user="testuser", params=params, expect_errors=True)
         json_response = loads(response.content.decode('utf8'))
-
         self.assertEqual(200, response.status_code)
         assert_that(json_response, has_entry(equal_to("groups"), has_item(
             has_entries(
@@ -126,8 +126,9 @@ class PreviewViewTestCase(WebTest):
 
     def test_two_facility_with_tracing_type(self):
         gen_consumption_record(formulation="form_tra", opening_balance=10, closing_balance=20)
-        params = FakeDefinition().traced().model('Consumption').tracing_formulations("form_tra",
-                                                                                     "form_trb").fields(
+        params = FakeDefinition().traced(tracer={"name": "trace1", "formulations": ["form_tra", "form_trb"]}).model(
+            'Consumption').tracing_formulations("form_tra",
+                                                "form_trb").fields(
             "opening_balance", "closing_balance").get()
         response = self.app.post_json(self.url, user="testuser", params=params, expect_errors=True)
         json_response = loads(response.content.decode('utf8'))
@@ -145,3 +146,79 @@ class PreviewViewTestCase(WebTest):
                 }
             )
         )))
+
+    def test_greater_than(self):
+        gen_consumption_record(formulation="form1", opening_balance=10, closing_balance=20)
+        gen_consumption_record(formulation="form2", opening_balance=40, closing_balance=30)
+        definition_builder = FakeDefinition().sampled().formulations("form1", "form2")
+        definition_builder.fields("opening_balance", "closing_balance")
+        definition_builder.model('Consumption')
+        definition_builder.is_greater_than(0.5)
+        response = self.app.post_json(self.url, user="testuser", params=definition_builder.get(), expect_errors=True)
+        json_response = loads(response.content.decode('utf8'))
+
+        self.assertEqual(200, response.status_code)
+        assert_that(json_response, has_entry(equal_to("groups"), has_item(
+            has_entries(
+                {
+                    "name": equal_to('G1'),
+                    "aggregation": "SUM",
+                    "values": equal_to([['form1', 10.0, 20.0], ['form2', 40.0, 30.0]]),
+                    "headers": equal_to(['opening_balance', 'closing_balance']),
+                    "result": equal_to(100.0)
+                }
+
+            )
+        )))
+        assert_that(json_response, has_entry(equal_to("groups"), has_item(
+            has_entries(
+                {
+                    "name": equal_to('G2'),
+                    "aggregation": "SUM",
+                    "values": equal_to([['form1', 10.0, 20.0], ['form2', 40.0, 30.0]]),
+                    "headers": equal_to(['opening_balance', 'closing_balance']),
+                    "result": equal_to(100.0)
+                }
+
+            )
+        )))
+
+        assert_that(json_response, has_entry(equal_to("result"), has_entries({"DEFAULT": equal_to("YES")})))
+
+    def test_less_than(self):
+        gen_consumption_record(formulation="form1", opening_balance=10, closing_balance=20)
+        gen_consumption_record(formulation="form2", opening_balance=40, closing_balance=30)
+        definition_builder = FakeDefinition().sampled().formulations("form1", "form2")
+        definition_builder.fields("opening_balance", "closing_balance")
+        definition_builder.model('Consumption')
+        definition_builder.is_less_than(0.5)
+        response = self.app.post_json(self.url, user="testuser", params=definition_builder.get(), expect_errors=True)
+        json_response = loads(response.content.decode('utf8'))
+
+        self.assertEqual(200, response.status_code)
+        assert_that(json_response, has_entry(equal_to("groups"), has_item(
+            has_entries(
+                {
+                    "name": equal_to('G1'),
+                    "aggregation": "SUM",
+                    "values": equal_to([['form1', 10.0, 20.0], ['form2', 40.0, 30.0]]),
+                    "headers": equal_to(['opening_balance', 'closing_balance']),
+                    "result": equal_to(100.0)
+                }
+
+            )
+        )))
+        assert_that(json_response, has_entry(equal_to("groups"), has_item(
+            has_entries(
+                {
+                    "name": equal_to('G2'),
+                    "aggregation": "SUM",
+                    "values": equal_to([['form1', 10.0, 20.0], ['form2', 40.0, 30.0]]),
+                    "headers": equal_to(['opening_balance', 'closing_balance']),
+                    "result": equal_to(100.0)
+                }
+
+            )
+        )))
+
+        assert_that(json_response, has_entry(equal_to("result"), has_entries({"DEFAULT": equal_to("NO")})))
