@@ -139,6 +139,7 @@ GOOGLE_ANALYTICS_PROPERTY_ID = os.environ.get('GOOGLE_ANALYTICS_ID', 'UA-1081705
 DHIS2_USERNAME = os.getenv("DHIS2_USERNAME")
 DHIS2_PASSWORD = os.getenv("DHIS2_PASSWORD")
 DHIS2_URL = os.getenv("DHIS2_URL")
+PROMETHEUS_EXPORT_MIGRATIONS = False
 try:
     from local_settings import *
 except ImportError:
