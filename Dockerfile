@@ -3,7 +3,7 @@ from node:alpine
 RUN mkdir -p /usr/src/app/dashboard/static
 WORKDIR /usr/src/app
 
-COPY package.json package-lock.json /usr/src/app/
+COPY package.json package-lock.json .eslintrc /usr/src/app/
 RUN npm install
 
 COPY webpack.config.js /usr/src/app/
