@@ -19,24 +19,27 @@ def as_number(value):
         return False, None
 
 
-def factor_values(fields, factors):
+def factor_values_by_formulation(formulations, factors):
     if not factors:
         factors = {}
 
     def _p(values):
         values = list(values)
-        for index, field in enumerate(fields):
-            factor = as_float_or_1(factors.get(field, 1))
-            is_numerical, numerical_value = as_number(values[index + 1])
-            if numerical_value:
-                values[index + 1] = numerical_value * factor
+        formulation_name = values[0]
+        factor = as_float_or_1(factors.get(formulation_name, 1))
+        for index, value in enumerate(values):
+            if index != 0:
+                is_numerical, numerical_value = as_number(value)
+                if numerical_value:
+                    values[index] = numerical_value * factor
+
         return values
 
     return _p
 
 
-def get_factored_values(fields, factors, values):
-    return py_(values).map(factor_values(fields, factors)).value()
+def get_factored_values(formulations, factors, values):
+    return py_(values).map(factor_values_by_formulation(formulations, factors)).value()
 
 
 def sum_aggregation(values):
@@ -78,16 +81,14 @@ class UserDefinedFacilityCheck(object):
 
     @timeit
     def get_preview_data(self):
-        data = {}
-        data['groups'] = list()
-        data['factored_groups'] = list()
+        data = {'groups': list(), 'factored_groups': list()}
         sample_location = self.definition.sample.get('location')
         sample_cycle = self.definition.sample.get('cycle')
         sample_tracer = self.definition.sample.get('tracer')
         groups = []
         for group in self.definition.groups:
-            for_group = self.get_values_for_group(group, sample_cycle, sample_location, sample_tracer)
-            groups.append(for_group)
+            values_for_group = self.get_values_for_group(group, sample_cycle, sample_location, sample_tracer)
+            groups.append(values_for_group)
         data['groups'] = groups
         data['result'] = self.compare_results(groups)
 
@@ -105,7 +106,7 @@ class UserDefinedFacilityCheck(object):
             ).values_list(
                 'formulation', *group.selected_fields)
 
-            factored_values = get_factored_values(group.selected_fields, group.factors, values)
+            factored_values = get_factored_values(group.selected_formulations, group.factors, values)
             return {
                 "name": group.name,
                 "aggregation": group.aggregation.name,

@@ -48,7 +48,7 @@ class PreviewViewTestCase(WebTest):
 
     def test_that_the_factors_are_considered(self):
         gen_paed_record()
-        params = FakeDefinition().sampled().model('Paed').factors(existing=2, new=5).get()
+        params = FakeDefinition().sampled().model('Paed').factors(form_b=2, form_a=5).get()
         response = self.app.post_json(self.url, user="testuser", params=params, expect_errors=True)
         json_response = loads(response.content.decode('utf8'))
         self.assertEqual(200, response.status_code)
@@ -58,9 +58,9 @@ class PreviewViewTestCase(WebTest):
                     "name": equal_to('G1'),
                     "aggregation": "SUM",
                     "values": equal_to([['form_a', 10.0, 20.0]]),
-                    "factored_values": equal_to([['form_a', 50.0, 40.0]]),
+                    "factored_values": equal_to([['form_a', 50.0, 100.0]]),
                     "headers": equal_to(['new', 'existing']),
-                    "result": equal_to(90.0)
+                    "result": equal_to(150.0)
                 }
             )
         )))
@@ -106,7 +106,7 @@ class PreviewViewTestCase(WebTest):
     def test_result_with_consumption_records(self):
         gen_consumption_record(opening_balance=10, closing_balance=20)
         params = FakeDefinition().sampled().fields("opening_balance", "closing_balance").model('Consumption').factors(
-            opening_balance=1, closing_balance=10).get()
+            form_a=10).get()
         response = self.app.post_json(self.url, user="testuser", params=params, expect_errors=True)
         json_response = loads(response.content.decode('utf8'))
 
@@ -117,9 +117,9 @@ class PreviewViewTestCase(WebTest):
                     "name": equal_to('G1'),
                     "aggregation": "SUM",
                     "values": equal_to([['form_a', 10.0, 20.0]]),
-                    "factored_values": equal_to([['form_a', 10.0, 200.0]]),
+                    "factored_values": equal_to([['form_a', 100.0, 200.0]]),
                     "headers": equal_to(['opening_balance', 'closing_balance']),
-                    "result": equal_to(210.0)
+                    "result": equal_to(300.0)
                 }
             )
         )))
