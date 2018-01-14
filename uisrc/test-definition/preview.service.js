@@ -7,6 +7,7 @@ var previewController = function (definition) {
                 definition.sample = {cycle: cycle, location: location, tracer: tracer};
                 metadataService.previewDefinition(definition).then(function (preview) {
                     $scope.groups = preview.groups;
+                    $scope.result = preview.result;
                 });
             }
         };

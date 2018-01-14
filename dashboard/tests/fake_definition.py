@@ -59,13 +59,18 @@ class FakeDefinition(object):
 
             return self.on_group(f)
 
-        def is_greater_than(self, ratio):
-            self.data["operator"] = "GreaterThan"
-            self.data["operatorConstant"] = ratio
+        def are_equal(self):
+            self.data["operator"] = {"id": "AreEqual", "name": "AreEqual"}
+            # self.data["operatorConstant"] = None
+            return self
+
+        def has_no_negatives(self):
+            self.data["operator"] = {"id": "NoNegatives", "name": "NoNegatives"}
+            # self.data["operatorConstant"] = None
             return self
 
         def is_less_than(self, ratio=1):
-            self.data["operator"] = "LessThan"
+            self.data["operator"] = {"id": "LessThan", "name": "LessThan"}
             self.data["operatorConstant"] = ratio
             return self
 

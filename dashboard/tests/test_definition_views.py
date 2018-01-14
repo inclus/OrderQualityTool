@@ -147,13 +147,52 @@ class PreviewViewTestCase(WebTest):
             )
         )))
 
-    def test_greater_than(self):
+    def test_equal_to(self):
         gen_consumption_record(formulation="form1", opening_balance=10, closing_balance=20)
         gen_consumption_record(formulation="form2", opening_balance=40, closing_balance=30)
         definition_builder = FakeDefinition().sampled().formulations("form1", "form2")
         definition_builder.fields("opening_balance", "closing_balance")
         definition_builder.model('Consumption')
-        definition_builder.is_greater_than(0.5)
+        definition_builder.are_equal()
+        response = self.app.post_json(self.url, user="testuser", params=definition_builder.get(), expect_errors=True)
+        json_response = loads(response.content.decode('utf8'))
+
+
+        assert_that(json_response, has_entry(equal_to("groups"), has_item(
+            has_entries(
+                {
+                    "name": equal_to('G1'),
+                    "aggregation": "SUM",
+                    "values": equal_to([['form1', 10.0, 20.0], ['form2', 40.0, 30.0]]),
+                    "headers": equal_to(['opening_balance', 'closing_balance']),
+                    "result": equal_to(100.0)
+                }
+
+            )
+        )))
+        self.assertEqual(200, response.status_code)
+        assert_that(json_response, has_entry(equal_to("groups"), has_item(
+            has_entries(
+                {
+                    "name": equal_to('G2'),
+                    "aggregation": "SUM",
+                    "values": equal_to([['form1', 10.0, 20.0], ['form2', 40.0, 30.0]]),
+                    "headers": equal_to(['opening_balance', 'closing_balance']),
+                    "result": equal_to(100.0)
+                }
+
+            )
+        )))
+
+        assert_that(json_response, has_entry(equal_to("result"), has_entries({"DEFAULT": equal_to("YES")})))
+
+    def test_less_than(self):
+        gen_consumption_record(formulation="form1", opening_balance=10, closing_balance=20)
+        gen_consumption_record(formulation="form2", opening_balance=40, closing_balance=30)
+        definition_builder = FakeDefinition().sampled().formulations("form1", "form2")
+        definition_builder.fields("opening_balance", "closing_balance")
+        definition_builder.model('Consumption')
+        definition_builder.is_less_than(50)
         response = self.app.post_json(self.url, user="testuser", params=definition_builder.get(), expect_errors=True)
         json_response = loads(response.content.decode('utf8'))
 
@@ -185,40 +224,41 @@ class PreviewViewTestCase(WebTest):
 
         assert_that(json_response, has_entry(equal_to("result"), has_entries({"DEFAULT": equal_to("YES")})))
 
-    def test_less_than(self):
+    def test_no_negatives(self):
         gen_consumption_record(formulation="form1", opening_balance=10, closing_balance=20)
         gen_consumption_record(formulation="form2", opening_balance=40, closing_balance=30)
         definition_builder = FakeDefinition().sampled().formulations("form1", "form2")
         definition_builder.fields("opening_balance", "closing_balance")
         definition_builder.model('Consumption')
-        definition_builder.is_less_than(0.5)
+        definition_builder.aggregation("VALUE")
+        definition_builder.has_no_negatives()
         response = self.app.post_json(self.url, user="testuser", params=definition_builder.get(), expect_errors=True)
         json_response = loads(response.content.decode('utf8'))
 
         self.assertEqual(200, response.status_code)
-        assert_that(json_response, has_entry(equal_to("groups"), has_item(
-            has_entries(
-                {
-                    "name": equal_to('G1'),
-                    "aggregation": "SUM",
-                    "values": equal_to([['form1', 10.0, 20.0], ['form2', 40.0, 30.0]]),
-                    "headers": equal_to(['opening_balance', 'closing_balance']),
-                    "result": equal_to(100.0)
-                }
-
-            )
-        )))
+        # assert_that(json_response, has_entry(equal_to("groups"), has_item(
+        #     has_entries(
+        #         {
+        #             "name": equal_to('G1'),
+        #             "aggregation": "VALUES",
+        #             "values": equal_to([['form1', 10.0, 20.0], ['form2', 40.0, 30.0]]),
+        #             "headers": equal_to(['opening_balance', 'closing_balance']),
+        #             "result": equal_to(100.0)
+        #         }
+        #
+        #     )
+        # )))
         assert_that(json_response, has_entry(equal_to("groups"), has_item(
             has_entries(
                 {
                     "name": equal_to('G2'),
-                    "aggregation": "SUM",
+                    "aggregation": "VALUE",
                     "values": equal_to([['form1', 10.0, 20.0], ['form2', 40.0, 30.0]]),
                     "headers": equal_to(['opening_balance', 'closing_balance']),
-                    "result": equal_to(100.0)
+                    "result": equal_to([10.0,20.0,40.0,30.0])
                 }
 
             )
         )))
 
-        assert_that(json_response, has_entry(equal_to("result"), has_entries({"DEFAULT": equal_to("NO")})))
+        assert_that(json_response, has_entry(equal_to("result"), has_entries({"DEFAULT": equal_to("YES")})))

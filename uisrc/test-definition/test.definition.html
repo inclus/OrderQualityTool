@@ -94,7 +94,7 @@
             <select ng-model="ctrl.definition.operator" ng-options="option.name for option in ctrl.definition.type.comparisons track by option.id">
             </select>
         </div>
-        <div class="group-control" ng-show="ctrl.definition.operator == 'LessThan'">
+        <div class="group-control" ng-show="ctrl.definition.operator.id == 'LessThan'">
             <input type="number" ng-model="ctrl.definition.operatorConstant">
         </div>
         <div class="group-control">

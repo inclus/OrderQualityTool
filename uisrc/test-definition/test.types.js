@@ -75,7 +75,6 @@ var SingleGroupFacilityTest = function (metaData) {
     ];
     
     test.comparisons = [
-        {id: "AreEqual", name:"Are Equal"},
         {id: "NoNegatives", name:"Has No Negatives"},
     ];
     return test;

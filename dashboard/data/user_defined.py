@@ -8,6 +8,8 @@ def as_float_or_1(value):
         return float(value)
     except ValueError as e:
         return 1
+    except TypeError as e:
+        return 1
 
 
 def as_number(value):
@@ -51,10 +53,27 @@ def avg_aggregation(values):
 
 
 def values_aggregation(values):
-    return values
+    return py_(values).reject(lambda x: x is None).value()
+
+
+def less_than_comparison(group1, group2, constant=100.0):
+    difference = abs(group2 - group1)
+    margin = (constant / 100.0) * group1
+    return difference < margin
+
+
+def equal_comparison(group1, group2, constant=1):
+    constant = as_float_or_1(constant)
+    return group1 == group2 * constant
+
+
+def no_negatives_comparison(group1, group2, constant=1):
+    return py_([group1, group2]).flatten_deep().reject(lambda x: x is None).every(lambda x: x >= 0).value()
 
 
 available_aggregations = {"SUM": sum_aggregation, "AVG": avg_aggregation, "VALUE": values_aggregation}
+available_comparisons = {"LessThan": less_than_comparison, "AreEqual": equal_comparison,
+                         "NoNegatives": no_negatives_comparison}
 
 
 def build_field_filters(selected_fields):
@@ -147,19 +166,17 @@ class UserDefinedFacilityCheck(object):
         return {"locations": locations}
 
     def compare_results(self, groups):
-        operator = self.definition.get_operator()
-        operator_constant = self.definition.operator_constant
-        if not operator_constant:
-            operator_constant = 1.0
+        if self.definition.operator:
+            comparator = available_comparisons.get(self.definition.operator.id)
+            operator_constant = self.definition.operator_constant
 
-        operator_constant = as_float_or_1(operator_constant)
+            operator_constant = as_float_or_1(operator_constant)
 
-        if operator:
-            group1_result = groups[0].get('result')
-            group2_result = groups[1].get('result')
-            factored_result = group2_result * operator_constant
-            result = "YES" if operator(group1_result, factored_result) else "NO"
-            return {"DEFAULT": result}
+            if comparator:
+                group1_result = groups[0].get('result')
+                group2_result = groups[1].get('result')
+                result = "YES" if comparator(group1_result, group2_result, constant=operator_constant) else "NO"
+                return {"DEFAULT": result}
         return {"DEFAULT": "N\A"}
 
 
