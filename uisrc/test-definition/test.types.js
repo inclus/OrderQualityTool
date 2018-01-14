@@ -23,6 +23,11 @@ FacilityTest = function (metaData) {
         },
         id: "FacilityTwoGroups",
         name: "Facility with 2 Groups of data",
+        comparisons: [
+            {id: "LessThan", name:"Differ By LessThan X %"},
+            {id: "AreEqual", name:"Are Equal"},
+            {id: "NoNegatives", name:"Has No Negatives"},
+        ],
         cycles:
             [
                 {id: "Current", name: "Current Cycle"},
@@ -31,7 +36,8 @@ FacilityTest = function (metaData) {
         calculations:
             [
                 {id: "SUM", name: "Sum"},
-                {id: "AVG", name: "Average"}
+                {id: "AVG", name: "Average"},
+                {id: "VALUE", name: "Values"}
             ],
         models:
             [
@@ -63,6 +69,15 @@ var SingleGroupFacilityTest = function (metaData) {
             test.newGroup(1, metaData),
         ];
     };
+    
+    test.calculations = [
+        {id: "VALUE", name: "Values"}
+    ];
+    
+    test.comparisons = [
+        {id: "AreEqual", name:"Are Equal"},
+        {id: "NoNegatives", name:"Has No Negatives"},
+    ];
     return test;
 };
 

@@ -50,7 +50,11 @@ def avg_aggregation(values):
     return py_(values).reject(lambda x: x is None).avg().value()
 
 
-available_aggregations = {"SUM": sum_aggregation, "AVG": avg_aggregation}
+def values_aggregation(values):
+    return values
+
+
+available_aggregations = {"SUM": sum_aggregation, "AVG": avg_aggregation, "VALUE": values_aggregation}
 
 
 def build_field_filters(selected_fields):
