@@ -166,6 +166,7 @@ class DefinitionSerializer(serializers.Serializer):
 
 testTypes = {
     "FacilityTwoGroups": UserDefinedFacilityCheck,
+    "FacilityOneGroup": UserDefinedFacilityCheck,
     "FacilityTwoGroupsAndTracingFormulation": UserDefinedFacilityTracedCheck,
 }
 

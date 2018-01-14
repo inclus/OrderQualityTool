@@ -21,12 +21,19 @@ var testDefinitionController = ["$scope", "metadataService", "previewService", f
         ctrl.definition.groups = testType.getGroups(ctrl.metaData);
     };
 
+    ctrl.testTypeChanged = function(testType) {
+        if(testType){
+            ctrl.definition.groups = testType.getGroups(ctrl.metaData);
+        }
+    };
+
     var init = function () {
         metadataService.getAllFields().then(function (metaData) {
             ctrl.metaData = metaData;
             ctrl.testTypes = [
                 testTypes.FacilityTest(metaData),
-                testTypes.FacilityTestWithTracingFormulation(metaData)
+                testTypes.FacilityTestWithTracingFormulation(metaData),
+                testTypes.SingleGroupFacilityTest(metaData)
             ];
             if (ctrl.value) {
                 ctrl.definition = testTypes.buildDefinition(ctrl.value, metaData);

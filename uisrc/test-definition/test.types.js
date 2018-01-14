@@ -54,12 +54,28 @@ var FacilityTestWithTracingFormulation = function (metaData) {
     return test;
 };
 
+var SingleGroupFacilityTest = function (metaData) {
+    var test = FacilityTest(metaData);
+    test.id = "FacilityOneGroup";
+    test.name = "Facility with 1 Group";
+    test.getGroups = function (metaData) {
+        return [
+            test.newGroup(1, metaData),
+        ];
+    };
+    return test;
+};
+
 var getTypeFromJson = function (metaData, typeData) {
     if (typeData.id === "FacilityTwoGroups") {
         return FacilityTest(metaData);
     }
     if (typeData.id === "FacilityTwoGroupsAndTracingFormulation") {
         return FacilityTestWithTracingFormulation(metaData);
+    }
+
+    if (typeData.id === "FacilityOneGroup") {
+        return SingleGroupFacilityTest(metaData);
     }
 };
 
@@ -72,5 +88,6 @@ var buildDefinition = function (inputValue, metaData) {
 module.exports = {
     FacilityTest: FacilityTest,
     FacilityTestWithTracingFormulation: FacilityTestWithTracingFormulation,
+    SingleGroupFacilityTest: SingleGroupFacilityTest,
     buildDefinition: buildDefinition
 };
