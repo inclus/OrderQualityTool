@@ -3,7 +3,8 @@ from rest_framework import serializers
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from dashboard.data.user_defined import UserDefinedFacilityCheck, UserDefinedFacilityTracedCheck
+from dashboard.data.user_defined import UserDefinedFacilityCheck, UserDefinedFacilityTracedCheck, \
+    UserDefinedSingleGroupFacilityTracedCheck
 from dashboard.models import AdultPatientsRecord, PAEDPatientsRecord, Consumption, TracingFormulations
 
 
@@ -136,7 +137,7 @@ class DefinitionSerializer(serializers.Serializer):
 
 testTypes = {
     "FacilityTwoGroups": UserDefinedFacilityCheck,
-    "FacilityOneGroup": UserDefinedFacilityCheck,
+    "FacilityOneGroup": UserDefinedSingleGroupFacilityTracedCheck,
     "FacilityTwoGroupsAndTracingFormulation": UserDefinedFacilityTracedCheck,
 }
 

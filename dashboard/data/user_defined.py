@@ -230,3 +230,23 @@ class UserDefinedFacilityTracedCheck(UserDefinedFacilityCheck):
             return py_(group.model.tracing_formulations).filter(
                 {"name": sample_tracer.get("name")}).first().value().get('formulations')
         return group.model.tracing_formulations[0].get('formulations')
+
+
+class UserDefinedSingleGroupFacilityTracedCheck(UserDefinedFacilityCheck):
+
+    def compare_results(self, groups):
+        if self.definition.operator:
+            comparison_class = available_comparisons.get(self.definition.operator.id)
+            comparator = comparison_class()
+            operator_constant = self.definition.operator_constant
+
+            operator_constant = as_float_or_1(operator_constant)
+
+            if comparator:
+                group1_result = groups[0].get('result')
+                group2_result = None
+                comparison_result = comparator.compare(group1_result, group2_result, constant=operator_constant)
+                result_text = comparator.text(group1_result, group2_result, operator_constant, comparison_result)
+                result = "YES" if comparison_result else "NO"
+                return {"DEFAULT": result}, result_text
+        return {"DEFAULT": "N\A"}, None
