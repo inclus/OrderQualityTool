@@ -8,6 +8,7 @@ var previewController = function (definition) {
                 metadataService.previewDefinition(definition).then(function (preview) {
                     $scope.groups = preview.groups;
                     $scope.result = preview.result;
+                    $scope.resultText = preview.resultText;
                 });
             }
         };

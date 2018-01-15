@@ -56,24 +56,40 @@ def values_aggregation(values):
     return py_(values).reject(lambda x: x is None).value()
 
 
-def less_than_comparison(group1, group2, constant=100.0):
-    difference = abs(group2 - group1)
-    margin = (constant / 100.0) * group1
-    return difference < margin
+class LessThanComparison(object):
+    def compare(self, group1, group2, constant=100.0):
+        difference = abs(group2 - group1)
+        margin = (constant / 100.0) * group1
+        return difference < margin
+
+    def text(self, group1, group2, constant, result):
+        template = "%d and %d differ by %s than %s"
+        return template % (group1, group2, "less" if result else "more", constant)
 
 
-def equal_comparison(group1, group2, constant=1):
-    constant = as_float_or_1(constant)
-    return group1 == group2 * constant
+class EqualComparison(object):
+    def compare(self, group1, group2, constant=100.0):
+        constant = as_float_or_1(constant)
+        return group1 == group2 * constant
+
+    def text(self, group1, group2, constant, result):
+        template = "%d and %d %s equal"
+        return template % (group1, group2, "are" if result else "are not")
 
 
-def no_negatives_comparison(group1, group2, constant=1):
-    return py_([group1, group2]).flatten_deep().reject(lambda x: x is None).every(lambda x: x >= 0).value()
+class NoNegativesComparison(object):
+    def compare(self, group1, group2, constant=100.0):
+        return py_([group1, group2]).flatten_deep().reject(lambda x: x is None).every(lambda x: x >= 0).value()
+
+    def text(self, group1, group2, constant, result):
+        values = py_([group1, group2]).flatten_deep().reject(lambda x: x is None).value()
+        template = "%s of the values %s are negative"
+        return template % ("none" if result else "some", values)
 
 
 available_aggregations = {"SUM": sum_aggregation, "AVG": avg_aggregation, "VALUE": values_aggregation}
-available_comparisons = {"LessThan": less_than_comparison, "AreEqual": equal_comparison,
-                         "NoNegatives": no_negatives_comparison}
+available_comparisons = {"LessThan": LessThanComparison, "AreEqual": EqualComparison,
+                         "NoNegatives": NoNegativesComparison}
 
 
 def build_field_filters(selected_fields):
@@ -113,7 +129,9 @@ class UserDefinedFacilityCheck(object):
             values_for_group = self.get_values_for_group(group, sample_cycle, sample_location, sample_tracer)
             groups.append(values_for_group)
         data['groups'] = groups
-        data['result'] = self.compare_results(groups)
+        comparison_result, comparison_text = self.compare_results(groups)
+        data['result'] = comparison_result
+        data['resultText'] = comparison_text
 
         return data
 
@@ -167,7 +185,8 @@ class UserDefinedFacilityCheck(object):
 
     def compare_results(self, groups):
         if self.definition.operator:
-            comparator = available_comparisons.get(self.definition.operator.id)
+            comparison_class = available_comparisons.get(self.definition.operator.id)
+            comparator = comparison_class()
             operator_constant = self.definition.operator_constant
 
             operator_constant = as_float_or_1(operator_constant)
@@ -175,9 +194,11 @@ class UserDefinedFacilityCheck(object):
             if comparator:
                 group1_result = groups[0].get('result')
                 group2_result = groups[1].get('result')
-                result = "YES" if comparator(group1_result, group2_result, constant=operator_constant) else "NO"
-                return {"DEFAULT": result}
-        return {"DEFAULT": "N\A"}
+                comparison_result = comparator.compare(group1_result, group2_result, constant=operator_constant)
+                result_text = comparator.text(group1_result, group2_result, operator_constant, comparison_result)
+                result = "YES" if comparison_result else "NO"
+                return {"DEFAULT": result}, result_text
+        return {"DEFAULT": "N\A"}, None
 
 
 class UserDefinedFacilityTracedCheck(UserDefinedFacilityCheck):
