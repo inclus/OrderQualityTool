@@ -1,6 +1,7 @@
 from pydash import py_
 
 from dashboard.data.utils import timeit
+from dashboard.helpers import get_prev_cycle, get_next_cycle
 
 
 def as_float_or_1(value):
@@ -110,6 +111,27 @@ def as_loc(items):
         return None
 
 
+def next(cycle):
+    return get_next_cycle(cycle)
+
+
+def previous(cycle):
+    return get_prev_cycle(cycle)
+
+
+def current(cycle):
+    return cycle
+
+
+cycle_lookups = {"Next": next, "Previous": previous, "Currrent": previous}
+
+
+def parse_cycle(sample_cycle, group):
+    lookup = group.cycle.id
+    lookup = cycle_lookups.get(lookup, current)
+    return lookup(sample_cycle)
+
+
 class UserDefinedFacilityCheck(object):
 
     def __init__(self, definition):
@@ -141,7 +163,7 @@ class UserDefinedFacilityCheck(object):
         if model:
             values = model.objects.filter(
                 name=sample_location['name'],
-                cycle=sample_cycle,
+                cycle=parse_cycle(sample_cycle, group),
                 district=sample_location['district'],
                 formulation__in=self.get_formulations(group, sample_tracer)
             ).values_list(

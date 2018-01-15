@@ -192,6 +192,14 @@ def get_prev_cycle(cycle):
     return prev_cycle
 
 
+def get_next_cycle(cycle):
+    current_cycle_date = to_date(cycle)
+    start_month = current_cycle_date.replace(months=1)
+    end_month = current_cycle_date.replace(months=2)
+    prev_cycle = format_range(start_month, end_month)
+    return prev_cycle
+
+
 VALUE = "value"
 COLUMN = "column"
 ROWS = "rows"
