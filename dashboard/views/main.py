@@ -4,6 +4,7 @@ from io import BytesIO
 import pygogo
 from braces.views import LoginRequiredMixin, StaffuserRequiredMixin
 from django.contrib import messages
+from django.contrib.admin.models import LogEntry, CHANGE
 from django.http import HttpResponse
 from django.views.generic import TemplateView, FormView
 from openpyxl import Workbook
@@ -69,6 +70,11 @@ class Dhis2ImportView(LoginRequiredMixin, StaffuserRequiredMixin, FormView):
         logger.info("launching task",
                     extra={"task_name": "import_data_from_dhis2", "period": cycle})
         import_data_from_dhis2.apply_async(args=[cycle], priority=2)
+        LogEntry.objects.create(
+            user_id=self.request.user.id,
+            action_flag=CHANGE,
+            change_message="Started Import for cycle %s from dhis2" % (cycle),
+        )
         messages.add_message(self.request, messages.INFO, 'Successfully started import for cycle %s' % (cycle))
         return super(Dhis2ImportView, self).form_valid(form)
 
