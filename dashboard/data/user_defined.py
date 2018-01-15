@@ -151,7 +151,7 @@ class UserDefinedFacilityCheck(object):
             values_for_group = self.get_values_for_group(group, sample_cycle, sample_location, sample_tracer)
             groups.append(values_for_group)
         data['groups'] = groups
-        comparison_result, comparison_text = self.compare_results(groups)
+        comparison_result, comparison_text = self.compare_results(groups, sample_tracer)
         data['result'] = comparison_result
         data['resultText'] = comparison_text
 
@@ -205,7 +205,7 @@ class UserDefinedFacilityCheck(object):
         locations = py_(raw_locations).uniq().group_by('name').map(as_loc).sort_by("name").value()
         return {"locations": locations}
 
-    def compare_results(self, groups):
+    def compare_results(self, groups, sample_tracer):
         if self.definition.operator:
             comparison_class = available_comparisons.get(self.definition.operator.id)
             comparator = comparison_class()
@@ -219,8 +219,13 @@ class UserDefinedFacilityCheck(object):
                 comparison_result = comparator.compare(group1_result, group2_result, constant=operator_constant)
                 result_text = comparator.text(group1_result, group2_result, operator_constant, comparison_result)
                 result = "YES" if comparison_result else "NO"
-                return {"DEFAULT": result}, result_text
-        return {"DEFAULT": "N\A"}, None
+                return {self.get_result_key(sample_tracer): result}, result_text
+        return {self.get_result_key(sample_tracer): "N\A"}, None
+
+    def get_result_key(self, sample_tracer):
+        if sample_tracer and "name" in sample_tracer:
+            return sample_tracer.get("name")
+        return "DEFAULT"
 
 
 class UserDefinedFacilityTracedCheck(UserDefinedFacilityCheck):
@@ -234,7 +239,7 @@ class UserDefinedFacilityTracedCheck(UserDefinedFacilityCheck):
 
 class UserDefinedSingleGroupFacilityTracedCheck(UserDefinedFacilityCheck):
 
-    def compare_results(self, groups):
+    def compare_results(self, groups, sample_tracer):
         if self.definition.operator:
             comparison_class = available_comparisons.get(self.definition.operator.id)
             comparator = comparison_class()
