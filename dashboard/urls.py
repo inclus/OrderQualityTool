@@ -16,6 +16,7 @@ urlpatterns = [
     url(r'^about/how_works$', dashboard.views.main.AboutHowWorks.as_view(), name='about.how_works'),
     url(r'^about/how_used$', dashboard.views.main.AboutHowUsed.as_view(), name='about.how_used'),
     url(r'^import/$', dashboard.views.main.DataImportView.as_view(), name='import'),
+    url(r'^import/dhis2$', dashboard.views.main.Dhis2ImportView.as_view(), name='import'),
     url(r'^import/mapping/$', dashboard.views.main.PartnerMappingImportPage.as_view(), name='update_partner_mapping'),
     url(r'^import/mapping/download/$', dashboard.views.main.download_mapping, name='download_partner_mapping'),
     url(r'^import/users/$', dashboard.views.upload_users.UserImportView.as_view(), name='import_users'),

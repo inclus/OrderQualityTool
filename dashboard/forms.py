@@ -25,8 +25,14 @@ class FileUploadForm(Form):
     import_file = FileField(validators=[validate_file_extension()])
     cycle = ChoiceField(choices=generate_choices())
 
+
+class Dhis2ImportForm(Form):
+    cycle = ChoiceField(choices=generate_choices())
+
+
 class MappingUploadForm(Form):
     import_file = FileField(validators=[validate_file_extension()])
+
 
 class UserUploadForm(Form):
     import_file = FileField(validators=[validate_file_extension(['.csv'])])

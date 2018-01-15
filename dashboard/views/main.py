@@ -1,6 +1,7 @@
 from functools import cmp_to_key
 from io import BytesIO
 
+import pygogo
 from braces.views import LoginRequiredMixin, StaffuserRequiredMixin
 from django.contrib import messages
 from django.http import HttpResponse
@@ -11,10 +12,10 @@ from openpyxl.writer.excel import save_virtual_workbook
 from dashboard.data.data_import import ExcelDataImport
 from dashboard.data.partner_mapping import load_file
 from dashboard.data.utils import timeit
-from dashboard.forms import FileUploadForm, MappingUploadForm
+from dashboard.forms import FileUploadForm, MappingUploadForm, Dhis2ImportForm
 from dashboard.helpers import F3, F2, F1, sort_cycle
 from dashboard.models import Score, LocationToPartnerMapping, FacilityTest
-from dashboard.tasks import update_checks
+from dashboard.tasks import update_checks, import_data_from_dhis2
 
 
 class HomeView(LoginRequiredMixin, TemplateView):
@@ -48,6 +49,28 @@ class AboutHowWorks(TemplateView):
 
 class AboutHowUsed(TemplateView):
     template_name = "about_used.html"
+
+
+logger = pygogo.Gogo(__name__).get_structured_logger()
+
+
+class Dhis2ImportView(LoginRequiredMixin, StaffuserRequiredMixin, FormView):
+    template_name = "import_dhis2.html"
+    form_class = Dhis2ImportForm
+    success_url = '/'
+
+    def get_context_data(self, **kwargs):
+        context = super(Dhis2ImportView, self).get_context_data(**kwargs)
+        context['title'] = "Import Data For Cycle from DHIS2"
+        return context
+
+    def form_valid(self, form):
+        cycle = form.cleaned_data['cycle']
+        logger.info("launching task",
+                    extra={"task_name": "import_data_from_dhis2", "period": cycle})
+        import_data_from_dhis2.apply_async(args=[cycle], priority=2)
+        messages.add_message(self.request, messages.INFO, 'Successfully started import for cycle %s' % (cycle))
+        return super(Dhis2ImportView, self).form_valid(form)
 
 
 class DataImportView(LoginRequiredMixin, StaffuserRequiredMixin, FormView):
