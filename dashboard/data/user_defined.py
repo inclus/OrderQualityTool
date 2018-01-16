@@ -88,9 +88,19 @@ class NoNegativesComparison(object):
         return template % ("none" if result else "some", values)
 
 
+class NoBlanksComparison(object):
+    def compare(self, group1, group2, constant=100.0):
+        return py_([group1, group2]).flatten_deep().every(lambda x: x is not None).value()
+
+    def text(self, group1, group2, constant, result):
+        values = py_([group1, group2]).flatten_deep().value()
+        template = "%s of the values %s are blank"
+        return template % ("none" if result else "some", values)
+
+
 available_aggregations = {"SUM": sum_aggregation, "AVG": avg_aggregation, "VALUE": values_aggregation}
 available_comparisons = {"LessThan": LessThanComparison, "AreEqual": EqualComparison,
-                         "NoNegatives": NoNegativesComparison}
+                         "NoNegatives": NoNegativesComparison, "NoBlanks": NoBlanksComparison}
 
 
 def build_field_filters(selected_fields):

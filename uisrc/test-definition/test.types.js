@@ -27,6 +27,7 @@ FacilityTest = function (metaData) {
             {id: "LessThan", name:"Differ By LessThan X %"},
             {id: "AreEqual", name:"Are Equal"},
             {id: "NoNegatives", name:"Has No Negatives"},
+            {id: "NoBlanks", name:"Has No Blanks"},
         ],
         cycles:
             [
@@ -76,6 +77,7 @@ var SingleGroupFacilityTest = function (metaData) {
     
     test.comparisons = [
         {id: "NoNegatives", name:"Has No Negatives"},
+        {id: "NoBlanks", name:"Has No Blanks"},
     ];
     return test;
 };
