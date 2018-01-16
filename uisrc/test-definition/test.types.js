@@ -1,12 +1,19 @@
 var models = require("./models");
 var BaseTest = Object.create(null);
-
+var group1Cycles = [
+    {id: "Current", name: "Current Cycle"},
+];
+var group2Cycles = [
+    {id: "Current", name: "Current Cycle"},
+    {id: "Previous", name: "Previous Cycle"}
+];
 FacilityTest = function (metaData) {
     return {
         newGroup:
             function (groupNumber) {
                 return {
-                    cycle: this.cycles[0],
+                    cycles: groupNumber == 1 ? group1Cycles: group2Cycles,
+                    cycle: group1Cycles[0],
                     model: this.models[0],
                     aggregation: this.calculations[0],
                     selected_fields: [],
@@ -29,11 +36,6 @@ FacilityTest = function (metaData) {
             {id: "NoNegatives", name:"Has No Negatives"},
             {id: "NoBlanks", name:"Has No Blanks"},
         ],
-        cycles:
-            [
-                {id: "Current", name: "Current Cycle"},
-                {id: "Next", name: "Next Cycle"},
-                {id: "Previous", name: "Previous Cycle"}],
         calculations:
             [
                 {id: "SUM", name: "Sum"},

@@ -41,7 +41,7 @@
                     <label for="" class="text-center">IN THE</label>
                 </div>
                 <select name="cycles" id="cycles" required
-                        ng-options="option.name for option in ctrl.definition.type.cycles track by option.id"
+                        ng-options="option.name for option in definitionGroup.cycles track by option.id"
                         ng-model="definitionGroup.cycle"></select>
             </div>
             <div class="group-dynamic-control">
