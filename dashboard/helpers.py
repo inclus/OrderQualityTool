@@ -36,6 +36,10 @@ def generate_choices():
     return [(s, s) for s in generate_cycles(now().replace(years=-2), now().replace(years=4))]
 
 
+def generate_past_choices(years=3):
+    return [(s, s) for s in generate_cycles(now().replace(years=-years), now())]
+
+
 def to_date(text):
     month = text.split('-')[1].strip()
     return arrow.get(month, 'MMM YYYY')
