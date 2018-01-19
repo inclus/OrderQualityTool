@@ -3,7 +3,7 @@ from unittest import TestCase
 from nose_parameterized import parameterized
 
 from dashboard.data.entities import LocationData
-from dashboard.data.nn import NNRTIADULTSCheck, NNRTIPAEDCheck
+from dashboard.checks.legacy.nn import NNRTIADULTSCheck, NNRTIPAEDCheck
 from dashboard.helpers import NOT_REPORTING, YES, C_RECORDS, FORMULATION, NO, \
     COMBINED_CONSUMPTION
 

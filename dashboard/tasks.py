@@ -1,29 +1,30 @@
 import re
 from collections import defaultdict
 
-import attr
 import pydash
 import pygogo
 from celery import shared_task
 from django.contrib.admin.models import LogEntry, CHANGE
 
-from dashboard.data.adherence import GuidelineAdherenceCheckAdult1L, GuidelineAdherenceCheckPaed1L
-from dashboard.data.adherence import GuidelineAdherenceCheckAdult2L
-from dashboard.data.blanks import BlanksQualityCheck, MultipleCheck, IsReportingCheck
-from dashboard.data.consumption_patients import ConsumptionAndPatientsQualityCheck
-from dashboard.data.cycles import BalancesMatchCheck, StablePatientVolumesCheck, WarehouseFulfillmentCheck, \
-    StableConsumptionCheck, OrdersOverTimeCheck
+from dashboard.checks.legacy.adherence import GuidelineAdherenceCheckAdult1L, GuidelineAdherenceCheckAdult2L, \
+    GuidelineAdherenceCheckPaed1L
+from dashboard.checks.legacy.blanks import BlanksQualityCheck, MultipleCheck, IsReportingCheck
+from dashboard.checks.legacy.consumption_patients import ConsumptionAndPatientsQualityCheck
+from dashboard.checks.legacy.cycles import BalancesMatchCheck, OrdersOverTimeCheck, StableConsumptionCheck, \
+    WarehouseFulfillmentCheck, StablePatientVolumesCheck
+from dashboard.checks.legacy.negatives import NegativeNumbersQualityCheck
+from dashboard.checks.legacy.nn import NNRTIADULTSCheck, NNRTIPAEDCheck
+from dashboard.checks.user_defined_check import get_check
 from dashboard.data.data_import import ExcelDataImport, DataImport
 from dashboard.data.entities import enrich_location_data
+from dashboard.checks.entities import Definition
 from dashboard.data.html_data_import import HtmlDataImport
-from dashboard.data.negatives import NegativeNumbersQualityCheck
-from dashboard.data.nn import NNRTIADULTSCheck
-from dashboard.data.nn import NNRTIPAEDCheck
-from dashboard.data.utils import facility_has_single_order, timeit
+from dashboard.utils import timeit
+from dashboard.checks.legacy.check import facility_has_single_order
 from dashboard.helpers import YES, get_prev_cycle, WEB, F1, F2, F3, DEFAULT, NO, NAME
 from dashboard.medist.tasks import fetch_reports
 from dashboard.models import Score, Cycle, Consumption, AdultPatientsRecord, PAEDPatientsRecord, MultipleOrderFacility, \
-    Dhis2StandardReport, LocationToPartnerMapping, DashboardUser
+    Dhis2StandardReport, LocationToPartnerMapping, DashboardUser, FacilityTest
 
 logger = pygogo.Gogo(__name__).get_structured_logger()
 
@@ -111,13 +112,32 @@ def add_log_entry(data_import):
 @timeit
 def calculate_scores_for_checks_in_cycle(data_import):
     # type: (DataImport) -> None
-    scores = run_checks(data_import)
-    persist_scores(scores, data_import.cycle)
     persist_consumption(data_import)
     persist_adult_records(data_import)
     persist_paed_records(data_import)
     persist_multiple_order_records(data_import)
+    scores = run_dynamic_checks(data_import)
+    persist_scores(scores, data_import.cycle)
     add_log_entry(data_import)
+
+
+@timeit
+def run_dynamic_checks(report):
+    scores = defaultdict(lambda: defaultdict(dict))
+    other_report = get_report_for_other_cycle(report)
+    facility_tests = FacilityTest.objects.all()
+    for check_obj in facility_tests:
+        definition = Definition.from_string(check_obj.definition)
+        check_to_run = get_check(definition)
+        if check_to_run:
+            for location in report.locs:
+                facility_data = enrich_location_data(location, report)
+                other_facility_data = enrich_location_data(location, other_report)
+                for combination in check_to_run.get_combinations():
+                    scores[location][check_obj.name][combination] = check_to_run.for_each_facility(facility_data,
+                                                                                                   combination,
+                                                                                                   other_facility_data)
+    return scores
 
 
 @timeit

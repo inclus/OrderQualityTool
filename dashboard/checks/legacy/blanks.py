@@ -1,6 +1,6 @@
 import pydash
 
-from dashboard.data.utils import values_for_records, QCheck, facility_not_reporting, multiple_orders_score
+from dashboard.checks.legacy.check import values_for_records, QCheck, facility_not_reporting, multiple_orders_score
 from dashboard.helpers import *
 
 
@@ -36,6 +36,9 @@ class IsReportingCheck(QCheck):
     test = REPORTING
     combinations = [{NAME: DEFAULT}]
 
+    def get_combinations(self):
+        return [DEFAULT]
+
     def for_each_facility(self, facility, combination, previous_cycle_data=None):
         return NO if facility_not_reporting(facility) else YES
 
@@ -43,6 +46,9 @@ class IsReportingCheck(QCheck):
 class MultipleCheck(QCheck):
     test = MULTIPLE_ORDERS
     combinations = [{NAME: DEFAULT}]
+
+    def get_combinations(self):
+        return [DEFAULT]
 
     def for_each_facility(self, facility_data, combination, previous_cycle_data=None):
         return multiple_orders_score(facility_data.location)

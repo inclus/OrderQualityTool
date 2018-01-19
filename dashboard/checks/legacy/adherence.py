@@ -1,7 +1,7 @@
 import pydash
 from dynamic_preferences.registries import global_preferences_registry
 
-from dashboard.data.utils import QCheck, values_for_records, facility_not_reporting, filter_consumption_records
+from dashboard.checks.legacy.check import values_for_records, QCheck, facility_not_reporting, filter_consumption_records
 from dashboard.helpers import *
 
 global_preferences = global_preferences_registry.manager()

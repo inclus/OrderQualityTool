@@ -2,7 +2,8 @@ from json import loads
 
 from django_webtest import WebTest
 
-from dashboard.tests.fake_definition import FakeDefinition, gen_adult_record, gen_paed_record, gen_consumption_record
+from dashboard.tests.fake_definition import FakeDefinition
+from dashboard.tests.test_helpers import gen_adult_record, gen_paed_record, gen_consumption_record
 from hamcrest import *
 
 

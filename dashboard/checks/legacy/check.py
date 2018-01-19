@@ -1,51 +1,7 @@
-import json
-import time
-
 import attr
 import pydash
-import pygogo
-import sys
 
-from prometheus_client import Histogram
-
-from dashboard.helpers import NO, NOT_REPORTING, YES, EXISTING, NEW
-
-TWO_CYCLE = "two_cycle"
-
-IS_INTERFACE = "is_interface"
-
-logger = pygogo.Gogo(__name__).get_structured_logger()
-method_execution_time_histogram = Histogram('qdb_method_execution_time_seconds', 'Time taken to execute the method',
-                                            ['method'])
-
-
-def should_log_time():
-    return 'test' not in sys.argv
-
-
-def timeit(method):
-    def timed(*args, **kw):
-        ts = time.time()
-        result = method(*args, **kw)
-        te = time.time()
-        duration = te - ts
-        method_name = method.__name__
-        method_execution_time_histogram.labels(method=method_name).observe(duration)
-        if should_log_time():
-            logger.info("timer",
-                        extra={
-                            "method": method_name,
-                            "duration": "%2.5f" % duration,
-                            "extra": [str(a)[:30] for a in args]})
-        return result
-
-    return timed
-
-
-def clean_name(row):
-    full_name = row[0].value
-    replace_template = "_" + row[5].value.strip()
-    return full_name.strip().replace(replace_template, "")
+from dashboard.helpers import NEW, EXISTING, NO, NOT_REPORTING, YES
 
 
 def reduce_to_values(records):
@@ -83,12 +39,6 @@ def has_blank(records, fields):
 
 def has_all_blanks(records, fields):
     return pydash.every(values_for_records(fields, records), lambda x: x is None)
-
-
-def write_to_disk(report, file_out):
-    with open(file_out, "w") as outfile:
-        json.dump(report.cs, outfile)
-    return report
 
 
 class QCheck:

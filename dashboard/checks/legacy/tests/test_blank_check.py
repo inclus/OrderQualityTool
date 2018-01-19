@@ -2,7 +2,7 @@ from unittest import TestCase
 
 from nose_parameterized import parameterized
 
-from dashboard.data.blanks import BlanksQualityCheck
+from dashboard.checks.legacy.blanks import BlanksQualityCheck
 from dashboard.data.entities import LocationData
 from dashboard.helpers import *
 

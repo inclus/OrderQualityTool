@@ -2,7 +2,7 @@ from django.test import TestCase
 from hamcrest import *
 
 from dashboard.data.entities import PatientRecord, Location, RegimenLocationCombination
-from dashboard.data.utils import get_patient_total
+from dashboard.checks.legacy.check import get_patient_total
 
 
 class TestGet_patient_total(TestCase):

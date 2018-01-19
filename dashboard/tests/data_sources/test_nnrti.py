@@ -1,7 +1,7 @@
 from django.test import TestCase
 from model_mommy import mommy
 
-from dashboard.data.nn import NNRTIADULTSCheck, NNRTIPAEDCheck
+from dashboard.checks.legacy.nn import NNRTIADULTSCheck, NNRTIPAEDCheck
 from dashboard.helpers import DEFAULT, DF1, NNRTI_ADULTS, DF2, FIELDS, YES, FORMULATION, VALUE, COLUMN, ROWS, \
     FINAL_SCORE, TOTAL, NNRTI_PAED, OTHER
 from dashboard.models import Score, Consumption

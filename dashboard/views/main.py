@@ -12,7 +12,7 @@ from openpyxl.writer.excel import save_virtual_workbook
 
 from dashboard.data.data_import import ExcelDataImport
 from dashboard.data.partner_mapping import load_file
-from dashboard.data.utils import timeit
+from dashboard.utils import timeit
 from dashboard.forms import FileUploadForm, MappingUploadForm, Dhis2ImportForm
 from dashboard.helpers import F3, F2, F1, sort_cycle
 from dashboard.models import Score, LocationToPartnerMapping, FacilityTest

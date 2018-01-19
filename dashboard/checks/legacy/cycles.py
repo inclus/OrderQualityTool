@@ -1,7 +1,7 @@
 import pydash
 
-from dashboard.data.utils import values_for_records, facility_not_reporting, get_consumption_records, \
-    get_patient_records, QCheck, as_float
+from dashboard.checks.legacy.check import values_for_records, as_float, QCheck, facility_not_reporting, \
+    get_consumption_records, get_patient_records
 from dashboard.helpers import *
 
 THRESHOLD = "threshold"

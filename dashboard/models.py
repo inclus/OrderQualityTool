@@ -1,7 +1,6 @@
 import logging
 
 from custom_user.models import AbstractEmailUser
-from django.contrib.postgres.fields import ArrayField
 from django.db import models
 from django.db.models import CharField
 from jsonfield import JSONField

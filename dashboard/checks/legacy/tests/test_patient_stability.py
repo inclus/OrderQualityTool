@@ -1,7 +1,7 @@
 from django.test import TestCase
 from nose_parameterized import parameterized
 
-from dashboard.data.cycles import StablePatientVolumesCheck
+from dashboard.checks.legacy.cycles import StablePatientVolumesCheck
 from dashboard.data.entities import LocationData
 from dashboard.helpers import *
 

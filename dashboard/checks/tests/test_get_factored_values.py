@@ -1,9 +1,9 @@
 from django.test import TestCase
 
-from dashboard.data.user_defined import get_factored_values
+from dashboard.checks.check import get_factored_values
 
 
-class TestGet_factored_values(TestCase):
+class TestFactoredValues(TestCase):
     def test_get_factored_values(self):
         result = get_factored_values(["formA", "formB"], {"formA": 2, "formB": 1},
                                      [["formA", 1, 3], ["formB", 2, 3], ["formA", 0, 0]])

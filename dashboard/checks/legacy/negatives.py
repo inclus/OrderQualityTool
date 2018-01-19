@@ -1,6 +1,6 @@
 import pydash
 
-from dashboard.data.utils import QCheck, get_consumption_records, values_for_records
+from dashboard.checks.legacy.check import values_for_records, QCheck, get_consumption_records
 from dashboard.helpers import *
 
 

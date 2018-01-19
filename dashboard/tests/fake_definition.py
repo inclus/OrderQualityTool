@@ -1,6 +1,4 @@
-from collections import defaultdict
-
-from dashboard.models import AdultPatientsRecord, PAEDPatientsRecord, Consumption
+from dashboard.checks.entities import Definition
 
 
 class FakeDefinition(object):
@@ -46,6 +44,9 @@ class FakeDefinition(object):
         def get(self):
             return self.data
 
+        def getDef(self):
+            return Definition.from_dict(self.data)
+
         def type(self, id):
             self.data["type"] = {"id": id}
             return self
@@ -90,6 +91,10 @@ class FakeDefinition(object):
 
             return self.on_group(f)
 
+        def python_class(self, class_name):
+            self.data['python_class'] = class_name
+            return self
+
     def initial(self):
         group1 = {"name": "G1", "cycle": {"id": "current", "name": "current"}, }
         group2 = {"name": "G2", "cycle": {"id": "current", "name": "current"}, }
@@ -109,30 +114,9 @@ class FakeDefinition(object):
         return self.initial().type("FacilityTwoGroupsAndTracingFormulation").sample(
             **kwargs)
 
-
-def gen_adult_record(name="loc1", district="dis1", formulation="form_a", cycle="cycle1", existing=12, new=1):
-    AdultPatientsRecord.objects.create(
-        name=name,
-        district=district,
-        formulation=formulation,
-        existing=existing,
-        new=new,
-        cycle=cycle)
-
-
-def gen_paed_record(name="loc1", district="dis1", formulation="form_a", cycle="cycle1", existing=20, new=10):
-    PAEDPatientsRecord.objects.create(
-        name=name,
-        district=district,
-        formulation=formulation,
-        existing=existing,
-        new=new,
-        cycle=cycle)
-
-
-def gen_consumption_record(name="loc1", district="dis1", formulation="form_a", cycle="cycle1", **fields):
-    Consumption.objects.create(
-        name=name,
-        district=district,
-        formulation=formulation,
-        cycle=cycle, **fields)
+    def based_on_class(self, class_name):
+        data = {
+            "type": "ClassBased",
+            "pythonClass": class_name
+        }
+        return self.Builder({}).type("ClassBased").python_class(class_name)

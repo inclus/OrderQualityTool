@@ -351,3 +351,5 @@ def enrich_location_data(location, report):
         p_records=p_records,
         a_records=a_records
     )
+
+

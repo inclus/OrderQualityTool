@@ -7,7 +7,7 @@ from termcolor import colored
 from dashboard.data.data_import import ExcelDataImport
 from dashboard.helpers import *
 from dashboard.models import Score, Cycle
-from dashboard.tasks import run_checks, persist_scores
+from dashboard.tasks import persist_scores, run_dynamic_checks
 
 
 def make_cond(cond):
@@ -18,7 +18,6 @@ def make_cond(cond):
 @click.command()
 def command():
     perform_checks()
-
 
 
 def export_results():
@@ -48,7 +47,8 @@ def export_results():
                 no_condition = {DEFAULT: NO}
                 not_reporting_condition = {(DEFAULT): NOT_REPORTING}
                 data = {"cycle": cycle, "test": test.get('test'), 'formulation': test.get('combination')}
-                for key, condition in {YES: yes_condition, NO: no_condition, NOT_REPORTING: not_reporting_condition}.items():
+                for key, condition in {YES: yes_condition, NO: no_condition,
+                                       NOT_REPORTING: not_reporting_condition}.items():
                     filter_key = "%s__icontains" % test.get('test')
                     filter_by = {filter_key: make_cond(condition)}
                     count = Score.objects.filter(cycle=cycle, **filter_by).count()
@@ -60,7 +60,8 @@ def export_results():
                     no_condition = {combination: NO}
                     not_reporting_condition = {combination: NOT_REPORTING}
                     data = {"cycle": cycle, "test": test.get('test'), 'formulation': combination}
-                    for key, condition in {YES: yes_condition, NO: no_condition, NOT_REPORTING: not_reporting_condition}.items():
+                    for key, condition in {YES: yes_condition, NO: no_condition,
+                                           NOT_REPORTING: not_reporting_condition}.items():
                         filter_key = "%s__icontains" % test.get('test')
                         filter_by = {filter_key: make_cond(condition)}
                         count = Score.objects.filter(cycle=cycle, **filter_by).count()
@@ -80,7 +81,7 @@ def perform_checks():
     data = Cycle.objects.filter(title=cycle)
     for cycle in data:
         report = ExcelDataImport(None, cycle.title).build_form_db(cycle)
-        run_checks(report)
+        run_dynamic_checks(report)
         persist_scores(report)
 
     checks = [
@@ -105,10 +106,14 @@ def perform_checks():
             expected = check[key]
             actual = count
             if expected == actual:
-                print colored(test_description + " Passed", "green")
+                print
+                colored(test_description + " Passed", "green")
             else:
                 tolerance = 10
                 diff = abs(float(expected) - float(actual))
                 c = "yellow" if diff <= tolerance else "red"
-                print colored(test_description + " Failed", c), colored("Got %s instead of %s " % (actual, expected), c), colored("diff: %s" % diff, "blue")
-        print "\n"
+                print
+                colored(test_description + " Failed", c), colored("Got %s instead of %s " % (actual, expected),
+                                                                  c), colored("diff: %s" % diff, "blue")
+        print
+        "\n"

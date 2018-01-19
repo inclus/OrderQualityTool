@@ -1,9 +1,9 @@
 from django.test import TestCase
 
-from dashboard.data.user_defined import LessThanComparison
+from dashboard.checks.check import LessThanComparison
 
 
-class TestLess_than_comparison(TestCase):
+class TestLessThanComparison(TestCase):
     def test_differ_by_less_than_50(self):
         self.assertFalse(LessThanComparison().compare(100, 200, 50))
 

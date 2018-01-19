@@ -3,7 +3,7 @@ from unittest import TestCase
 from nose_parameterized import parameterized
 
 from dashboard.data.entities import LocationData
-from dashboard.data.negatives import NegativeNumbersQualityCheck
+from dashboard.checks.legacy.negatives import NegativeNumbersQualityCheck
 from dashboard.helpers import NOT_REPORTING, YES, C_RECORDS, OPENING_BALANCE, F1_QUERY, FORMULATION, NO
 
 has_no_data = LocationData.migrate_from_dict({})

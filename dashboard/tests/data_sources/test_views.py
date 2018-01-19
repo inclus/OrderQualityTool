@@ -4,7 +4,7 @@ from django.core.urlresolvers import reverse
 from django_webtest import WebTest
 from model_mommy import mommy
 
-from dashboard.data.nn import NNRTIPAEDCheck, NNRTIADULTSCheck
+from dashboard.checks.legacy.nn import NNRTIPAEDCheck, NNRTIADULTSCheck
 from dashboard.helpers import DEFAULT, YES, F1, F1_QUERY, DF1, DF2, F1_PATIENT_QUERY, PACKS_ORDERED, \
     ESTIMATED_NUMBER_OF_NEW_PREGNANT_WOMEN, ESTIMATED_NUMBER_OF_NEW_ART_PATIENTS, \
     QUANTITY_REQUIRED_FOR_CURRENT_PATIENTS, MONTHS_OF_STOCK_ON_HAND, CLOSING_BALANCE, LOSES_ADJUSTMENTS, \

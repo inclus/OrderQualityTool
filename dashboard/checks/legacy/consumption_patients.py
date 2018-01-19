@@ -1,6 +1,6 @@
 from collections import defaultdict
 
-from dashboard.data.utils import get_patient_total, get_consumption_totals, has_all_blanks, QCheck, \
+from dashboard.checks.legacy.check import get_consumption_totals, get_patient_total, has_all_blanks, QCheck, \
     get_consumption_records, get_patient_records
 from dashboard.helpers import *
 

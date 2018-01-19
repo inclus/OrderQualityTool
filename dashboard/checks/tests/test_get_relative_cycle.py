@@ -1,16 +1,10 @@
 from django.test import TestCase
 
-from dashboard.data.user_defined import parse_cycle
-from dashboard.views.definition import DefinitionGroup
+from dashboard.checks.check_preview import parse_cycle
+from dashboard.checks.entities import DefinitionGroup
 
 
-class TestGet_relative_cycle(TestCase):
-    def test_that_you_can_get_next_cycle(self):
-        group = DefinitionGroup.from_dict({"cycle": {"id": "Next", "name": ""}, "model": {}})
-        self.assertEqual(parse_cycle("May - Jun 2016", group), "Jul - Aug 2016")
-        self.assertEqual(parse_cycle("Jul - Aug 2016", group), "Sep - Oct 2016")
-        self.assertEqual(parse_cycle("Sep - Oct 2016", group), "Nov - Dec 2016")
-        self.assertEqual(parse_cycle("Nov - Dec 2016", group), "Jan - Feb 2017")
+class TestCycleLookup(TestCase):
 
     def test_that_you_can_get_current_cycle(self):
         group = DefinitionGroup.from_dict({"cycle": {"id": "Current", "name": ""}, "model": {}})

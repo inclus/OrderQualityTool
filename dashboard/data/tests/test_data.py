@@ -4,14 +4,14 @@ from collections import defaultdict
 from django.contrib.admin.models import LogEntry
 from django.test import TestCase
 
-from dashboard.data.adherence import GuidelineAdherenceCheckAdult1L, calculate_score
-from dashboard.data.blanks import BlanksQualityCheck, IsReportingCheck, MultipleCheck
+from dashboard.checks.legacy.adherence import GuidelineAdherenceCheckAdult1L, calculate_score
+from dashboard.checks.legacy.blanks import BlanksQualityCheck, IsReportingCheck, MultipleCheck
 from dashboard.data.data_import import ExcelDataImport
 from dashboard.data.entities import enrich_location_data, LocationData, PatientRecord
 from dashboard.data.html_data_import import HtmlDataImport
 from dashboard.data.tests.test_html_data_import import get_test_output_from_fixture
-from dashboard.data.utils import clean_name, get_patient_total, get_consumption_totals, \
-    values_for_records, get_consumption_records, get_patient_records
+from dashboard.checks.legacy.check import values_for_records, get_consumption_totals, get_patient_total, \
+    get_consumption_records, get_patient_records
 from dashboard.helpers import *
 from dashboard.models import Score, Consumption, PAEDPatientsRecord, AdultPatientsRecord, MultipleOrderFacility, \
     LocationToPartnerMapping
@@ -213,3 +213,9 @@ class GuidelineAdherenceAdult1LTestCase(TestCase):
         check = GuidelineAdherenceCheckAdult1L()
         result = check.for_each_facility(data, check.combinations[0])
         self.assertEqual(result, YES)
+
+
+def clean_name(row):
+    full_name = row[0].value
+    replace_template = "_" + row[5].value.strip()
+    return full_name.strip().replace(replace_template, "")

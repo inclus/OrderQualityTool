@@ -3,13 +3,13 @@ from collections import defaultdict
 import pydash
 from dynamic_preferences.registries import global_preferences_registry
 
-from dashboard.data.adherence import GuidelineAdherenceCheckAdult1L, GuidelineAdherenceCheckAdult2L, \
+from dashboard.checks.legacy.adherence import GuidelineAdherenceCheckAdult1L, GuidelineAdherenceCheckAdult2L, \
     GuidelineAdherenceCheckPaed1L
-from dashboard.data.consumption_patients import ConsumptionAndPatientsQualityCheck
-from dashboard.data.cycles import OrdersOverTimeCheck, BalancesMatchCheck, StableConsumptionCheck, \
+from dashboard.checks.legacy.consumption_patients import ConsumptionAndPatientsQualityCheck
+from dashboard.checks.legacy.cycles import OrdersOverTimeCheck, BalancesMatchCheck, StableConsumptionCheck, \
     StablePatientVolumesCheck
-from dashboard.data.negatives import NegativeNumbersQualityCheck
-from dashboard.data.nn import NNRTIADULTSCheck, NNRTIPAEDCheck
+from dashboard.checks.legacy.negatives import NegativeNumbersQualityCheck
+from dashboard.checks.legacy.nn import NNRTIADULTSCheck, NNRTIPAEDCheck
 from dashboard.helpers import *
 from dashboard.helpers import ORDER_FORM_FREE_OF_GAPS, ORDER_FORM_FREE_OF_NEGATIVE_NUMBERS, DIFFERENT_ORDERS_OVER_TIME, \
     CLOSING_BALANCE_MATCHES_OPENING_BALANCE, CONSUMPTION_AND_PATIENTS, STABLE_CONSUMPTION, WAREHOUSE_FULFILMENT, \

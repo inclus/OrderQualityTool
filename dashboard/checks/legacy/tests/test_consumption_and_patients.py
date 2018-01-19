@@ -1,7 +1,7 @@
 from django.test import TestCase
 from nose_parameterized import parameterized
 
-from dashboard.data.consumption_patients import ConsumptionAndPatientsQualityCheck
+from dashboard.checks.legacy.consumption_patients import ConsumptionAndPatientsQualityCheck
 from dashboard.data.entities import LocationData
 from dashboard.helpers import *
 

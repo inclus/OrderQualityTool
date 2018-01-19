@@ -7,7 +7,7 @@ from django.forms import model_to_dict
 
 from dashboard.data.data_import import DataImport
 from dashboard.data.entities import HtmlDataImportRecord
-from dashboard.data.utils import timeit
+from dashboard.utils import timeit
 from dashboard.helpers import PAED_PATIENT_REPORT, ADULT_PATIENT_REPORT, CONSUMPTION_REPORT, HTML_PARSER
 
 logger = pygogo.Gogo(__name__).get_structured_logger()
