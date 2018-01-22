@@ -35,21 +35,25 @@ class DefinitionSerializer(serializers.Serializer):
     type = serializers.DictField()
     operator = OptionField(required=False)
     operatorConstant = serializers.CharField(required=False)
-
+    python_class = serializers.CharField(required=False)
 
     def get_locations_and_cycles_with_data(self):
-        definition = Definition.from_dict(self.validated_data)
+        definition = self.get_definition()
         check = get_check(definition)
         if check:
             return check.get_locations_and_cycles()
         return {}
+
+    def get_definition(self):
+        definition = Definition.from_dict(self.validated_data)
+        return definition
 
 
 class DefinitionSampleSerializer(DefinitionSerializer):
     sample = SampleSerializer()
 
     def get_preview_data(self):
-        definition = Definition.from_dict(self.validated_data)
+        definition = self.get_definition()
         check = get_check(definition)
         if check:
             return check.get_preview_data()

@@ -1,10 +1,23 @@
 from json import loads
 
+from django.test import TestCase
 from django_webtest import WebTest
 
 from dashboard.tests.fake_definition import FakeDefinition
 from dashboard.tests.test_helpers import gen_adult_record, gen_paed_record, gen_consumption_record
 from hamcrest import *
+
+from dashboard.views.serializers import DefinitionSerializer
+
+
+class DefinitionSerializerTestCase(TestCase):
+    def test_that_serializer_can_handle_test_of_type_class_based(self):
+        serializer = DefinitionSerializer(
+            data={"python_class": "test", "groups": [], "type": {"id": "ClassBased", "name": "ClassBased"}})
+        self.assertTrue(serializer.is_valid())
+        definition = serializer.get_definition()
+        self.assertEqual(definition.type.get("id"), "ClassBased")
+        self.assertEqual(definition.python_class, "test")
 
 
 class PreviewLocationsViewTestCase(WebTest):
@@ -158,7 +171,6 @@ class PreviewViewTestCase(WebTest):
         response = self.app.post_json(self.url, user="testuser", params=definition_builder.get(), expect_errors=True)
         json_response = loads(response.content.decode('utf8'))
 
-
         assert_that(json_response, has_entry(equal_to("groups"), has_item(
             has_entries(
                 {
@@ -256,7 +268,7 @@ class PreviewViewTestCase(WebTest):
                     "aggregation": "VALUE",
                     "values": equal_to([['form1', 10.0, 20.0], ['form2', 40.0, 30.0]]),
                     "headers": equal_to(['opening_balance', 'closing_balance']),
-                    "result": equal_to([10.0,20.0,40.0,30.0])
+                    "result": equal_to([10.0, 20.0, 40.0, 30.0])
                 }
 
             )
