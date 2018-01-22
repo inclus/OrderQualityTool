@@ -1,4 +1,6 @@
 var testTypes = require("./test.types");
+var _ = require("lodash");
+
 var testDefinitionController = ["$scope", "metadataService", "previewService", function ($scope, metadataService, preview) {
     var ctrl = this;
 
@@ -10,7 +12,15 @@ var testDefinitionController = ["$scope", "metadataService", "previewService", f
             });
         }
     };
-
+    
+    ctrl.getFormulationsForFactors = function(group) {
+        if (group.model.hasTrace) {
+            return _.chain(group.model.tracingFormulations).map("formulations").flatten().value();
+        }else {
+            return group.selected_formulations;
+        }
+    };
+    
     ctrl.previewDefinition = function (definition) {
         preview.show(definition);
     };
