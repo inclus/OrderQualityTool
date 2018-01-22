@@ -7,7 +7,8 @@ from termcolor import colored
 from dashboard.data.data_import import ExcelDataImport
 from dashboard.helpers import *
 from dashboard.models import Score, Cycle
-from dashboard.tasks import persist_scores, run_dynamic_checks
+from dashboard.checks.tasks import run_dynamic_checks
+from dashboard.data.tasks import persist_scores
 
 
 def make_cond(cond):

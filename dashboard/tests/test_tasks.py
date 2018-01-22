@@ -5,8 +5,8 @@ from django.test import TestCase
 from dashboard.data.entities import Location, PatientRecord, ConsumptionRecord
 from dashboard.data.tests.test_data import FakeReport
 from dashboard.models import Score, Consumption, AdultPatientsRecord, PAEDPatientsRecord, Cycle, MultipleOrderFacility
-from dashboard.tasks import persist_scores, persist_consumption, persist_adult_records, persist_paed_records, \
-    get_report_for_other_cycle, persist_multiple_order_records
+from dashboard.data.tasks import persist_consumption, persist_adult_records, persist_paed_records, \
+    persist_multiple_order_records, get_report_for_other_cycle, persist_scores
 
 
 class TaskTestCase(TestCase):
