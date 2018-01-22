@@ -95,6 +95,10 @@ var getTypeFromJson = function (metaData, typeData) {
     if (typeData.id === "FacilityOneGroup") {
         return SingleGroupFacilityTest(metaData);
     }
+
+    if (typeData.id === "ClassBased") {
+        return ClassBasedTest(metaData);
+    }
 };
 
 var buildDefinition = function (inputValue, metaData) {
@@ -102,10 +106,26 @@ var buildDefinition = function (inputValue, metaData) {
     definition.type = getTypeFromJson(metaData, definition.type);
     return definition;
 };
-
+var ClassBasedTest = function (metaData) {
+    var test = {};
+    test.id = "ClassBased";
+    test.name = "Class Based Facility Check";
+    test.getGroups = function (metaData) {
+        return [
+        ];
+    };
+    
+    test.calculations = [
+    ];
+    
+    test.comparisons = [
+    ];
+    return test;
+};
 module.exports = {
     FacilityTest: FacilityTest,
     FacilityTestWithTracingFormulation: FacilityTestWithTracingFormulation,
     SingleGroupFacilityTest: SingleGroupFacilityTest,
+    ClassBasedTest: ClassBasedTest,
     buildDefinition: buildDefinition
 };
