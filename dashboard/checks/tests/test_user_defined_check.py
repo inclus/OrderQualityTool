@@ -10,7 +10,7 @@ from dashboard.data.entities import F1_PATIENT_QUERY
 from dashboard.data.entities import LocationData
 from dashboard.helpers import A_RECORDS, NEW, EXISTING, \
     COMBINED_CONSUMPTION, ESTIMATED_NUMBER_OF_NEW_ART_PATIENTS, ESTIMATED_NUMBER_OF_NEW_PREGNANT_WOMEN
-from dashboard.helpers import NOT_REPORTING, YES, C_RECORDS, OPENING_BALANCE, F1_QUERY, FORMULATION, NO
+from dashboard.helpers import C_RECORDS, OPENING_BALANCE, F1_QUERY, FORMULATION, NO
 
 
 class UserDefinedCheckTestCase(TestCase):

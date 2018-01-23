@@ -151,6 +151,10 @@ class DefinitionFactory(object):
             self.data["operatorConstant"] = ratio
             return self
 
+        def has_no_blanks(self):
+            self.data["operator"] = {"id": "NoBlanks", "name": "NoBlanks"}
+            return self
+
     def blank(self):
         return self.Builder({"groups": [{"fields": [], "formulations": [], "model": {}},
                                         {"fields": [], "formulations": [], "model": {}}]})
@@ -237,7 +241,7 @@ def no_blanks_check():
     builder.add_group(0, VALUE, "current", "Consumption",
                       ["opening_balance", "consumption", "closing_balance", "estimated_number_of_new_patients"],
                       [])
-    builder.has_no_negatives()
+    builder.has_no_blanks()
     return builder.get()
 
 

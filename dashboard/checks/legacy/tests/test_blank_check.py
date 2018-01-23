@@ -38,7 +38,7 @@ class BlankCheckTestCase(TestCase):
         self.assertEquals(result, expected)
 
     def test_should_fail_if_has_more_than_2_blanks(self):
-        data =  LocationData.migrate_from_dict({
+        data = LocationData.migrate_from_dict({
             WEB_PAPER: "-",
             C_RECORDS:
                 [
