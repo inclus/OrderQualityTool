@@ -173,7 +173,7 @@ def guideline_adherence_adult2l_check():
                       ["Atazanavir/Ritonavir (ATV/r) 300mg/100mg [Pack 30]"])
     builder.add_group(1, "SUM", "current", "Consumption", ["estimated_number_of_new_patients"],
                       ["Lopinavir/Ritonavir (LPV/r) 200mg/50mg [Pack 120]"])
-    builder.is_less_than(73)
+    builder.at_least_of_total(73)
 
     return builder.get()
 
@@ -185,7 +185,7 @@ def guideline_paed1l_check():
     builder.add_group(1, "SUM", "current", "Consumption", ["estimated_number_of_new_patients"],
                       ["Zidovudine/Lamivudine/Nevirapine (AZT/3TC/NVP) 60mg/30mg/50mg [Pack 60]",
                        "Zidovudine/Lamivudine (AZT/3TC) 60mg/30mg [Pack 60]"])
-    builder.is_less_than(80)
+    builder.at_least_of_total(80)
 
     return builder.get()
 
