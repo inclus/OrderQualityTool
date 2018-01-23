@@ -15,8 +15,8 @@ class TestNo_negatives_comparison(TestCase):
         self.assertTrue(result)
 
     def test_can_fail(self):
-        result = no_negatives_comparison(1, -3)
-        self.assertFalse(result)
+        self.assertFalse(no_negatives_comparison(1, -3))
+        self.assertFalse(no_negatives_comparison(-3, None))
 
     def test_can_fail_with_list(self):
         result = no_negatives_comparison([11, 212, -3], -3)

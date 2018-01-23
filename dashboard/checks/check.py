@@ -1,5 +1,6 @@
 import attr
 from pydash import py_, pick
+from pymaybe import maybe
 
 from dashboard.helpers import get_prev_cycle
 
@@ -46,12 +47,14 @@ def values_aggregation(values):
 
 class LessThanComparison(object):
     def compare(self, group1, group2, constant=100.0):
+        group2 = maybe(group2).or_else(0)
         difference = abs(group2 - group1)
         margin = (constant / 100.0) * group1
         return difference < margin
 
     def text(self, group1, group2, constant, result):
         template = "%d and %d differ by %s than %s"
+        group2 = maybe(group2).or_else(0)
         return template % (group1, group2, "less" if result else "more", constant)
 
 

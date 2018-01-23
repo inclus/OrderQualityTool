@@ -1,13 +1,16 @@
 from django.test import TestCase
 from nose_parameterized import parameterized
 
-from dashboard.checks.entities import DefinitionGroup, Definition
+from dashboard.checks.check_builder import DefinitionFactory, guideline_adherence_adult1l_check, no_negatives_check
+from dashboard.checks.entities import DefinitionGroup
 from dashboard.checks.legacy.adherence import GuidelineAdherenceCheckAdult1L
+from dashboard.checks.legacy.negatives import NegativeNumbersQualityCheck
 from dashboard.checks.user_defined_check import UserDefinedFacilityCheck, get_check_from_dict
-from dashboard.data.entities import LocationData, F1_PATIENT_QUERY
-from dashboard.helpers import FORMULATION, F1_QUERY, OPENING_BALANCE, C_RECORDS, A_RECORDS, NEW, EXISTING, \
+from dashboard.data.entities import F1_PATIENT_QUERY
+from dashboard.data.entities import LocationData
+from dashboard.helpers import A_RECORDS, NEW, EXISTING, \
     COMBINED_CONSUMPTION, ESTIMATED_NUMBER_OF_NEW_ART_PATIENTS, ESTIMATED_NUMBER_OF_NEW_PREGNANT_WOMEN
-from dashboard.checks.check_builder import DefinitionFactory, guideline_adherence_adult1l_check
+from dashboard.helpers import NOT_REPORTING, YES, C_RECORDS, OPENING_BALANCE, F1_QUERY, FORMULATION, NO
 
 
 class UserDefinedCheckTestCase(TestCase):
@@ -60,18 +63,24 @@ no_data = LocationData.migrate_from_dict({
     'status': 'reporting',
 
     C_RECORDS: [
-        {FORMULATION: "Tenofovir/Lamivudine/Efavirenz (TDF/3TC/EFV) 300mg/300mg/600mg[Pack 30]", ESTIMATED_NUMBER_OF_NEW_ART_PATIENTS: 40, ESTIMATED_NUMBER_OF_NEW_PREGNANT_WOMEN: 20},
-        {FORMULATION: "AZT/3TC 300/150mg", ESTIMATED_NUMBER_OF_NEW_ART_PATIENTS: 40, ESTIMATED_NUMBER_OF_NEW_PREGNANT_WOMEN: 20},
-        {FORMULATION: "AZT/3TC/NVP 300/150/200mg", ESTIMATED_NUMBER_OF_NEW_ART_PATIENTS: 40, ESTIMATED_NUMBER_OF_NEW_PREGNANT_WOMEN: 20}
+        {FORMULATION: "Tenofovir/Lamivudine/Efavirenz (TDF/3TC/EFV) 300mg/300mg/600mg[Pack 30]",
+         ESTIMATED_NUMBER_OF_NEW_ART_PATIENTS: 40, ESTIMATED_NUMBER_OF_NEW_PREGNANT_WOMEN: 20},
+        {FORMULATION: "AZT/3TC 300/150mg", ESTIMATED_NUMBER_OF_NEW_ART_PATIENTS: 40,
+         ESTIMATED_NUMBER_OF_NEW_PREGNANT_WOMEN: 20},
+        {FORMULATION: "AZT/3TC/NVP 300/150/200mg", ESTIMATED_NUMBER_OF_NEW_ART_PATIENTS: 40,
+         ESTIMATED_NUMBER_OF_NEW_PREGNANT_WOMEN: 20}
     ]
 })
 yes_data = LocationData.migrate_from_dict({
     'status': 'reporting',
 
     C_RECORDS: [
-        {FORMULATION: "Tenofovir/Lamivudine/Efavirenz (TDF/3TC/EFV) 300mg/300mg/600mg[Pack 30]", ESTIMATED_NUMBER_OF_NEW_ART_PATIENTS: 40, ESTIMATED_NUMBER_OF_NEW_PREGNANT_WOMEN: 50},
-        {FORMULATION: "AZT/3TC 300/150mg", ESTIMATED_NUMBER_OF_NEW_ART_PATIENTS: 3, ESTIMATED_NUMBER_OF_NEW_PREGNANT_WOMEN: 2},
-        {FORMULATION: "AZT/3TC/NVP 300/150/200mg", ESTIMATED_NUMBER_OF_NEW_ART_PATIENTS: 3, ESTIMATED_NUMBER_OF_NEW_PREGNANT_WOMEN: 2}
+        {FORMULATION: "Tenofovir/Lamivudine/Efavirenz (TDF/3TC/EFV) 300mg/300mg/600mg[Pack 30]",
+         ESTIMATED_NUMBER_OF_NEW_ART_PATIENTS: 40, ESTIMATED_NUMBER_OF_NEW_PREGNANT_WOMEN: 50},
+        {FORMULATION: "AZT/3TC 300/150mg", ESTIMATED_NUMBER_OF_NEW_ART_PATIENTS: 3,
+         ESTIMATED_NUMBER_OF_NEW_PREGNANT_WOMEN: 2},
+        {FORMULATION: "AZT/3TC/NVP 300/150/200mg", ESTIMATED_NUMBER_OF_NEW_ART_PATIENTS: 3,
+         ESTIMATED_NUMBER_OF_NEW_PREGNANT_WOMEN: 2}
     ]
 })
 
@@ -91,3 +100,39 @@ class TestGuideLineAdherence(TestCase):
         self.assertEqual(legacy_check_result, new_check_result)
         self.assertEqual(expected_result, new_check_result)
 
+
+has_no_data = LocationData.migrate_from_dict({})
+has_no_negatives = LocationData.migrate_from_dict({
+    C_RECORDS: [
+        {OPENING_BALANCE: 3, FORMULATION: F1_QUERY}
+    ]
+})
+
+has_blanks = LocationData.migrate_from_dict({
+    C_RECORDS: [
+        {OPENING_BALANCE: None, FORMULATION: F1_QUERY}
+    ]
+})
+
+has_negatives = LocationData.migrate_from_dict({
+    C_RECORDS: [
+        {OPENING_BALANCE: -3, FORMULATION: F1_QUERY}
+    ]
+})
+
+
+class NegativeCheckTestCase(TestCase):
+    @parameterized.expand([
+        # ("no data", has_no_data, NOT_REPORTING),
+        # ("no negatives", has_no_negatives, YES),
+        ("has negatives", has_negatives, NO),
+        # ("has blanks", has_blanks, YES),
+    ])
+    def test_check(self, name, data, expected):
+        new_check = get_check_from_dict(no_negatives_check())
+        legacy_check = NegativeNumbersQualityCheck()
+
+        new_check_result = new_check.for_each_facility(data, {"name": "DEFAULT"})
+        legacy_check_result = legacy_check.for_each_facility(data, legacy_check.combinations[0])
+        self.assertEqual(legacy_check_result, new_check_result)
+        self.assertEqual(expected, new_check_result)

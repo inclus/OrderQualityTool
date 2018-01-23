@@ -1,6 +1,7 @@
 import importlib
 
 from pydash import py_
+from pymaybe import maybe
 
 from dashboard.checks.check import as_float_or_1, get_factored_values, as_values, available_comparisons
 from dashboard.checks.check_preview import DBBasedCheckPreview
@@ -24,7 +25,7 @@ class UserDefinedFacilityCheck(DBBasedCheckPreview):
         return comparison_result
 
     def _group_values_from_location_data(self, group, facility_data, other_facility_data):
-        data_source = other_facility_data if group.cycle.id is "Previous" else facility_data
+        data_source = other_facility_data if group.cycle and group.cycle.id is "Previous" else facility_data
         records = group.model.get_records(data_source)
 
         if records:
@@ -41,10 +42,12 @@ class UserDefinedFacilityCheck(DBBasedCheckPreview):
             }
 
     def get_values_from_records(self, records, group):
-        formulations = [f.lower() for f in self.get_formulations(group)]
+        try:
+            formulations = [f.lower() for f in maybe(self.get_formulations(group)).or_else([])]
+        except AttributeError as e:
+            formulations = []
         return py_(records).reject(lambda x: x.formulation.lower() not in formulations).map(
             as_values(group.selected_fields)).value()
-
 
 class UserDefinedFacilityTracedCheck(UserDefinedFacilityCheck):
     def get_combinations(self):
@@ -54,7 +57,7 @@ class UserDefinedFacilityTracedCheck(UserDefinedFacilityCheck):
         if sample_tracer and "name" in sample_tracer:
             return py_(group.model.tracing_formulations).filter(
                 {"name": sample_tracer.get("name")}).first().value().get('formulations')
-        return group.model.tracing_formulations[0].get('formulations')
+        return maybe(py_(group.model.tracing_formulations).first().value()).or_else(lambda: {}).get('formulations')
 
 
 class UserDefinedSingleGroupFacilityTracedCheck(UserDefinedFacilityCheck):

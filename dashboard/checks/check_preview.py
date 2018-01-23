@@ -1,4 +1,5 @@
 from pydash import py_
+from pymaybe import maybe
 
 from dashboard.checks.check import as_float_or_1, get_factored_values, available_aggregations, available_comparisons, \
     cycle_lookups, current
@@ -102,7 +103,6 @@ class DBBasedCheckPreview(object):
     def compare_results(self, groups):
         values = py_(groups).reject(lambda x: x is None).map('factored_values').map(skip_formulation).flatten().reject(lambda x: x is None).value()
         value_count = len(values)
-
         if self.definition.operator and value_count > 0:
             comparison_class = available_comparisons.get(self.definition.operator.id)
             comparator = comparison_class()
@@ -112,7 +112,7 @@ class DBBasedCheckPreview(object):
             gs = py_(groups).reject(lambda x: x is None).value()
             if comparator and gs:
                 group1_result = groups[0].get('result')
-                group2_result = groups[1].get('result')
+                group2_result = maybe(groups[1]).or_else({}).get('result')
                 comparison_result = comparator.compare(group1_result, group2_result, constant=operator_constant)
                 result_text = comparator.text(group1_result, group2_result, operator_constant, comparison_result)
                 result = "YES" if comparison_result else "NO"
