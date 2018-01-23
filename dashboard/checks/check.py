@@ -85,9 +85,21 @@ class NoBlanksComparison(object):
         return template % ("none" if result else "some", values)
 
 
+class AtLeastNOfTotal(object):
+    def compare(self, group1, group2, constant=100.0):
+        total = group2 + group1
+        adjusted_total = (constant / 100.0) * total
+        return group1 >= adjusted_total
+
+    def text(self, group1, group2, constant, result):
+        template = "%d %s %d percent of %d"
+        return template % (group1,  "is at least" if result else "is less than", constant, group2)
+
+
 available_aggregations = {"SUM": sum_aggregation, "AVG": avg_aggregation, "VALUE": values_aggregation}
 available_comparisons = {"LessThan": LessThanComparison, "AreEqual": EqualComparison,
-                         "NoNegatives": NoNegativesComparison, "NoBlanks": NoBlanksComparison}
+                         "NoNegatives": NoNegativesComparison, "NoBlanks": NoBlanksComparison,
+                         "AtLeastNOfTotal": AtLeastNOfTotal}
 
 
 def as_values(fields):

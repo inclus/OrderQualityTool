@@ -56,7 +56,6 @@ def parse_periods_from_bi_monthly_cycle(bi_monthly_cycle):
         year = matches.group(3)
         second_month_match = matches.group(2)
         first_month_match = matches.group(1)
-        print(year, first_month_match, second_month_match)
         first_month = "%s%s" % (year, to_mon(first_month_match))
         second_month = "%s%s" % (year, to_mon(second_month_match))
 

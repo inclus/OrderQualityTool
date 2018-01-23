@@ -1,6 +1,7 @@
 import json
 
 import attr
+from pydash import py_
 
 
 @attr.s(cmp=True, frozen=True)
@@ -84,7 +85,7 @@ class Definition(object):
     @staticmethod
     def from_dict(data):
         return Definition(
-            groups=map(DefinitionGroup.from_dict, data.get('groups', [])),
+            groups=py_(data.get('groups', [])).map(DefinitionGroup.from_dict).value(),
             type=data.get('type'),
             python_class=data.get('python_class'),
             sample=data.get('sample'),

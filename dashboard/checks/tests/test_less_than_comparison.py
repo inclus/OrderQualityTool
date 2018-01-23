@@ -1,6 +1,6 @@
 from django.test import TestCase
 
-from dashboard.checks.check import LessThanComparison
+from dashboard.checks.check import LessThanComparison, AtLeastNOfTotal
 
 
 class TestLessThanComparison(TestCase):
@@ -11,3 +11,14 @@ class TestLessThanComparison(TestCase):
         self.assertTrue(LessThanComparison().compare(10, 14, 50))
         self.assertTrue(LessThanComparison().compare(14, 9, 50))
         self.assertTrue(LessThanComparison().compare(10, 10, 50))
+
+
+class TestAtLeastNOfTotalComparison(TestCase):
+    def test_comparison(self):
+        self.assertTrue(AtLeastNOfTotal().compare(200, 100, 50))
+        self.assertEqual(AtLeastNOfTotal().text(200, 100, 50, True), "200 is at least 50 percent of 100")
+        self.assertTrue(AtLeastNOfTotal().compare(10, 14, 10))
+        self.assertTrue(AtLeastNOfTotal().compare(14, 9, 50))
+        self.assertFalse(AtLeastNOfTotal().compare(10, 60, 50))
+        self.assertEqual(AtLeastNOfTotal().text(10, 60, 50, False), "10 is less than 50 percent of 60")
+

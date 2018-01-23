@@ -29,6 +29,9 @@ def parse_cycle(sample_cycle, group):
     return lookup(sample_cycle)
 
 
+def skip_formulation(collection):
+    return py_(collection).flatten().value()[1:]
+
 class DBBasedCheckPreview(object):
     def __init__(self, definition):
         self.definition = definition
@@ -43,8 +46,8 @@ class DBBasedCheckPreview(object):
             values_for_group = self._group_values_from_db(group, sample_cycle, sample_location, sample_tracer)
             groups.append(values_for_group)
         data = {'groups': groups, 'factored_groups': list()}
-        comparison_result, comparison_text = self.compare_results(groups, self.get_result_key(sample_tracer))
-        data['result'] = comparison_result
+        comparison_result, comparison_text = self.compare_results(groups)
+        data['result'] = {self.get_result_key(sample_tracer): comparison_result}
         data['resultText'] = comparison_text
         return data
 
@@ -96,8 +99,11 @@ class DBBasedCheckPreview(object):
         locations = py_(raw_locations).uniq().group_by('name').map(as_loc).sort_by("name").value()
         return {"locations": locations}
 
-    def compare_results(self, groups, combination):
-        if self.definition.operator:
+    def compare_results(self, groups):
+        values = py_(groups).reject(lambda x: x is None).map('factored_values').map(skip_formulation).flatten().reject(lambda x: x is None).value()
+        value_count = len(values)
+
+        if self.definition.operator and value_count > 0:
             comparison_class = available_comparisons.get(self.definition.operator.id)
             comparator = comparison_class()
             operator_constant = self.definition.operator_constant
@@ -110,8 +116,8 @@ class DBBasedCheckPreview(object):
                 comparison_result = comparator.compare(group1_result, group2_result, constant=operator_constant)
                 result_text = comparator.text(group1_result, group2_result, operator_constant, comparison_result)
                 result = "YES" if comparison_result else "NO"
-                return {combination: result}, result_text
-        return {combination: "N\A"}, None
+                return result, result_text
+        return "NOT_REPORTING", None
 
     def get_result_key(self, sample_tracer):
         if sample_tracer and "name" in sample_tracer:

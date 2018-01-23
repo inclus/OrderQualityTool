@@ -4,6 +4,7 @@ from pydash import py_
 
 from dashboard.checks.check import as_float_or_1, get_factored_values, as_values, available_comparisons
 from dashboard.checks.check_preview import DBBasedCheckPreview
+from dashboard.checks.entities import Definition
 from dashboard.helpers import DEFAULT, NO, YES, N_A
 
 CLASS_BASED = "ClassBased"
@@ -19,7 +20,7 @@ class UserDefinedFacilityCheck(DBBasedCheckPreview):
         for group in self.definition.groups:
             values_for_group = self._group_values_from_location_data(group, facility_data, other_facility_data)
             groups.append(values_for_group)
-        comparison_result, comparison_text = self.compare_results(groups, combination)
+        comparison_result, comparison_text = self.compare_results(groups)
         return comparison_result
 
     def _group_values_from_location_data(self, group, facility_data, other_facility_data):
@@ -58,7 +59,7 @@ class UserDefinedFacilityTracedCheck(UserDefinedFacilityCheck):
 
 class UserDefinedSingleGroupFacilityTracedCheck(UserDefinedFacilityCheck):
 
-    def compare_results(self, groups, sample_tracer):
+    def compare_results(self, groups):
         if self.definition.operator:
             comparison_class = available_comparisons.get(self.definition.operator.id)
             comparator = comparison_class()
@@ -72,8 +73,8 @@ class UserDefinedSingleGroupFacilityTracedCheck(UserDefinedFacilityCheck):
                 comparison_result = comparator.compare(group1_result, group2_result, constant=operator_constant)
                 result_text = comparator.text(group1_result, group2_result, operator_constant, comparison_result)
                 result = YES if comparison_result else NO
-                return {DEFAULT: result}, result_text
-        return {DEFAULT: N_A}, None
+                return result, result_text
+        return N_A, None
 
 
 testTypes = {
@@ -81,6 +82,11 @@ testTypes = {
     "FacilityOneGroup": UserDefinedSingleGroupFacilityTracedCheck,
     "FacilityTwoGroupsAndTracingFormulation": UserDefinedFacilityTracedCheck,
 }
+
+
+def get_check_from_dict(data):
+    definition = Definition.from_dict(data)
+    return get_check(definition)
 
 
 def get_check(definition):

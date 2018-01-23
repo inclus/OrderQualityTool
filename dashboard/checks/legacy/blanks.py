@@ -8,6 +8,9 @@ class BlanksQualityCheck(QCheck):
     test = ORDER_FORM_FREE_OF_GAPS
     combinations = [{NAME: DEFAULT}]
 
+    def get_combinations(self):
+        return [DEFAULT]
+
     fields = [OPENING_BALANCE,
               QUANTITY_RECEIVED,
               COMBINED_CONSUMPTION,

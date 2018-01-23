@@ -3,7 +3,7 @@ from json import loads
 from django.test import TestCase
 from django_webtest import WebTest
 
-from dashboard.tests.fake_definition import FakeDefinition
+from dashboard.checks.check_builder import DefinitionFactory
 from dashboard.tests.test_helpers import gen_adult_record, gen_paed_record, gen_consumption_record
 from hamcrest import *
 
@@ -27,7 +27,7 @@ class PreviewLocationsViewTestCase(WebTest):
         gen_adult_record(cycle="cycle2")
         gen_adult_record(name="loc2", cycle="cycle2")
         gen_adult_record(name="loc3", cycle="cycle3", existing=None, new=None)
-        params = FakeDefinition().initial().get()
+        params = DefinitionFactory().initial().get()
         response = self.app.post_json(url, user="testuser", params=params)
         json_response = response.content.decode('utf8')
         self.assertEqual(200, response.status_code)
@@ -54,7 +54,7 @@ class PreviewViewTestCase(WebTest):
     url = "/api/tests/preview"
 
     def test_that_a_sample_is_required(self):
-        response = self.app.post_json(self.url, user="testuser", params=FakeDefinition().initial().get(),
+        response = self.app.post_json(self.url, user="testuser", params=DefinitionFactory().initial().get(),
                                       expect_errors=True)
         json_response = loads(response.content.decode('utf8'))
         self.assertEqual(400, response.status_code)
@@ -62,7 +62,7 @@ class PreviewViewTestCase(WebTest):
 
     def test_that_the_factors_are_considered(self):
         gen_paed_record()
-        params = FakeDefinition().sampled().model('Paed').factors(form_b=2, form_a=5).get()
+        params = DefinitionFactory().sampled().model('Paed').factors(form_b=2, form_a=5).get()
         response = self.app.post_json(self.url, user="testuser", params=params, expect_errors=True)
         json_response = loads(response.content.decode('utf8'))
         self.assertEqual(200, response.status_code)
@@ -81,7 +81,7 @@ class PreviewViewTestCase(WebTest):
 
     def test_result_with_paed_records(self):
         gen_paed_record()
-        params = FakeDefinition().sampled().model('Paed').get()
+        params = DefinitionFactory().sampled().model('Paed').get()
         response = self.app.post_json(self.url, user="testuser", params=params, expect_errors=True)
         json_response = loads(response.content.decode('utf8'))
         self.assertEqual(200, response.status_code)
@@ -100,7 +100,7 @@ class PreviewViewTestCase(WebTest):
 
     def test_result_with_adult_records(self):
         gen_adult_record()
-        params = FakeDefinition().sampled().get()
+        params = DefinitionFactory().sampled().get()
         response = self.app.post_json(self.url, user="testuser", params=params, expect_errors=True)
         json_response = loads(response.content.decode('utf8'))
         self.assertEqual(200, response.status_code)
@@ -119,7 +119,7 @@ class PreviewViewTestCase(WebTest):
 
     def test_result_with_consumption_records(self):
         gen_consumption_record(opening_balance=10, closing_balance=20)
-        params = FakeDefinition().sampled().fields("opening_balance", "closing_balance").model('Consumption').factors(
+        params = DefinitionFactory().sampled().fields("opening_balance", "closing_balance").model('Consumption').factors(
             form_a=10).get()
         response = self.app.post_json(self.url, user="testuser", params=params, expect_errors=True)
         json_response = loads(response.content.decode('utf8'))
@@ -140,7 +140,7 @@ class PreviewViewTestCase(WebTest):
 
     def test_two_facility_with_tracing_type(self):
         gen_consumption_record(formulation="form_tra", opening_balance=10, closing_balance=20)
-        params = FakeDefinition().traced(tracer={"name": "trace1", "formulations": ["form_tra", "form_trb"]}).model(
+        params = DefinitionFactory().traced(tracer={"name": "trace1", "formulations": ["form_tra", "form_trb"]}).model(
             'Consumption').tracing_formulations("form_tra",
                                                 "form_trb").fields(
             "opening_balance", "closing_balance").get()
@@ -164,7 +164,7 @@ class PreviewViewTestCase(WebTest):
     def test_equal_to(self):
         gen_consumption_record(formulation="form1", opening_balance=10, closing_balance=20)
         gen_consumption_record(formulation="form2", opening_balance=40, closing_balance=30)
-        definition_builder = FakeDefinition().sampled().formulations("form1", "form2")
+        definition_builder = DefinitionFactory().sampled().formulations("form1", "form2")
         definition_builder.fields("opening_balance", "closing_balance")
         definition_builder.model('Consumption')
         definition_builder.are_equal()
@@ -202,7 +202,7 @@ class PreviewViewTestCase(WebTest):
     def test_less_than(self):
         gen_consumption_record(formulation="form1", opening_balance=10, closing_balance=20)
         gen_consumption_record(formulation="form2", opening_balance=40, closing_balance=30)
-        definition_builder = FakeDefinition().sampled().formulations("form1", "form2")
+        definition_builder = DefinitionFactory().sampled().formulations("form1", "form2")
         definition_builder.fields("opening_balance", "closing_balance")
         definition_builder.model('Consumption')
         definition_builder.is_less_than(50)
@@ -240,7 +240,7 @@ class PreviewViewTestCase(WebTest):
     def test_no_negatives(self):
         gen_consumption_record(formulation="form1", opening_balance=10, closing_balance=20)
         gen_consumption_record(formulation="form2", opening_balance=40, closing_balance=30)
-        definition_builder = FakeDefinition().sampled().formulations("form1", "form2")
+        definition_builder = DefinitionFactory().sampled().formulations("form1", "form2")
         definition_builder.fields("opening_balance", "closing_balance")
         definition_builder.model('Consumption')
         definition_builder.aggregation("VALUE")
