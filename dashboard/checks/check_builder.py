@@ -14,22 +14,27 @@ F1_PATIENT_QUERY = ["TDF/3TC/EFV (PMTCT)", "TDF/3TC/EFV (ADULT)"]
 F1_QUERY = ["Tenofovir/Lamivudine/Efavirenz (TDF/3TC/EFV) 300mg/300mg/600mg[Pack 30]"]
 F3_QUERY = ["Efavirenz (EFV) 200mg [Pack 90]"]
 F2_QUERY = ["Abacavir/Lamivudine (ABC/3TC) 60mg/30mg [Pack 60]"]
+CONSUMPTION_MODEL = "Consumption"
+FORMULATIONS = "formulations"
+TRACING_FORMULATIONS = "tracingFormulations"
+NAME = "name"
+FACILITY_TWO_GROUPS = "FacilityTwoGroups"
 
 
 def build_model(name, check_type):
-    model = {"id": ("%s" % name), "name": ("%s Records" % name)}
+    model = {"id": ("%s" % name), NAME: ("%s Records" % name)}
     if check_type and check_type["id"] == "FacilityTwoGroupsAndTracingFormulation":
         model["hasTrace"] = True
         if name.lower() in ["paed", "adult"]:
-            model["tracingFormulations"] = [
-                {"name": F1, "formulations": F1_PATIENT_QUERY},
-                {"name": F2, "formulations": F2_PATIENT_QUERY},
-                {"name": F3, "formulations": F3_PATIENT_QUERY}, ]
-        if name.lower() in ["consumption"]:
-            model["tracingFormulations"] = [
-                {"name": F1, "formulations": F1_QUERY},
-                {"name": F2, "formulations": F2_QUERY},
-                {"name": F3, "formulations": F3_QUERY}, ]
+            model[TRACING_FORMULATIONS] = [
+                {NAME: F1, FORMULATIONS: F1_PATIENT_QUERY},
+                {NAME: F2, FORMULATIONS: F2_PATIENT_QUERY},
+                {NAME: F3, FORMULATIONS: F3_PATIENT_QUERY}, ]
+        if name.lower() in [CONSUMPTION_MODEL.lower()]:
+            model[TRACING_FORMULATIONS] = [
+                {NAME: F1, FORMULATIONS: F1_QUERY},
+                {NAME: F2, FORMULATIONS: F2_QUERY},
+                {NAME: F3, FORMULATIONS: F3_QUERY}, ]
     return model
 
 
@@ -41,9 +46,9 @@ class DefinitionFactory(object):
         def add_group(self, position, aggegation, cycle, model, fields, formulations, factors=None):
             position_ = position + 1
             group = {
-                "name": "G%d" % position_,
-                "cycle": {"id": cycle, "name": cycle},
-                "aggregation": {"id": aggegation, "name": aggegation},
+                NAME: "G%d" % position_,
+                "cycle": {"id": cycle, NAME: cycle},
+                "aggregation": {"id": aggegation, NAME: aggegation},
                 "model": build_model(model, self.data["type"]),
                 "selected_fields": fields,
                 "selected_formulations": formulations,
@@ -64,7 +69,7 @@ class DefinitionFactory(object):
 
         def aggregation(self, id):
             def f(group):
-                group['aggregation'] = {"id": id, "name": id}
+                group['aggregation'] = {"id": id, NAME: id}
                 return group
 
             return self.on_group(f)
@@ -112,23 +117,23 @@ class DefinitionFactory(object):
             return self.on_group(f)
 
         def are_equal(self):
-            self.data["operator"] = {"id": "AreEqual", "name": "AreEqual"}
+            self.data["operator"] = {"id": "AreEqual", NAME: "AreEqual"}
             # self.data["operatorConstant"] = None
             return self
 
         def has_no_negatives(self):
-            self.data["operator"] = {"id": "NoNegatives", "name": "NoNegatives"}
+            self.data["operator"] = {"id": "NoNegatives", NAME: "NoNegatives"}
             # self.data["operatorConstant"] = None
             return self
 
         def is_less_than(self, ratio=1):
-            self.data["operator"] = {"id": "LessThan", "name": "LessThan"}
+            self.data["operator"] = {"id": "LessThan", NAME: "LessThan"}
             self.data["operatorConstant"] = ratio
             return self
 
         def sample(self, location=None, cycle="cycle1", tracer=None):
             if location is None:
-                location = {"name": "loc1", "district": "dis1"}
+                location = {NAME: "loc1", "district": "dis1"}
             sample = {"location": location, "cycle": cycle}
             if tracer:
                 sample['tracer'] = tracer
@@ -137,7 +142,7 @@ class DefinitionFactory(object):
 
         def tracing_formulations(self, *formulations):
             def f(group):
-                group['model']['tracingFormulations'] = [{"formulations": formulations, "name": "trace1"}]
+                group['model']['tracingFormulations'] = [{FORMULATIONS: formulations, NAME: "trace1"}]
                 return group
 
             return self.on_group(f)
@@ -147,28 +152,28 @@ class DefinitionFactory(object):
             return self
 
         def at_least_of_total(self, ratio=100):
-            self.data["operator"] = {"id": "AtLeastNOfTotal", "name": "LessThan"}
+            self.data["operator"] = {"id": "AtLeastNOfTotal", NAME: "LessThan"}
             self.data["operatorConstant"] = ratio
             return self
 
         def has_no_blanks(self):
-            self.data["operator"] = {"id": "NoBlanks", "name": "NoBlanks"}
+            self.data["operator"] = {"id": "NoBlanks", NAME: "NoBlanks"}
             return self
 
     def blank(self):
-        return self.Builder({"groups": [{"fields": [], "formulations": [], "model": {}},
-                                        {"fields": [], "formulations": [], "model": {}}]})
+        return self.Builder({"groups": [{"fields": [], FORMULATIONS: [], "model": {}},
+                                        {"fields": [], FORMULATIONS: [], "model": {}}]})
 
     def initial(self):
-        group1 = {"name": "G1", "cycle": {"id": "current", "name": "current"}, }
-        group2 = {"name": "G2", "cycle": {"id": "current", "name": "current"}, }
+        group1 = {NAME: "G1", "cycle": {"id": "current", NAME: "current"}, }
+        group2 = {NAME: "G2", "cycle": {"id": "current", NAME: "current"}, }
         data = {
             "groups": [
                 group1,
                 group2
             ]
         }
-        return self.Builder(data).type("FacilityTwoGroups").aggregation("SUM").formulations("form_a", "form_b").fields(
+        return self.Builder(data).type(FACILITY_TWO_GROUPS).aggregation("SUM").formulations("form_a", "form_b").fields(
             "new", "existing").model("Adult")
 
     def sampled(self, **kwargs):
@@ -191,12 +196,12 @@ def class_based_check(class_name):
 
 
 def guideline_adherence_adult1l_check():
-    builder = DefinitionFactory().blank().type("FacilityTwoGroups")
-    builder.add_group(0, SUM, "current", "Consumption",
+    builder = DefinitionFactory().blank().type(FACILITY_TWO_GROUPS)
+    builder.add_group(0, SUM, "current", CONSUMPTION_MODEL,
                       ["estimated_number_of_new_patients", "estimated_number_of_new_pregnant_women"],
                       ["Tenofovir/Lamivudine/Efavirenz (TDF/3TC/EFV) 300mg/300mg/600mg[Pack 30]",
                        "Tenofovir/Lamivudine (TDF/3TC) 300mg/300mg [Pack 30]"])
-    builder.add_group(1, SUM, "current", "Consumption",
+    builder.add_group(1, SUM, "current", CONSUMPTION_MODEL,
                       ["estimated_number_of_new_patients", "estimated_number_of_new_pregnant_women"],
                       ["AZT/3TC/NVP 300/150/200mg", "AZT/3TC 300/150mg"])
     builder.at_least_of_total(80)
@@ -205,10 +210,10 @@ def guideline_adherence_adult1l_check():
 
 
 def guideline_adherence_adult2l_check():
-    builder = DefinitionFactory().blank().type("FacilityTwoGroups")
-    builder.add_group(0, SUM, "current", "Consumption", ["estimated_number_of_new_patients"],
+    builder = DefinitionFactory().blank().type(FACILITY_TWO_GROUPS)
+    builder.add_group(0, SUM, "current", CONSUMPTION_MODEL, ["estimated_number_of_new_patients"],
                       ["Atazanavir/Ritonavir (ATV/r) 300mg/100mg [Pack 30]"])
-    builder.add_group(1, SUM, "current", "Consumption", ["estimated_number_of_new_patients"],
+    builder.add_group(1, SUM, "current", CONSUMPTION_MODEL, ["estimated_number_of_new_patients"],
                       ["Lopinavir/Ritonavir (LPV/r) 200mg/50mg [Pack 120]"])
     builder.at_least_of_total(73)
 
@@ -216,10 +221,10 @@ def guideline_adherence_adult2l_check():
 
 
 def guideline_paed1l_check():
-    builder = DefinitionFactory().blank().type("FacilityTwoGroups")
-    builder.add_group(0, SUM, "current", "Consumption", ["estimated_number_of_new_patients"],
+    builder = DefinitionFactory().blank().type(FACILITY_TWO_GROUPS)
+    builder.add_group(0, SUM, "current", CONSUMPTION_MODEL, ["estimated_number_of_new_patients"],
                       ["Abacavir/Lamivudine (ABC/3TC) 60mg/30mg [Pack 60]"])
-    builder.add_group(1, SUM, "current", "Consumption", ["estimated_number_of_new_patients"],
+    builder.add_group(1, SUM, "current", CONSUMPTION_MODEL, ["estimated_number_of_new_patients"],
                       ["Zidovudine/Lamivudine/Nevirapine (AZT/3TC/NVP) 60mg/30mg/50mg [Pack 60]",
                        "Zidovudine/Lamivudine (AZT/3TC) 60mg/30mg [Pack 60]"])
     builder.at_least_of_total(80)
@@ -229,7 +234,7 @@ def guideline_paed1l_check():
 
 def no_negatives_check():
     builder = DefinitionFactory().blank().type("FacilityTwoGroupsAndTracingFormulation")
-    builder.add_group(0, VALUE, "current", "Consumption",
+    builder.add_group(0, VALUE, "current", CONSUMPTION_MODEL,
                       ["opening_balance", "consumption", "closing_balance", "estimated_number_of_new_patients"],
                       [])
     builder.has_no_negatives()
@@ -238,7 +243,7 @@ def no_negatives_check():
 
 def no_blanks_check():
     builder = DefinitionFactory().blank().type("FacilityTwoGroupsAndTracingFormulation")
-    builder.add_group(0, VALUE, "current", "Consumption",
+    builder.add_group(0, VALUE, "current", CONSUMPTION_MODEL,
                       ["opening_balance", "consumption", "closing_balance", "estimated_number_of_new_patients"],
                       [])
     builder.has_no_blanks()
@@ -247,7 +252,7 @@ def no_blanks_check():
 
 def volume_tally_check():
     builder = DefinitionFactory().blank().type("FacilityTwoGroupsAndTracingFormulation")
-    builder.add_group(0, SUM, "current", "Consumption", ["consumption"], [],
+    builder.add_group(0, SUM, "current", CONSUMPTION_MODEL, ["consumption"], [],
                       factors={
                           "Tenofovir/Lamivudine/Efavirenz (TDF/3TC/EFV) 300mg/300mg/600mg[Pack 30]": 0.5,
                           "Abacavir/Lamivudine (ABC/3TC) 60mg/30mg [Pack 60]": 1 / 4.6,
@@ -259,7 +264,12 @@ def volume_tally_check():
 
 
 def non_repeating_check():
-    return no_blanks_check()
+    builder = DefinitionFactory().blank().type("FacilityTwoGroupsAndTracingFormulation")
+    formulations = ["consumption", "opening_balance", "closing_balance", "estimated_number_of_new_patients"]
+    builder.add_group(0, VALUE, "current", CONSUMPTION_MODEL, formulations, [])
+    builder.add_group(1, VALUE, "previous", CONSUMPTION_MODEL, formulations, [])
+    builder.are_equal()
+    return builder.get()
 
 
 def open_closing_check():

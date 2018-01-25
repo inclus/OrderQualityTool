@@ -83,10 +83,12 @@ class WithinComparison(Comparison):
 class EqualComparison(Comparison):
     def compare(self, group1, group2, constant=100.0):
         constant = as_float_or_1(constant)
+        if type(group1) is list or type(group2) is list:
+            return group1 == group2
         return group1 == group2 * constant
 
     def text(self, group1, group2, constant, result):
-        template = "%d and %d %s equal"
+        template = "%s and %s %s equal"
         return template % (group1, group2, "are" if result else "are not")
 
 
