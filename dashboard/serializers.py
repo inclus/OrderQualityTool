@@ -20,22 +20,7 @@ class JSONSerializerField(serializers.Field):
 
 
 class ScoreSerializer(ModelSerializer):
-    REPORTING = JSONSerializerField()
-    WEB_BASED = JSONSerializerField()
-    MULTIPLE_ORDERS = JSONSerializerField()
-    OrderFormFreeOfGaps = JSONSerializerField()
-    guidelineAdherenceAdult1L = JSONSerializerField()
-    guidelineAdherenceAdult2L = JSONSerializerField()
-    guidelineAdherencePaed1L = JSONSerializerField()
-    nnrtiPaed = JSONSerializerField()
-    nnrtiAdults = JSONSerializerField()
-    stablePatientVolumes = JSONSerializerField()
-    consumptionAndPatients = JSONSerializerField()
-    warehouseFulfilment = JSONSerializerField()
-    differentOrdersOverTime = JSONSerializerField()
-    closingBalanceMatchesOpeningBalance = JSONSerializerField()
-    orderFormFreeOfNegativeNumbers = JSONSerializerField()
-    stableConsumption = JSONSerializerField()
+    data = JSONSerializerField()
 
     class Meta:
         model = Score

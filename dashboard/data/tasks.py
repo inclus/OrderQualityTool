@@ -118,9 +118,8 @@ def persist_scores(score_cache, cycle):
             ip=location.partner,
             district=location.district,
             warehouse=location.warehouse,
-            cycle=cycle)
+            cycle=cycle, data=scores)
         for key, value in scores.items():
-            setattr(s, key, value)
             for f, result in value.items():
                 formulation_mapping = mapping.get(f)
                 if result in [YES, WEB]:

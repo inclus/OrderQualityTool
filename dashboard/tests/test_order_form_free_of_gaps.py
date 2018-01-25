@@ -1,5 +1,6 @@
 import json
 
+from arrow import utcnow
 from django.core.urlresolvers import reverse
 from django_webtest import WebTest
 from mock import patch
@@ -31,16 +32,17 @@ class OrderFormFreeOfNegativesViewTestCase(WebTest):
         url = reverse(self.url_name)
         start = "Mar - Apr %s" % year
         end = "Nov - Dec %s" % year
-        Score.objects.create(**{self.test: {self.formulation: YES}, 'name': "F4", 'cycle': start})
-        Score.objects.create(**{self.test: {self.formulation: NO}, 'name': "F5", 'cycle': start})
-        Score.objects.create(**{self.test: {self.formulation: NO}, 'name': "F6", 'cycle': start})
-        Score.objects.create(**{self.test: {self.formulation: NOT_REPORTING}, 'name': "F7", 'cycle': start})
-        Score.objects.create(**{self.test: {self.formulation: NOT_REPORTING}, 'name': "F8", 'cycle': start})
+        Score.objects.create(data={self.test: {self.formulation: YES}}, name="F4", cycle=start)
+        Score.objects.create(data={self.test: {self.formulation: NO}}, name="F5", cycle=start)
+        Score.objects.create(data={self.test: {self.formulation: NO}}, name="F6", cycle=start)
+        Score.objects.create(data={self.test: {self.formulation: NOT_REPORTING}}, name="F7", cycle=start)
+        Score.objects.create(data={self.test: {self.formulation: NOT_REPORTING}}, name="F8", cycle=start)
         response = self.app.get(self.get_url(end, start, url), user="testuser")
         self.assertEqual(200, response.status_code)
         json_content = response.content.decode('utf8')
         data = json.loads(json_content)
         self.assertEqual(data['values'][0], {u'cycle': u'Mar - Apr 2015', u'no': 40, u'not_reporting': 40, u'yes': 20})
+
 
 class OrderFormFreeOfGapsViewTestCase(OrderFormFreeOfNegativesViewTestCase):
     url_name = 'order_form_free_of_gaps'

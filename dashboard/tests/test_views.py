@@ -5,10 +5,11 @@ from json import loads
 from django.core.urlresolvers import reverse
 from django_webtest import WebTest
 from mock import patch
+from pydash import py_
 from webtest import Upload
 
 from dashboard.helpers import *
-from dashboard.models import Cycle, Score, DashboardUser, MultipleOrderFacility, LocationToPartnerMapping
+from dashboard.models import Cycle, Score, DashboardUser, MultipleOrderFacility, LocationToPartnerMapping, FacilityTest
 from dashboard.views.data_sources import get_test_name
 
 
@@ -49,8 +50,8 @@ class DataImportViewTestCase(WebTest):
 class FacilitiesReportingView(WebTest):
     def test_that_cycles_are_padded(self):
         cycle = 'Jan - Feb %s' % now().format("YYYY")
-        Score.objects.create(REPORTING={DEFAULT: YES}, name="F2", cycle=cycle)
-        Score.objects.create(REPORTING={DEFAULT: NO}, name="F3", cycle=cycle)
+        Score.objects.create(data={"REPORTING": {DEFAULT: YES}, "WEB_BASED": {DEFAULT: YES}}, name="F2", cycle=cycle)
+        Score.objects.create(data={"REPORTING": {DEFAULT: NO}, "WEB_BASED": {DEFAULT: YES}}, name="F3", cycle=cycle)
         url = "/api/test/submittedOrder"
         json_response = self.app.get(url, user="testuser").content.decode('utf8')
         data = loads(json_response)['values']
@@ -80,11 +81,13 @@ class FacilitiesMultipleReportingViewTestCase(WebTest):
 
 class BestDistrictReportingViewFor(WebTest):
     def test_best_performing_districts(self):
-        Score.objects.create(name="F1", warehouse="W1", ip="I1", district="D1", REPORTING={"DEFAULT": "YES"},
-                             WEB_BASED={"DEFAULT": "YES"}, default_pass_count=9, default_fail_count=4, f1_pass_count=1,
+        Score.objects.create(name="F1", warehouse="W1", ip="I1", district="D1",
+                             data={"REPORTING": {DEFAULT: YES}, "WEB_BASED": {DEFAULT: YES}}, default_pass_count=9,
+                             default_fail_count=4, f1_pass_count=1,
                              f1_fail_count=9)
-        Score.objects.create(name="F1", warehouse="W1", ip="I1", district="D2", REPORTING={"DEFAULT": "NO"},
-                             WEB_BASED={"DEFAULT": "YES"}, default_pass_count=6, default_fail_count=4, f1_pass_count=1,
+        Score.objects.create(name="F1", warehouse="W1", ip="I1", district="D2",
+                             data={"REPORTING": {DEFAULT: NO}, "WEB_BASED": {DEFAULT: YES}}, default_pass_count=6,
+                             default_fail_count=4, f1_pass_count=1,
                              f1_fail_count=9)
         url = reverse("ranking_best")
         json_response = self.app.get(url, user="testuser").content.decode('utf8')
@@ -93,11 +96,13 @@ class BestDistrictReportingViewFor(WebTest):
         self.assertEquals(10.0, data[0]['rate'])
 
     def test_best_performing_ips(self):
-        Score.objects.create(name="F1", warehouse="W1", ip="I1", district="D1", REPORTING={"DEFAULT": "YES"},
-                             WEB_BASED={"DEFAULT": "YES"}, default_pass_count=9, default_fail_count=4, f1_pass_count=1,
+        Score.objects.create(name="F1", warehouse="W1", ip="I1", district="D1",
+                             data={"REPORTING": {DEFAULT: YES}, "WEB_BASED": {DEFAULT: YES}}, default_pass_count=9,
+                             default_fail_count=4, f1_pass_count=1,
                              f1_fail_count=9)
-        Score.objects.create(name="F1", warehouse="W1", ip="I2", district="D2", REPORTING={"DEFAULT": "NO"},
-                             WEB_BASED={"DEFAULT": "YES"}, default_pass_count=6, default_fail_count=4, f1_pass_count=1,
+        Score.objects.create(name="F1", warehouse="W1", ip="I2", district="D2",
+                             data={"REPORTING": {DEFAULT: NO}, "WEB_BASED": {DEFAULT: YES}}, default_pass_count=6,
+                             default_fail_count=4, f1_pass_count=1,
                              f1_fail_count=9)
         url = reverse("ranking_best") + "?level=ip"
         json_response = self.app.get(url, user="testuser").content.decode('utf8')
@@ -106,11 +111,13 @@ class BestDistrictReportingViewFor(WebTest):
         self.assertEquals(10.0, data[0]['rate'])
 
     def test_best_performing_warehouses(self):
-        Score.objects.create(name="F1", warehouse="W1", ip="I1", district="D1", REPORTING={"DEFAULT": "YES"},
-                             WEB_BASED={"DEFAULT": "YES"}, default_pass_count=9, default_fail_count=4, f1_pass_count=1,
+        Score.objects.create(name="F1", warehouse="W1", ip="I1", district="D1",
+                             data={"REPORTING": {DEFAULT: YES}, "WEB_BASED": {DEFAULT: YES}}, default_pass_count=9,
+                             default_fail_count=4, f1_pass_count=1,
                              f1_fail_count=9)
-        Score.objects.create(name="F1", warehouse="W1", ip="I2", district="D2", REPORTING={"DEFAULT": "NO"},
-                             WEB_BASED={"DEFAULT": "YES"}, default_pass_count=6, default_fail_count=4, f1_pass_count=1,
+        Score.objects.create(name="F1", warehouse="W1", ip="I2", district="D2",
+                             data={"REPORTING": {DEFAULT: NO}, "WEB_BASED": {DEFAULT: YES}}, default_pass_count=6,
+                             default_fail_count=4, f1_pass_count=1,
                              f1_fail_count=9)
         url = reverse("ranking_best") + "?level=warehouse"
         json_response = self.app.get(url, user="testuser").content.decode('utf8')
@@ -119,11 +126,13 @@ class BestDistrictReportingViewFor(WebTest):
         self.assertAlmostEqual(8.5, data[0]['rate'])
 
     def test_best_performing_facilities(self):
-        Score.objects.create(name="F1", warehouse="W1", ip="I1", district="D1", REPORTING={"DEFAULT": "YES"},
-                             WEB_BASED={"DEFAULT": "YES"}, default_pass_count=9, default_fail_count=4, f1_pass_count=1,
+        Score.objects.create(name="F1", warehouse="W1", ip="I1", district="D1",
+                             data={"REPORTING": {DEFAULT: YES}, "WEB_BASED": {DEFAULT: YES}}, default_pass_count=9,
+                             default_fail_count=4, f1_pass_count=1,
                              f1_fail_count=90)
-        Score.objects.create(name="F2", warehouse="W1", ip="I2", district="D2", REPORTING={"DEFAULT": "NO"},
-                             WEB_BASED={"DEFAULT": "YES"}, default_pass_count=6, default_fail_count=4, f1_pass_count=1,
+        Score.objects.create(name="F2", warehouse="W1", ip="I2", district="D2",
+                             data={"REPORTING": {DEFAULT: NO}, "WEB_BASED": {DEFAULT: YES}}, default_pass_count=6,
+                             default_fail_count=4, f1_pass_count=1,
                              f1_fail_count=9)
         url = reverse("ranking_best") + "?level=facility"
         json_response = self.app.get(url, user="testuser").content.decode('utf8')
@@ -132,11 +141,13 @@ class BestDistrictReportingViewFor(WebTest):
         self.assertEquals(10.0, data[0]['rate'])
 
     def test_worst_performing_districts(self):
-        Score.objects.create(name="F1", warehouse="W1", ip="I1", district="D1", REPORTING={"DEFAULT": "YES"},
-                             WEB_BASED={"DEFAULT": "YES"}, default_pass_count=2, default_fail_count=3, f1_pass_count=4,
+        Score.objects.create(name="F1", warehouse="W1", ip="I1", district="D1",
+                             data={"REPORTING": {DEFAULT: YES}, "WEB_BASED": {DEFAULT: YES}}, default_pass_count=2,
+                             default_fail_count=3, f1_pass_count=4,
                              f1_fail_count=5)
-        Score.objects.create(name="F2", warehouse="W1", ip="I2", district="D2", REPORTING={"DEFAULT": "NO"},
-                             WEB_BASED={"DEFAULT": "YES"}, default_pass_count=6, default_fail_count=4, f1_pass_count=1,
+        Score.objects.create(name="F2", warehouse="W1", ip="I2", district="D2",
+                             data={"REPORTING": {DEFAULT: NO}, "WEB_BASED": {DEFAULT: YES}}, default_pass_count=6,
+                             default_fail_count=4, f1_pass_count=1,
                              f1_fail_count=9)
         url = reverse("ranking_worst")
         json_response = self.app.get(url, user="testuser").content.decode('utf8')
@@ -145,11 +156,13 @@ class BestDistrictReportingViewFor(WebTest):
         self.assertEquals(13.0, data[0]['rate'])
 
     def test_worst_performing_ips(self):
-        Score.objects.create(name="F1", warehouse="W1", ip="I1", district="D1", REPORTING={"DEFAULT": "YES"},
-                             WEB_BASED={"DEFAULT": "YES"}, default_pass_count=6, default_fail_count=4, f1_pass_count=1,
+        Score.objects.create(name="F1", warehouse="W1", ip="I1", district="D1",
+                             data={"REPORTING": {DEFAULT: YES}, "WEB_BASED": {DEFAULT: YES}}, default_pass_count=6,
+                             default_fail_count=4, f1_pass_count=1,
                              f1_fail_count=9)
-        Score.objects.create(name="F2", warehouse="W1", ip="I2", district="D2", REPORTING={"DEFAULT": "NO"},
-                             WEB_BASED={"DEFAULT": "YES"}, default_pass_count=6, default_fail_count=4, f1_pass_count=1,
+        Score.objects.create(name="F2", warehouse="W1", ip="I2", district="D2",
+                             data={"REPORTING": {DEFAULT: NO}, "WEB_BASED": {DEFAULT: YES}}, default_pass_count=6,
+                             default_fail_count=4, f1_pass_count=1,
                              f1_fail_count=90)
         url = reverse("ranking_worst") + "?level=ip"
         json_response = self.app.get(url, user="testuser").content.decode('utf8')
@@ -158,11 +171,13 @@ class BestDistrictReportingViewFor(WebTest):
         self.assertEquals(94, data[0]['rate'])
 
     def test_worst_performing_warehouses(self):
-        Score.objects.create(name="F1", warehouse="W1", ip="I1", district="D1", REPORTING={"DEFAULT": "YES"},
-                             WEB_BASED={"DEFAULT": "YES"}, default_pass_count=2, default_fail_count=3, f1_pass_count=4,
+        Score.objects.create(name="F1", warehouse="W1", ip="I1", district="D1",
+                             data={"REPORTING": {DEFAULT: YES}, "WEB_BASED": {DEFAULT: YES}}, default_pass_count=2,
+                             default_fail_count=3, f1_pass_count=4,
                              f1_fail_count=5)
-        Score.objects.create(name="F2", warehouse="W2", ip="I2", district="D2", REPORTING={"DEFAULT": "NO"},
-                             WEB_BASED={"DEFAULT": "YES"}, default_pass_count=4, default_fail_count=3, f1_pass_count=4,
+        Score.objects.create(name="F2", warehouse="W2", ip="I2", district="D2",
+                             data={"REPORTING": {DEFAULT: NO}, "WEB_BASED": {DEFAULT: YES}}, default_pass_count=4,
+                             default_fail_count=3, f1_pass_count=4,
                              f1_fail_count=9)
         url = reverse("ranking_worst") + "?level=warehouse"
         json_response = self.app.get(url, user="testuser").content.decode('utf8')
@@ -171,11 +186,13 @@ class BestDistrictReportingViewFor(WebTest):
         self.assertEquals(12.0, data[0]['rate'])
 
     def test_worst_performing_facilities(self):
-        Score.objects.create(name="F1", warehouse="W1", ip="I1", district="D1", REPORTING={"DEFAULT": "YES"},
-                             WEB_BASED={"DEFAULT": "YES"}, default_pass_count=6, default_fail_count=4, f1_pass_count=1,
+        Score.objects.create(name="F1", warehouse="W1", ip="I1", district="D1",
+                             data={"REPORTING": {DEFAULT: YES}, "WEB_BASED": {DEFAULT: YES}}, default_pass_count=6,
+                             default_fail_count=4, f1_pass_count=1,
                              f1_fail_count=9)
-        Score.objects.create(name="F2", warehouse="W2", ip="I2", district="D2", REPORTING={"DEFAULT": "NO"},
-                             WEB_BASED={"DEFAULT": "YES"}, default_pass_count=6, default_fail_count=4, f1_pass_count=1,
+        Score.objects.create(name="F2", warehouse="W2", ip="I2", district="D2",
+                             data={"REPORTING": {DEFAULT: NO}, "WEB_BASED": {DEFAULT: YES}}, default_pass_count=6,
+                             default_fail_count=4, f1_pass_count=1,
                              f1_fail_count=20)
         url = reverse("ranking_worst") + "?level=facility"
         json_response = self.app.get(url, user="testuser").content.decode('utf8')
@@ -184,10 +201,10 @@ class BestDistrictReportingViewFor(WebTest):
         self.assertEquals(24.0, data[0]['rate'])
 
     def test_worst_csv(self):
-        Score.objects.create(name="F1", warehouse="W1", ip="I1", district="D1", REPORTING={"DEFAULT": "YES"},
-                             WEB_BASED={"DEFAULT": "YES"})
-        Score.objects.create(name="F2", warehouse="W2", ip="I2", district="D2", REPORTING={"DEFAULT": "NO"},
-                             WEB_BASED={"DEFAULT": "YES"})
+        Score.objects.create(name="F1", warehouse="W1", ip="I1", district="D1",
+                             data={"REPORTING": {DEFAULT: YES}, "WEB_BASED": {DEFAULT: YES}})
+        Score.objects.create(name="F2", warehouse="W2", ip="I2", district="D2",
+                             data={"REPORTING": {DEFAULT: NO}, "WEB_BASED": {DEFAULT: YES}})
         url = reverse("ranking_worst_csv") + "?level=facility"
         csv = self.app.get(url, user="testuser").content.decode('utf8')
         expected = """facility,Average Number of Fails
@@ -197,10 +214,10 @@ F2,0.0
         self.assertEquals(csv.replace("\r", ""), expected)
 
     def test_best_csv(self):
-        Score.objects.create(name="F1", warehouse="W1", ip="I1", district="D1", REPORTING={"DEFAULT": "YES"},
-                             WEB_BASED={"DEFAULT": "YES"})
-        Score.objects.create(name="F2", warehouse="W2", ip="I2", district="D2", REPORTING={"DEFAULT": "NO"},
-                             WEB_BASED={"DEFAULT": "YES"}, default_fail_count=12)
+        Score.objects.create(name="F1", warehouse="W1", ip="I1", district="D1",
+                             data={"REPORTING": {DEFAULT: YES}, "WEB_BASED": {DEFAULT: YES}})
+        Score.objects.create(name="F2", warehouse="W2", ip="I2", district="D2",
+                             data={"REPORTING": {DEFAULT: NO}, "WEB_BASED": {DEFAULT: YES}}, default_fail_count=12)
         url = reverse("ranking_best_csv") + "?level=facility"
         csv = self.app.get(url, user="testuser").content.decode('utf8')
         expected = """facility,Average Number of Passes
@@ -213,7 +230,7 @@ F2,0.0
 class FacilityTestCycleScoresListViewTestCase(WebTest):
     def test_should_make_one_query(self):
         Score.objects.create(name='AIC Jinja Special Clinic', warehouse='warehouse', district='dis1', ip='ip',
-                             REPORTING={"formulation1": "YES", "formulation2": "NO"})
+                             data={"REPORTING": {"formulation1": "YES", "formulation2": "NO"}})
         with self.assertNumQueries(2):
             response = self.app.get(reverse("scores"))
             json_text = response.content.decode('utf8')
@@ -223,7 +240,7 @@ class FacilityTestCycleScoresListViewTestCase(WebTest):
             self.assertEqual(data['results'][0]['warehouse'], 'warehouse')
             self.assertEqual(data['results'][0]['district'], 'dis1')
             self.assertEqual(data['results'][0]['ip'], 'ip')
-            self.assertEqual(data['results'][0]['REPORTING'], {'formulation1': 'YES', 'formulation2': 'NO'})
+            self.assertEqual(data['results'][0]['data']['REPORTING'], {'formulation1': 'YES', 'formulation2': 'NO'})
 
 
 class ScoreDetailsViewTestCase(WebTest):
@@ -238,6 +255,7 @@ class ScoreDetailsViewTestCase(WebTest):
     def test_can_get_location_data(self):
         score = Score.objects.create(name="Name 1", ip="IP 1", district="District 1", warehouse="Warehouse 1")
         url = reverse(self.url_name, kwargs={"id": score.id, "column": 5})
+        print(py_(FacilityTest.objects.all()).map(lambda x: {"name": x.name, "o": x.order}).value())
         response = self.app.get(url)
         self.assertEqual(200, response.status_code)
         self.assertTemplateUsed(response, "check/base.html")
@@ -249,13 +267,13 @@ class ScoreDetailsViewTestCase(WebTest):
 
     def test_can_get_score(self):
         score = Score.objects.create(name="Name 1", ip="IP 1", district="District 1", warehouse="Warehouse 1",
-                                     MULTIPLE_ORDERS={DEFAULT: YES})
-        url = reverse(self.url_name, kwargs={"id": score.id, "column": 9})
+                                     data={"MULTIPLE ORDERS": {DEFAULT: YES}})
+        url = reverse(self.url_name, kwargs={"id": score.id, "column": 8})
         response = self.app.get(url)
         self.assertEqual(200, response.status_code)
         response_data = response.context
         self.assertEqual(True, response_data["has_result"])
-        self.assertEqual(get_test_name(MULTIPLE_ORDERS), response_data["result"]["test"])
+        self.assertEqual("MULTIPLE ORDERS: Submitted more than one order?", response_data["result"]["test"])
         self.assertEqual('Pass', response_data["result"]["result"])
 
     def test_has_no_result_if_column_is_less_than_4(self):
@@ -300,4 +318,3 @@ class PartnerMappingImportViewTestCase(WebTest):
 
         new_mapping = LocationToPartnerMapping.get_mapping()
         self.assertEqual(len(new_mapping), 8)
-

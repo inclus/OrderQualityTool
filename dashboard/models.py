@@ -1,10 +1,13 @@
+import json
 import logging
 
 from custom_user.models import AbstractEmailUser
 from django.db import models
 from django.db.models import CharField
 from jsonfield import JSONField
+from ordered_model.models import OrderedModel
 from picklefield import PickledObjectField
+from pymaybe import maybe
 
 from dashboard.data.partner_mapping import FormattedKeyDict
 from dashboard.helpers import NOT_REPORTING, YES, NO, REPORT_TYPES
@@ -64,22 +67,7 @@ class Score(models.Model):
     district = models.CharField(max_length=256, db_index=True)
     ip = models.CharField(max_length=256, db_index=True)
     warehouse = models.CharField(max_length=256, db_index=True)
-    REPORTING = JSONField()
-    WEB_BASED = JSONField()
-    MULTIPLE_ORDERS = JSONField()
-    OrderFormFreeOfGaps = JSONField()
-    guidelineAdherenceAdult1L = JSONField()
-    guidelineAdherenceAdult2L = JSONField()
-    guidelineAdherencePaed1L = JSONField()
-    nnrtiPaed = JSONField()
-    nnrtiAdults = JSONField()
-    stablePatientVolumes = JSONField()
-    consumptionAndPatients = JSONField()
-    warehouseFulfilment = JSONField()
-    differentOrdersOverTime = JSONField()
-    closingBalanceMatchesOpeningBalance = JSONField()
-    orderFormFreeOfNegativeNumbers = JSONField()
-    stableConsumption = JSONField()
+    data = JSONField()
     default_fail_count = models.IntegerField(default=0)
     default_pass_count = models.IntegerField(default=0)
     f1_fail_count = models.IntegerField(default=0)
@@ -194,7 +182,7 @@ class LocationToPartnerMapping(models.Model):
         return FormattedKeyDict(cls.objects.first().mapping)
 
 
-class FacilityTest(models.Model):
+class FacilityTest(OrderedModel):
     name = models.CharField(max_length=255)
     created = models.DateTimeField(auto_now_add=True, editable=False)
     last_updated = models.DateTimeField(auto_now=True, editable=False)
@@ -202,14 +190,14 @@ class FacilityTest(models.Model):
     description = models.TextField()
     short_description = models.TextField()
 
-    class Meta:
-        ordering = ('-created',)
+    class Meta(OrderedModel.Meta):
+        verbose_name_plural = "Facility Tests"
 
     def __unicode__(self):
         return u'%s' % self.name
 
-    class Meta:
-        verbose_name_plural = "Facility Tests"
+    def get_type(self):
+        return maybe(json.loads(self.definition))['type']['id'].or_else(None)
 
 
 class TracingFormulations(models.Model):

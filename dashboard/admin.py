@@ -9,6 +9,7 @@ from django.utils.translation import ugettext_lazy as _
 from dynamic_preferences.admin import GlobalPreferenceAdmin
 from dynamic_preferences.models import GlobalPreferenceModel
 from logentry_admin.admin import LogEntryAdmin
+from ordered_model.admin import OrderedModelAdmin
 
 from dashboard.forms import TestDefinitionForm
 from dashboard.models import DashboardUser, Consumption, Cycle, AdultPatientsRecord, PAEDPatientsRecord, \
@@ -108,23 +109,7 @@ class ScoreAdmin(ModelAdmin):
                     'default_pass_count',
                     'default_fail_count',
                     'f1_pass_count',
-                    'f1_fail_count',
-                    'stablePatientVolumes',
-                    'REPORTING',
-                    'consumptionAndPatients',
-                    'nnrtiPaed',
-                    'warehouseFulfilment',
-                    'differentOrdersOverTime',
-                    'closingBalanceMatchesOpeningBalance',
-                    'WEB_BASED',
-                    'OrderFormFreeOfGaps',
-                    'MULTIPLE_ORDERS',
-                    'orderFormFreeOfNegativeNumbers',
-                    'nnrtiAdults',
-                    'stableConsumption',
-                    'guidelineAdherenceAdult1L',
-                    'guidelineAdherenceAdult2L',
-                    'guidelineAdherencePaed1L',
+                    'f1_fail_count'
                     )
     list_filter = ('cycle',)
 
@@ -142,6 +127,10 @@ class CycleAdmin(ModelAdmin):
         return super(CycleAdmin, self).get_queryset(request).defer("state")
 
 
+class FacilityTestAdmin(OrderedModelAdmin):
+    list_display = ('name', 'move_up_down_links', 'order')
+
+
 admin_site = QdbSite()
 admin_site.register(Group, GroupAdmin)
 admin_site.register(DashboardUser, EmailUserAdmin)
@@ -153,6 +142,6 @@ admin_site.register(Cycle, CycleAdmin)
 admin_site.register(MultipleOrderFacility)
 admin_site.register(GlobalPreferenceModel, GlobalPreferenceAdmin)
 admin_site.register(Dhis2StandardReport)
-admin_site.register(FacilityTest)
+admin_site.register(FacilityTest, FacilityTestAdmin)
 admin_site.register(TracingFormulations)
 admin_site.register(LogEntry, LogEntryAdmin)

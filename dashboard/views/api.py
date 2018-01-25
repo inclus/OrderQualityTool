@@ -31,12 +31,12 @@ def aggregate_scores(user, test, cycles, formulation, keys, count_values, filter
             scores_filter[access_level.lower()] = access_area
     if user.is_superuser:
         scores_filter = filters
-    score_objects = Score.objects.filter(**scores_filter).values(test, "cycle")
+    score_objects = Score.objects.filter(**scores_filter).values("data", "cycle")
     grouped_objects = pydash.group_by(score_objects, lambda x: x["cycle"])
 
     def get_count_key(value):
-        value_as_dict = json.loads(value[test])
-        return value_as_dict.get(formulation, None) if type(value_as_dict) is dict else None
+        value_as_dict = json.loads(value.get('data'))
+        return value_as_dict.get(test, {}).get(formulation, None) if type(value_as_dict) is dict else None
 
     def agg(value):
         values = grouped_objects.get(value, [])

@@ -165,6 +165,7 @@ class ReportsView(LoginRequiredMixin, TemplateView):
         qs = Score.objects.filter(**qs_filter)
         ips = qs.values('ip').order_by('ip').distinct()
         warehouses = qs.values('warehouse').order_by('warehouse').distinct()
+        checks = FacilityTest.objects.all()
         districts = qs.values('district').order_by('district').distinct()
         raw_cycles = [c[0] for c in qs.values_list('cycle').distinct()]
         cycles = sorted(raw_cycles, key=cmp_to_key(sort_cycle), reverse=True)
@@ -172,5 +173,6 @@ class ReportsView(LoginRequiredMixin, TemplateView):
         context['ips'] = ips
         context['warehouses'] = warehouses
         context['cycles'] = cycles
+        context['checks'] = checks
         context['formulations'] = [F1, F2, F3]
         return context

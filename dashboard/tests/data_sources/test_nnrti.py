@@ -18,8 +18,7 @@ class NNRTIDataSourceTestCaseForCurrentAdults(TestCase):
 
     def test_that_table_for_df1_has_proper_header(self):
         combination = DEFAULT
-        score = Score.objects.create(name="F1", warehouse="W1", ip="I1", district="D1", REPORTING={DEFAULT: YES},
-                                     WEB_BASED={DEFAULT: YES})
+        score = Score.objects.create(name="F1", warehouse="W1", ip="I1", district="D1", data={"REPORTING": {DEFAULT: YES}, "WEB_BASED": {DEFAULT: YES}})
         data_source = NNRTIDataSource()
         data = data_source.load(score, self.test_name, combination)
         self.assertEqual(data[DF1][HEADERS], ["", TOTAL])
@@ -27,8 +26,7 @@ class NNRTIDataSourceTestCaseForCurrentAdults(TestCase):
 
     def test_that_table_for_df2_has_proper_header(self):
         combination = DEFAULT
-        score = Score.objects.create(name="F1", warehouse="W1", ip="I1", district="D1", REPORTING={DEFAULT: YES},
-                                     WEB_BASED={DEFAULT: YES})
+        score = Score.objects.create(name="F1", warehouse="W1", ip="I1", district="D1", data={"REPORTING": {DEFAULT: YES}, "WEB_BASED": {DEFAULT: YES}})
         data_source = NNRTIDataSource()
         data = data_source.load(score, self.test_name, combination)
         self.assertEqual(data[DF2][HEADERS], ["", TOTAL])
@@ -50,8 +48,7 @@ class NNRTIDataSourceTestCaseForCurrentAdults(TestCase):
                        cycle=cycle, **data)
         combination = DEFAULT
         score = Score.objects.create(name=facility_name, warehouse=warehouse_name, ip=ip_name, district=district_name,
-                                     REPORTING={DEFAULT: YES},
-                                     WEB_BASED={DEFAULT: YES}, cycle=cycle)
+                                     data={"REPORTING": {DEFAULT: YES}, "WEB_BASED": {DEFAULT: YES}}, cycle=cycle)
         data_source = NNRTIDataSource()
         data = data_source.load(score, self.test_name, combination)
         self.assertEqual(len(data[DF1][ROWS]), 3)
@@ -74,8 +71,7 @@ class NNRTIDataSourceTestCaseForCurrentAdults(TestCase):
                        cycle=cycle, **data)
         combination = DEFAULT
         score = Score.objects.create(name=facility_name, warehouse=warehouse_name, ip=ip_name, district=district_name,
-                                     REPORTING={DEFAULT: YES},
-                                     WEB_BASED={DEFAULT: YES}, cycle=cycle)
+                                     data={"REPORTING": {DEFAULT: YES}, "WEB_BASED": {DEFAULT: YES}}, cycle=cycle)
         data_source = NNRTIDataSource()
         data = data_source.load(score, self.test_name, combination)
         ratios_key = DF1 + "_ratios"
@@ -103,8 +99,7 @@ class NNRTIDataSourceTestCaseForCurrentAdults(TestCase):
                        cycle=cycle, **data)
         combination = DEFAULT
         score = Score.objects.create(name=facility_name, warehouse=warehouse_name, ip=ip_name, district=district_name,
-                                     REPORTING={DEFAULT: YES},
-                                     WEB_BASED={DEFAULT: YES}, cycle=cycle)
+                                     data={"REPORTING": {DEFAULT: YES}, "WEB_BASED": {DEFAULT: YES}}, cycle=cycle)
         data_source = NNRTIDataSource()
         data = data_source.load(score, self.test_name, combination)
         ratios_key = "%s_calculated" % DF1
@@ -135,8 +130,7 @@ class NNRTIDataSourceTestCaseForCurrentAdults(TestCase):
                        cycle=cycle, **data)
         combination = DEFAULT
         score = Score.objects.create(name=facility_name, warehouse=warehouse_name, ip=ip_name, district=district_name,
-                                     REPORTING={DEFAULT: YES},
-                                     WEB_BASED={DEFAULT: YES}, cycle=cycle)
+                                     data={"REPORTING": {DEFAULT: YES}, "WEB_BASED": {DEFAULT: YES}}, cycle=cycle)
         data_source = NNRTIDataSource()
         data = data_source.load(score, self.test_name, combination)
         self.assertEqual(len(data[DF2][ROWS]), 5)
@@ -159,8 +153,7 @@ class NNRTIDataSourceTestCaseForCurrentAdults(TestCase):
                        cycle=cycle, **data)
         combination = DEFAULT
         score = Score.objects.create(name=facility_name, warehouse=warehouse_name, ip=ip_name, district=district_name,
-                                     REPORTING={DEFAULT: YES},
-                                     WEB_BASED={DEFAULT: YES}, cycle=cycle)
+                                     data={"REPORTING": {DEFAULT: YES}, "WEB_BASED": {DEFAULT: YES}}, cycle=cycle)
         data_source = NNRTIDataSource()
         data = data_source.load(score, self.test_name, combination)
         ratios_key = DF2 + "_ratios"
@@ -192,8 +185,7 @@ class NNRTIDataSourceTestCaseForCurrentAdults(TestCase):
                        cycle=cycle, **data)
         combination = DEFAULT
         score = Score.objects.create(name=facility_name, warehouse=warehouse_name, ip=ip_name, district=district_name,
-                                     REPORTING={DEFAULT: YES},
-                                     WEB_BASED={DEFAULT: YES}, cycle=cycle)
+                                     data={"REPORTING": {DEFAULT: YES}, "WEB_BASED": {DEFAULT: YES}}, cycle=cycle)
         data_source = NNRTIDataSource()
         data = data_source.load(score, self.test_name, combination)
         ratios_key = "%s_calculated" % DF2
@@ -229,8 +221,7 @@ class NNRTIDataSourceTestCaseForCurrentAdults(TestCase):
                            district=district_name, cycle=cycle, **data)
         combination = DEFAULT
         score = Score.objects.create(name=facility_name, warehouse=warehouse_name, ip=ip_name, district=district_name,
-                                     REPORTING={DEFAULT: YES},
-                                     WEB_BASED={DEFAULT: YES}, cycle=cycle)
+                                     data={"REPORTING": {DEFAULT: YES}, "WEB_BASED": {DEFAULT: YES}}, cycle=cycle)
         data_source = NNRTIDataSource()
         data = data_source.load(score, self.test_name, combination)
         self.assertEqual(data["%s_COUNT" % DF1], 30.0)
@@ -248,8 +239,7 @@ class NNRTIDataSourceTestCaseForCurrentPaed(TestCase):
 
     def test_that_table_for_df1_has_proper_header(self):
         combination = DEFAULT
-        score = Score.objects.create(name="F1", warehouse="W1", ip="I1", district="D1", REPORTING={DEFAULT: YES},
-                                     WEB_BASED={DEFAULT: YES})
+        score = Score.objects.create(name="F1", warehouse="W1", ip="I1", district="D1", data={"REPORTING": {DEFAULT: YES}, "WEB_BASED": {DEFAULT: YES}})
         data_source = NNRTIDataSource()
         data = data_source.load(score, self.test_name, combination)
         self.assertEqual(data[DF1][HEADERS], ["", TOTAL])
@@ -257,8 +247,7 @@ class NNRTIDataSourceTestCaseForCurrentPaed(TestCase):
 
     def test_that_table_for_df2_has_proper_header(self):
         combination = DEFAULT
-        score = Score.objects.create(name="F1", warehouse="W1", ip="I1", district="D1", REPORTING={DEFAULT: YES},
-                                     WEB_BASED={DEFAULT: YES})
+        score = Score.objects.create(name="F1", warehouse="W1", ip="I1", district="D1",data={"REPORTING": {DEFAULT: YES}, "WEB_BASED": {DEFAULT: YES}})
         data_source = NNRTIDataSource()
         data = data_source.load(score, self.test_name, combination)
         self.assertEqual(data[DF2][HEADERS], ["", TOTAL])
@@ -280,8 +269,7 @@ class NNRTIDataSourceTestCaseForCurrentPaed(TestCase):
                        cycle=cycle, **data)
         combination = DEFAULT
         score = Score.objects.create(name=facility_name, warehouse=warehouse_name, ip=ip_name, district=district_name,
-                                     REPORTING={DEFAULT: YES},
-                                     WEB_BASED={DEFAULT: YES}, cycle=cycle)
+                                     data={"REPORTING": {DEFAULT: YES}, "WEB_BASED": {DEFAULT: YES}}, cycle=cycle)
         data_source = NNRTIDataSource()
         data = data_source.load(score, self.test_name, combination)
         self.assertEqual(len(data[DF1][ROWS]), 2)
@@ -304,8 +292,7 @@ class NNRTIDataSourceTestCaseForCurrentPaed(TestCase):
                        cycle=cycle, **data)
         combination = DEFAULT
         score = Score.objects.create(name=facility_name, warehouse=warehouse_name, ip=ip_name, district=district_name,
-                                     REPORTING={DEFAULT: YES},
-                                     WEB_BASED={DEFAULT: YES}, cycle=cycle)
+                                     data={"REPORTING": {DEFAULT: YES}, "WEB_BASED": {DEFAULT: YES}}, cycle=cycle)
         data_source = NNRTIDataSource()
         data = data_source.load(score, self.test_name, combination)
         ratios_key = DF1 + "_ratios"
@@ -331,8 +318,7 @@ class NNRTIDataSourceTestCaseForCurrentPaed(TestCase):
                        cycle=cycle, **data)
         combination = DEFAULT
         score = Score.objects.create(name=facility_name, warehouse=warehouse_name, ip=ip_name, district=district_name,
-                                     REPORTING={DEFAULT: YES},
-                                     WEB_BASED={DEFAULT: YES}, cycle=cycle)
+                                     data={"REPORTING": {DEFAULT: YES}, "WEB_BASED": {DEFAULT: YES}}, cycle=cycle)
         data_source = NNRTIDataSource()
         data = data_source.load(score, self.test_name, combination)
         ratios_key = "%s_calculated" % DF1
@@ -361,8 +347,7 @@ class NNRTIDataSourceTestCaseForCurrentPaed(TestCase):
                        cycle=cycle, **data)
         combination = DEFAULT
         score = Score.objects.create(name=facility_name, warehouse=warehouse_name, ip=ip_name, district=district_name,
-                                     REPORTING={DEFAULT: YES},
-                                     WEB_BASED={DEFAULT: YES}, cycle=cycle)
+                                     data={"REPORTING": {DEFAULT: YES}, "WEB_BASED": {DEFAULT: YES}}, cycle=cycle)
         data_source = NNRTIDataSource()
         data = data_source.load(score, self.test_name, combination)
         self.assertEqual(len(data[DF2][ROWS]), 4)
@@ -385,8 +370,7 @@ class NNRTIDataSourceTestCaseForCurrentPaed(TestCase):
                        cycle=cycle, **data)
         combination = DEFAULT
         score = Score.objects.create(name=facility_name, warehouse=warehouse_name, ip=ip_name, district=district_name,
-                                     REPORTING={DEFAULT: YES},
-                                     WEB_BASED={DEFAULT: YES}, cycle=cycle)
+                                     data={"REPORTING": {DEFAULT: YES}, "WEB_BASED": {DEFAULT: YES}}, cycle=cycle)
         data_source = NNRTIDataSource()
         data = data_source.load(score, self.test_name, combination)
         ratios_key = DF2 + "_ratios"
@@ -417,8 +401,7 @@ class NNRTIDataSourceTestCaseForCurrentPaed(TestCase):
                        cycle=cycle, **data)
         combination = DEFAULT
         score = Score.objects.create(name=facility_name, warehouse=warehouse_name, ip=ip_name, district=district_name,
-                                     REPORTING={DEFAULT: YES},
-                                     WEB_BASED={DEFAULT: YES}, cycle=cycle)
+                                     data={"REPORTING": {DEFAULT: YES}, "WEB_BASED": {DEFAULT: YES}}, cycle=cycle)
         data_source = NNRTIDataSource()
         data = data_source.load(score, self.test_name, combination)
         ratios_key = "%s_calculated" % DF2
@@ -454,8 +437,7 @@ class NNRTIDataSourceTestCaseForCurrentPaed(TestCase):
                            district=district_name, cycle=cycle, **data)
         combination = DEFAULT
         score = Score.objects.create(name=facility_name, warehouse=warehouse_name, ip=ip_name, district=district_name,
-                                     REPORTING={DEFAULT: YES},
-                                     WEB_BASED={DEFAULT: YES}, cycle=cycle)
+                                     data={"REPORTING": {DEFAULT: YES}, "WEB_BASED": {DEFAULT: YES}}, cycle=cycle)
         data_source = NNRTIDataSource()
         data = data_source.load(score, self.test_name, combination)
         df1_c = 80.0 / 4.6

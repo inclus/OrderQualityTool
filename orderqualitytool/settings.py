@@ -24,7 +24,8 @@ INSTALLED_APPS = (
     'rest_framework',
     'analytical',
     'django.contrib.sites',
-    'custom_user'
+    'custom_user',
+    'ordered_model'
 )
 
 MIDDLEWARE_CLASSES = (

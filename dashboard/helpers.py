@@ -1,5 +1,6 @@
 import arrow
 from arrow import Arrow, now
+from pymaybe import maybe
 
 
 class CustomArrow(Arrow):
@@ -222,13 +223,8 @@ P_COUNT = "paed_count"
 
 
 def get_actual_result(result, combination):
-    def combination_yes():
-        return result.get(combination) if type(result) == dict else result
 
-    def combination_no():
-        return result.get(DEFAULT, None) if type(result) == dict else result
-
-    return combination_yes() if combination in result else combination_no()
+    return maybe(result)[combination].or_else(result)
 
 
 PAED_PATIENT_REPORT = "Paediatric ART Patient Report"

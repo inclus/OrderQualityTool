@@ -32,16 +32,24 @@ class NegativesCheckDataSourceTestCase(TestCase):
         ip = "I1"
         district = "D1"
         cycle = "Jan - Feb 2015"
-        self.score = Score.objects.create(name=name, warehouse=warehouse, ip=ip, district=district, REPORTING={DEFAULT: YES},
-                                          WEB_BASED={DEFAULT: YES}, cycle=cycle, orderFormFreeOfNegativeNumbers={F1: YES})
+        self.score = Score.objects.create(name=name, warehouse=warehouse, ip=ip, district=district,
+                                          data={
+                                              "REPORTING": {DEFAULT: YES},
+                                              "WEB_BASED": {DEFAULT: YES},
+                                              "orderFormFreeOfNegativeNumbers": {F1: YES}
+                                          }, cycle=cycle,
+                                          )
 
     def test_should_show_check_name(self):
         data_source = NegativesCheckDataSource()
         generated_data = data_source.as_array(self.score, ORDER_FORM_FREE_OF_NEGATIVE_NUMBERS, F1)
         self.assertEquals(generated_data[1][1], get_test_name(ORDER_FORM_FREE_OF_NEGATIVE_NUMBERS))
         self.assertEquals(generated_data[2][0], "")
-        self.assertEquals(generated_data[3], ["", "Facility", "District", "Warehouse", "IP", "Cycle", "Formulation", "Result"])
-        self.assertEquals(generated_data[4], ["", self.score.name, self.score.district, self.score.warehouse, self.score.ip, self.score.cycle, F1, YES])
+        self.assertEquals(generated_data[3],
+                          ["", "Facility", "District", "Warehouse", "IP", "Cycle", "Formulation", "Result"])
+        self.assertEquals(generated_data[4],
+                          ["", self.score.name, self.score.district, self.score.warehouse, self.score.ip,
+                           self.score.cycle, F1, YES])
         self.assertEquals(generated_data[5][0], "")
         self.assertEquals(generated_data[6][0], "")
         self.assertEquals(generated_data[7][1], "RAW ORDER DATA")
@@ -54,22 +62,32 @@ class ConsumptionAndPatientsDataSourceExportTestCase(TestCase):
         ip = "I1"
         district = "D1"
         cycle = "Jan - Feb 2015"
-        self.score = Score.objects.create(name=name, warehouse=warehouse, ip=ip, district=district, REPORTING={DEFAULT: YES},
-                                          WEB_BASED={DEFAULT: YES}, cycle=cycle, consumptionAndPatients={F1: YES})
+        self.score = Score.objects.create(name=name, warehouse=warehouse, ip=ip, district=district,
+                                          data={REPORTING: {DEFAULT: YES},
+                                                WEB_BASED: {DEFAULT: YES},
+                                                "consumptionAndPatients": {F1: YES}
+                                                }, cycle=cycle,
+                                          )
         for q in F1_PATIENT_QUERY:
-            mommy.make(AdultPatientsRecord, name=name, warehouse=warehouse, ip=ip, district=district, cycle=cycle, formulation=q, new=50, existing=50)
-            mommy.make(PAEDPatientsRecord, name=name, warehouse=warehouse, ip=ip, district=district, cycle=cycle, formulation=q, new=100, existing=100)
+            mommy.make(AdultPatientsRecord, name=name, warehouse=warehouse, ip=ip, district=district, cycle=cycle,
+                       formulation=q, new=50, existing=50)
+            mommy.make(PAEDPatientsRecord, name=name, warehouse=warehouse, ip=ip, district=district, cycle=cycle,
+                       formulation=q, new=100, existing=100)
         for formulation in [F1_QUERY]:
             values = generate_values()
-            mommy.make(Consumption, name=name, warehouse=warehouse, ip=ip, district=district, cycle=cycle, formulation=formulation, **values)
+            mommy.make(Consumption, name=name, warehouse=warehouse, ip=ip, district=district, cycle=cycle,
+                       formulation=formulation, **values)
 
     def test_should_show_check_name(self):
         data_source = ConsumptionAndPatientsDataSource()
         generated_data = data_source.as_array(self.score, CONSUMPTION_AND_PATIENTS, F1)
         self.assertEquals(generated_data[1][1], get_test_name(CONSUMPTION_AND_PATIENTS))
         self.assertEquals(generated_data[2][0], "")
-        self.assertEquals(generated_data[3], ["", "Facility", "District", "Warehouse", "IP", "Cycle", "Formulation", "Result"])
-        self.assertEquals(generated_data[4], ["", self.score.name, self.score.district, self.score.warehouse, self.score.ip, self.score.cycle, F1, YES])
+        self.assertEquals(generated_data[3],
+                          ["", "Facility", "District", "Warehouse", "IP", "Cycle", "Formulation", "Result"])
+        self.assertEquals(generated_data[4],
+                          ["", self.score.name, self.score.district, self.score.warehouse, self.score.ip,
+                           self.score.cycle, F1, YES])
         self.assertEquals(generated_data[5][0], "")
         self.assertEquals(generated_data[6][0], "")
         self.assertEquals(generated_data[7][1], "RAW ORDER DATA")
@@ -82,7 +100,8 @@ class ConsumptionAndPatientsDataSourceExportTestCase(TestCase):
         self.assertEquals(generated_data[8][4], "PATIENTS")
         self.assertEquals(generated_data[9], [])
         self.assertEquals(generated_data[10], ["", F1_QUERY, "", "", F1_PATIENT_QUERY[0], ""])
-        self.assertEquals(generated_data[11], ["", FIELD_NAMES.get(COMBINED_CONSUMPTION), 50, "", FIELD_NAMES.get(NEW), 50])
+        self.assertEquals(generated_data[11],
+                          ["", FIELD_NAMES.get(COMBINED_CONSUMPTION), 50, "", FIELD_NAMES.get(NEW), 50])
         self.assertEquals(generated_data[12], ["", TOTAL, 50, "", FIELD_NAMES.get(EXISTING), 50])
         self.assertEquals(generated_data[13], ["", "", "", "", TOTAL, 100])
         self.assertEquals(generated_data[14], [])

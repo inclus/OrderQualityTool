@@ -84,11 +84,15 @@ def create_default_tests(apps, schema_editor):
         model.objects.filter(name=test.get("name")).update(definition=json.dumps(test.get("definition")))
 
 
+def reverse(apps, schema_editor):
+    pass
+
+
 class Migration(migrations.Migration):
     dependencies = [
         ('dashboard', '0033_auto_20171211_0155'),
     ]
 
     operations = [
-        migrations.RunPython(create_default_tests),
+        migrations.RunPython(create_default_tests, reverse),
     ]

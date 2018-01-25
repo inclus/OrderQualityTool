@@ -67,21 +67,9 @@
                     <th>DISTRICT</th>
                     <th>WAREHOUSE</th>
                     <th>IP</th>
-                    <th>REPORTING?</th>
-                    <th>GUIDELINE ADHERENCE: Adult 1L</th>
-                    <th>GUIDELINE ADHERENCE: Adult 2L</th>
-                    <th>GUIDELINE ADHERENCE: Paed 1L</th>
-                    <th>NO BLANKS?</th>
-                    <th>MULTIPLE ORDERS?</th>
-                    <th>NO NEGATIVES?</th>
-                    <th>VOLUME TALLY?</th>
-                    <th>NON-REPEATING?</th>
-                    <th>OPENING = CLOSING?</th>
-                    <th>STABLE CONSUMPTION?</th>
-                    <th>STABLE PATIENT VOLUMES?</th>
-                    <th>WAREHOUSE FULFILMENT?</th>
-                    <th>NRTI vs. INSTI/NNRTI/PI (PAED)</th>
-                    <th>NRTI vs. INSTI/NNRTI/PI (Adults)</th>
+                    {% for check in checks %}
+                        <th>{{ check.name }}</th>
+                    {% endfor %}
                 </tr>
                 </thead>
             </table>

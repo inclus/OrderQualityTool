@@ -58,7 +58,7 @@ class CheckDataSource(object):
     def as_array(self, score, test, combination):
         row = []
         data = self.get_context(score, test, combination)
-        result = getattr(score, test, None)
+        result = score.data.get(test, None)
         name_row = ["", get_test_name(test)]
         row.append([""])
         row.append(name_row)
