@@ -146,7 +146,7 @@ class DefinitionFactory(object):
             self.data['python_class'] = class_name
             return self
 
-        def at_least_of_total(self, ratio=80):
+        def at_least_of_total(self, ratio=100):
             self.data["operator"] = {"id": "AtLeastNOfTotal", "name": "LessThan"}
             self.data["operatorConstant"] = ratio
             return self
@@ -253,7 +253,7 @@ def volume_tally_check():
                           "Abacavir/Lamivudine (ABC/3TC) 60mg/30mg [Pack 60]": 1 / 4.6,
                           "Efavirenz (EFV) 200mg [Pack 90]": 1,
                       })
-    builder.add_group(1, SUM, "previous", "Paed", ["new", "existing"], [])
+    builder.add_group(1, SUM, "current", "Adult", ["new", "existing"], [])
     builder.is_less_than(30)
     return builder.get()
 

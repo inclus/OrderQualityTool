@@ -45,7 +45,29 @@ def values_aggregation(values):
     return py_(values).reject(lambda x: x is None).value()
 
 
-class LessThanComparison(object):
+class Comparison(object):
+    def compare(self, group1, group2, constant=100.0):
+        raise NotImplementedError
+
+    def text(self, group1, group2, constant, result):
+        raise NotImplementedError
+
+
+class LessThanComparison(Comparison):
+    def compare(self, group1, group2, constant=100.0):
+        if group1 == 0:
+            return False
+        group2 = maybe(group2).or_else(0)
+        change = (abs(float(group2) - group1) / group1) * 100.0
+        return change < constant
+
+    def text(self, group1, group2, constant, result):
+        template = "%d and %d differ by %s than %s"
+        group2 = maybe(group2).or_else(0)
+        return template % (group1, group2, "less" if result else "more", constant)
+
+
+class WithinComparison(Comparison):
     def compare(self, group1, group2, constant=100.0):
         group2 = maybe(group2).or_else(0)
         difference = abs(group2 - group1)
@@ -58,7 +80,7 @@ class LessThanComparison(object):
         return template % (group1, group2, "less" if result else "more", constant)
 
 
-class EqualComparison(object):
+class EqualComparison(Comparison):
     def compare(self, group1, group2, constant=100.0):
         constant = as_float_or_1(constant)
         return group1 == group2 * constant
@@ -68,7 +90,7 @@ class EqualComparison(object):
         return template % (group1, group2, "are" if result else "are not")
 
 
-class NoNegativesComparison(object):
+class NoNegativesComparison(Comparison):
     def compare(self, group1, group2, constant=100.0):
         return py_([group1, group2]).flatten_deep().reject(lambda x: x is None).every(lambda x: x >= 0).value()
 
@@ -78,7 +100,7 @@ class NoNegativesComparison(object):
         return template % ("none" if result else "some", values)
 
 
-class NoBlanksComparison(object):
+class NoBlanksComparison(Comparison):
     def compare(self, group1, group2, constant=100.0):
         return py_([group1, group2]).flatten_deep().every(lambda x: x is not None).value()
 
@@ -88,7 +110,7 @@ class NoBlanksComparison(object):
         return template % ("none" if result else "some", values)
 
 
-class AtLeastNOfTotal(object):
+class AtLeastNOfTotal(Comparison):
     def compare(self, group1, group2, constant=100.0):
         total = group2 + group1
         adjusted_total = (constant / 100.0) * total
@@ -96,13 +118,18 @@ class AtLeastNOfTotal(object):
 
     def text(self, group1, group2, constant, result):
         template = "%d %s %d percent of %d"
-        return template % (group1,  "is at least" if result else "is less than", constant, group2)
+        return template % (group1, "is at least" if result else "is less than", constant, group2)
 
 
 available_aggregations = {"SUM": sum_aggregation, "AVG": avg_aggregation, "VALUE": values_aggregation}
-available_comparisons = {"LessThan": LessThanComparison, "AreEqual": EqualComparison,
-                         "NoNegatives": NoNegativesComparison, "NoBlanks": NoBlanksComparison,
-                         "AtLeastNOfTotal": AtLeastNOfTotal}
+available_comparisons = {
+    "LessThan": LessThanComparison,
+    "AreEqual": EqualComparison,
+    "NoNegatives": NoNegativesComparison,
+    "NoBlanks": NoBlanksComparison,
+    "Within": WithinComparison,
+    "AtLeastNOfTotal": AtLeastNOfTotal,
+}
 
 
 def as_values(fields):

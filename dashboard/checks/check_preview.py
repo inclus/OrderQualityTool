@@ -31,7 +31,10 @@ def parse_cycle(sample_cycle, group):
 
 
 def skip_formulation(collection):
-    return py_(collection).flatten().value()[1:]
+    if len(collection) > 0 and type(collection[0]) is list:
+        return py_(collection).map(skip_formulation).flatten().value()
+    return py_(collection).value()[1:]
+
 
 class DBBasedCheckPreview(object):
     def __init__(self, definition):
@@ -101,7 +104,8 @@ class DBBasedCheckPreview(object):
         return {"locations": locations}
 
     def compare_results(self, groups):
-        values = py_(groups).reject(lambda x: x is None).map('factored_values').map(skip_formulation).flatten().reject(lambda x: x is None).value()
+        values = py_(groups).reject(lambda x: x is None).map('factored_values').map(skip_formulation).flatten().reject(
+            lambda x: x is None).value()
         value_count = len(values)
         if self.definition.operator and value_count > 0:
             comparison_class = available_comparisons.get(self.definition.operator.id)

@@ -1,7 +1,9 @@
 from django.test import TestCase
 from nose_parameterized import parameterized
 
+from dashboard.checks.check_builder import guideline_adherence_adult1l_check, volume_tally_check
 from dashboard.checks.legacy.consumption_patients import ConsumptionAndPatientsQualityCheck
+from dashboard.checks.user_defined_check import get_check_from_dict
 from dashboard.data.entities import LocationData
 from dashboard.helpers import *
 
@@ -111,6 +113,12 @@ class ConsumptionAndPatientsQualityCheckTestCase(TestCase):
         ("two", two, NO),
     ])
     def test_check(self, name, data, expected):
-        check = ConsumptionAndPatientsQualityCheck()
-        result = check.for_each_facility(data, check.combinations[0])
-        self.assertEquals(result, expected)
+        # new_check = get_check_from_dict(volume_tally_check())
+        # new_check_result = new_check.for_each_facility(data, {"name": "TDF/3TC/EFV (Adult)"})
+        # self.assertEqual(expected, new_check_result)
+
+        legacy_check = ConsumptionAndPatientsQualityCheck()
+        legacy_check_result = legacy_check.for_each_facility(data, legacy_check.combinations[0])
+        self.assertEqual(expected, legacy_check_result)
+
+        # self.assertEqual(legacy_check_result, new_check_result)

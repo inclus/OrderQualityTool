@@ -9,6 +9,8 @@ class TestLessThanComparison(TestCase):
 
     def test_dont_differ_by_less_than_50(self):
         self.assertTrue(LessThanComparison().compare(10, 14, 50))
+        self.assertFalse(LessThanComparison().compare(0, 3, 50))
+        self.assertFalse(LessThanComparison().compare(3, 0, 50))
         self.assertTrue(LessThanComparison().compare(14, 9, 50))
         self.assertTrue(LessThanComparison().compare(10, 10, 50))
 
