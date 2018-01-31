@@ -42,6 +42,8 @@ angular.module("dashboard").controller("HomeController", ["$scope", "ReportServi
                     return item == start;
                 });
                 $scope.endCycles = $scope.cycles.slice(0, pos + 1);
+
+                $scope.selectedCycle = start;
             }
 
         }, true);
