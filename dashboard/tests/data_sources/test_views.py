@@ -9,7 +9,7 @@ from dashboard.helpers import DEFAULT, YES, F1, F1_QUERY, DF1, DF2, F1_PATIENT_Q
     ESTIMATED_NUMBER_OF_NEW_PREGNANT_WOMEN, ESTIMATED_NUMBER_OF_NEW_ART_PATIENTS, \
     QUANTITY_REQUIRED_FOR_CURRENT_PATIENTS, MONTHS_OF_STOCK_ON_HAND, CLOSING_BALANCE, LOSES_ADJUSTMENTS, \
     COMBINED_CONSUMPTION, QUANTITY_RECEIVED, OPENING_BALANCE
-from dashboard.models import Score, Consumption, AdultPatientsRecord, PAEDPatientsRecord
+from dashboard.models import Score, Consumption, AdultPatientsRecord, PAEDPatientsRecord, FacilityTest
 
 
 def generate_values():
@@ -71,76 +71,57 @@ class NNRTICheckTestMixin(ScoreDetailTestCase):
 
 class ReportingCheckDetailView(WebTest, ScoreDetailTestCase):
     column = 4
-    template_name = "check/base.html"
 
 
 class MultipleOrdersCheckDetailView(WebTest, ScoreDetailTestCase):
     column = 10
-    template_name = "check/base.html"
 
 
 class GapsCheckDetailView(WebTest, ScoreDetailTestCase):
     column = 9
-    template_name = "check/base.html"
 
 
 class GuideLineAdherenceAdult1LCheckDetailView(WebTest, ScoreDetailTestCase):
     column = 5
-    template_name = "check/adherence.html"
 
 
 class GuideLineAdherenceAdult2LCheckDetailView(WebTest, ScoreDetailTestCase):
     column = 6
-    template_name = "check/adherence.html"
 
 
 class GuideLineAdherencePaed1LCheckDetailView(WebTest, ScoreDetailTestCase):
     column = 7
-    template_name = "check/adherence.html"
 
 
 class NNRTIPaedCheckDetailView(WebTest, NNRTICheckTestMixin):
     check = NNRTIPAEDCheck
     column = 17
-    template_name = "check/nnrti.html"
 
 
 class NNRTICurrentAdultCheckDetailView(WebTest, NNRTICheckTestMixin):
     check = NNRTIADULTSCheck
-    column = 18
-    template_name = "check/nnrti.html"
-
-
-class StablePatientsCheckDetailView(WebTest, ScoreDetailTestCase):
-    column = 15
-    template_name = "check/patientStability.html"
+    column = 16
 
 
 class ConsumptionAndPatientsCheckDetailView(WebTest, ScoreDetailTestCase):
     column = 11
-    template_name = "check/consumptionAndPatients.html"
 
 
 class WarehouseCheckDetailView(WebTest, ScoreDetailTestCase):
-    column = 16
-    template_name = "check/differentOrdersOverTime.html"
+    column = 15
 
 
 class DiffOrdersCheckDetailView(WebTest, ScoreDetailTestCase):
     column = 12
-    template_name = "check/differentOrdersOverTime.html"
 
 
 class ClosingBalanceCheckDetailView(WebTest, ScoreDetailTestCase):
     column = 13
-    template_name = "check/differentOrdersOverTime.html"
 
 
 class NegativesCheckDetailView(WebTest, ScoreDetailTestCase):
     column = 10
-    template_name = "check/orderFormFreeOfNegativeNumbers.html"
 
 
 class StableConsumptionCheckDetailView(WebTest, ScoreDetailTestCase):
     column = 14
-    template_name = "check/differentOrdersOverTime.html"

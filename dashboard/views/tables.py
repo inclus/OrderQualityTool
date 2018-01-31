@@ -1,4 +1,5 @@
 import csv
+import json
 
 from django.db.models import Q
 from django.http import HttpResponse
@@ -8,6 +9,7 @@ from django_datatables_view.base_datatable_view import BaseDatatableView
 from pydash import py_
 
 from dashboard.checks.check_builder import FACILITY_TWO_GROUPS_WITH_SAMPLE
+from dashboard.checks.user_defined_check import get_check_from_dict
 from dashboard.helpers import *
 from dashboard.models import Score, FacilityTest
 
@@ -109,18 +111,17 @@ class ScoreDetailsView(View):
         response_data = {'score': score_data, 'has_result': has_result}
         template_name = "check/base.html"
         if has_result:
-            test = self.get_test_by_column(column)
-            # if test in TEST_DATA:
-            #     data_source_class = TEST_DATA.get(test)
-            #     data_source = data_source_class()
-            #     template_name = data_source.get_template(test)
-            #     response_data['data'] = data_source.load(score, test, combination)
-            if score.data:
-                result = score.data.get(test.name)
+            check_obj = self.get_test_by_column(column)
+            check = get_check_from_dict(json.loads(check_obj.definition))
+            response_data['data'] = check.get_preview_data({'name': score.name, "district": score.district},
+                                                           score.cycle, {"name": combination})
+            if score.data and type(score.data) is dict:
+                result = score.data.get(check_obj.name)
             else:
                 result = None
-            actual_result = get_actual_result(result, combination)
-            result_data = {'test': test.short_description, 'result': scores.get(actual_result),
+            # actual_result = get_actual_result(result, combination)
+            result_data = {'name': check_obj.name, 'test': check_obj.short_description,
+                           'result': scores.get(response_data['data']['result'][combination]),
                            'has_combination': len(maybe(result).or_else([])) > 1}
             response_data['result'] = result_data
         response_data['detail'] = {'id': id, 'column': column, 'test': score.name}
@@ -134,17 +135,62 @@ class ScoreDetailsView(View):
         return render_to_response(template_name, context=response_data)
 
 
+def results_as_array(response_data, score, combination):
+    row = []
+    name_row = [response_data['result']['name']]
+    row.append([""])
+    row.append(name_row)
+    row.append([""])
+    headers = ["Facility", "District", "Warehouse", "IP", "Cycle"]
+    details = [score.name, score.district, score.warehouse, score.ip, score.cycle]
+    if combination != DEFAULT:
+        headers.append("Formulation")
+        details.append(combination)
+    headers.append("Result")
+    details.append(response_data['result']['result'])
+    row.append(headers)
+    row.append(details)
+    row.append([""])
+    row.append([""])
+
+    groups = response_data['data'].get('groups', [])
+    if len(groups) > 0:
+        for group in groups:
+            row.append([""])
+            row.append([group['name']])
+            row.append([""])
+            group_headers = ["Formulation"]
+            group_headers.extend(group['headers'])
+            row.append(group_headers)
+            for value_row in group['values']:
+                row.append(value_row)
+
+        row.append([""])
+        row.append([""])
+        row.append(["Factored"])
+        row.append([""])
+
+        for group in groups:
+            row.append([""])
+            row.append([group['name']])
+            row.append([""])
+            group_headers = ["Formulation"]
+            group_headers.extend(group['headers'])
+            row.append(group_headers)
+            for value_row in group['factored_values']:
+                row.append(value_row)
+    return row
+
+
 class ScoreDetailsCSVView(ScoreDetailsView):
     def get(self, request, id, column):
-        view = ScoresTableView()
-        test = view.columns[int(column)]
         response_data, template_name, score, combination = self.get_context_data(request, id, column)
         response = HttpResponse(content_type='text/csv')
-        response['Content-Disposition'] = 'attachment; filename="%s-%s.csv"' % (score.name, test)
+        response['Content-Disposition'] = 'attachment; filename="%s-%s.csv"' % (
+            score.name, response_data['result']['name'])
         writer = csv.writer(response)
-        data_source_class = TEST_DATA.get(test)
-        data_source = data_source_class()
-        writer.writerows(data_source.as_array(score, test, combination))
+
+        writer.writerows(results_as_array(response_data, score, combination))
         return response
 
 

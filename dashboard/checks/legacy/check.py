@@ -51,6 +51,11 @@ class QCheck:
     def for_each_facility(self, data, combination, previous_cycle_data=None):
         raise NotImplementedError(self.test)
 
+    def get_result_key(self, sample_tracer):
+        if sample_tracer and "name" in sample_tracer:
+            return sample_tracer.get("name")
+        return "DEFAULT"
+
 
 def facility_not_reporting(location_data):
     return location_data.location.status.strip().lower() != 'reporting'

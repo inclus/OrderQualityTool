@@ -41,15 +41,18 @@ class DBBasedCheckPreview(object):
         self.definition = definition
 
     @timeit
-    def get_preview_data(self):
-        sample_location = self.definition.sample.get('location')
-        sample_cycle = self.definition.sample.get('cycle')
-        sample_tracer = self.definition.sample.get('tracer')
+    def get_preview_data(self, sample_location=None, sample_cycle=None, sample_tracer=None):
+        if sample_location is None:
+            sample_location = self.definition.sample.get('location')
+        if sample_cycle is None:
+            sample_cycle = self.definition.sample.get('cycle')
+        if sample_tracer is None:
+            sample_tracer = self.definition.sample.get('tracer')
         groups = []
         for group in self.definition.groups:
             values_for_group = self._group_values_from_db(group, sample_cycle, sample_location, sample_tracer)
             groups.append(values_for_group)
-        data = {'groups': groups, 'factored_groups': list()}
+        data = {'groups': groups}
         comparison_result, comparison_text = self.compare_results(groups)
         data['result'] = {self.get_result_key(sample_tracer): comparison_result}
         data['resultText'] = comparison_text

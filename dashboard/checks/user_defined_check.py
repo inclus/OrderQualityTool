@@ -49,6 +49,7 @@ class UserDefinedFacilityCheck(DBBasedCheckPreview):
         return py_(records).reject(lambda x: x.formulation.lower() not in formulations).map(
             as_values(group.selected_fields)).value()
 
+
 class UserDefinedFacilityTracedCheck(UserDefinedFacilityCheck):
     def get_combinations(self):
         return [tracer.get("name") for tracer in self.definition.groups[0].model.tracing_formulations]

@@ -1,53 +1,126 @@
 <div class="modal-dialog modal-lg">
     <div class="modal-content">
         <div class="modal-body">
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                    aria-hidden="true">&times;</span></button>
             <div class="row text-center score-header">
-                <span class="score_detail_title">{{result.test}} </span>
+                <span class="score_detail_title">{{ result.test }} </span>
             </div>
             <hr>
             <div class="facility-detail">
                 <div class="score-location-item">
-                    <span class="text-up">{{score.name}}</span>
+                    <span class="text-up">{{ score.name }}</span>
                     <span class="text-down">FACILITY</span>
                 </div>
                 <div class="score-location-item">
-                    <span class="text-up">{{score.district}}</span>
+                    <span class="text-up">{{ score.district }}</span>
                     <span class="text-down">DISTRICT</span>
                 </div>
                 <div class="score-location-item">
-                    <span class="text-up">{{score.warehouse}}</span>
+                    <span class="text-up">{{ score.warehouse }}</span>
                     <span class="text-down">WAREHOUSE</span>
                 </div>
                 <div class="score-location-item">
-                    <span class="text-up">{{score.ip}}</span>
+                    <span class="text-up">{{ score.ip }}</span>
                     <span class="text-down">IP</span>
                 </div>
                 <div class="score-location-item">
-                    <span class="text-up">{{score.cycle}}</span>
+                    <span class="text-up">{{ score.cycle }}</span>
                     <span class="text-down">CYCLE</span>
                 </div>
                 {% if result.has_combination %}
-                <div class="score-location-item">
-                    <span class="text-up">{{score.combination}}</span>
-                    <span class="text-down">FORMULATION</span>
-                </div>
+                    <div class="score-location-item">
+                        <span class="text-up">{{ score.combination }}</span>
+                        <span class="text-down">FORMULATION</span>
+                    </div>
                 {% endif %}
 
-                <div class="score-location-item omega score-{{result.result}}">
-                    <span class="text-up">{{result.result}}</span>
+                <div class="score-location-item omega score-{{ result.result }}">
+                    <span class="text-up">{{ result.result }}</span>
                     <span class="text-down">RESULT</span>
                 </div>
             </div>
             <hr>
-            <div class="row text-center">
-                {% block content %}
-                {% endblock %}
-            </div>
+            {% for group in data.groups %}
+                <div class="row text-center">
+                    <h5>
+                        {{ group.name }}
+                    </h5>
+                    <table class="table table-striped table-bordered table-condensed">
+                        <thead>
+                        <tr>
+                            <th>Formulation</th>
+                            {% for header in group.headers %}
+                                <th>{{ header }}</th>
+                            {% endfor %}
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for value in group.values %}
+                            <tr ng-repeat="value in group.values">
+                                {% for item in value %}
+                                    <td>{{ item }}</td>
+                                {% endfor %}
+
+                            </tr>
+                        {% endfor %}
+
+                        </tbody>
+
+
+                    </table>
+                    {% if result.has_combination %}
+                        <div>
+                            <h5>
+                                Calculated Values for {{ group.name }}
+                            </h5>
+                            <table class="table">
+                                <thead>
+                                <tr>
+                                    <th>Formulation</th>
+                                    {% for header in group.headers %}
+                                        <th>{{ header }}</th>
+                                    {% endfor %}
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {% for value in group.values %}
+                                    <tr ng-repeat="value in group.factored_values">
+                                        {% for item in value %}
+                                            <td>{{ item }}</td>
+                                        {% endfor %}
+
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+
+
+                            </table>
+                        </div>
+                    {% endif %}
+
+                    <div class="score-display">
+                        <h4>
+                            {{ group.name }} {{ group.aggregation }} : {{ group.result }}
+                        </h4>
+                    </div>
+                </div>
+            {% endfor %}
+            {% if data.resultText %}
+                <div class="row">
+                    <hr>
+                    <div class="final-score col-md-6 col-md-offset-3">
+                        <span class="-down">{{ data.resultText }}</span>
+                    </div>
+                </div>
+            {% endif %}
             <div class="row">
                 <div class="pull-right">
                     <button type="button" class="btn btn-default" data-dismiss="modal" aria-label="Close">CLOSE</button>
-                    <button type="button" class="btn btn-default" onclick="downloadCSV('{% url "scores-detail-csv" id=detail.id column=detail.column %}?combination={{score.combination}}', '{{details.test}}')">CSV</button>
+                    <button type="button" class="btn btn-default"
+                            onclick="downloadCSV('{% url "scores-detail-csv" id=detail.id column=detail.column %}?combination={{ score.combination }}', '{{ details.test }}')">
+                        CSV
+                    </button>
                 </div>
             </div>
         </div>

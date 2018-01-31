@@ -10,7 +10,6 @@ from webtest import Upload
 
 from dashboard.helpers import *
 from dashboard.models import Cycle, Score, DashboardUser, MultipleOrderFacility, LocationToPartnerMapping, FacilityTest
-from dashboard.views.data_sources import get_test_name
 
 
 class HomeViewTestCase(WebTest):
@@ -255,7 +254,6 @@ class ScoreDetailsViewTestCase(WebTest):
     def test_can_get_location_data(self):
         score = Score.objects.create(name="Name 1", ip="IP 1", district="District 1", warehouse="Warehouse 1")
         url = reverse(self.url_name, kwargs={"id": score.id, "column": 5})
-        print(py_(FacilityTest.objects.all()).map(lambda x: {"name": x.name, "o": x.order}).value())
         response = self.app.get(url)
         self.assertEqual(200, response.status_code)
         self.assertTemplateUsed(response, "check/base.html")
