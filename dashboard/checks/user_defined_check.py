@@ -40,6 +40,15 @@ class UserDefinedFacilityCheck(DBBasedCheckPreview):
                 "factored_values": factored_values,
                 "result": self.aggregate_values(group, factored_values)
             }
+        return {
+            "name": group.name,
+            "aggregation": maybe(group.aggregation).name.or_else(None),
+            "values": [],
+            "headers": group.selected_fields,
+            "has_factors": group.has_factors,
+            "factored_values": [],
+            "result": None
+        }
 
     def get_values_from_records(self, records, group):
         try:
