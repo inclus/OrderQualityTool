@@ -55,6 +55,7 @@ class Comparison(object):
 
 class LessThanComparison(Comparison):
     def compare(self, group1, group2, constant=100.0):
+        group1 = maybe(group1).or_else(0)
         if group1 == 0:
             return False
         group2 = maybe(group2).or_else(0)
