@@ -107,8 +107,7 @@
             </div>
         </div>
     </div>
-
-    <div class="has_no_groups" ng-if="ctrl.definition.groups.length == 0">
+    <div class="has_no_groups" ng-if="!ctrl.definition.groups">
 <div class="row">
     <label for="">Python Class</label>
     <input  class="vTextField" type="text" ng-model="ctrl.definition.python_class" placeholder="Full Path to the python class">
