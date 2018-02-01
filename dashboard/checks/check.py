@@ -64,6 +64,7 @@ class LessThanComparison(Comparison):
 
     def text(self, group1, group2, constant, result):
         template = "%d and %d differ by %s than %s"
+        group1 = maybe(group1).or_else(0)
         group2 = maybe(group2).or_else(0)
         return template % (group1, group2, "less" if result else "more", constant)
 

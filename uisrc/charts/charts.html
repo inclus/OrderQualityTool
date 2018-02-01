@@ -1,0 +1,49 @@
+<div class="row">
+    <div class="col-md-12">
+        <h3>KEY METRICS</h3>
+        <div class="quality_test" ng-repeat="test in ctrl.featuredTests" ng-click="ctrl.select(test)"
+             ng-class="{'quality_test_active': ctrl.selectedTest.name == test.name}">
+            <a>
+                <span class="quality_test__metric">{{ test.metric }} %</span>
+                <span class="quality_test__description">{{ test.name | uppercase }}</span>
+            </a>
+        </div>
+        <div class="quality_test quality_test_add" ng-click="ctrl.select(ctrl.otherTests[0])"
+             ng-class="{'quality_test_active': ctrl.featuredTests.indexOf(ctrl.selectedTest) == -1}">
+            <a>
+                <span class="quality_test__metric glyphicon glyphicon-plus"></span>
+                <span class="quality_test__description">CLICK TO SHOW MORE TESTS</span>
+            </a>
+        </div>
+    </div>
+
+</div>
+<div class="row">
+    <div class="col-md-3" ng-if="ctrl.featuredTests.indexOf(ctrl.selectedTest) == -1">
+        <h5>SELECT TEST</h5>
+        <select
+                ng-model="ctrl.otherTest"
+                ng-change="ctrl.select(ctrl.otherTest)"
+                class="form-control select-drop"
+                ng-options="test.name for test in ctrl.otherTests track by test.id">
+        </select>
+        <h5 ng-show="ctrl.selectedTest.sampled">Choose FORMULATION</h5>
+        <select
+                ng-show="ctrl.selectedTest.sampled"
+                ng-model="ctrl.selectedRegimen"
+                class="form-control select-drop"
+                ng-options="regimen.name for regimen in ctrl.selectedTest.regimens">
+        </select>
+    </div>
+    <div ng-class="{'col-md-9': ctrl.featuredTests.indexOf(ctrl.selectedTest) == -1, 'col-md-12': ctrl.featuredTests.indexOf(ctrl.selectedTest) > -1}">
+        <div class="test-area clearfix">
+            <div>
+                <h4 class="text-center">{{ ctrl.selectedTest.name }}</h4>
+                <div class="page_graph">
+                    <angular-chart options="ctrl.options"></angular-chart>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>

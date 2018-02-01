@@ -15,9 +15,10 @@ from rest_framework.generics import ListAPIView
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from dashboard.checks.check_builder import FACILITY_TWO_GROUPS_WITH_SAMPLE
 from dashboard.helpers import *
 from dashboard.models import Score, WAREHOUSE, DISTRICT, MultipleOrderFacility, Cycle, MOH_CENTRAL, Consumption, \
-    AdultPatientsRecord, PAEDPatientsRecord
+    AdultPatientsRecord, PAEDPatientsRecord, FacilityTest, TracingFormulations
 from dashboard.serializers import ScoreSerializer, NewImportSerializer
 from dashboard.tasks import import_data_from_dhis2
 
@@ -149,23 +150,6 @@ def get_most_recent_cycle(model=Score, field='cycle'):
         return most_recent_cycle
 
 
-class ReportMetrics(APIView):
-    def get(self, request):
-        filters = build_filters(self.request)
-        adh = self.request.GET.get("adh", "Adult 1L")
-        most_recent_cycle = get_most_recent_cycle()
-        adh_filter = "%s%s" % (GUIDELINE_ADHERENCE, adh.replace(" ", ""))
-        reporting_scores = aggregate_scores(self.request.user, REPORTING, [most_recent_cycle], DEFAULT,
-                                            {YES: 'reporting', NO: 'not_reporting', NOT_REPORTING: 'n_a'},
-                                            {YES: YES, NO: NO, NOT_REPORTING: NOT_REPORTING}, filters)
-        adherence_scores = aggregate_scores(self.request.user, adh_filter, [most_recent_cycle], DEFAULT,
-                                            {YES: 'yes', NO: 'no', NOT_REPORTING: 'not_reporting'},
-                                            {YES: YES, NO: NO, NOT_REPORTING: NOT_REPORTING}, filters)
-        report_rate = "{0:.1f}".format(reporting_scores[0]['reporting']) if len(reporting_scores) > 0 else ""
-        adherence = "{0:.1f}".format(adherence_scores[0]['yes']) if len(adherence_scores) > 0 else ""
-        return Response({"reporting": report_rate, "adherence": adherence})
-
-
 def add_item_to_filter(name, value, filter):
     if value is not None and "all %s" % name not in value.lower():
         filter[name] = value
@@ -182,9 +166,28 @@ def build_filters(request):
     return filters
 
 
+def prepare_for_ui(regimens):
+    def for_each_item(item):
+        new_item = {"name": item["name"], "id": item["id"]}
+        definition = json.loads(maybe(item)["definition"].or_else("{}"))
+        new_item["sampled"] = maybe(definition)['type']['id'].or_else("") == FACILITY_TWO_GROUPS_WITH_SAMPLE
+        new_item["regimens"] = regimens
+        return new_item
+
+    return for_each_item
+
+
+class GetTestsAPIView(APIView):
+    def get(self, request):
+        all_tests = FacilityTest.objects.order_by('order').values('id', 'name', 'order', 'definition')
+        regimens = TracingFormulations.objects.filter(model="Consumption").values('name')
+        all_tests = pydash.py_(all_tests).map(prepare_for_ui(regimens)).value()
+        return Response({'featured': all_tests[:2], 'other': all_tests[2:]})
+
+
 class ScoresAPIView(APIView):
     def generate_data(self, test, start, end, formulation=DEFAULT,
-                      keys={YES: 'yes', NO: 'no', NOT_REPORTING: 'not_reporting'},
+                      keys={YES: YES, NO: NO, NOT_REPORTING: NOT_REPORTING},
                       count_values={YES: YES, NO: NO, NOT_REPORTING: NOT_REPORTING}):
         filters = build_filters(self.request)
         if formulation is None:
@@ -198,100 +201,13 @@ class ScoresAPIView(APIView):
         results = aggregate_scores(self.request.user, test, cycles, formulation, keys, count_values, filters)
         return Response({'values': results})
 
-
-class FacilitiesReportingView(ScoresAPIView):
-    test = REPORTING
-
-    def get(self, request):
+    def get(self, request, id):
         start = request.GET.get('start', None)
         end = request.GET.get('end', None)
-        keys = {YES: 'reporting', NO: 'not_reporting', NOT_REPORTING: 'n_a'}
-        return self.generate_data(self.test, start, end, None, keys)
-
-
-class FacilitiesMultipleReportingView(ScoresAPIView):
-    def get(self, request):
-        scores_filter = {}
-        filters = build_filters(self.request)
-        if request.user:
-            access_level = request.user.access_level
-            access_area = request.user.access_area
-            if access_level and access_area:
-                scores_filter[access_level.lower()] = access_area
-        if request.user.is_superuser:
-            scores_filter = filters
-
-        most_recent_cycle = get_most_recent_cycle(MultipleOrderFacility)
-        if most_recent_cycle:
-            cycle = request.GET.get('cycle', most_recent_cycle)
-            records = MultipleOrderFacility.objects.filter(cycle=cycle, **scores_filter).order_by('name').values('name',
-                                                                                                                 'district',
-                                                                                                                 'ip',
-                                                                                                                 'warehouse')
-            return Response({"values": records})
-        return Response({"values": []})
-
-
-class OrderFormFreeOfGapsView(ScoresAPIView):
-    test = ORDER_FORM_FREE_OF_GAPS
-
-    def get(self, request):
-        start = request.GET.get('start', None)
-        end = request.GET.get('end', None)
-        return self.generate_data(self.test, start, end)
-
-
-class OrderFormFreeOfNegativeNumbersView(ScoresAPIView):
-    test = ORDER_FORM_FREE_OF_NEGATIVE_NUMBERS
-
-    def get(self, request):
-        start = request.GET.get('start', None)
-        end = request.GET.get('end', None)
-        formulation = request.GET.get('regimen', None)
-        return self.generate_data(self.test, start, end, formulation)
-
-
-class DifferentOrdersOverTimeView(OrderFormFreeOfNegativeNumbersView):
-    test = DIFFERENT_ORDERS_OVER_TIME
-
-
-class ClosingBalanceView(DifferentOrdersOverTimeView):
-    test = CLOSING_BALANCE_MATCHES_OPENING_BALANCE
-
-
-class ConsumptionAndPatientsView(DifferentOrdersOverTimeView):
-    test = CONSUMPTION_AND_PATIENTS
-
-
-class StableConsumptionView(DifferentOrdersOverTimeView):
-    test = STABLE_CONSUMPTION
-
-
-class WarehouseFulfilmentView(DifferentOrdersOverTimeView):
-    test = WAREHOUSE_FULFILMENT
-
-
-class StablePatientVolumesView(DifferentOrdersOverTimeView):
-    test = STABLE_PATIENT_VOLUMES
-
-
-class GuideLineAdherenceView(DifferentOrdersOverTimeView):
-    test = GUIDELINE_ADHERENCE
-
-    def get(self, request):
-        start = request.GET.get('start', None)
-        end = request.GET.get('end', None)
-        formulation = request.GET.get('regimen', None)
-        test_name = "%s%s" % (self.test, formulation.replace(" ", ""))
-        return self.generate_data(test_name, start, end, DEFAULT)
-
-
-class NNRTIAdultsView(OrderFormFreeOfGapsView):
-    test = NNRTI_ADULTS
-
-
-class NNRTIPaedView(OrderFormFreeOfGapsView):
-    test = NNRTI_PAED
+        regimen = request.GET.get('regimen', None)
+        keys = {YES: 'yes', NO: 'no', NOT_REPORTING: 'not_reporting'}
+        test = FacilityTest.objects.get(id=id)
+        return self.generate_data(test.name, start, end, regimen, keys)
 
 
 class FilterValuesView(APIView):

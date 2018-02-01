@@ -53,10 +53,10 @@ class CyclesViewTestCase(WebTest):
 class ReportingRateAggregateViewTestCase(WebTest):
     def test_should_only_consider_faciilites_user_has_access_to(self):
         cycle = 'Jan - Feb %s' % now().format("YYYY")
-        Score.objects.create(name="F1", ip="IP1", cycle=cycle, data={"REPORTING":{DEFAULT: YES}})
-        Score.objects.create(name="F2", ip="IP1", cycle=cycle, data={"REPORTING":{DEFAULT: NO}})
+        Score.objects.create(name="F1", ip="IP1", cycle=cycle, data={"Facility Reporting":{DEFAULT: YES}})
+        Score.objects.create(name="F2", ip="IP1", cycle=cycle, data={"Facility Reporting":{DEFAULT: NO}})
         user = mommy.make(DashboardUser, access_level='IP', access_area='IP1')
-        url = reverse('submiited_order')
-        response = self.app.get(url, user=user)
+        response = self.app.get("/api/test/1/", user=user)
+        print(response)
         data = json.loads(response.content.decode('utf8'))['values']
-        self.assertIn({"reporting": 50, "cycle": cycle, "not_reporting": 50, "n_a": 0}, data)
+        self.assertIn({"yes": 50, "cycle": cycle, "no": 50, "not_reporting": 0}, data)

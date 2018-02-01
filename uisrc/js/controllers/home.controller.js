@@ -114,24 +114,7 @@ angular.module("dashboard").controller("HomeController", ["$scope", "ReportServi
         $scope.$watch("worstPerforming", function() {
             updateWorstList();
         });
-        var setupMetrics = function(guidelineType){
-          ReportService.getMetrics(guidelineType, $scope.selectedDistrict, $scope.selectedIp, $scope.selectedWarehouse).then(function(data) {
-            $scope.webRate = data.webBased;
-            $scope.reportingRate = data.reporting;
-            $scope.adherenceRate = data.adherence;
-          });
-        };
 
-        $scope.$on("GUIDELINE_TYPE", function(event, data) { setupMetrics(data); });
-
-        setupMetrics();
-
-        $scope.$watchGroup(["selectedIp", "selectedWarehouse", "selectedDistrict"], function(data){
-            console.log(data, "changes -------------------");
-            if(data[0] && data[1] && data[2]){
-              setupMetrics();
-            }
-        });
         ReportService.getRankingsAccess().then(function(data) {
           $scope.rankingLevels = data.values;
           $scope.bestPerforming = $scope.rankingLevels[0];

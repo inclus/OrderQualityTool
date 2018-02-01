@@ -49,12 +49,12 @@ class DataImportViewTestCase(WebTest):
 class FacilitiesReportingView(WebTest):
     def test_that_cycles_are_padded(self):
         cycle = 'Jan - Feb %s' % now().format("YYYY")
-        Score.objects.create(data={"REPORTING": {DEFAULT: YES}, "WEB_BASED": {DEFAULT: YES}}, name="F2", cycle=cycle)
-        Score.objects.create(data={"REPORTING": {DEFAULT: NO}, "WEB_BASED": {DEFAULT: YES}}, name="F3", cycle=cycle)
-        url = "/api/test/submittedOrder"
+        Score.objects.create(data={"Facility Reporting": {DEFAULT: YES}, "WEB_BASED": {DEFAULT: YES}}, name="F2", cycle=cycle)
+        Score.objects.create(data={"Facility Reporting": {DEFAULT: NO}, "WEB_BASED": {DEFAULT: YES}}, name="F3", cycle=cycle)
+        url = "/api/test/1/"
         json_response = self.app.get(url, user="testuser").content.decode('utf8')
         data = loads(json_response)['values']
-        self.assertIn({"reporting": 50, "cycle": cycle, "not_reporting": 50, "n_a": 0}, data)
+        self.assertIn({"yes": 50, "cycle": cycle, "no": 50, "not_reporting": 0}, data)
 
     @patch("dashboard.views.api.now")
     def test_that_start_end_work(self, time_mock):
@@ -62,20 +62,12 @@ class FacilitiesReportingView(WebTest):
         cycle = 'Jan - Feb 2015'
         cycle_2 = 'Mar - Apr 2015'
         Cycle.objects.create(title=cycle)
-        url = "/api/test/submittedOrder?start=%s&end=%s" % (cycle, cycle_2)
+        url = "/api/test/1/?start=%s&end=%s" % (cycle, cycle_2)
         json_response = self.app.get(url, user="testuser").content.decode('utf8')
         data = loads(json_response)['values']
         self.assertEqual(len(data), 2)
 
 
-class FacilitiesMultipleReportingViewTestCase(WebTest):
-    def test_shows_all_facilities_that_report_multiple_times(self):
-        cycle = 'Jan - Feb %s' % now().format("YYYY")
-        MultipleOrderFacility.objects.create(cycle=cycle, name="one")
-        url = "/api/test/facilitiesMultiple"
-        json_response = self.app.get(url, user="testuser").content.decode('utf8')
-        data = loads(json_response)['values']
-        self.assertEqual(len(data), 1)
 
 
 class BestDistrictReportingViewFor(WebTest):

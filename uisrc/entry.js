@@ -5,7 +5,6 @@ require("./js/ui-select/select.css");
 require("./js/ui-select/selectize.css");
 require("./js/ui-select/selectize.bootstrap3.css");
 require("./css/datatables.css");
-require("angular-chart.js/dist/angular-chart.css");
 require("c3/c3.css");
 require("ng-table/dist/ng-table.css");
 require("datatables.net-bs/css/dataTables.bootstrap.css");
