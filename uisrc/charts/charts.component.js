@@ -12,8 +12,9 @@ var chartsController = ["$scope", "chartsService", function ($scope, chartsServi
 
         if (test.sampled) {
             ctrl.selectedRegimen = test.regimens[0];
+        } else {
+            ctrl.selectedRegimen = null;
         }
-        console.log("test selected", test.name, $scope.instance, ctrl.options);
 
     };
     chartsService.getTests().then(function (data) {
