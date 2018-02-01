@@ -18,7 +18,7 @@
     
         <div class="row-vertical group-container" ng-repeat="definitionGroup in ctrl.definition.groups">
             <div class="row with-space-between">
-                <h3>{{ definitionGroup.name }}</h3>
+                <input ng-model="definitionGroup.name" type="text">
             </div>
             <div class="group">
                 <div class="group-control">
