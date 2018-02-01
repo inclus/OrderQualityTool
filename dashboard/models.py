@@ -189,6 +189,7 @@ class FacilityTest(OrderedModel):
     definition = TestDefinitionField()
     description = models.TextField()
     short_description = models.TextField()
+    featured = models.BooleanField(default=False)
 
     class Meta(OrderedModel.Meta):
         verbose_name_plural = "Facility Tests"

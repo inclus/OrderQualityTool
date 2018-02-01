@@ -179,10 +179,17 @@ def prepare_for_ui(regimens):
 
 class GetTestsAPIView(APIView):
     def get(self, request):
-        all_tests = FacilityTest.objects.order_by('order').values('id', 'name', 'order', 'definition')
+        featured_tests = FacilityTest.objects.filter(featured=True).order_by('order').values('id', 'name', 'order',
+                                                                                             'definition')[:2]
+        ids_for_featured_tests = [item['id'] for item in featured_tests]
+        other_tests = FacilityTest.objects.exclude(id__in=ids_for_featured_tests).order_by('order').values('id',
+                                                                                                           'name',
+                                                                                                           'order',
+                                                                                                           'definition')
         regimens = TracingFormulations.objects.filter(model="Consumption").values('name')
-        all_tests = pydash.py_(all_tests).map(prepare_for_ui(regimens)).value()
-        return Response({'featured': all_tests[:2], 'other': all_tests[2:]})
+        featured = pydash.py_(featured_tests).map(prepare_for_ui(regimens)).value()
+        other = pydash.py_(other_tests).map(prepare_for_ui(regimens)).value()
+        return Response({'featured': featured, 'other': other})
 
 
 class ScoresAPIView(APIView):
