@@ -7,7 +7,7 @@ from django.db import migrations
 
 def create_default_tests(apps, schema_editor):
     model = apps.get_registered_model("dashboard", "FacilityTest")
-    model.objects.filter(name_in=["Facility Reporting", "GUIDELINE ADHERENCE (Adult 1L)"]).update(featured=True)
+    model.objects.filter(name__in=["Facility Reporting", "GUIDELINE ADHERENCE (Adult 1L)"]).update(featured=True)
 
 
 def reverse(apps, schema_editor):
