@@ -8,7 +8,10 @@ var chartService = ["$http", "$q",
                 params: params
             }).then(handleResponse);
         };
-        var getFeaturedTests = function () {
+        var getMetrics = function (params) {
+            return $http.get("/api/test/metrics", {params: params}).then(handleResponse);
+        };
+        var getTests = function () {
             return $http.get("/api/test/list").then(handleResponse);
         };
 
@@ -82,7 +85,8 @@ var chartService = ["$http", "$q",
             });
         };
         return {
-            "getTests": getFeaturedTests,
+            "getTests": getTests,
+            "getMetrics": getMetrics,
             "buildOptions": buildOptions
         };
     }

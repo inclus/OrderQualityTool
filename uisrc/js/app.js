@@ -19,7 +19,6 @@ var serviceConstructor = require("../charts/charts.service");
 serviceConstructor(dashboard);
 var componentConstructor = require("../charts/charts.component");
 componentConstructor(dashboard);
-require("./controllers/main.check.controller");
 
 
 dashboard.config(["$stateProvider", "$urlRouterProvider",

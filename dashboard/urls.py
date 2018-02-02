@@ -47,4 +47,5 @@ urlpatterns = [
     url(r'^api/tests/preview/locations$', dashboard.views.definition.PreviewLocationsView.as_view(), name='preview-locations'),
     url(r'^api/tests/tracing/consumption$', dashboard.views.definition.ConsumptionTracingFormulationView.as_view(), name='tracing-consumption'),
     url(r'^api/tests/tracing/patients', dashboard.views.definition.PatientTracingFormulationView.as_view(), name='tracing-patients'),
+    url(r'^api/test/metrics', dashboard.views.api.ReportMetrics.as_view(), name='metrics'),
 ]

@@ -150,6 +150,23 @@ def get_most_recent_cycle(model=Score, field='cycle'):
         return most_recent_cycle
 
 
+class ReportMetrics(APIView):
+    def get(self, request):
+        output = {}
+        facility_filters = build_filters(self.request)
+        most_recent_cycle = get_most_recent_cycle()
+        featured_tests = FacilityTest.objects.filter(featured=True).order_by('order')[:2]
+        for test in featured_tests:
+            scores = aggregate_scores(self.request.user, test.name, [most_recent_cycle], DEFAULT,
+                                      {YES: YES, NO: NO, NOT_REPORTING: NOT_REPORTING},
+                                      {YES: YES, NO: NO, NOT_REPORTING: NOT_REPORTING}, facility_filters)
+
+            rate = "{0:.1f}".format(scores[0][YES]) if len(scores) > 0 else ""
+            output[test.name] = rate
+
+        return Response(output)
+
+
 def add_item_to_filter(name, value, filter):
     if value is not None and "all %s" % name not in value.lower():
         filter[name] = value

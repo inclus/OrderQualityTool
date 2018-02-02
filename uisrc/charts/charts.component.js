@@ -23,6 +23,35 @@ var chartsController = ["$scope", "chartsService", function ($scope, chartsServi
         ctrl.select(data.featured[0]);
     });
 
+    $scope.$watchGroup(
+        ["ctrl.selectedDistrict",
+            "ctrl.selectedIp",
+            "ctrl.selectedWarehouse",
+            "ctrl.startCycle",
+            "ctrl.endCycle",
+            "ctrl.selectedRegimen"], function (newValues) {
+            chartsService.getMetrics({
+                district: newValues[0],
+                ip: newValues[1],
+                warehouse: newValues[2]
+            }).then(function (metrics) {
+                ctrl.featuredTests.forEach(function (test) {
+                    test.metric = metrics[test.name];
+                });
+            });
+            if (ctrl.selectedTest) {
+                chartsService.buildOptions(
+                    ctrl.selectedTest,
+                    ctrl.selectedDistrict,
+                    ctrl.selectedIp,
+                    ctrl.selectedWarehouse,
+                    ctrl.startCycle,
+                    ctrl.endCycle,
+                    ctrl.selectedRegimen).then(function (options) {
+                    ctrl.options = options;
+                });
+            }
+        });
 
     return ctrl;
 }];
