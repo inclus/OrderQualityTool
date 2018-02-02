@@ -119,7 +119,7 @@ class DBBasedCheckPreview(object):
             gs = py_(groups).reject(lambda x: x is None).value()
             if comparator and gs:
                 group1_result = groups[0].get('result')
-                group2_result = maybe(groups[1]).or_else({}).get('result')
+                group2_result = maybe(groups)[1].or_else({}).get('result')
                 comparison_result = comparator.compare(group1_result, group2_result, constant=operator_constant)
                 result_text = comparator.text(group1_result, group2_result, operator_constant, comparison_result)
                 result = "YES" if comparison_result else "NO"

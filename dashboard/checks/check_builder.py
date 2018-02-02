@@ -21,8 +21,8 @@ FORMULATIONS = "formulations"
 TRACING_FORMULATIONS = "tracingFormulations"
 NAME = "name"
 FACILITY_TWO_GROUPS = "FacilityTwoGroups"
-CURRENT_CYCLE = "current"
-PREVIOUS_CYCLE = "previous"
+CURRENT_CYCLE = "Current"
+PREVIOUS_CYCLE = "Previous"
 FACILITY_TWO_GROUPS_WITH_SAMPLE = "FacilityTwoGroupsAndTracingFormulation"
 
 
@@ -48,12 +48,11 @@ class DefinitionFactory(object):
         def __init__(self, data):
             self.data = data
 
-        def add_group(self, position, aggegation, cycle, model, fields, formulations, factors=None):
-            position_ = position + 1
+        def add_group(self, name, aggegation, cycle, model, fields, formulations, factors=None):
             id = "id"
             group = {
-                NAME: "G%d" % position_,
-                "cycle": {id: cycle, NAME: cycle},
+                NAME: name,
+                "cycle": {id: cycle, NAME: "%s Cycle" % cycle},
                 "aggregation": {"id": aggegation, NAME: aggegation},
                 "model": build_model(model, self.data["type"]),
                 "selected_fields": fields,
@@ -63,7 +62,7 @@ class DefinitionFactory(object):
                 group["hasFactors"] = True
                 group["factors"] = factors
 
-            self.data["groups"][position] = group
+            self.data["groups"].append(group)
             return self
 
         def formulations(self, *formulations):
@@ -167,8 +166,7 @@ class DefinitionFactory(object):
             return self
 
     def blank(self):
-        return self.Builder({"groups": [{"fields": [], FORMULATIONS: [], "model": {}},
-                                        {"fields": [], FORMULATIONS: [], "model": {}}]})
+        return self.Builder({"groups": []})
 
     def initial(self):
         group1 = {NAME: "G1", "cycle": {"id": CURRENT_CYCLE, NAME: CURRENT_CYCLE}, }
@@ -203,11 +201,11 @@ def class_based_check(class_name):
 
 def guideline_adherence_adult1l_check():
     builder = DefinitionFactory().blank().type(FACILITY_TWO_GROUPS)
-    builder.add_group(0, SUM, CURRENT_CYCLE, CONSUMPTION_MODEL,
+    builder.add_group("G1", SUM, CURRENT_CYCLE, CONSUMPTION_MODEL,
                       ["estimated_number_of_new_patients", "estimated_number_of_new_pregnant_women"],
                       ["Tenofovir/Lamivudine/Efavirenz (TDF/3TC/EFV) 300mg/300mg/600mg[Pack 30]",
                        "Tenofovir/Lamivudine (TDF/3TC) 300mg/300mg [Pack 30]"])
-    builder.add_group(1, SUM, CURRENT_CYCLE, CONSUMPTION_MODEL,
+    builder.add_group("G2", SUM, CURRENT_CYCLE, CONSUMPTION_MODEL,
                       ["estimated_number_of_new_patients", "estimated_number_of_new_pregnant_women"],
                       ["AZT/3TC/NVP 300/150/200mg", "AZT/3TC 300/150mg"])
     builder.at_least_of_total(80)
@@ -217,9 +215,9 @@ def guideline_adherence_adult1l_check():
 
 def guideline_adherence_adult2l_check():
     builder = DefinitionFactory().blank().type(FACILITY_TWO_GROUPS)
-    builder.add_group(0, SUM, CURRENT_CYCLE, CONSUMPTION_MODEL, ["estimated_number_of_new_patients"],
+    builder.add_group("G1", SUM, CURRENT_CYCLE, CONSUMPTION_MODEL, ["estimated_number_of_new_patients"],
                       ["Atazanavir/Ritonavir (ATV/r) 300mg/100mg [Pack 30]"])
-    builder.add_group(1, SUM, CURRENT_CYCLE, CONSUMPTION_MODEL, ["estimated_number_of_new_patients"],
+    builder.add_group("G2", SUM, CURRENT_CYCLE, CONSUMPTION_MODEL, ["estimated_number_of_new_patients"],
                       ["Lopinavir/Ritonavir (LPV/r) 200mg/50mg [Pack 120]"])
     builder.at_least_of_total(73)
 
@@ -228,9 +226,9 @@ def guideline_adherence_adult2l_check():
 
 def guideline_paed1l_check():
     builder = DefinitionFactory().blank().type(FACILITY_TWO_GROUPS)
-    builder.add_group(0, SUM, CURRENT_CYCLE, CONSUMPTION_MODEL, ["estimated_number_of_new_patients"],
+    builder.add_group("G1", SUM, CURRENT_CYCLE, CONSUMPTION_MODEL, ["estimated_number_of_new_patients"],
                       ["Abacavir/Lamivudine (ABC/3TC) 60mg/30mg [Pack 60]"])
-    builder.add_group(1, SUM, CURRENT_CYCLE, CONSUMPTION_MODEL, ["estimated_number_of_new_patients"],
+    builder.add_group("G2", SUM, CURRENT_CYCLE, CONSUMPTION_MODEL, ["estimated_number_of_new_patients"],
                       ["Zidovudine/Lamivudine/Nevirapine (AZT/3TC/NVP) 60mg/30mg/50mg [Pack 60]",
                        "Zidovudine/Lamivudine (AZT/3TC) 60mg/30mg [Pack 60]"])
     builder.at_least_of_total(80)
@@ -240,7 +238,7 @@ def guideline_paed1l_check():
 
 def no_negatives_check():
     builder = DefinitionFactory().blank().type(FACILITY_TWO_GROUPS_WITH_SAMPLE)
-    builder.add_group(0, VALUE, CURRENT_CYCLE, CONSUMPTION_MODEL,
+    builder.add_group("G1", VALUE, CURRENT_CYCLE, CONSUMPTION_MODEL,
                       ["opening_balance", "consumption", "closing_balance", "estimated_number_of_new_patients"],
                       [])
     builder.has_no_negatives()
@@ -249,7 +247,7 @@ def no_negatives_check():
 
 def no_blanks_check():
     builder = DefinitionFactory().blank().type(FACILITY_TWO_GROUPS_WITH_SAMPLE)
-    builder.add_group(0, VALUE, CURRENT_CYCLE, CONSUMPTION_MODEL,
+    builder.add_group("G1", VALUE, CURRENT_CYCLE, CONSUMPTION_MODEL,
                       ["opening_balance", "consumption", "closing_balance", "estimated_number_of_new_patients"],
                       [])
     builder.has_no_blanks()
@@ -258,13 +256,13 @@ def no_blanks_check():
 
 def volume_tally_check():
     builder = DefinitionFactory().blank().type(FACILITY_TWO_GROUPS_WITH_SAMPLE)
-    builder.add_group(0, SUM, CURRENT_CYCLE, CONSUMPTION_MODEL, ["consumption"], [],
+    builder.add_group("G1", SUM, CURRENT_CYCLE, CONSUMPTION_MODEL, ["consumption"], [],
                       factors={
                           "Tenofovir/Lamivudine/Efavirenz (TDF/3TC/EFV) 300mg/300mg/600mg[Pack 30]": 0.5,
                           "Abacavir/Lamivudine (ABC/3TC) 60mg/30mg [Pack 60]": 1 / 4.6,
                           "Efavirenz (EFV) 200mg [Pack 90]": 1,
                       })
-    builder.add_group(1, SUM, CURRENT_CYCLE, "Adult", ["new", "existing"], [])
+    builder.add_group("G2", SUM, CURRENT_CYCLE, "Adult", ["new", "existing"], [])
     builder.is_less_than(30)
     return builder.get()
 
@@ -272,17 +270,17 @@ def volume_tally_check():
 def non_repeating_check():
     builder = DefinitionFactory().blank().type(FACILITY_TWO_GROUPS_WITH_SAMPLE)
     formulations = ["consumption", "opening_balance", "closing_balance", "estimated_number_of_new_patients"]
-    builder.add_group(0, VALUE, CURRENT_CYCLE, CONSUMPTION_MODEL, formulations, [])
-    builder.add_group(1, VALUE, PREVIOUS_CYCLE, CONSUMPTION_MODEL, formulations, [])
+    builder.add_group("G0", VALUE, CURRENT_CYCLE, CONSUMPTION_MODEL, formulations, [])
+    builder.add_group("G1", VALUE, PREVIOUS_CYCLE, CONSUMPTION_MODEL, formulations, [])
     builder.are_equal()
     return builder.get()
 
 
 def open_closing_check():
     builder = DefinitionFactory().blank().type(FACILITY_TWO_GROUPS_WITH_SAMPLE)
-    builder.add_group(0, VALUE, CURRENT_CYCLE, CONSUMPTION_MODEL,
+    builder.add_group("G1", VALUE, CURRENT_CYCLE, CONSUMPTION_MODEL,
                       ["opening_balance"], [])
-    builder.add_group(1, VALUE, PREVIOUS_CYCLE, CONSUMPTION_MODEL,
+    builder.add_group("G2", VALUE, PREVIOUS_CYCLE, CONSUMPTION_MODEL,
                       ["closing_balance"], [])
     builder.are_equal()
     return builder.get()
@@ -290,23 +288,23 @@ def open_closing_check():
 
 def stable_consumption_check():
     builder = DefinitionFactory().blank().type(FACILITY_TWO_GROUPS_WITH_SAMPLE)
-    builder.add_group(0, SUM, CURRENT_CYCLE, CONSUMPTION_MODEL, ["consumption"], [])
-    builder.add_group(1, SUM, PREVIOUS_CYCLE, CONSUMPTION_MODEL, ["consumption"], [])
+    builder.add_group("G1", SUM, CURRENT_CYCLE, CONSUMPTION_MODEL, ["consumption"], [])
+    builder.add_group("G2", SUM, PREVIOUS_CYCLE, CONSUMPTION_MODEL, ["consumption"], [])
     builder.is_less_than(50)
     return builder.get()
 
 
 def warehouse_fulfillment_check():
     builder = DefinitionFactory().blank().type(FACILITY_TWO_GROUPS_WITH_SAMPLE)
-    builder.add_group(0, VALUE, CURRENT_CYCLE, CONSUMPTION_MODEL, ["quantity_received"], [])
-    builder.add_group(1, VALUE, PREVIOUS_CYCLE, CONSUMPTION_MODEL, ["packs_ordered"], [])
+    builder.add_group("G1", VALUE, CURRENT_CYCLE, CONSUMPTION_MODEL, ["quantity_received"], [])
+    builder.add_group("G2", VALUE, PREVIOUS_CYCLE, CONSUMPTION_MODEL, ["packs_ordered"], [])
     builder.are_equal()
     return builder.get()
 
 
 def nnrti_paed():
     builder = DefinitionFactory().blank().type(FACILITY_TWO_GROUPS_WITH_SAMPLE)
-    builder.add_group(0, SUM, CURRENT_CYCLE, CONSUMPTION_MODEL, ["consumption"], [
+    builder.add_group("G1", SUM, CURRENT_CYCLE, CONSUMPTION_MODEL, ["consumption"], [
         "Abacavir/Lamivudine (ABC/3TC) 60mg/30mg [Pack 60]",
         "Zidovudine/Lamivudine (AZT/3TC) 60mg/30mg [Pack 60]",
         "Efavirenz (EFV) 200mg [Pack 90]"
@@ -315,7 +313,7 @@ def nnrti_paed():
         "Abacavir/Lamivudine (ABC/3TC) 60mg/30mg [Pack 60]": 4.6,
         "Zidovudine/Lamivudine (AZT/3TC) 60mg/30mg [Pack 60]": 4.6,
     })
-    builder.add_group(1, SUM, CURRENT_CYCLE, CONSUMPTION_MODEL, ["consumption"], [
+    builder.add_group("G2", SUM, CURRENT_CYCLE, CONSUMPTION_MODEL, ["consumption"], [
         "Nevirapine (NVP) 50mg [Pack 60]",
         "Lopinavir/Ritonavir (LPV/r) 80mg/20ml oral susp [Bottle 60ml]",
         "Lopinavir/Ritonavir (LPV/r) 100mg/25mg",
@@ -326,7 +324,7 @@ def nnrti_paed():
 
 def nnrti_adult():
     builder = DefinitionFactory().blank().type(FACILITY_TWO_GROUPS_WITH_SAMPLE)
-    builder.add_group(0, SUM, CURRENT_CYCLE, CONSUMPTION_MODEL, ["consumption"], [
+    builder.add_group("G1", SUM, CURRENT_CYCLE, CONSUMPTION_MODEL, ["consumption"], [
         "Zidovudine/Lamivudine (AZT/3TC) 300mg/150mg [Pack 60]",
         "Tenofovir/Lamivudine (TDF/3TC) 300mg/300mg [Pack 30]",
         "Abacavir/Lamivudine (ABC/3TC) 600mg/300mg [Pack 30]"
@@ -335,7 +333,7 @@ def nnrti_adult():
         "Tenofovir/Lamivudine (TDF/3TC) 300mg/300mg [Pack 30]": 2,
         "Abacavir/Lamivudine (ABC/3TC) 600mg/300mg [Pack 30]": 2,
     })
-    builder.add_group(1, SUM, CURRENT_CYCLE, CONSUMPTION_MODEL, ["consumption"], [
+    builder.add_group("G2", SUM, CURRENT_CYCLE, CONSUMPTION_MODEL, ["consumption"], [
         "Efavirenz (EFV) 600mg [Pack 30]",
         "Nevirapine (NVP) 200mg [Pack 60]",
         "Atazanavir/Ritonavir (ATV/r) 300mg/100mg [Pack 30]",

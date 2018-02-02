@@ -12,7 +12,7 @@ FacilityTest = function (metaData) {
         newGroup:
             function (groupNumber) {
                 return {
-                    cycles: groupNumber == 1 ? group1Cycles: group2Cycles,
+                    cycles: groupNumber == 1 ? group1Cycles : group2Cycles,
                     cycle: group1Cycles[0],
                     model: this.models[0],
                     aggregation: this.calculations[0],
@@ -31,11 +31,11 @@ FacilityTest = function (metaData) {
         id: "FacilityTwoGroups",
         name: "Facility with 2 Groups of data",
         comparisons: [
-            {id: "LessThan", name:"Differ By LessThan X %"},
-            {id: "AtLeastNOfTotal", name:"Group1 Is at least N% of the total"},
-            {id: "AreEqual", name:"Are Equal"},
-            {id: "NoNegatives", name:"Has No Negatives"},
-            {id: "NoBlanks", name:"Has No Blanks"},
+            {id: "LessThan", name: "Differ By LessThan X %"},
+            {id: "AtLeastNOfTotal", name: "Group1 Is at least N% of the total"},
+            {id: "AreEqual", name: "Are Equal"},
+            {id: "NoNegatives", name: "Has No Negatives"},
+            {id: "NoBlanks", name: "Has No Blanks"}
         ],
         calculations:
             [
@@ -73,19 +73,19 @@ var SingleGroupFacilityTest = function (metaData) {
             test.newGroup(1, metaData),
         ];
     };
-    
+
     test.calculations = [
         {id: "VALUE", name: "Values"}
     ];
-    
+
     test.comparisons = [
-        {id: "NoNegatives", name:"Has No Negatives"},
-        {id: "NoBlanks", name:"Has No Blanks"},
+        {id: "NoNegatives", name: "Has No Negatives"},
+        {id: "NoBlanks", name: "Has No Blanks"},
     ];
     return test;
 };
 
-var getTypeFromJson = function (metaData, typeData) {
+var getTypeFromJSON = function (metaData, typeData) {
     if (typeData.id === "FacilityTwoGroups") {
         return FacilityTest(metaData);
     }
@@ -102,9 +102,27 @@ var getTypeFromJson = function (metaData, typeData) {
     }
 };
 
+function rebuildGroupsFromJSON(groups, testType, metaData) {
+    var count = 0;
+    return _.map(groups, function (group) {
+        if (testType.id === "FacilityTwoGroups" || testType.id === "FacilityOneGroup") {
+            group.model = models.newModel(group.model.id, group.model.name, metaData, testType.id);
+        }
+        if (testType.id === "FacilityTwoGroupsAndTracingFormulation") {
+            group.model = models.newTracingModel(group.model.id, group.model.name, metaData, testType.id);
+        }
+        group.cycles = count === 0 ? group1Cycles : group2Cycles;
+        count += 1;
+        return group;
+    });
+}
+
 var buildDefinition = function (inputValue, metaData) {
     var definition = JSON.parse(inputValue);
-    definition.type = getTypeFromJson(metaData, definition.type);
+    definition.type = getTypeFromJSON(metaData, definition.type);
+    if (definition.groups) {
+        definition.groups = rebuildGroupsFromJSON(definition.groups, definition.type, metaData);
+    }
     return definition;
 };
 var ClassBasedTest = function (metaData) {
@@ -112,15 +130,12 @@ var ClassBasedTest = function (metaData) {
     test.id = "ClassBased";
     test.name = "Class Based Facility Check";
     test.getGroups = function (metaData) {
-        return [
-        ];
+        return [];
     };
-    
-    test.calculations = [
-    ];
-    
-    test.comparisons = [
-    ];
+
+    test.calculations = [];
+
+    test.comparisons = [];
     return test;
 };
 module.exports = {
