@@ -30,15 +30,16 @@ var chartsController = ["$scope", "chartsService", function ($scope, chartsServi
             "ctrl.startCycle",
             "ctrl.endCycle",
             "ctrl.selectedRegimen"], function (newValues) {
-            chartsService.getMetrics({
-                district: newValues[0],
-                ip: newValues[1],
-                warehouse: newValues[2]
-            }).then(function (metrics) {
-                ctrl.featuredTests.forEach(function (test) {
-                    test.metric = metrics[test.name];
+            if (newValues[0] && newValues[1] && newValues[2])
+                chartsService.getMetrics({
+                    district: newValues[0].district,
+                    ip: newValues[1].ip,
+                    warehouse: newValues[2].warehouse
+                }).then(function (metrics) {
+                    ctrl.featuredTests.forEach(function (test) {
+                        test.metric = metrics[test.name];
+                    });
                 });
-            });
             if (ctrl.selectedTest) {
                 chartsService.buildOptions(
                     ctrl.selectedTest,

@@ -19,10 +19,10 @@ var chartService = ["$http", "$q",
             return getDataForTest(test.id, {
                 start: startCycle,
                 end: endCycle,
-                ip: ip,
+                ip: ip.ip,
                 regimen: regimen,
-                warehouse: warehouse,
-                district: district
+                warehouse: warehouse.warehouse,
+                district: district.district
             }).then(function (data) {
                 var values = data.values;
                 return options = {
