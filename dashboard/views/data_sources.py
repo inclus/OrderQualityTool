@@ -1,10 +1,8 @@
 import pydash
-from dynamic_preferences.registries import global_preferences_registry
 
 from dashboard.helpers import *
 from dashboard.models import Consumption
 
-global_preferences = global_preferences_registry.manager()
 CHECK = "check"
 IS_HEADER = "isHeader"
 HEADERS = "headers"

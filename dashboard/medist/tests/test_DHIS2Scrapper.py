@@ -36,21 +36,19 @@ def build_fake_browser(mock_browser_class):
 class TestDHIS2Scrapper(TestCase):
     @patch("dashboard.medist.scrapper.Browser", autospec=True)
     def test_that_scrapper_generates_correct_login_url(self, mock_browser_class):
-        with self.settings(DHIS2_URL='http://dhis2.web'):
-            fake_browser = build_fake_browser(mock_browser_class)
-            DHIS2Scrapper()
-            mock_browser_class.assert_called_with("phantomjs")
-            fake_browser.visit.assert_called_with("http://dhis2.web/dhis-web-commons-about/about.action")
+        fake_browser = build_fake_browser(mock_browser_class)
+        DHIS2Scrapper()
+        mock_browser_class.assert_called_with("phantomjs")
+        fake_browser.visit.assert_called_with("http://localhost:8080/dhis-web-commons-about/about.action")
 
     @patch("dashboard.medist.scrapper.Browser", autospec=True)
     def test_that_scrapper_generates_correct_report_url(self, mock_browser_class):
-        with self.settings(DHIS2_URL='http://dhis2.web'):
-            fake_browser = build_fake_browser(mock_browser_class)
-            fake_browser.html = "<html></html>"
-            scrapper = DHIS2Scrapper()
-            scrapper.get_standard_report("1", "May", "home")
-            fake_browser.visit.assert_called_with(
-                "http://dhis2.web/dhis-web-reporting/generateHtmlReport.action?uid=1&pe=May&ou=home")
+        fake_browser = build_fake_browser(mock_browser_class)
+        fake_browser.html = "<html></html>"
+        scrapper = DHIS2Scrapper()
+        scrapper.get_standard_report("1", "May", "home")
+        fake_browser.visit.assert_called_with(
+            "http://localhost:8080/dhis-web-reporting/generateHtmlReport.action?uid=1&pe=May&ou=home")
 
     @parameterized.expand([
         ("has_two_tables", body_with_two_tables, "3434"),

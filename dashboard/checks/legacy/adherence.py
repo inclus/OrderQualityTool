@@ -1,10 +1,7 @@
 import pydash
-from dynamic_preferences.registries import global_preferences_registry
 
 from dashboard.checks.legacy.check import values_for_records, QCheck, facility_not_reporting, filter_consumption_records
 from dashboard.helpers import *
-
-global_preferences = global_preferences_registry.manager()
 
 
 class GuidelineAdherenceCheckAdult1L(QCheck):
@@ -20,8 +17,7 @@ class GuidelineAdherenceCheckAdult1L(QCheck):
             DF1: [
                 "TDF/3TC",
             ],
-            RATIO: global_preferences['Quality_Tests__Guideline_Adherence_Adult_1L_Ratio'],
-            # RATIO: 0.80,
+            RATIO: 0.80,
             FIELDS: [ESTIMATED_NUMBER_OF_NEW_ART_PATIENTS, ESTIMATED_NUMBER_OF_NEW_PREGNANT_WOMEN]
         }]
 
@@ -48,8 +44,7 @@ class GuidelineAdherenceCheckAdult2L(GuidelineAdherenceCheckAdult1L):
             NAME: DEFAULT,
             DF2: ["Lopinavir/Ritonavir (LPV/r) 200mg/50mg [Pack 120]"],
             DF1: ["Atazanavir/Ritonavir (ATV/r) 300mg/100mg [Pack 30]"],
-            RATIO: global_preferences['Quality_Tests__Guideline_Adherence_Adult_2L_Ratio'],
-            # RATIO: 0.80,
+            RATIO: 0.80,
             FIELDS: [ESTIMATED_NUMBER_OF_NEW_ART_PATIENTS, ESTIMATED_NUMBER_OF_NEW_PREGNANT_WOMEN]
         }]
         self.test = GUIDELINE_ADHERENCE_ADULT_2L

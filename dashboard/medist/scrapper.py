@@ -1,9 +1,11 @@
 import pygogo
 from bs4 import BeautifulSoup
+
 from splinter import Browser
 
 from dashboard.data.html_data_import import TR, TD
 from dashboard.helpers import HTML_PARSER
+from dynamic_preferences.registries import global_preferences_registry
 
 logger = pygogo.Gogo(__name__).get_structured_logger()
 
@@ -26,10 +28,11 @@ def get_html_table(html_doc, report_id):
 
 class DHIS2Scrapper(object):
     def __init__(self):
-        from django.conf import settings
-        username = settings.DHIS2_USERNAME
-        password = settings.DHIS2_PASSWORD
-        base_url = settings.DHIS2_URL
+        global_preferences = global_preferences_registry.manager()
+
+        username = global_preferences.get('DHIS2_Settings__DHIS2_USERNAME')
+        password = global_preferences.get('DHIS2_Settings__DHIS2_PASSWORD')
+        base_url = global_preferences.get('DHIS2_Settings__DHIS2_URL')
         self.base_url = base_url
 
         browser = Browser('phantomjs')
