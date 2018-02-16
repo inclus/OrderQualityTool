@@ -1,5 +1,5 @@
+import base64
 from functools import cmp_to_key
-from io import BytesIO
 
 import pygogo
 from braces.views import LoginRequiredMixin, StaffuserRequiredMixin
@@ -10,13 +10,12 @@ from django.views.generic import TemplateView, FormView
 from openpyxl import Workbook
 from openpyxl.writer.excel import save_virtual_workbook
 
-from dashboard.data.data_import import ExcelDataImport
 from dashboard.data.partner_mapping import load_file
-from dashboard.utils import timeit
 from dashboard.forms import FileUploadForm, MappingUploadForm, Dhis2ImportForm
 from dashboard.helpers import F3, F2, F1, sort_cycle
 from dashboard.models import Score, LocationToPartnerMapping, FacilityTest
-from dashboard.tasks import update_checks, import_data_from_dhis2
+from dashboard.tasks import import_data_from_dhis2, run_manual_import
+from dashboard.utils import timeit
 
 
 class HomeView(LoginRequiredMixin, TemplateView):
@@ -79,6 +78,10 @@ class Dhis2ImportView(LoginRequiredMixin, StaffuserRequiredMixin, FormView):
         return super(Dhis2ImportView, self).form_valid(form)
 
 
+def serialize_upload_file(import_file):
+    return base64.b64encode(import_file.read())
+
+
 class DataImportView(LoginRequiredMixin, StaffuserRequiredMixin, FormView):
     template_name = "import.html"
     form_class = FileUploadForm
@@ -92,10 +95,8 @@ class DataImportView(LoginRequiredMixin, StaffuserRequiredMixin, FormView):
     def form_valid(self, form):
         import_file = form.cleaned_data['import_file']
         cycle = form.cleaned_data['cycle']
-        report = parse_excel_file(cycle, import_file)
-        cycle = save_data_import(report)
-        update_checks.apply_async(args=[[cycle.id]], priority=1)
-        messages.add_message(self.request, messages.INFO, 'Successfully started import for cycle %s' % (cycle))
+        run_manual_import.apply_async(args=[cycle, serialize_upload_file(import_file)], priority=1)
+        messages.add_message(self.request, messages.INFO, 'Successfully started import for cycle %s' % cycle)
         return super(DataImportView, self).form_valid(form)
 
 
@@ -138,15 +139,6 @@ def download_mapping(request):
     return response
 
 
-@timeit
-def parse_excel_file(cycle, excel_file):
-    report = ExcelDataImport(BytesIO(excel_file.read()), cycle).load()
-    return report
-
-
-@timeit
-def save_data_import(report):
-    return report.save()
 
 
 DEFAULT = 'DEFAULT'

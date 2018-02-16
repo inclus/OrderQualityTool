@@ -4,7 +4,7 @@ from json import loads
 
 from django.core.urlresolvers import reverse
 from django_webtest import WebTest
-from mock import patch
+from mock import patch, ANY
 from pydash import py_
 from webtest import Upload
 
@@ -27,7 +27,7 @@ class DataImportViewTestCase(WebTest):
         file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'fixtures', name)
         return file_path
 
-    @patch('dashboard.views.main.update_checks.apply_async')
+    @patch('dashboard.views.main.run_manual_import.apply_async')
     def test_valid_form_starts_import_process(self, mock_method):
         user = DashboardUser.objects.create_superuser("a@a.com", "secret")
         cycle_title = 'Jan - Feb %s' % now().format("YYYY")
@@ -39,11 +39,12 @@ class DataImportViewTestCase(WebTest):
         form['cycle'] = cycle_title
         form['import_file'] = Upload(self.get_fixture_path("c.xlsx"))
         form.submit()
-        cycles_count = Cycle.objects.all()
-        self.assertEqual(len(cycles_count), 1)
-        first_cycle = cycles_count[0]
-        self.assertEqual(first_cycle.title, cycle_title)
-        mock_method.assert_called_with(args=[[first_cycle.id]], priority=1)
+        # cycles_count = Cycle.objects.all()
+        # self.assertEqual(len(cycles_count), 1)
+        # first_cycle = cycles_count[0]
+        # self.assertEqual(first_cycle.title, cycle_title)
+        # mock_method.assert_called_with(args=[[first_cycle.id]], priority=1)
+        mock_method.assert_called_with(args=[cycle_title, ANY], priority=1)
 
 
 class FacilitiesReportingView(WebTest):

@@ -1,9 +1,11 @@
+import base64
 import re
 
 from celery import shared_task
+from io import BytesIO
 
 from dashboard.checks.tasks import run_dynamic_checks
-from dashboard.data.data_import import DataImport
+from dashboard.data.data_import import DataImport, ExcelDataImport
 from dashboard.data.html_data_import import HtmlDataImport
 from dashboard.data.tasks import persist_consumption, persist_adult_records, persist_paed_records, \
     persist_multiple_order_records, add_log_entry, persist_scores
@@ -77,3 +79,24 @@ def _dhis2_import(bi_monthly_cycle):
     data_import = HtmlDataImport(results, bi_monthly_cycle).load(partner_mapping)
     cycle = data_import.save()
     update_checks.apply_async(args=[[cycle.id]], priority=1)
+
+
+@timeit
+def parse_excel_file(cycle, excel_file):
+    import_file = BytesIO(base64.b64decode(excel_file))
+    import_file.name = "import.xlsx"
+    report = ExcelDataImport(import_file, cycle).load()
+    return report
+
+
+@timeit
+def save_data_import(report):
+    return report.save()
+
+
+@shared_task
+def run_manual_import(cycle, data):
+    report = parse_excel_file(cycle, data)
+    cycle = save_data_import(report)
+    update_checks.apply_async(args=[[cycle.id]], priority=1)
+    return cycle

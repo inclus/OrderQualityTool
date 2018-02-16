@@ -4,3 +4,9 @@ tmp
 dashboard/static/vendor/
 .node_modules/
 data/
+.git/
+.tox/
+.tmp/
+.ropeproject/
+.vscode/
+.idea/

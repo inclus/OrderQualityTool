@@ -1,15 +1,29 @@
 from collections import defaultdict
 
+import os
 from django.test import TestCase
+from mock import patch
 
 from dashboard.data.entities import Location, PatientRecord, ConsumptionRecord
 from dashboard.data.tests.test_data import FakeReport
 from dashboard.models import Score, Consumption, AdultPatientsRecord, PAEDPatientsRecord, Cycle, MultipleOrderFacility
 from dashboard.data.tasks import persist_consumption, persist_adult_records, persist_paed_records, \
     persist_multiple_order_records, get_report_for_other_cycle, persist_scores
+from dashboard.tasks import run_manual_import
+from dashboard.views.main import serialize_upload_file
 
 
 class TaskTestCase(TestCase):
+
+    @patch('dashboard.tasks.update_checks.apply_async')
+    def test_should_import_file(self, mocked):
+        file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'fixtures',
+                                 "new_format.xlsx")
+        with open(file_path, "rb") as file_handle:
+            data = serialize_upload_file(file_handle)
+            cycle = run_manual_import("May Jun", data)
+            self.assertEqual( 1, cycle.id)
+
     def test_should_record_scores_for_each_facility(self):
         report = FakeReport()
         report.cycle = "May - Jun 2015"
