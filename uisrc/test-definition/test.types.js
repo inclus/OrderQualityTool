@@ -31,7 +31,7 @@ FacilityTest = function (metaData) {
         id: "FacilityTwoGroups",
         name: "Facility with 2 Groups of data",
         comparisons: [
-            {id: "LessThan", name: "Differ By LessThan X %"},
+            {id: "LessThan", name: "Percentage Variance is less than"},
             {id: "AtLeastNOfTotal", name: "Group1 Is at least N% of the total"},
             {id: "AreEqual", name: "Are Equal"},
             {id: "NoNegatives", name: "Has No Negatives"},

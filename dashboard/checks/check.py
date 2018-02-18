@@ -53,14 +53,20 @@ class Comparison(object):
         raise NotImplementedError
 
 
-class LessThanComparison(Comparison):
+def calculate_percentage_variance(old_value, new_value):
+    old_value = maybe(old_value).or_else(0)
+    new_value = maybe(new_value).or_else(0)
+    return abs(((float(new_value) - float(old_value)) / old_value) * 100.0)
+
+
+class PercentageVarianceLessThanComparison(Comparison):
+
     def compare(self, group1, group2, constant=100.0):
-        group1 = maybe(group1).or_else(0)
-        if group1 == 0:
+        old_value = maybe(group1).or_else(0)
+        if old_value == 0:
             return False
-        group2 = maybe(group2).or_else(0)
-        change = (abs(float(group2) - group1) / group1) * 100.0
-        return change < constant
+        percentage_variance = calculate_percentage_variance(group1, group2)
+        return percentage_variance < constant
 
     def text(self, group1, group2, constant, result):
         template = "%d and %d differ by %s than %s"
@@ -127,7 +133,7 @@ class AtLeastNOfTotal(Comparison):
 
 available_aggregations = {"SUM": sum_aggregation, "AVG": avg_aggregation, "VALUE": values_aggregation}
 available_comparisons = {
-    "LessThan": LessThanComparison,
+    "LessThan": PercentageVarianceLessThanComparison,
     "AreEqual": EqualComparison,
     "NoNegatives": NoNegativesComparison,
     "NoBlanks": NoBlanksComparison,
