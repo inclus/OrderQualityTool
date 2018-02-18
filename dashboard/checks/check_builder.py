@@ -59,7 +59,7 @@ class DefinitionFactory(object):
                 "selected_formulations": formulations,
             }
             if factors:
-                group["hasFactors"] = True
+                group["has_factors"] = True
                 group["factors"] = factors
 
             self.data["groups"].append(group)
