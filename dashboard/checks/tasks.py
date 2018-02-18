@@ -4,7 +4,7 @@ from dashboard.checks.entities import Definition
 from dashboard.checks.legacy.adherence import GuidelineAdherenceCheckAdult1L, GuidelineAdherenceCheckAdult2L, \
     GuidelineAdherenceCheckPaed1L
 from dashboard.checks.legacy.blanks import BlanksQualityCheck, MultipleCheck, IsReportingCheck
-from dashboard.checks.legacy.consumption_patients import ConsumptionAndPatientsQualityCheck
+from dashboard.checks.legacy.volume_tally import VolumeTallyCheck
 from dashboard.checks.legacy.cycles import BalancesMatchCheck, OrdersOverTimeCheck, StableConsumptionCheck, \
     WarehouseFulfillmentCheck, StablePatientVolumesCheck
 from dashboard.checks.legacy.negatives import NegativeNumbersQualityCheck
@@ -43,7 +43,7 @@ def run_checks(report):
     checks = [
         BlanksQualityCheck(),
         NegativeNumbersQualityCheck(),
-        ConsumptionAndPatientsQualityCheck(),
+        VolumeTallyCheck(),
         MultipleCheck(),
         IsReportingCheck(),
         GuidelineAdherenceCheckAdult1L(),

@@ -1,7 +1,6 @@
 import pydash
 
 from dashboard.checks.legacy.check import values_for_records, QCheck, facility_not_reporting, multiple_orders_score
-from dashboard.data.entities import ConsumptionRecord
 from dashboard.helpers import *
 from dashboard.models import MultipleOrderFacility, Score, Consumption
 

@@ -1,9 +1,7 @@
 from django.test import TestCase
 from nose_parameterized import parameterized
 
-from dashboard.checks.check_builder import guideline_adherence_adult1l_check, volume_tally_check
-from dashboard.checks.legacy.consumption_patients import ConsumptionAndPatientsQualityCheck
-from dashboard.checks.user_defined_check import get_check_from_dict
+from dashboard.checks.legacy.volume_tally import VolumeTallyCheck
 from dashboard.data.entities import LocationData
 from dashboard.helpers import *
 
@@ -100,7 +98,7 @@ two = LocationData.migrate_from_dict({
 no_data = LocationData.migrate_from_dict({})
 
 
-class ConsumptionAndPatientsQualityCheckTestCase(TestCase):
+class VolumeTallyQualityCheckTestCase(TestCase):
     @parameterized.expand([
         ("no data", no_data, NOT_REPORTING),
         ("both zero", both_zero, YES),
@@ -117,7 +115,7 @@ class ConsumptionAndPatientsQualityCheckTestCase(TestCase):
         # new_check_result = new_check.for_each_facility(data, {"name": "TDF/3TC/EFV (Adult)"})
         # self.assertEqual(expected, new_check_result)
 
-        legacy_check = ConsumptionAndPatientsQualityCheck()
+        legacy_check = VolumeTallyCheck()
         legacy_check_result = legacy_check.for_each_facility(data, legacy_check.combinations[0])
         self.assertEqual(expected, legacy_check_result)
 

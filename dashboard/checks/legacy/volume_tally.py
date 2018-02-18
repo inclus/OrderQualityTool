@@ -5,7 +5,7 @@ from dashboard.checks.legacy.check import get_consumption_totals, get_patient_to
 from dashboard.helpers import *
 
 
-class ConsumptionAndPatientsQualityCheck(QCheck):
+class VolumeTallyCheck(QCheck):
     test = CONSUMPTION_AND_PATIENTS
     combinations = [
         {
