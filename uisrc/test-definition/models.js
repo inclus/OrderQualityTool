@@ -33,10 +33,14 @@ var newModel = function (id, name, metaData, typeId) {
     };
 };
 
-var newTracingModel = function (id, name, metaData, typeId) {
+var newTracingModel = function (id, name, metaData, typeId, allowOverride, overrideOptions) {
+    overrideOptions = overrideOptions || [];
+    allowOverride = allowOverride || false;
     var model = newModel(id, name, metaData, typeId);
     model.hasTrace = true;
     model.tracingFormulations = ModelHelper.getTracingFormulations(id, metaData);
+    model.allowOverride = allowOverride;
+    model.overrideOptions = overrideOptions;
     return model;
 };
 module.exports = {

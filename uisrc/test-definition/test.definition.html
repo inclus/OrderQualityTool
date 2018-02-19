@@ -15,7 +15,7 @@
         <div class="row">
             <h1>Groups</h1>
         </div>
-    
+
         <div class="row-vertical group-container" ng-repeat="definitionGroup in ctrl.definition.groups">
             <div class="row with-space-between">
                 <input ng-model="definitionGroup.name" type="text">
@@ -51,10 +51,10 @@
                     </div>
                     <select selector multi="true" model="definitionGroup.selected_fields"
                             options="definitionGroup.model.fields"></select>
-                  
-    
+
+
                 </div>
-    
+
                 <div class="group-dynamic-control">
                     <div class="group-text">
                         <label for="" class="text-center">IN FORMULATIONS</label>
@@ -65,9 +65,25 @@
                     <div ng-show="definitionGroup.model.hasTrace">
                         <div ng-repeat="trace in definitionGroup.model.tracingFormulations">
                             <h4>{{ trace.name }}</h4>
-                            <p ng-repeat="formulation in trace.formulations">
-                                {{ formulation }}
-                            </p>
+                            <div class="tracing-formulation-container">
+                                <div class="tracing-formulation-name">
+                                    <p ng-repeat="formulation in trace.formulations">
+                                        {{ formulation }}</p>
+                                </div>
+                                <div class="tracing-formulation-overrides"
+                                     ng-show="definitionGroup.model.allowOverride">
+                                    <input type="checkbox"
+                                           ng-model="definitionGroup.sample_formulation_model_overridden[trace.name]">
+                                    <label class="tracing-formulation-overrides-label">Override Model</label>
+                                    <select ng-model="definitionGroup.sample_formulation_model_overrides[trace.name]"
+                                            ng-options="option.id for option in [{'id': 'Paed', 'formulations': trace.formulations},{'id': 'Adult', 'formulations': trace.formulations},] track by option.id"
+                                            ng-show="definitionGroup.sample_formulation_model_overridden[trace.name]">
+                                    </select>
+
+                                </div>
+
+                            </div>
+
                         </div>
                     </div>
                     <div class="checkbox-row">
@@ -78,7 +94,8 @@
                     </div>
                     <div ng-show="definitionGroup.has_factors">
                         <h5>Multiplication Factors</h5>
-                        <div class="factor-container" ng-repeat="value in ctrl.getFormulationsForFactors(definitionGroup) track by $index">
+                        <div class="factor-container"
+                             ng-repeat="value in ctrl.getFormulationsForFactors(definitionGroup) track by $index">
                             <span for="" class="factor-label">{{ value }}</span>
                             <strong class="factor-label">*</strong>
                             <input class="factor-input" ng-model="definitionGroup.factors[value]"/>
@@ -92,10 +109,12 @@
         </div>
         <div class="compgroup">
             <div class="group-dynamic-control">
-                <select ng-model="ctrl.definition.operator" ng-options="option.name for option in ctrl.definition.type.comparisons track by option.id">
+                <select ng-model="ctrl.definition.operator"
+                        ng-options="option.name for option in ctrl.definition.type.comparisons track by option.id">
                 </select>
             </div>
-            <div class="group-control" ng-show="ctrl.definition.operator.id == 'LessThan' || ctrl.definition.operator.id == 'AtLeastNOfTotal'">
+            <div class="group-control"
+                 ng-show="ctrl.definition.operator.id == 'LessThan' || ctrl.definition.operator.id == 'AtLeastNOfTotal'">
                 <input type="number" ng-model="ctrl.definition.operatorConstant">
             </div>
             <div class="group-control">
@@ -108,12 +127,13 @@
         </div>
     </div>
     <div class="has_no_groups" ng-if="!ctrl.definition.groups">
-<div class="row">
-    <label for="">Python Class</label>
-    <input  class="vTextField" type="text" ng-model="ctrl.definition.python_class" placeholder="Full Path to the python class">
-</div>
+        <div class="row">
+            <label for="">Python Class</label>
+            <input class="vTextField" type="text" ng-model="ctrl.definition.python_class"
+                   placeholder="Full Path to the python class">
+        </div>
     </div>
-  
+
     <div class="row">
         <textarea hidden name="definition" id="id_definition" cols="40" rows="10"
                   class="vLargeTextField">{{ ctrl.definition|json }}</textarea>

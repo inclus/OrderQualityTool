@@ -12,15 +12,15 @@ var testDefinitionController = ["$scope", "metadataService", "previewService", f
             });
         }
     };
-    
-    ctrl.getFormulationsForFactors = function(group) {
+
+    ctrl.getFormulationsForFactors = function (group) {
         if (group.model.hasTrace) {
             return _.chain(group.model.tracingFormulations).map("formulations").flatten().value();
-        }else {
+        } else {
             return group.selected_formulations;
         }
     };
-    
+
     ctrl.previewDefinition = function (definition) {
         preview.show(definition);
     };
@@ -31,8 +31,8 @@ var testDefinitionController = ["$scope", "metadataService", "previewService", f
         ctrl.definition.groups = testType.getGroups(ctrl.metaData);
     };
 
-    ctrl.testTypeChanged = function(testType) {
-        if(testType){
+    ctrl.testTypeChanged = function (testType) {
+        if (testType) {
             ctrl.definition.groups = testType.getGroups(ctrl.metaData);
         }
     };
@@ -44,7 +44,7 @@ var testDefinitionController = ["$scope", "metadataService", "previewService", f
                 testTypes.FacilityTest(metaData),
                 testTypes.FacilityTestWithTracingFormulation(metaData),
                 testTypes.SingleGroupFacilityTest(metaData),
-                testTypes.ClassBasedTest(metaData),
+                testTypes.ClassBasedTest(metaData)
             ];
             if (ctrl.value) {
                 ctrl.definition = testTypes.buildDefinition(ctrl.value, metaData);

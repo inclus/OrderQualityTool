@@ -1,7 +1,7 @@
 var models = require("./models");
 var BaseTest = Object.create(null);
 var group1Cycles = [
-    {id: "Current", name: "Current Cycle"},
+    {id: "Current", name: "Current Cycle"}
 ];
 var group2Cycles = [
     {id: "Current", name: "Current Cycle"},
@@ -12,12 +12,14 @@ FacilityTest = function (metaData) {
         newGroup:
             function (groupNumber) {
                 return {
-                    cycles: groupNumber == 1 ? group1Cycles : group2Cycles,
+                    cycles: groupNumber === 1 ? group1Cycles : group2Cycles,
                     cycle: group1Cycles[0],
                     model: this.models[0],
                     aggregation: this.calculations[0],
                     selected_fields: [],
                     selected_formulations: [],
+                    sample_formulation_model_overridden: {},
+                    sample_formulation_model_overrides: {},
                     name: "G" + groupNumber
                 };
 
@@ -57,8 +59,8 @@ var FacilityTestWithTracingFormulation = function (metaData) {
     test.id = "FacilityTwoGroupsAndTracingFormulation";
     test.name = "Facility with 2 Groups And Tracing Formulation";
     test.models = [
-        models.newTracingModel("Adult", "Adult Records", metaData, "FacilityTwoGroupsAndTracingFormulation"),
-        models.newTracingModel("Paed", "Paed Records", metaData, "FacilityTwoGroupsAndTracingFormulation"),
+        models.newTracingModel("Adult", "Adult Records", metaData, "FacilityTwoGroupsAndTracingFormulation", true),
+        models.newTracingModel("Paed", "Paed Records", metaData, "FacilityTwoGroupsAndTracingFormulation", true),
         models.newTracingModel("Consumption", "Consumption Records", metaData, "FacilityTwoGroupsAndTracingFormulation")
     ];
     return test;
@@ -70,7 +72,7 @@ var SingleGroupFacilityTest = function (metaData) {
     test.name = "Facility with 1 Group";
     test.getGroups = function (metaData) {
         return [
-            test.newGroup(1, metaData),
+            test.newGroup(1, metaData)
         ];
     };
 
@@ -80,7 +82,7 @@ var SingleGroupFacilityTest = function (metaData) {
 
     test.comparisons = [
         {id: "NoNegatives", name: "Has No Negatives"},
-        {id: "NoBlanks", name: "Has No Blanks"},
+        {id: "NoBlanks", name: "Has No Blanks"}
     ];
     return test;
 };
@@ -109,7 +111,7 @@ function rebuildGroupsFromJSON(groups, testType, metaData) {
             group.model = models.newModel(group.model.id, group.model.name, metaData, testType.id);
         }
         if (testType.id === "FacilityTwoGroupsAndTracingFormulation") {
-            group.model = models.newTracingModel(group.model.id, group.model.name, metaData, testType.id);
+            group.model = models.newTracingModel(group.model.id, group.model.name, metaData, testType.id, group.model.allowOverride);
         }
         group.cycles = count === 0 ? group1Cycles : group2Cycles;
         count += 1;
