@@ -7,6 +7,7 @@ from django.forms import model_to_dict
 
 from dashboard.data.data_import import DataImport
 from dashboard.data.entities import HtmlDataImportRecord
+from dashboard.medist.client import get_all_locations
 from dashboard.utils import timeit
 from dashboard.helpers import PAED_PATIENT_REPORT, ADULT_PATIENT_REPORT, CONSUMPTION_REPORT, HTML_PARSER
 
@@ -19,14 +20,16 @@ TR_ROTATED = "tr_rotated"
 @timeit
 def extract_locations_and_import_records(report_outputs, partner_mapping):
     records = get_all_records(report_outputs, partner_mapping)
-    locations = get_locations(records)
+    locations_that_are_reporting = get_locations(records)
+    locations = get_all_locations(partner_mapping, locations_that_are_reporting)
     return locations, records
 
 
 @timeit
 def get_locations(records):
     grouped_by_location = pydash.group_by(records, lambda item: item.location)
-    return list(grouped_by_location.keys())
+    locations = list(grouped_by_location.keys())
+    return dict((loc, loc) for loc in locations)
 
 
 @timeit

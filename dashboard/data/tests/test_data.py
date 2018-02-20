@@ -1,6 +1,7 @@
 import os
 from collections import defaultdict
 
+import responses
 from django.contrib.admin.models import LogEntry
 from django.test import TestCase
 
@@ -13,6 +14,7 @@ from dashboard.data.tests.test_html_data_import import get_test_output_from_fixt
 from dashboard.checks.legacy.check import values_for_records, get_consumption_totals, get_patient_total, \
     get_consumption_records, get_patient_records
 from dashboard.helpers import *
+from dashboard.medist.tests.test_helpers import fake_orgunit_response
 from dashboard.models import Score, Consumption, PAEDPatientsRecord, AdultPatientsRecord, MultipleOrderFacility, \
     LocationToPartnerMapping
 from dashboard.tasks import calculate_scores_for_checks_in_cycle
@@ -117,6 +119,8 @@ class DataTestCase(TestCase):
         entries = LogEntry.objects.all()
         self.assertEqual(len(entries), 1)
 
+    @responses.activate
+    @fake_orgunit_response()
     def test_full_html_import(self):
         fixture = get_test_output_from_fixture("arv-0-consumption-data-report-maul.html",
                                                report_type=CONSUMPTION_REPORT)
@@ -125,15 +129,15 @@ class DataTestCase(TestCase):
         report = HtmlDataImport(fixture, "May Jun").load(LocationToPartnerMapping.get_mapping())
         test_cycle = "Jul - Aug 2015"
         report.cycle = test_cycle
-        self.assertEqual(len(report.locs), 6)
+        self.assertEqual(len(report.locs), 50)
         entries = LogEntry.objects.all()
         self.assertEqual(len(entries), 0)
 
         calculate_scores_for_checks_in_cycle(report)
-        self.assertEqual(len(Score.objects.filter(cycle=test_cycle)), 6)
+        self.assertEqual(len(Score.objects.filter(cycle=test_cycle)), 50)
         self.assertEqual(len(AdultPatientsRecord.objects.filter(cycle=test_cycle)), 0)
         self.assertEqual(len(PAEDPatientsRecord.objects.filter(cycle=test_cycle)), 0)
-        self.assertEqual(len(Consumption.objects.filter(cycle=test_cycle)), 126)
+        self.assertEqual(len(Consumption.objects.filter(cycle=test_cycle)), 0)
         self.assertEqual(len(MultipleOrderFacility.objects.filter(cycle=test_cycle)), 0)
         entries = LogEntry.objects.all()
         self.assertEqual(len(entries), 1)

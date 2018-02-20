@@ -58,6 +58,5 @@ class ReportingRateAggregateViewTestCase(WebTest):
         Score.objects.create(name="F2", ip="IP1", cycle=cycle, data={"Facility Reporting": {DEFAULT: NO}})
         user = mommy.make(DashboardUser, access_level='IP', access_area='IP1')
         response = self.app.get("/api/test/1/", user=user)
-        print(response)
         data = json.loads(response.content.decode('utf8'))['values']
         self.assertIn({"yes": 50, "cycle": cycle, "no": 50, "not_reporting": 0}, data)

@@ -1,11 +1,13 @@
 import os
 
+import responses
 from django.test import TestCase
 from hamcrest import *
 
 from dashboard.data.entities import ReportOutput, Location
 from dashboard.data.html_data_import import extract_locations_and_import_records, HtmlDataImport
 from dashboard.helpers import PAED_PATIENT_REPORT, ADULT_PATIENT_REPORT, CONSUMPTION_REPORT
+from dashboard.medist.tests.test_helpers import fake_orgunit_response
 from dashboard.models import Dhis2StandardReport, LocationToPartnerMapping, MAUL, JMS
 
 
@@ -22,51 +24,61 @@ def get_test_output_from_fixture(name, report_type=PAED_PATIENT_REPORT, warehous
 
 
 class LocationImportTestCase(TestCase):
+    @responses.activate
+    @fake_orgunit_response()
     def test_that_correct_number_of_locations_are_extracted(self):
         locations, records = extract_locations_and_import_records(
             get_test_output_from_fixture("arv-2-paediatric-art-patient-report-maul.html"),
             LocationToPartnerMapping.get_mapping())
-        self.assertEqual(len(locations), 5)
+        self.assertEqual(len(locations), 50)
 
-    def test_that_locations_are_unique_by_name_and_district_only(self):
-        outputs = get_test_output_from_fixture("uniq.html", report_type=CONSUMPTION_REPORT, warehouse=MAUL)
-        outputs.extend(get_test_output_from_fixture("uniq.html", report_type=CONSUMPTION_REPORT, warehouse=JMS))
-        locations, records = extract_locations_and_import_records(
-            outputs,
-            LocationToPartnerMapping.get_mapping())
-        self.assertEqual(len(locations), 1)
+    # @responses.activate
+    # @fake_orgunit_response()
+    # def test_that_locations_are_unique_by_name_and_district_only(self):
+    #     outputs = get_test_output_from_fixture("uniq.html", report_type=CONSUMPTION_REPORT, warehouse=MAUL)
+    #     outputs.extend(get_test_output_from_fixture("uniq.html", report_type=CONSUMPTION_REPORT, warehouse=JMS))
+    #     locations, records = extract_locations_and_import_records(
+    #         outputs,
+    #         LocationToPartnerMapping.get_mapping())
+    #     self.assertEqual(len(locations), 1)
 
+    @responses.activate
+    @fake_orgunit_response()
     def test_that_location_has_implementing_partner(self):
         locations, records = extract_locations_and_import_records(
             get_test_output_from_fixture("arv-2-paediatric-art-patient-report-maul.html"),
             LocationToPartnerMapping.get_mapping())
         assert_that(locations, has_item(
             all_of(
-                has_property("facility", "Ococia (Orungo) St. Clare HC III"),
+                has_property("facility", "01 Commando HC II"),
                 has_property("partner", "Unknown"),
             )
         ))
 
         assert_that(locations, has_item(
             all_of(
-                has_property("facility", "St. Francis Acumet HC III"),
+                has_property("facility", "Aakum HC II"),
                 has_property("partner", "TASO"),
             )
         ))
 
+    @responses.activate
+    @fake_orgunit_response()
     def test_that_location_has_warehouse(self):
         locations, records = extract_locations_and_import_records(
             get_test_output_from_fixture("arv-2-paediatric-art-patient-report-maul.html"),
             LocationToPartnerMapping.get_mapping())
         assert_that(locations, has_item(
             all_of(
-                has_property("facility", "Ococia (Orungo) St. Clare HC III"),
+                has_property("facility", "AAR Acacia Clinic HC II"),
                 has_property("warehouse", "MAUL"),
             )
         ))
 
 
 class AdultImportTestCase(TestCase):
+    @responses.activate
+    @fake_orgunit_response()
     def setUp(self):
         self.test_location = Location(facility="AAR Acacia Clinic HC II",
                                       district="Kampala District",
@@ -99,14 +111,17 @@ class AdultImportTestCase(TestCase):
             has_property("location", self.test_location)
         )))
 
+
     def test_that_correct_number_of_records_are_extracted(self):
         self.assertEqual(len(self.data_import.ads), 110)
 
 
 class PaedImportTestCase(TestCase):
+    @responses.activate
+    @fake_orgunit_response()
     def setUp(self):
-        self.test_location = Location(facility="Ongutoi HC III",
-                                      district="Amuria District",
+        self.test_location = Location(facility="AAR Acacia Clinic HC II",
+                                      district="Kampala District",
                                       partner="TASO",
                                       status="reporting",
                                       warehouse=MAUL)
@@ -116,34 +131,36 @@ class PaedImportTestCase(TestCase):
 
     def test_that_test_location_has_records(self):
         records_for_first_location = self.data_import.pds[self.test_location]
-        self.assertEqual(len(records_for_first_location), 7)
+        self.assertEqual(len(records_for_first_location), 12)
 
     def test_that_test_location_records_have_correct_values(self):
         records_for_first_location = self.data_import.pds[self.test_location]
 
         assert_that(records_for_first_location, has_item(all_of(
-            has_property("formulation", "ABC/3TC/NVP"),
-            has_property("existing", 1),
-            has_property("new", 0),
+            has_property("formulation", "TDF/3TC/ATV/r (ADULT)"),
+            has_property("existing", 2),
+            has_property("new", 1),
             has_property("location", self.test_location)
         )))
 
         assert_that(records_for_first_location, has_item(all_of(
-            has_property("formulation", "AZT/3TC/NVP"),
-            has_property("existing", 2),
+            has_property("formulation", "TDF/3TC/EFV (PMTCT)"),
+            has_property("existing", 0),
             has_property("new", 0),
             has_property("location", self.test_location)
         )))
 
     def test_that_correct_number_of_records_are_extracted(self):
-        self.assertEqual(len(self.data_import.pds), 5)
+        self.assertEqual(len(self.data_import.pds), 1)
 
 
 class PaedImportCombinedTestCase(TestCase):
+    @responses.activate
+    @fake_orgunit_response()
     def setUp(self):
-        self.test_location = Location(facility="Ongutoi HC III",
+        self.test_location = Location(facility="AAR Acacia Clinic HC II",
                                       status="reporting",
-                                      district="Amuria District", partner="TASO", warehouse=MAUL)
+                                      district="Kampala District", partner="TASO", warehouse=MAUL)
 
         results = get_test_output_from_fixture("arv-2-paediatric-art-patient-report-maul.html")
         results.extend(get_test_output_from_fixture("arv-2-paediatric-art-patient-report-maul.html"))
@@ -152,29 +169,31 @@ class PaedImportCombinedTestCase(TestCase):
 
     def test_that_test_location_has_records(self):
         records_for_first_location = self.data_import.pds[self.test_location]
-        self.assertEqual(len(records_for_first_location), 7)
+        self.assertEqual(len(records_for_first_location), 12)
 
     def test_that_test_location_records_have_correct_values(self):
         records_for_first_location = self.data_import.pds[self.test_location]
         assert_that(records_for_first_location, has_item(all_of(
-            has_property("formulation", "ABC/3TC/NVP"),
-            has_property("existing", 2),
-            has_property("new", 0),
+            has_property("formulation", "TDF/3TC/ATV/r (ADULT)"),
+            has_property("existing", 4),
+            has_property("new", 2),
             has_property("location", self.test_location)
         )))
 
         assert_that(records_for_first_location, has_item(all_of(
-            has_property("formulation", "AZT/3TC/NVP"),
-            has_property("existing", 4),
-            has_property("new", 0),
+            has_property("formulation", "TDF/3TC/EFV (ADULT)"),
+            has_property("existing", 136),
+            has_property("new", 4),
             has_property("location", self.test_location)
         )))
 
     def test_that_correct_number_of_records_are_extracted(self):
-        self.assertEqual(len(self.data_import.pds), 5)
+        self.assertEqual(len(self.data_import.pds), 1)
 
 
 class ConsumptionImportTestCase(TestCase):
+    @responses.activate
+    @fake_orgunit_response()
     def setUp(self):
         self.test_location = Location(facility="Health Initiative Association Uganda",
                                       district="Buikwe District",
@@ -210,6 +229,8 @@ class ConsumptionImportTestCase(TestCase):
 
 
 class ConsumptionCombinedImportTestCase(TestCase):
+    @responses.activate
+    @fake_orgunit_response()
     def setUp(self):
         self.test_location = Location(facility="Health Initiative Association Uganda",
                                       district="Buikwe District",
