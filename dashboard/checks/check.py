@@ -63,13 +63,16 @@ class PercentageVarianceLessThanComparison(Comparison):
 
     def compare(self, group1, group2, constant=100.0):
         old_value = maybe(group1).or_else(0)
+        new_value = maybe(group2).or_else(0)
         if old_value == 0:
+            if new_value == 0:
+                return True
             return False
         percentage_variance = calculate_percentage_variance(group1, group2)
         return percentage_variance < constant
 
     def text(self, group1, group2, constant, result):
-        template = "%d and %d differ by %s than %s"
+        template = "%6.1f and %6.1f differ by %s than %s"
         group1 = maybe(group1).or_else(0)
         group2 = maybe(group2).or_else(0)
         return template % (group1, group2, "less" if result else "more", constant)

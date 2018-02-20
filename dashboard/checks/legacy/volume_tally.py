@@ -1,5 +1,6 @@
 from collections import defaultdict
 
+from dashboard.checks.check import calculate_percentage_variance
 from dashboard.checks.legacy.check import get_consumption_totals, get_patient_total, has_all_blanks, QCheck, \
     get_consumption_records, get_patient_records
 from dashboard.helpers import *
@@ -17,7 +18,8 @@ class VolumeTallyCheck(QCheck):
             FIELDS: [COMBINED_CONSUMPTION], IS_ADULT: False
         },
         {
-            NAME: F3, PATIENT_QUERY: F3_PATIENT_QUERY, CONSUMPTION_QUERY: F3_QUERY, RATIO: 1.0, FIELDS: [COMBINED_CONSUMPTION],
+            NAME: F3, PATIENT_QUERY: F3_PATIENT_QUERY, CONSUMPTION_QUERY: F3_QUERY, RATIO: 1.0,
+            FIELDS: [COMBINED_CONSUMPTION],
             IS_ADULT: False
         }]
     key_cache = defaultdict(dict)
@@ -26,17 +28,19 @@ class VolumeTallyCheck(QCheck):
         df1_records = get_consumption_records(data, combination[CONSUMPTION_QUERY])
         df2_records = get_patient_records(data, combination[PATIENT_QUERY],
                                           combination[IS_ADULT])
-        df2_sum = get_patient_total(df2_records)
-        df1_sum = get_consumption_totals(combination[FIELDS], df1_records)
+        actual_patient_volumes = get_patient_total(df2_records)
+        total_consumption = get_consumption_totals(combination[FIELDS], df1_records)
         all_df1_blank = has_all_blanks(df1_records, combination[FIELDS])
         all_df2_blank = has_all_blanks(df2_records, [NEW, EXISTING])
-        both_are_zero = (df1_sum == 0 and df2_sum == 0)
+        both_are_zero = (total_consumption == 0 and actual_patient_volumes == 0)
         if len(df1_records) == 0 and len(df2_records) == 0:
             return NOT_REPORTING
-        adjusted_df1_sum = df1_sum / combination[RATIO]
+        implied_patient_volume = total_consumption / combination[RATIO]
         no_blanks = not all_df1_blank and not all_df2_blank
-        divisible = df2_sum != 0
-        if no_blanks and (both_are_zero or (divisible and 0.7 < float(adjusted_df1_sum) / float(df2_sum) < 1.429)):
+        divisible = actual_patient_volumes != 0
+
+        if no_blanks and (both_are_zero or (
+                divisible and calculate_percentage_variance(implied_patient_volume, actual_patient_volumes) < 30)):
             return YES
         else:
             return NO

@@ -119,7 +119,8 @@ class PreviewViewTestCase(WebTest):
 
     def test_result_with_consumption_records(self):
         gen_consumption_record(opening_balance=10, closing_balance=20)
-        params = DefinitionFactory().sampled().fields("opening_balance", "closing_balance").model('Consumption').factors(
+        params = DefinitionFactory().sampled().fields("opening_balance", "closing_balance").model(
+            'Consumption').factors(
             form_a=10).get()
         response = self.app.post_json(self.url, user="testuser", params=params, expect_errors=True)
         json_response = loads(response.content.decode('utf8'))
@@ -205,7 +206,7 @@ class PreviewViewTestCase(WebTest):
         definition_builder = DefinitionFactory().sampled().formulations("form1", "form2")
         definition_builder.fields("opening_balance", "closing_balance")
         definition_builder.model('Consumption')
-        definition_builder.is_less_than(50)
+        definition_builder.percentage_variance_is_less_than(50)
         response = self.app.post_json(self.url, user="testuser", params=definition_builder.get(), expect_errors=True)
         json_response = loads(response.content.decode('utf8'))
 
@@ -275,3 +276,28 @@ class PreviewViewTestCase(WebTest):
         )))
 
         assert_that(json_response, has_entry(equal_to("result"), has_entries({"DEFAULT": equal_to("YES")})))
+
+    def test_that_models_can_be_overridden(self):
+        gen_paed_record(formulation="form_tra")
+        gen_paed_record(formulation="form_trb")
+        gen_adult_record(formulation="form_tra", new=300, existing=300)
+        definition_builder = DefinitionFactory().traced(
+            tracer={"name": "trace1", "formulations": ["form_tra", "form_trb"]})
+        definition_builder.model('Paed').model_overrides({"trace1": {"id": "Adult", "formulations": ["form_tra"]}})
+        definition_builder.tracing_formulations("form_tra", "form_trb")
+        definition = definition_builder.get()
+        response = self.app.post_json(self.url, user="testuser", params=definition, expect_errors=True)
+        json_response = loads(response.content.decode('utf8'))
+        self.assertEqual(200, response.status_code)
+        assert_that(json_response, has_entry(equal_to("groups"), has_item(
+            has_entries(
+                {
+                    "name": equal_to('G1'),
+                    "aggregation": "SUM",
+                    "values": equal_to([['form_tra', 300.0, 300.0]]),
+                    "factored_values": equal_to([['form_tra', 300.0, 300.0]]),
+                    "headers": equal_to(['new', 'existing']),
+                    "result": equal_to(600.0)
+                }
+            )
+        )))

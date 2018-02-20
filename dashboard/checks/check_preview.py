@@ -61,6 +61,11 @@ class DBBasedCheckPreview(object):
     @timeit
     def _group_values_from_db(self, group, sample_cycle, sample_location, sample_tracer):
         model = group.model.as_model()
+        if group.has_overrides:
+            tracer_name = sample_tracer.get("name")
+            model_id = group.sample_formulation_model_overrides.get(tracer_name, {}).get("id", None)
+            if model_id:
+                model = group.model.as_model(model_id)
         if model:
             values = model.objects.filter(
                 name=sample_location['name'],

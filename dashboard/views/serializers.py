@@ -11,6 +11,7 @@ class OptionField(serializers.Serializer):
 
 class GroupModelField(OptionField):
     tracingFormulations = serializers.ListField(child=serializers.DictField(), required=False)
+    allowOverride = serializers.BooleanField(required=False)
 
 
 class GroupSerializer(serializers.Serializer):
@@ -22,6 +23,8 @@ class GroupSerializer(serializers.Serializer):
     aggregation = OptionField()
     has_factors = serializers.BooleanField(required=False)
     factors = serializers.DictField(required=False)
+    sample_formulation_model_overridden = serializers.DictField(required=False)
+    sample_formulation_model_overrides = serializers.DictField(required=False)
 
 
 class SampleSerializer(serializers.Serializer):

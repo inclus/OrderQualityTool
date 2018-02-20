@@ -43,17 +43,26 @@ def build_model(name, check_type):
     return model
 
 
+def override_models_on_group(group, overrides):
+    for (key, value) in overrides.items():
+        if 'sample_formulation_model_overridden' not in group:
+            group['sample_formulation_model_overridden'] = {}
+            group['sample_formulation_model_overrides'] = {}
+        group['sample_formulation_model_overridden'][key] = True
+        group['sample_formulation_model_overrides'][key] = value
+
+
 class DefinitionFactory(object):
     class Builder(object):
         def __init__(self, data):
             self.data = data
 
-        def add_group(self, name, aggegation, cycle, model, fields, formulations, factors=None):
+        def add_group(self, name, aggregation, cycle, model, fields, formulations, factors=None, model_overrides=None):
             id = "id"
             group = {
                 NAME: name,
                 "cycle": {id: cycle, NAME: "%s Cycle" % cycle},
-                "aggregation": {"id": aggegation, NAME: aggegation},
+                "aggregation": {"id": aggregation, NAME: aggregation},
                 "model": build_model(model, self.data["type"]),
                 "selected_fields": fields,
                 "selected_formulations": formulations,
@@ -61,6 +70,9 @@ class DefinitionFactory(object):
             if factors:
                 group["has_factors"] = True
                 group["factors"] = factors
+
+            if model_overrides is not None:
+                override_models_on_group(group, model_overrides)
 
             self.data["groups"].append(group)
             return self
@@ -102,6 +114,13 @@ class DefinitionFactory(object):
 
             return self.on_group(f)
 
+        def model_overrides(self, overrides):
+            def f(group):
+                override_models_on_group(group, overrides)
+                return group
+
+            return self.on_group(f)
+
         def get(self):
             return self.data
 
@@ -131,8 +150,8 @@ class DefinitionFactory(object):
             # self.data["operatorConstant"] = None
             return self
 
-        def is_less_than(self, ratio=1):
-            self.data[OPERATOR] = {"id": "LessThan", NAME: "LessThan"}
+        def percentage_variance_is_less_than(self, ratio=1):
+            self.data[OPERATOR] = {"id": "LessThan", NAME: "Percentage Variance is less than"}
             self.data["operatorConstant"] = ratio
             return self
 
@@ -262,8 +281,10 @@ def volume_tally_check():
                           "Abacavir/Lamivudine (ABC/3TC) 60mg/30mg [Pack 60]": 1 / 4.6,
                           "Efavirenz (EFV) 200mg [Pack 90]": 1,
                       })
-    builder.add_group("G2", SUM, CURRENT_CYCLE, "Adult", ["new", "existing"], [])
-    builder.is_less_than(30)
+    builder.add_group("G2", SUM, CURRENT_CYCLE, "Adult", ["new", "existing"], [],
+                      model_overrides={F2: {"id": "Paed", "formulations": F2_PATIENT_QUERY},
+                       F3: {"id": "Paed", "formulations": F3_PATIENT_QUERY}})
+    builder.percentage_variance_is_less_than(30)
     return builder.get()
 
 
@@ -290,7 +311,7 @@ def stable_consumption_check():
     builder = DefinitionFactory().blank().type(FACILITY_TWO_GROUPS_WITH_SAMPLE)
     builder.add_group("G1", SUM, CURRENT_CYCLE, CONSUMPTION_MODEL, ["consumption"], [])
     builder.add_group("G2", SUM, PREVIOUS_CYCLE, CONSUMPTION_MODEL, ["consumption"], [])
-    builder.is_less_than(50)
+    builder.percentage_variance_is_less_than(50)
     return builder.get()
 
 
@@ -318,7 +339,7 @@ def nnrti_paed():
         "Lopinavir/Ritonavir (LPV/r) 80mg/20ml oral susp [Bottle 60ml]",
         "Lopinavir/Ritonavir (LPV/r) 100mg/25mg",
     ])
-    builder.is_less_than(30)
+    builder.percentage_variance_is_less_than(30)
     return builder.get()
 
 
@@ -340,5 +361,5 @@ def nnrti_adult():
         "Lopinavir/Ritonavir (LPV/r) 200mg/50mg [Pack 120]",
         "Dolutegravir (DTG) 50mg"
     ])
-    builder.is_less_than(30)
+    builder.percentage_variance_is_less_than(30)
     return builder.get()

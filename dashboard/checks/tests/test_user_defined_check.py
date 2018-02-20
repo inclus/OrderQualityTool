@@ -9,7 +9,8 @@ from dashboard.checks.user_defined_check import UserDefinedFacilityCheck, get_ch
 from dashboard.data.entities import F1_PATIENT_QUERY
 from dashboard.data.entities import LocationData
 from dashboard.helpers import A_RECORDS, NEW, EXISTING, \
-    COMBINED_CONSUMPTION, ESTIMATED_NUMBER_OF_NEW_ART_PATIENTS, ESTIMATED_NUMBER_OF_NEW_PREGNANT_WOMEN
+    COMBINED_CONSUMPTION, ESTIMATED_NUMBER_OF_NEW_ART_PATIENTS, ESTIMATED_NUMBER_OF_NEW_PREGNANT_WOMEN, F1, \
+    NOT_REPORTING, YES
 from dashboard.helpers import C_RECORDS, OPENING_BALANCE, F1_QUERY, FORMULATION, NO
 
 
@@ -44,7 +45,8 @@ class UserDefinedCheckTestCase(TestCase):
              "selected_fields": [OPENING_BALANCE]
              }
         )
-        output = check.get_values_from_records(test_location_data.c_records, group)
+        output = check.get_values_from_records(test_location_data.c_records, group.selected_formulations,
+                                               group.selected_fields)
         self.assertEqual(output, [[F1_QUERY, 3]])
 
 
@@ -123,8 +125,8 @@ has_negatives = LocationData.migrate_from_dict({
 
 class NegativeCheckTestCase(TestCase):
     @parameterized.expand([
-        # ("no data", has_no_data, NOT_REPORTING),
-        # ("no negatives", has_no_negatives, YES),
+        ("no data", has_no_data, NOT_REPORTING),
+        ("no negatives", has_no_negatives, YES),
         ("has negatives", has_negatives, NO),
         # ("has blanks", has_blanks, YES),
     ])
@@ -132,7 +134,7 @@ class NegativeCheckTestCase(TestCase):
         new_check = get_check_from_dict(no_negatives_check())
         legacy_check = NegativeNumbersQualityCheck()
 
-        new_check_result = new_check.for_each_facility(data, {"name": "DEFAULT"})
+        new_check_result = new_check.for_each_facility(data, {"name": F1, "formulations": F1_QUERY})
         legacy_check_result = legacy_check.for_each_facility(data, legacy_check.combinations[0])
         self.assertEqual(legacy_check_result, new_check_result)
         self.assertEqual(expected, new_check_result)

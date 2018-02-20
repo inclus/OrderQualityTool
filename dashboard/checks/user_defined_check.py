@@ -1,4 +1,5 @@
 import importlib
+from collections import defaultdict
 
 from pydash import py_
 from pymaybe import maybe
@@ -19,18 +20,20 @@ class UserDefinedFacilityCheck(DBBasedCheckPreview):
     def for_each_facility(self, facility_data, combination, other_facility_data=None):
         groups = []
         for group in self.definition.groups:
-            values_for_group = self._group_values_from_location_data(group, facility_data, other_facility_data)
+            values_for_group = self._group_values_from_location_data(group, facility_data, other_facility_data,
+                                                                     combination)
             groups.append(values_for_group)
         comparison_result, comparison_text = self.compare_results(groups)
         return comparison_result
 
-    def _group_values_from_location_data(self, group, facility_data, other_facility_data):
+    def _group_values_from_location_data(self, group, facility_data, other_facility_data, combination):
         data_source = other_facility_data if group.cycle and group.cycle.id is "Previous" else facility_data
-        records = group.model.get_records(data_source)
+        records = self.get_records_from_data_source(data_source, group)
 
         if records:
-            values = self.get_values_from_records(records, group)
-            factored_values = get_factored_values(self.get_formulations(group), group.factors, values)
+            formulations = self.get_formulations(group, combination)
+            values = self.get_values_from_records(records, formulations, group.selected_fields)
+            factored_values = get_factored_values(formulations, group.factors, values)
             return {
                 "name": group.name,
                 "aggregation": group.aggregation.name,
@@ -50,18 +53,37 @@ class UserDefinedFacilityCheck(DBBasedCheckPreview):
             "result": None
         }
 
-    def get_values_from_records(self, records, group):
-        try:
-            formulations = [f.lower() for f in maybe(self.get_formulations(group)).or_else([])]
-        except AttributeError as e:
-            formulations = []
+    def get_records_from_data_source(self, data_source, group):
+        records = group.model.get_records(data_source)
+        return records
+
+    def get_values_from_records(self, records, formulations, selected_fields):
+        formulations = [f.lower() for f in formulations]
         return py_(records).reject(lambda x: x.formulation.lower() not in formulations).map(
-            as_values(group.selected_fields)).value()
+            as_values(selected_fields)).value()
 
 
 class UserDefinedFacilityTracedCheck(UserDefinedFacilityCheck):
     def get_combinations(self):
         return [tracer.get("name") for tracer in self.definition.groups[0].model.tracing_formulations]
+
+    def get_records_from_data_source(self, data_source, group):
+        records = group.model.get_records(data_source)
+        if group.has_overrides:
+            formulations_to_add = defaultdict(set)
+            formulations_to_override = []
+            for (sample, override_model) in group.sample_formulation_model_overrides.items():
+                cleaned_formulation_names = [name.lower() for name in override_model.get("formulations", [])]
+                for name in cleaned_formulation_names:
+                    formulations_to_add[override_model.get('id')].add(name)
+                    formulations_to_override.append(name)
+            records = py_(records).reject(lambda x: x.formulation.lower() in formulations_to_override).value()
+            for (model, formulations) in formulations_to_add.items():
+                get_records = group.model.get_records(data_source, model)
+                records_for_override_model = py_(get_records).reject(
+                    lambda x: x.formulation.lower() not in formulations).value()
+                records.extend(records_for_override_model)
+        return records
 
     def get_formulations(self, group, sample_tracer=None):
         if sample_tracer and "name" in sample_tracer:
@@ -70,7 +92,7 @@ class UserDefinedFacilityTracedCheck(UserDefinedFacilityCheck):
         return maybe(py_(group.model.tracing_formulations).first().value()).or_else(lambda: {}).get('formulations')
 
 
-class UserDefinedSingleGroupFacilityTracedCheck(UserDefinedFacilityCheck):
+class UserDefinedSingleGroupFacilityCheck(UserDefinedFacilityCheck):
 
     def compare_results(self, groups):
         if self.definition.operator:
@@ -92,7 +114,7 @@ class UserDefinedSingleGroupFacilityTracedCheck(UserDefinedFacilityCheck):
 
 testTypes = {
     "FacilityTwoGroups": UserDefinedFacilityCheck,
-    "FacilityOneGroup": UserDefinedSingleGroupFacilityTracedCheck,
+    "FacilityOneGroup": UserDefinedSingleGroupFacilityCheck,
     "FacilityTwoGroupsAndTracingFormulation": UserDefinedFacilityTracedCheck,
 }
 

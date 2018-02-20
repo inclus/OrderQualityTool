@@ -311,9 +311,9 @@ class LocationData(object):
 
     @staticmethod
     def migrate_from_dict(data):
-        c_records = pydash.map_(data.get(C_RECORDS, []), ConsumptionRecord.migrate_from_dict)
-        a_records = pydash.map_(data.get(A_RECORDS, []), PatientRecord.migrate_from_dict)
-        p_records = pydash.map_(data.get(P_RECORDS, []), PatientRecord.migrate_from_dict)
+        c_records = list(map(ConsumptionRecord.migrate_from_dict, data.get(C_RECORDS, [])))
+        a_records = list(map(PatientRecord.migrate_from_dict, data.get(A_RECORDS, [])))
+        p_records = list(map(PatientRecord.migrate_from_dict, data.get(P_RECORDS, [])))
         location = Location.migrate_from_dict(data)
         c_count = data.get(C_COUNT, len(c_records))
         a_count = data.get(A_COUNT, len(a_records))
@@ -351,5 +351,3 @@ def enrich_location_data(location, report):
         p_records=p_records,
         a_records=a_records
     )
-
-

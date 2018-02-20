@@ -32,18 +32,22 @@ class GroupModel(DefinitionOption):
             has_trace=data.get('hasTrace', False),
         )
 
-    def get_records(self, location_data):
+    def get_records(self, location_data, id=None):
         models = {'Adult': "a_records", 'Paed': "p_records", 'Consumption': "c_records"}
-        if self.id in models:
-            return getattr(location_data, models.get(self.id))
+        if id is None:
+            id = self.id
+        if id in models:
+            return getattr(location_data, models.get(id))
         else:
             return []
 
-    def as_model(self):
+    def as_model(self, model_id=None):
         from dashboard.models import AdultPatientsRecord, PAEDPatientsRecord, Consumption
         models = {'Adult': AdultPatientsRecord, 'Paed': PAEDPatientsRecord, 'Consumption': Consumption}
-        if self.id in models:
-            return models.get(self.id)
+        if model_id is None:
+            model_id = self.id
+        if model_id in models:
+            return models.get(model_id)
         else:
             return None
 
@@ -55,6 +59,8 @@ class DefinitionGroup(object):
     cycle = attr.ib()
     selected_fields = attr.ib()
     selected_formulations = attr.ib()
+    sample_formulation_model_overridden = attr.ib()
+    sample_formulation_model_overrides = attr.ib()
     aggregation = attr.ib()
     has_factors = attr.ib()
     factors = attr.ib()
@@ -68,9 +74,16 @@ class DefinitionGroup(object):
             aggregation=DefinitionOption.from_dict(data.get('aggregation')),
             selected_fields=data.get('selected_fields'),
             selected_formulations=data.get('selected_formulations'),
+            sample_formulation_model_overrides=data.get('sample_formulation_model_overrides', {}),
+            sample_formulation_model_overridden=data.get('sample_formulation_model_overridden', {}),
             has_factors=data.get('has_factors'),
             factors=data.get('factors'),
         )
+
+    @property
+    def has_overrides(self):
+        return len(py_(self.sample_formulation_model_overrides.values()).map(
+            lambda x: dict(x).get("formulations", [])).flatten().value()) > 0
 
 
 @attr.s(cmp=True, frozen=True)
