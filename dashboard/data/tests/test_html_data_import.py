@@ -30,7 +30,7 @@ class LocationImportTestCase(TestCase):
         locations, records = extract_locations_and_import_records(
             get_test_output_from_fixture("arv-2-paediatric-art-patient-report-maul.html"),
             LocationToPartnerMapping.get_mapping())
-        self.assertEqual(len(locations), 50)
+        self.assertEqual(len(locations), 2115)
 
     # @responses.activate
     # @fake_orgunit_response()
@@ -48,17 +48,18 @@ class LocationImportTestCase(TestCase):
         locations, records = extract_locations_and_import_records(
             get_test_output_from_fixture("arv-2-paediatric-art-patient-report-maul.html"),
             LocationToPartnerMapping.get_mapping())
+
         assert_that(locations, has_item(
             all_of(
-                has_property("facility", "01 Commando HC II"),
+                has_property("facility", "St. Michael Kanyike HC III"),
                 has_property("partner", "Unknown"),
             )
         ))
 
         assert_that(locations, has_item(
             all_of(
-                has_property("facility", "Aakum HC II"),
-                has_property("partner", "TASO"),
+                has_property("facility", "St. Monica Katende HC III"),
+                has_property("partner", "RHSP"),
             )
         ))
 
@@ -70,7 +71,7 @@ class LocationImportTestCase(TestCase):
             LocationToPartnerMapping.get_mapping())
         assert_that(locations, has_item(
             all_of(
-                has_property("facility", "AAR Acacia Clinic HC II"),
+                has_property("facility", "Medical Research Center Clinic"),
                 has_property("warehouse", "MAUL"),
             )
         ))
@@ -110,7 +111,6 @@ class AdultImportTestCase(TestCase):
             has_property("new", 1),
             has_property("location", self.test_location)
         )))
-
 
     def test_that_correct_number_of_records_are_extracted(self):
         self.assertEqual(len(self.data_import.ads), 110)

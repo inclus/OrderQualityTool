@@ -1,7 +1,7 @@
 import os
 
 from django.core.exceptions import ValidationError
-from django.forms import Form, FileField, ChoiceField, ModelForm
+from django.forms import Form, FileField, ChoiceField, ModelForm, MultipleChoiceField
 
 from dashboard.helpers import generate_choices, generate_past_choices
 from dashboard.models import FacilityTest
@@ -27,7 +27,7 @@ class FileUploadForm(Form):
 
 
 class Dhis2ImportForm(Form):
-    cycle = ChoiceField(choices=generate_past_choices())
+    cycle = MultipleChoiceField(choices=generate_past_choices())
 
 
 class MappingUploadForm(Form):

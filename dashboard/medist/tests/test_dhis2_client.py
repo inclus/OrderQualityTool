@@ -36,7 +36,6 @@ class TestDHIS2FacilityAsLocation(TestCase):
             loc: loc})(data)
         self.assertEqual(location.facility, "01 Commando HC II")
         self.assertEqual(location.district, "Otuke District")
-        self.assertEqual(location.warehouse, "")
         self.assertEqual(location.status, "Reporting")
         self.assertEqual(location.partner, "PT")
 
@@ -46,4 +45,5 @@ class TestGetAllLocations(TestCase):
     @fake_orgunit_response()
     def test_should_parse_json_response(self):
         locations = get_all_locations({}, {})
-        self.assertEqual(len(locations), 50)
+        self.assertEqual(len(locations), 2115)
+        self.assertEqual(locations[0].warehouse, "MAUL")

@@ -65,16 +65,16 @@ class Dhis2ImportView(LoginRequiredMixin, StaffuserRequiredMixin, FormView):
         return context
 
     def form_valid(self, form):
-        cycle = form.cleaned_data['cycle']
+        cycles = form.cleaned_data['cycle']
         logger.info("launching task",
-                    extra={"task_name": "import_data_from_dhis2", "period": cycle})
-        import_data_from_dhis2.apply_async(args=[cycle], priority=2)
+                    extra={"task_name": "import_data_from_dhis2", "periods": cycles})
+        import_data_from_dhis2.apply_async(args=cycles, priority=2)
         LogEntry.objects.create(
             user_id=self.request.user.id,
             action_flag=CHANGE,
-            change_message="Started Import for cycle %s from dhis2" % (cycle),
+            change_message="Started Import for cycle %s from dhis2" % (cycles),
         )
-        messages.add_message(self.request, messages.INFO, 'Successfully started import for cycle %s' % (cycle))
+        messages.add_message(self.request, messages.INFO, 'Successfully started import for cycles %s' % (cycles))
         return super(Dhis2ImportView, self).form_valid(form)
 
 
@@ -137,8 +137,6 @@ def download_mapping(request):
     response['Content-Disposition'] = 'attachment; filename=partner_mapping.xlsx'
 
     return response
-
-
 
 
 DEFAULT = 'DEFAULT'
