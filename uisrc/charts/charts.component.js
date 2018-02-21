@@ -48,7 +48,7 @@ var chartsController = ["$scope", "chartsService", function ($scope, chartsServi
                     ctrl.selectedWarehouse,
                     ctrl.startCycle,
                     ctrl.endCycle,
-                    ctrl.selectedRegimen).then(function (options) {
+                    ctrl.selectedRegimen.name).then(function (options) {
                     ctrl.options = options;
                 });
             }
