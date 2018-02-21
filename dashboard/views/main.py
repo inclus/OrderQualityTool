@@ -68,7 +68,8 @@ class Dhis2ImportView(LoginRequiredMixin, StaffuserRequiredMixin, FormView):
         cycles = form.cleaned_data['cycle']
         logger.info("launching task",
                     extra={"task_name": "import_data_from_dhis2", "periods": cycles})
-        import_data_from_dhis2.apply_async(args=cycles, priority=2)
+        for cycle in cycles:
+            import_data_from_dhis2.apply_async(args=[cycle], priority=2)
         LogEntry.objects.create(
             user_id=self.request.user.id,
             action_flag=CHANGE,
