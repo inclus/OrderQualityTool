@@ -125,10 +125,9 @@ class DBBasedCheckPreview(object):
             if comparator and gs:
                 group1_result = groups[0].get('result')
                 group2_result = maybe(groups)[1].or_else({}).get('result')
-                comparison_result = comparator.compare(group1_result, group2_result, constant=operator_constant)
-                result_text = comparator.text(group1_result, group2_result, operator_constant, comparison_result)
-                result = "YES" if comparison_result else "NO"
-                return result, result_text
+                comparison_result = comparator.as_result(group1_result, group2_result, constant=operator_constant)
+                result_text = comparator.text(group1_result, group2_result, operator_constant)
+                return comparison_result, result_text
         return "NOT_REPORTING", None
 
     def get_result_key(self, sample_tracer):

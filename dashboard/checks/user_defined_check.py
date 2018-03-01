@@ -23,7 +23,8 @@ class UserDefinedFacilityCheck(DBBasedCheckPreview):
             values_for_group = self._group_values_from_location_data(group, facility_data, other_facility_data,
                                                                      combination)
             groups.append(values_for_group)
-        comparison_result, comparison_text = self.compare_results(groups)
+
+        comparison_result, _ = self.compare_results(groups)
         return comparison_result
 
     def _group_values_from_location_data(self, group, facility_data, other_facility_data, combination):

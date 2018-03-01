@@ -142,12 +142,14 @@ class DefinitionFactory(object):
 
         def are_equal(self):
             self.data["operator"] = {"id": "AreEqual", NAME: "AreEqual"}
-            # self.data["operatorConstant"] = None
+            return self
+
+        def are_not_equal(self):
+            self.data["operator"] = {"id": "AreNotEqual", NAME: "AreNotEqual"}
             return self
 
         def has_no_negatives(self):
             self.data["operator"] = {"id": "NoNegatives", NAME: "NoNegatives"}
-            # self.data["operatorConstant"] = None
             return self
 
         def percentage_variance_is_less_than(self, ratio=1):
@@ -290,10 +292,10 @@ def volume_tally_check():
 
 def non_repeating_check():
     builder = DefinitionFactory().blank().type(FACILITY_TWO_GROUPS_WITH_SAMPLE)
-    formulations = ["consumption", "opening_balance", "closing_balance", "estimated_number_of_new_patients"]
+    formulations = ["consumption", "opening_balance", "days_out_of_stock"]
     builder.add_group("G0", VALUE, CURRENT_CYCLE, CONSUMPTION_MODEL, formulations, [])
     builder.add_group("G1", VALUE, PREVIOUS_CYCLE, CONSUMPTION_MODEL, formulations, [])
-    builder.are_equal()
+    builder.are_not_equal()
     return builder.get()
 
 

@@ -36,6 +36,7 @@ FacilityTest = function (metaData) {
             {id: "LessThan", name: "Percentage Variance is less than"},
             {id: "AtLeastNOfTotal", name: "Group1 Is at least N% of the total"},
             {id: "AreEqual", name: "Are Equal"},
+            {id: "AreNotEqual", name: "Are Not Equal"},
             {id: "NoNegatives", name: "Has No Negatives"},
             {id: "NoBlanks", name: "Has No Blanks"}
         ],
