@@ -129,15 +129,15 @@ class DataTestCase(TestCase):
         report = HtmlDataImport(fixture, "May Jun").load(LocationToPartnerMapping.get_mapping())
         test_cycle = "Jul - Aug 2015"
         report.cycle = test_cycle
-        self.assertEqual(len(report.locs), 2115)
+        self.assertEqual(len(report.locs), 30)
         entries = LogEntry.objects.all()
         self.assertEqual(len(entries), 0)
 
         calculate_scores_for_checks_in_cycle(report)
-        self.assertEqual(len(Score.objects.filter(cycle=test_cycle)), 2114)
+        self.assertEqual(len(Score.objects.filter(cycle=test_cycle)), 30)
         self.assertEqual(len(AdultPatientsRecord.objects.filter(cycle=test_cycle)), 0)
         self.assertEqual(len(PAEDPatientsRecord.objects.filter(cycle=test_cycle)), 0)
-        self.assertEqual(len(Consumption.objects.filter(cycle=test_cycle)), 101)
+        self.assertEqual(len(Consumption.objects.filter(cycle=test_cycle)), 25)
         self.assertEqual(len(MultipleOrderFacility.objects.filter(cycle=test_cycle)), 0)
         entries = LogEntry.objects.all()
         self.assertEqual(len(entries), 1)

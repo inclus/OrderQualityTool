@@ -45,5 +45,5 @@ class TestGetAllLocations(TestCase):
     @fake_orgunit_response()
     def test_should_parse_json_response(self):
         locations = get_all_locations({}, {})
-        self.assertEqual(len(locations), 2115)
+        self.assertEqual(len(locations), 30)
         self.assertEqual(locations[0].warehouse, "MAUL")

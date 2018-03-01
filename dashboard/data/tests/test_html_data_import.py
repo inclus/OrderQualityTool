@@ -30,7 +30,7 @@ class LocationImportTestCase(TestCase):
         locations, records = extract_locations_and_import_records(
             get_test_output_from_fixture("arv-2-paediatric-art-patient-report-maul.html"),
             LocationToPartnerMapping.get_mapping())
-        self.assertEqual(len(locations), 2115)
+        self.assertEqual(len(locations), 30)
 
     # @responses.activate
     # @fake_orgunit_response()
@@ -71,7 +71,7 @@ class LocationImportTestCase(TestCase):
             LocationToPartnerMapping.get_mapping())
         assert_that(locations, has_item(
             all_of(
-                has_property("facility", "Medical Research Center Clinic"),
+                has_property("facility", "TASO Mulago CLINIC"),
                 has_property("warehouse", "MAUL"),
             )
         ))
