@@ -1,8 +1,8 @@
 from django.test import TestCase
 
 from dashboard.checks.legacy.blanks import MultipleCheck
-from dashboard.checks.user_defined_check import get_check, UserDefinedFacilityCheck
-from dashboard.checks.check_builder import DefinitionFactory
+from dashboard.checks.user_defined_check import get_check, UserDefinedFacilityCheck, get_check_from_dict
+from dashboard.checks.check_builder import DefinitionFactory, volume_tally_check
 
 
 class TestCheckLookup(TestCase):
@@ -15,3 +15,15 @@ class TestCheckLookup(TestCase):
         definition = DefinitionFactory().initial().getDef()
         check = get_check(definition)
         self.assertIsInstance(check, UserDefinedFacilityCheck)
+
+
+class TestCombinations(TestCase):
+    def test_get_combinations(self):
+        new_check = get_check_from_dict(volume_tally_check())
+        combinations = new_check.get_combinations()
+        self.assertListEqual(['TDF/3TC/EFV (Adult)', 'ABC/3TC (Paed)', 'EFV200 (Paed)'], combinations)
+        f1_formulations = new_check.get_formulations(new_check.definition.groups[0], combinations[0])
+        f2_formulations = new_check.get_formulations(new_check.definition.groups[0], combinations[1])
+        f3_formulations = new_check.get_formulations(new_check.definition.groups[0], combinations[2])
+        self.assertNotEqual(f1_formulations, f2_formulations)
+        self.assertNotEqual(f1_formulations, f3_formulations)

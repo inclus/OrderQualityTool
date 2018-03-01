@@ -87,9 +87,14 @@ class UserDefinedFacilityTracedCheck(UserDefinedFacilityCheck):
         return records
 
     def get_formulations(self, group, sample_tracer=None):
-        if sample_tracer and "name" in sample_tracer:
+        if sample_tracer:
+            combination_name = sample_tracer
+            if "name" in sample_tracer:
+                combination_name = sample_tracer.get("name")
+
             return py_(group.model.tracing_formulations).filter(
-                {"name": sample_tracer.get("name")}).first().value().get('formulations')
+                {"name": combination_name}).first().value().get('formulations')
+
         return maybe(py_(group.model.tracing_formulations).first().value()).or_else(lambda: {}).get('formulations')
 
 
