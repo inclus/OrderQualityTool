@@ -60,7 +60,7 @@ class EqualComparison(Comparison):
     def as_result(self, group1, group2, constant=100.0):
         if type(group1) is list:
 
-            if len(group1) < 1 or len(group2) < 2:
+            if len(group1) < 1 or len(group2) < 1:
                 return "NOT_REPORTING"
             values = list(group1)
             values.extend(group2)
