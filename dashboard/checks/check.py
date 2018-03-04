@@ -1,9 +1,15 @@
+import importlib
+from collections import defaultdict
+
 import attr
-import pydash
 from pydash import py_, pick
 from pymaybe import maybe
 
-from dashboard.helpers import get_prev_cycle
+from dashboard.checks.aggregations import available_aggregations
+from dashboard.checks.comparisons import as_float_or_1, available_comparisons
+from dashboard.checks.entities import Definition
+from dashboard.helpers import get_prev_cycle, DEFAULT, YES, NO, N_A
+from dashboard.utils import timeit
 
 
 def as_number(value):
@@ -34,152 +40,6 @@ def factor_values_by_formulation(formulations, factors):
     return _p
 
 
-def sum_aggregation(values):
-    return py_(values).reject(lambda x: x is None).sum().value()
-
-
-def avg_aggregation(values):
-    return py_(values).reject(lambda x: x is None).avg().value()
-
-
-def values_aggregation(values):
-    return py_(values).reject(lambda x: x is None).value()
-
-
-class Comparison(object):
-    def as_result(self, group1, group2, constant=100.0):
-        result = self.compare(group1, group2, constant)
-        return "YES" if result else "NO"
-
-    def compare(self, group1, group2, constant=100.0):
-        raise NotImplementedError
-
-    def text(self, group1, group2, constant):
-        raise NotImplementedError
-
-
-def calculate_percentage_variance(old_value, new_value):
-    old_value = maybe(old_value).or_else(0)
-    new_value = maybe(new_value).or_else(0)
-    return abs(((float(new_value) - float(old_value)) / old_value) * 100.0)
-
-
-class PercentageVarianceLessThanComparison(Comparison):
-
-    def compare(self, group1, group2, constant=100.0):
-        old_value = maybe(group1).or_else(0)
-        new_value = maybe(group2).or_else(0)
-        if old_value == 0:
-            if new_value == 0:
-                return True
-            return False
-        percentage_variance = calculate_percentage_variance(group1, group2)
-        return percentage_variance < constant
-
-    def text(self, group1, group2, constant):
-        result = self.compare(group1, group2, constant)
-        template = "%6.1f and %6.1f differ by %s than %s"
-        group1 = maybe(group1).or_else(0)
-        group2 = maybe(group2).or_else(0)
-        return template % (group1, group2, "less" if result else "more", constant)
-
-
-class WithinComparison(Comparison):
-    def compare(self, group1, group2, constant=100.0):
-        group2 = maybe(group2).or_else(0)
-        difference = abs(group2 - group1)
-        margin = (constant / 100.0) * group1
-        return difference < margin
-
-    def text(self, group1, group2, constant):
-        result = self.compare(group1, group2, constant)
-        template = "%d and %d differ by %s than %s"
-        group2 = maybe(group2).or_else(0)
-        return template % (group1, group2, "less" if result else "more", constant)
-
-
-class EqualComparison(Comparison):
-
-    def as_result(self, group1, group2, constant=100.0):
-        if type(group1) is list:
-
-            if len(group1) < 1 or len(group2) < 2:
-                return "NOT_REPORTING"
-            values = list(group1)
-            values.extend(group2)
-            all_zero = pydash.every(values, lambda x: x == 0)
-            if all_zero:
-                return "YES"
-
-        result = self.compare(group1, group2, constant)
-        return "YES" if result else "NO"
-
-    def compare(self, group1, group2, constant=100.0):
-        constant = as_float_or_1(constant)
-        if type(group1) is list or type(group2) is list:
-            return group1 == group2
-        return group1 == group2 * constant
-
-    def text(self, group1, group2, constant):
-        result = self.compare(group1, group2, constant)
-        template = "%s and %s %s equal"
-        return template % (group1, group2, "are" if result else "are not")
-
-
-class NotEqualComparison(EqualComparison):
-
-    def compare(self, group1, group2, constant=100.0):
-        parent = super(NotEqualComparison, self).compare(group1, group2, constant)
-        result = not parent
-        return result
-
-
-class NoNegativesComparison(Comparison):
-    def compare(self, group1, group2, constant=100.0):
-        return py_([group1, group2]).flatten_deep().reject(lambda x: x is None).every(lambda x: x >= 0).value()
-
-    def text(self, group1, group2, constant):
-        result = self.compare(group1, group2, constant)
-        values = py_([group1, group2]).flatten_deep().reject(lambda x: x is None).value()
-        template = "%s of the values %s are negative"
-        return template % ("none" if result else "some", values)
-
-
-class NoBlanksComparison(Comparison):
-    def compare(self, group1, group2, constant=100.0):
-        return py_([group1, group2]).flatten_deep().every(lambda x: x is not None).value()
-
-    def text(self, group1, group2, constant):
-        result = self.compare(group1, group2, constant)
-        values = py_([group1, group2]).flatten_deep().value()
-        template = "%s of the values %s are blank"
-        return template % ("none" if result else "some", values)
-
-
-class AtLeastNOfTotal(Comparison):
-    def compare(self, group1, group2, constant=100.0):
-        total = group2 + group1
-        adjusted_total = (constant / 100.0) * total
-        return group1 >= adjusted_total
-
-    def text(self, group1, group2, constant):
-        result = self.compare(group1, group2, constant)
-        template = "%d %s %d percent of %d"
-        return template % (group1, "is at least" if result else "is less than", constant, group2)
-
-
-available_aggregations = {"SUM": sum_aggregation, "AVG": avg_aggregation, "VALUE": values_aggregation}
-available_comparisons = {
-    "LessThan": PercentageVarianceLessThanComparison,
-    "AreEqual": EqualComparison,
-    "AreNotEqual": NotEqualComparison,
-    "NoNegatives": NoNegativesComparison,
-    "NoBlanks": NoBlanksComparison,
-    "Within": WithinComparison,
-    "AtLeastNOfTotal": AtLeastNOfTotal,
-}
-
-
 def as_values(fields):
     def _map(item):
         values = pick(attr.asdict(item), fields).values()
@@ -201,14 +61,276 @@ def current(cycle):
 cycle_lookups = {"Previous": previous, "Currrent": previous}
 
 
-def as_float_or_1(value):
-    try:
-        return float(value)
-    except ValueError as e:
-        return 1
-    except TypeError as e:
-        return 1
-
-
 def get_factored_values(formulations, factors, values):
     return py_(values).map(factor_values_by_formulation(formulations, factors)).value()
+
+
+CLASS_BASED = "ClassBased"
+
+
+class DynamicCheckMixin(object):
+    def __init__(self, definition):
+        self.definition = definition
+
+    def get_formulations(self, group, sample_tracer=None):
+        return group.selected_formulations
+
+    def aggregate_values(self, group, values):
+        aggregation = available_aggregations.get(group.aggregation.id)
+        if aggregation:
+            all_values = py_(values).map(lambda x: x[1:]).flatten_deep().value()
+            return aggregation(all_values)
+        return None
+
+    def compare_results(self, groups):
+        values = py_(groups).reject(lambda x: x is None).map('factored_values').map(skip_formulation).flatten().reject(
+            lambda x: x is None).value()
+        value_count = len(values)
+        if self.definition.operator and value_count > 0:
+            comparison_class = available_comparisons.get(self.definition.operator.id)
+            comparator = comparison_class()
+            operator_constant = self.definition.operator_constant
+
+            operator_constant = as_float_or_1(operator_constant)
+            gs = py_(groups).reject(lambda x: x is None).value()
+            if comparator and gs:
+                group1_result = groups[0].get('result')
+                group2_result = maybe(groups)[1].or_else({}).get('result')
+                comparison_result = comparator.as_result(group1_result, group2_result, constant=operator_constant)
+                result_text = comparator.text(group1_result, group2_result, operator_constant)
+                return comparison_result, result_text
+        return "NOT_REPORTING", None
+
+
+class DBBasedCheckPreview(DynamicCheckMixin):
+
+    @timeit
+    def get_preview_data(self, sample_location=None, sample_cycle=None, sample_tracer=None):
+        if sample_location is None:
+            sample_location = self.definition.sample.get('location')
+        if sample_cycle is None:
+            sample_cycle = self.definition.sample.get('cycle')
+        if sample_tracer is None:
+            sample_tracer = self.definition.sample.get('tracer')
+        groups = []
+        for group in self.definition.groups:
+            values_for_group = self._group_values_from_db(group, sample_cycle, sample_location, sample_tracer)
+            groups.append(values_for_group)
+        data = {'groups': groups}
+        comparison_result, comparison_text = self.compare_results(groups)
+        data['result'] = {self.get_result_key(sample_tracer): comparison_result}
+        data['resultText'] = comparison_text
+        return data
+
+    @timeit
+    def _group_values_from_db(self, group, sample_cycle, sample_location, sample_tracer):
+        model = group.model.as_model()
+        if group.has_overrides:
+            tracer_name = sample_tracer.get("name")
+            model_id = group.sample_formulation_model_overrides.get(tracer_name, {}).get("id", None)
+            if model_id:
+                model = group.model.as_model(model_id)
+        if model:
+            values = model.objects.filter(
+                name=sample_location['name'],
+                cycle=parse_cycle(sample_cycle, group),
+                district=sample_location['district'],
+                formulation__in=self.get_formulations(group, sample_tracer)
+            ).values_list(
+                'formulation', *group.selected_fields)
+
+            factored_values = get_factored_values(group.selected_formulations, group.factors, values)
+            return {
+                "name": group.name,
+                "aggregation": group.aggregation.name,
+                "values": values,
+                "headers": group.selected_fields,
+                "has_factors": group.has_factors,
+                "factored_values": factored_values,
+                "result": self.aggregate_values(group, factored_values)
+            }
+
+    @timeit
+    def get_locations_and_cycles(self):
+        raw_locations = []
+        for group in self.definition.groups:
+            model = group.model.as_model()
+            if model:
+                field_filters = build_field_filters(group.selected_fields)
+                base_queryset = model.objects.filter(formulation__in=self.get_formulations(group),
+                                                     **field_filters)
+                raw_locations.extend(
+                    base_queryset.order_by('name').values(
+                        'name', 'district', 'cycle').distinct())
+        locations = py_(raw_locations).uniq().group_by('name').map(as_loc).sort_by("name").value()
+        return {"locations": locations}
+
+    def get_result_key(self, sample_tracer):
+        if sample_tracer and "name" in sample_tracer:
+            return sample_tracer.get("name")
+        return "DEFAULT"
+
+
+class UserDefinedFacilityCheck(DBBasedCheckPreview):
+
+    def get_combinations(self):
+        return [DEFAULT]
+
+    def for_each_facility(self, facility_data, combination, other_facility_data=None):
+        groups = []
+        for group in self.definition.groups:
+            values_for_group = self._group_values_from_location_data(group, facility_data, other_facility_data,
+                                                                     combination)
+            groups.append(values_for_group)
+
+        comparison_result, _ = self.compare_results(groups)
+        return comparison_result
+
+    def _group_values_from_location_data(self, group, facility_data, other_facility_data, combination):
+        data_source = other_facility_data if group.cycle and group.cycle.id is "Previous" else facility_data
+        records = self.get_records_from_data_source(data_source, group)
+
+        if records:
+            formulations = self.get_formulations(group, combination)
+            values = self.get_values_from_records(records, formulations, group.selected_fields)
+            factored_values = get_factored_values(formulations, group.factors, values)
+            return {
+                "name": group.name,
+                "aggregation": group.aggregation.name,
+                "values": values,
+                "headers": group.selected_fields,
+                "has_factors": group.has_factors,
+                "factored_values": factored_values,
+                "result": self.aggregate_values(group, factored_values)
+            }
+        return {
+            "name": group.name,
+            "aggregation": maybe(group.aggregation).name.or_else(None),
+            "values": [],
+            "headers": group.selected_fields,
+            "has_factors": group.has_factors,
+            "factored_values": [],
+            "result": None
+        }
+
+    def get_records_from_data_source(self, data_source, group):
+        records = group.model.get_records(data_source)
+        return records
+
+    def get_values_from_records(self, records, formulations, selected_fields):
+        formulations = [f.lower() for f in formulations]
+        return py_(records).reject(lambda x: x.formulation.lower() not in formulations).map(
+            as_values(selected_fields)).value()
+
+
+class UserDefinedFacilityTracedCheck(UserDefinedFacilityCheck):
+    def get_combinations(self):
+        return [tracer.get("name") for tracer in self.definition.groups[0].model.tracing_formulations]
+
+    def get_records_from_data_source(self, data_source, group):
+        records = group.model.get_records(data_source)
+        if group.has_overrides:
+            formulations_to_add = defaultdict(set)
+            formulations_to_override = []
+            for (sample, override_model) in group.sample_formulation_model_overrides.items():
+                cleaned_formulation_names = [name.lower() for name in override_model.get("formulations", [])]
+                for name in cleaned_formulation_names:
+                    formulations_to_add[override_model.get('id')].add(name)
+                    formulations_to_override.append(name)
+            records = py_(records).reject(lambda x: x.formulation.lower() in formulations_to_override).value()
+            for (model, formulations) in formulations_to_add.items():
+                get_records = group.model.get_records(data_source, model)
+                records_for_override_model = py_(get_records).reject(
+                    lambda x: x.formulation.lower() not in formulations).value()
+                records.extend(records_for_override_model)
+        return records
+
+    def get_formulations(self, group, sample_tracer=None):
+        if sample_tracer:
+            combination_name = sample_tracer
+            if "name" in sample_tracer:
+                combination_name = sample_tracer.get("name")
+
+            return py_(group.model.tracing_formulations).filter(
+                {"name": combination_name}).first().value().get('formulations')
+
+        return maybe(py_(group.model.tracing_formulations).first().value()).or_else(lambda: {}).get('formulations')
+
+
+class UserDefinedSingleGroupFacilityCheck(UserDefinedFacilityCheck):
+
+    def compare_results(self, groups):
+        if self.definition.operator:
+            comparison_class = available_comparisons.get(self.definition.operator.id)
+            comparator = comparison_class()
+            operator_constant = self.definition.operator_constant
+
+            operator_constant = as_float_or_1(operator_constant)
+
+            if comparator:
+                group1_result = groups[0].get('result')
+                group2_result = None
+                comparison_result = comparator.compare(group1_result, group2_result, constant=operator_constant)
+                result_text = comparator.text(group1_result, group2_result, operator_constant, comparison_result)
+                result = YES if comparison_result else NO
+                return result, result_text
+        return N_A, None
+
+
+testTypes = {
+    "FacilityTwoGroups": UserDefinedFacilityCheck,
+    "FacilityOneGroup": UserDefinedSingleGroupFacilityCheck,
+    "FacilityTwoGroupsAndTracingFormulation": UserDefinedFacilityTracedCheck,
+}
+
+
+def get_check_from_dict(data):
+    definition = Definition.from_dict(data)
+    return get_check(definition)
+
+
+def get_check(definition):
+    check_type = definition.type.get('id')
+    full_class_name = definition.python_class
+    if check_type == CLASS_BASED and full_class_name:
+        return get_check_by_class(full_class_name)
+    dynamic_check = testTypes.get(check_type)(definition)
+    return dynamic_check
+
+
+def get_check_by_class(full_class_name):
+    module_name = ".".join(full_class_name.split(".")[:-1])
+    class_name = full_class_name.split(".")[-1]
+    selected_module = importlib.import_module(module_name)
+    check_class = getattr(selected_module, class_name)
+    return check_class()
+
+
+def build_field_filters(selected_fields):
+    filter_kwargs = {}
+    for field in selected_fields:
+        filter_kwargs[field + "__isnull"] = False
+    return filter_kwargs
+
+
+def as_loc(items):
+    if len(items) > 0:
+        return {
+            "name": items[0]['name'],
+            "district": items[0]['district'],
+            "cycles": [item['cycle'] for item in items]
+        }
+    else:
+        return None
+
+
+def parse_cycle(sample_cycle, group):
+    lookup = group.cycle.id
+    lookup = cycle_lookups.get(lookup, current)
+    return lookup(sample_cycle)
+
+
+def skip_formulation(collection):
+    if len(collection) > 0 and type(collection[0]) is list:
+        return py_(collection).map(skip_formulation).flatten().value()
+    return py_(collection).value()[1:]

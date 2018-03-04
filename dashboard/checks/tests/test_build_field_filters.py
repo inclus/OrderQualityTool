@@ -1,6 +1,6 @@
 from django.test import TestCase
 
-from dashboard.checks.check_preview import build_field_filters
+from dashboard.checks.check import build_field_filters
 
 
 class TestFieldFilters(TestCase):

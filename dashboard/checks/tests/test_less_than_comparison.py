@@ -1,6 +1,7 @@
 from django.test import TestCase
 
-from dashboard.checks.check import PercentageVarianceLessThanComparison, AtLeastNOfTotal, calculate_percentage_variance
+from dashboard.checks.comparisons import calculate_percentage_variance, PercentageVarianceLessThanComparison, \
+    AtLeastNOfTotal
 
 
 class TestPercentageVarianceLessThanComparison(TestCase):

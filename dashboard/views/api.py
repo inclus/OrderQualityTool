@@ -15,7 +15,7 @@ from rest_framework.generics import ListAPIView
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from dashboard.checks.check_builder import FACILITY_TWO_GROUPS_WITH_SAMPLE
+from dashboard.checks.builder import FACILITY_TWO_GROUPS_WITH_SAMPLE
 from dashboard.helpers import *
 from dashboard.models import Score, WAREHOUSE, DISTRICT, MultipleOrderFacility, Cycle, MOH_CENTRAL, Consumption, \
     AdultPatientsRecord, PAEDPatientsRecord, FacilityTest, TracingFormulations

@@ -1,6 +1,6 @@
 from django.test import TestCase
 
-from dashboard.checks.check_preview import parse_cycle
+from dashboard.checks.check import parse_cycle
 from dashboard.checks.entities import DefinitionGroup
 
 

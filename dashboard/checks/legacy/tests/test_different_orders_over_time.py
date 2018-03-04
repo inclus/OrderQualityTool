@@ -1,9 +1,9 @@
 from django.test import TestCase
 from nose_parameterized import parameterized
 
-from dashboard.checks.check_builder import non_repeating_check
+from dashboard.checks.builder import non_repeating_check
 from dashboard.checks.legacy.cycles import OrdersOverTimeCheck
-from dashboard.checks.user_defined_check import get_check_from_dict
+from dashboard.checks.check import get_check_from_dict
 from dashboard.data.entities import LocationData
 from dashboard.helpers import C_RECORDS, FORMULATION, F1_QUERY, OPENING_BALANCE, COMBINED_CONSUMPTION, YES, \
     NOT_REPORTING, NO, DAYS_OUT_OF_STOCK, F1, F1_PATIENT_QUERY

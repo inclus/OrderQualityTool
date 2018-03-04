@@ -1,8 +1,8 @@
 from django.test import TestCase
 
 from dashboard.checks.legacy.blanks import MultipleCheck
-from dashboard.checks.user_defined_check import get_check, UserDefinedFacilityCheck, get_check_from_dict
-from dashboard.checks.check_builder import DefinitionFactory, volume_tally_check
+from dashboard.checks.check import UserDefinedFacilityCheck, get_check_from_dict, get_check
+from dashboard.checks.builder import DefinitionFactory, volume_tally_check
 
 
 class TestCheckLookup(TestCase):

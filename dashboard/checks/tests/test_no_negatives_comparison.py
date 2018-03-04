@@ -1,6 +1,6 @@
 from django.test import TestCase
 
-from dashboard.checks.check import NoNegativesComparison
+from dashboard.checks.comparisons import NoNegativesComparison
 
 no_negatives_comparison = NoNegativesComparison().compare
 

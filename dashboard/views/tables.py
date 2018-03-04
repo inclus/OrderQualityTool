@@ -8,8 +8,8 @@ from django.views.generic import View
 from django_datatables_view.base_datatable_view import BaseDatatableView
 from pydash import py_
 
-from dashboard.checks.check_builder import FACILITY_TWO_GROUPS_WITH_SAMPLE
-from dashboard.checks.user_defined_check import get_check_from_dict
+from dashboard.checks.builder import FACILITY_TWO_GROUPS_WITH_SAMPLE
+from dashboard.checks.check import get_check_from_dict
 from dashboard.helpers import *
 from dashboard.models import Score, FacilityTest
 

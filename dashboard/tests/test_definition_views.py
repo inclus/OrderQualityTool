@@ -3,7 +3,7 @@ from json import loads
 from django.test import TestCase
 from django_webtest import WebTest
 
-from dashboard.checks.check_builder import DefinitionFactory
+from dashboard.checks.builder import DefinitionFactory
 from dashboard.tests.test_helpers import gen_adult_record, gen_paed_record, gen_consumption_record
 from hamcrest import *
 

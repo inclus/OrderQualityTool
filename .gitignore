@@ -155,3 +155,4 @@ node_modules/
 .tmp
 coverage
 test_sqlite.db
+.vscode

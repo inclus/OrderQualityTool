@@ -1,6 +1,6 @@
 from django.test import TestCase
 
-from dashboard.checks.check_preview import skip_formulation
+from dashboard.checks.check import skip_formulation
 
 
 class TestSkip_formulation(TestCase):

@@ -1,9 +1,9 @@
 from django.test import TestCase
 from nose_parameterized import parameterized
 
-from dashboard.checks.check_builder import volume_tally_check
-from dashboard.checks.legacy.volume_tally import VolumeTallyCheck
-from dashboard.checks.user_defined_check import get_check_from_dict
+from dashboard.checks.builder import volume_tally_check
+from dashboard.checks.legacy.volumetally import VolumeTallyCheck
+from dashboard.checks.check import get_check_from_dict
 from dashboard.data.entities import LocationData
 from dashboard.helpers import *
 

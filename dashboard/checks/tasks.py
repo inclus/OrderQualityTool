@@ -4,12 +4,12 @@ from dashboard.checks.entities import Definition
 from dashboard.checks.legacy.adherence import GuidelineAdherenceCheckAdult1L, GuidelineAdherenceCheckAdult2L, \
     GuidelineAdherenceCheckPaed1L
 from dashboard.checks.legacy.blanks import BlanksQualityCheck, MultipleCheck, IsReportingCheck
-from dashboard.checks.legacy.volume_tally import VolumeTallyCheck
+from dashboard.checks.legacy.volumetally import VolumeTallyCheck
 from dashboard.checks.legacy.cycles import BalancesMatchCheck, OrdersOverTimeCheck, StableConsumptionCheck, \
     WarehouseFulfillmentCheck, StablePatientVolumesCheck
 from dashboard.checks.legacy.negatives import NegativeNumbersQualityCheck
 from dashboard.checks.legacy.nn import NNRTIADULTSCheck, NNRTIPAEDCheck
-from dashboard.checks.user_defined_check import get_check
+from dashboard.checks.check import get_check
 from dashboard.data.entities import enrich_location_data
 from dashboard.data.tasks import get_report_for_other_cycle
 from dashboard.helpers import NAME

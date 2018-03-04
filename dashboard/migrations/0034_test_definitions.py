@@ -6,7 +6,7 @@ import json
 
 from django.db import migrations
 
-from dashboard.checks.check_builder import class_based_check, guideline_adherence_adult1l_check, \
+from dashboard.checks.builder import class_based_check, guideline_adherence_adult1l_check, \
     guideline_adherence_adult2l_check, guideline_paed1l_check, no_negatives_check, volume_tally_check, \
     non_repeating_check, open_closing_check, stable_consumption_check, nnrti_paed, warehouse_fulfillment_check, \
     nnrti_adult

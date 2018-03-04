@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
 from dashboard.checks.entities import Definition
-from dashboard.checks.user_defined_check import get_check
+from dashboard.checks.check import get_check
 
 
 class OptionField(serializers.Serializer):

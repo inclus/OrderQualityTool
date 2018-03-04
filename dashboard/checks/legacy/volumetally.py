@@ -1,6 +1,6 @@
 from collections import defaultdict
 
-from dashboard.checks.check import calculate_percentage_variance
+from dashboard.checks.comparisons import calculate_percentage_variance
 from dashboard.checks.legacy.check import get_consumption_totals, get_patient_total, has_all_blanks, QCheck, \
     get_consumption_records, get_patient_records
 from dashboard.helpers import *
