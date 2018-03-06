@@ -18,6 +18,10 @@ class Comparison(object):
 def calculate_percentage_variance(old_value, new_value):
     old_value = maybe(old_value).or_else(0)
     new_value = maybe(new_value).or_else(0)
+    if new_value > old_value:
+        temp = new_value
+        new_value = old_value
+        old_value = temp
     return abs(((float(new_value) - float(old_value)) / old_value) * 100.0)
 
 
@@ -31,7 +35,7 @@ class PercentageVarianceLessThanComparison(Comparison):
                 return True
             return False
         percentage_variance = calculate_percentage_variance(group1, group2)
-        return percentage_variance < constant
+        return percentage_variance <= constant
 
     def text(self, group1, group2, constant):
         result = self.compare(group1, group2, constant)
@@ -60,10 +64,11 @@ class EqualComparison(Comparison):
     def as_result(self, group1, group2, constant=100.0):
         if type(group1) is list:
 
-            if len(group1) < 1 or len(group2) < 1:
+            if len(group1) < 1 or (group2 is not None and len(group2) < 1):
                 return "NOT_REPORTING"
             values = list(group1)
-            values.extend(group2)
+            if group2 is not None:
+                values.extend(group2)
             all_zero = pydash.every(values, lambda x: x == 0)
             if all_zero:
                 return "YES"

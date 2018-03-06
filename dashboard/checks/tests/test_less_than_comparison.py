@@ -6,11 +6,14 @@ from dashboard.checks.comparisons import calculate_percentage_variance, Percenta
 
 class TestPercentageVarianceLessThanComparison(TestCase):
     def test_differ_by_less_than_50(self):
-        self.assertFalse(PercentageVarianceLessThanComparison().compare(100, 200, 50))
+        self.assertFalse(PercentageVarianceLessThanComparison().compare(100, 201, 50))
+        self.assertFalse(PercentageVarianceLessThanComparison().compare(201, 100, 50))
+        self.assertTrue(PercentageVarianceLessThanComparison().compare(200, 100, 50))
+        self.assertTrue(PercentageVarianceLessThanComparison().compare(30, 60, 50))
 
     def test_dont_differ_by_less_than_50(self):
         self.assertTrue(PercentageVarianceLessThanComparison().compare(10, 14, 50))
-        self.assertEquals(calculate_percentage_variance(10, 14), 40)
+        self.assertAlmostEqual(calculate_percentage_variance(10, 14.0), 400.0/14)
         self.assertFalse(PercentageVarianceLessThanComparison().compare(0, 3, 50))
         self.assertEquals(calculate_percentage_variance(3, 0), 100)
         self.assertFalse(PercentageVarianceLessThanComparison().compare(3, 0, 50))

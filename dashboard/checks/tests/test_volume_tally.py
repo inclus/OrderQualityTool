@@ -66,7 +66,7 @@ above_30_percent = LocationData.migrate_from_dict({
         {FORMULATION: F1_PATIENT_QUERY[1], NEW: 7.143, EXISTING: 7.143},
     ],
     C_RECORDS: [
-        {FORMULATION: F1_QUERY, COMBINED_CONSUMPTION: 40}
+        {FORMULATION: F1_QUERY, COMBINED_CONSUMPTION: 36}
     ]
 })
 

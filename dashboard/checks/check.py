@@ -11,7 +11,6 @@ from dashboard.checks.entities import Definition
 from dashboard.helpers import get_prev_cycle, DEFAULT, YES, NO, N_A
 from dashboard.utils import timeit
 
-
 def as_number(value):
     if not value:
         return False, None
@@ -123,7 +122,7 @@ class DBBasedCheckPreview(DynamicCheckMixin):
         return data
 
     @timeit
-    def _group_values_from_db(self, group, sample_cycle, sample_location, sample_tracer):
+    def _group_values_from_db(self, group, cycle, sample_location, sample_tracer):
         model = group.model.as_model()
         if group.has_overrides:
             tracer_name = sample_tracer.get("name")
@@ -133,7 +132,7 @@ class DBBasedCheckPreview(DynamicCheckMixin):
         if model:
             values = model.objects.filter(
                 name=sample_location['name'],
-                cycle=parse_cycle(sample_cycle, group),
+                cycle=parse_cycle(cycle, group),
                 district=sample_location['district'],
                 formulation__in=self.get_formulations(group, sample_tracer)
             ).values_list(
@@ -182,12 +181,11 @@ class UserDefinedFacilityCheck(DBBasedCheckPreview):
             values_for_group = self._group_values_from_location_data(group, facility_data, other_facility_data,
                                                                      combination)
             groups.append(values_for_group)
-
         comparison_result, _ = self.compare_results(groups)
         return comparison_result
 
     def _group_values_from_location_data(self, group, facility_data, other_facility_data, combination):
-        data_source = other_facility_data if group.cycle and group.cycle.id is "Previous" else facility_data
+        data_source = other_facility_data if group.cycle and group.cycle.id == "Previous" else facility_data
         records = self.get_records_from_data_source(data_source, group)
 
         if records:
@@ -201,6 +199,7 @@ class UserDefinedFacilityCheck(DBBasedCheckPreview):
                 "headers": group.selected_fields,
                 "has_factors": group.has_factors,
                 "factored_values": factored_values,
+                "cycle": group.cycle.id,
                 "result": self.aggregate_values(group, factored_values)
             }
         return {

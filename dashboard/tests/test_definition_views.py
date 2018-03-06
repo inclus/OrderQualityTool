@@ -50,6 +50,7 @@ class PreviewLocationsViewTestCase(WebTest):
         )))
 
 
+
 class PreviewViewTestCase(WebTest):
     url = "/api/tests/preview"
 
