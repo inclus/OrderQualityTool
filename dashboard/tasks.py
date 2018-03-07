@@ -4,6 +4,8 @@ import re
 from celery import shared_task
 from io import BytesIO
 
+from raven.contrib.django.models import client
+
 from dashboard.checks.tasks import run_dynamic_checks
 from dashboard.data.data_import import DataImport, ExcelDataImport
 from dashboard.data.html_data_import import HtmlDataImport
@@ -30,8 +32,11 @@ def calculate_scores_for_checks_in_cycle(data_import):
 def update_checks(ids):
     data = Cycle.objects.filter(id__in=ids).all()
     for cycle in data:
-        data_import = DataImport(None, cycle.title).build_form_db(cycle)
-        calculate_scores_for_checks_in_cycle(data_import)
+        try:
+            data_import = DataImport(None, cycle.title).build_form_db(cycle)
+            calculate_scores_for_checks_in_cycle(data_import)
+        except Exception:
+            client.captureException()
 
 
 def to_mon(first_month_match):

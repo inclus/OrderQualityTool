@@ -15,6 +15,7 @@ from dashboard.data.tasks import get_report_for_other_cycle
 from dashboard.helpers import NAME
 from dashboard.models import FacilityTest
 from dashboard.utils import timeit
+from raven.contrib.django.raven_compat.models import client
 
 
 @timeit
@@ -23,16 +24,19 @@ def run_dynamic_checks(report):
     other_report = get_report_for_other_cycle(report)
     facility_tests = FacilityTest.objects.all()
     for check_obj in facility_tests:
-        definition = Definition.from_string(check_obj.definition)
-        check_to_run = get_check(definition)
-        if check_to_run:
-            for location in report.locs:
-                facility_data = enrich_location_data(location, report)
-                other_facility_data = enrich_location_data(location, other_report)
-                for combination in check_to_run.get_combinations():
-                    scores[location][check_obj.name][combination] = check_to_run.for_each_facility(facility_data,
-                                                                                                   combination,
-                                                                                                   other_facility_data)
+        try:
+            definition = Definition.from_string(check_obj.definition)
+            check_to_run = get_check(definition)
+            if check_to_run:
+                for location in report.locs:
+                    facility_data = enrich_location_data(location, report)
+                    other_facility_data = enrich_location_data(location, other_report)
+                    for combination in check_to_run.get_combinations():
+                        scores[location][check_obj.name][combination] = check_to_run.for_each_facility(facility_data,
+                                                                                                       combination,
+                                                                                                       other_facility_data)
+        except Exception:
+            client.captureException()
     return scores
 
 

@@ -26,6 +26,7 @@ class TestAtLeastNOfTotalComparison(TestCase):
     def test_comparison(self):
         self.assertTrue(AtLeastNOfTotal().compare(200, 100, 50))
         self.assertFalse(AtLeastNOfTotal().compare(4183 , None, 50))
+        self.assertEqual(AtLeastNOfTotal().text(200, None, 50), "200 is less than 50 percent of None")
         self.assertEqual(AtLeastNOfTotal().text(200, 100, 50), "200 is at least 50 percent of 100")
         self.assertTrue(AtLeastNOfTotal().compare(10, 14, 10))
         self.assertTrue(AtLeastNOfTotal().compare(14, 9, 50))

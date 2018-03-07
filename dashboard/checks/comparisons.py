@@ -134,7 +134,7 @@ class AtLeastNOfTotal(Comparison):
 
     def text(self, group1, group2, constant):
         result = self.compare(group1, group2, constant)
-        template = "%d %s %d percent of %d"
+        template = "%s %s %s percent of %s"
         return template % (group1, "is at least" if result else "is less than", constant, group2)
 
 
