@@ -23,6 +23,12 @@ class DHIS2APIClient(object):
         logger.debug("creating dhis2 client", extra={"url": self.base_url, "username": username})
         self.auth = HTTPBasicAuth(username, password)
 
+    def get_children(self, org_unit):
+        url = "%s/api/organisationUnits/%s.json?fields=children[id,name],id,name,level" % (self.base_url, org_unit)
+        response = requests.get(url, auth=self.auth)
+        logger.debug("dhis2 api request", extra={"url": url, "status": response.status_code})
+        return [unit.get("id") for unit in response.json().get("children", [])]
+
     def get_locations(self):
         filter = "filter=name:eq:ARVs%20Warehouse"
         fields = "fields=id,name,organisationUnitGroups[id,name,organisationUnits[id,name,ancestors[id,name,level]]]"
