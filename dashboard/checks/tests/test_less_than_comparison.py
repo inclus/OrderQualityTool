@@ -7,6 +7,7 @@ from dashboard.checks.comparisons import calculate_percentage_variance, Percenta
 class TestPercentageVarianceLessThanComparison(TestCase):
     def test_differ_by_less_than_50(self):
         self.assertFalse(PercentageVarianceLessThanComparison().compare(100, 201, 50))
+        self.assertFalse(PercentageVarianceLessThanComparison().compare(-11.5, None, 50))
         self.assertFalse(PercentageVarianceLessThanComparison().compare(201, 100, 50))
         self.assertTrue(PercentageVarianceLessThanComparison().compare(200, 100, 50))
         self.assertTrue(PercentageVarianceLessThanComparison().compare(30, 60, 50))
@@ -24,6 +25,7 @@ class TestPercentageVarianceLessThanComparison(TestCase):
 class TestAtLeastNOfTotalComparison(TestCase):
     def test_comparison(self):
         self.assertTrue(AtLeastNOfTotal().compare(200, 100, 50))
+        self.assertFalse(AtLeastNOfTotal().compare(4183 , None, 50))
         self.assertEqual(AtLeastNOfTotal().text(200, 100, 50), "200 is at least 50 percent of 100")
         self.assertTrue(AtLeastNOfTotal().compare(10, 14, 10))
         self.assertTrue(AtLeastNOfTotal().compare(14, 9, 50))

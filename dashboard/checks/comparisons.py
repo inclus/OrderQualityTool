@@ -30,6 +30,10 @@ class PercentageVarianceLessThanComparison(Comparison):
     def compare(self, group1, group2, constant=100.0):
         old_value = maybe(group1).or_else(0)
         new_value = maybe(group2).or_else(0)
+        if new_value > old_value:
+            temp = new_value
+            new_value = old_value
+            old_value = temp
         if old_value == 0:
             if new_value == 0:
                 return True
@@ -120,7 +124,11 @@ class NoBlanksComparison(Comparison):
 
 class AtLeastNOfTotal(Comparison):
     def compare(self, group1, group2, constant=100.0):
-        total = group2 + group1
+        old_value = maybe(group1).or_else(0)
+        new_value = maybe(group2).or_else(0)
+        if new_value == 0:
+            return False
+        total = new_value + old_value
         adjusted_total = (constant / 100.0) * total
         return group1 >= adjusted_total
 
