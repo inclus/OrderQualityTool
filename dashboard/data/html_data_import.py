@@ -11,7 +11,7 @@ from dashboard.medist.client import get_all_locations
 from dashboard.utils import timeit
 from dashboard.helpers import PAED_PATIENT_REPORT, ADULT_PATIENT_REPORT, CONSUMPTION_REPORT, HTML_PARSER
 
-logger = pygogo.Gogo(__name__).get_structured_logger()
+logger = pygogo.Gogo(__name__, low_formatter=pygogo.formatters.structured_formatter).get_logger()
 TR = "tr"
 TD = "td"
 TR_ROTATED = "tr_rotated"

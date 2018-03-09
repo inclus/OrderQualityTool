@@ -51,7 +51,7 @@ class AboutHowUsed(TemplateView):
     template_name = "about_used.html"
 
 
-logger = pygogo.Gogo(__name__).get_structured_logger()
+logger = pygogo.Gogo(__name__, low_formatter=pygogo.formatters.structured_formatter).get_logger()
 
 
 class Dhis2ImportView(LoginRequiredMixin, StaffuserRequiredMixin, FormView):

@@ -279,7 +279,7 @@ class AdminAccessView(APIView):
         return Response({"is_admin": is_admin})
 
 
-logger = pygogo.Gogo(__name__).get_structured_logger()
+logger = pygogo.Gogo(__name__, low_formatter=pygogo.formatters.structured_formatter).get_logger()
 
 
 class NewImportView(APIView):

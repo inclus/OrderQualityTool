@@ -7,7 +7,7 @@ from requests.auth import HTTPBasicAuth
 
 from dashboard.data.entities import Location
 
-logger = pygogo.Gogo(__name__).get_structured_logger()
+logger = pygogo.Gogo(__name__, low_formatter=pygogo.formatters.structured_formatter).get_logger()
 
 
 def parse_warehouse(warehouse):

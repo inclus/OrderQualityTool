@@ -10,7 +10,7 @@ from dashboard.models import Consumption, AdultPatientsRecord, PAEDPatientsRecor
     Cycle, Score
 from dashboard.utils import timeit
 
-logger = pygogo.Gogo(__name__).get_structured_logger()
+logger = pygogo.Gogo(__name__, low_formatter=pygogo.formatters.structured_formatter).get_logger()
 
 
 @timeit
