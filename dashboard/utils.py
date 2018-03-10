@@ -30,7 +30,7 @@ def timeit(method):
             logger.info("timer",
                         extra={
                             "method": method_name,
-                            "duration": "%2.5f" % duration,
+                            "duration": duration,
                             "extra": [str(a)[:30] for a in args]})
         return result
 
