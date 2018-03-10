@@ -19,6 +19,7 @@ TABLE_COLUMN_REGIMEN = "Regimen"
 TABLE_COLUMN_OPENING_BALANCE = "Opening Balance"
 TABLE_COLUMN_CLOSING_BALANCE = "Closing Balance"
 TABLE_COLUMN_ART_CONSUMPTION = "ART Consumption"
+TABLE_COLUMN_PMTCT_CONSUMPTION = "PMTCT Consumption"
 TABLE_COLUMN_LOSES_ADJUSTMENTS = "Losses/Adjustments"
 TABLE_COLUMN_NEW = "New"
 TABLE_COLUMN_EXISTING = "Existing"
@@ -187,7 +188,7 @@ class HtmlDataImportRecord(object):
         return as_number(self.data.get(TABLE_COLUMN_RECEIVED))
 
     def get_consumption(self):
-        return as_number(self.data.get(TABLE_COLUMN_ART_CONSUMPTION))
+        return as_number(self.data.get(TABLE_COLUMN_ART_CONSUMPTION)) + as_number(self.data.get(TABLE_COLUMN_PMTCT_CONSUMPTION))
 
     def get_loses_adjustments(self):
         return as_number(self.data.get(TABLE_COLUMN_LOSES_ADJUSTMENTS))

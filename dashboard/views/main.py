@@ -15,7 +15,7 @@ from dashboard.forms import FileUploadForm, MappingUploadForm, Dhis2ImportForm
 from dashboard.helpers import F3, F2, F1, sort_cycle
 from dashboard.models import Score, LocationToPartnerMapping, FacilityTest
 from dashboard.tasks import import_data_from_dhis2, run_manual_import
-from dashboard.utils import timeit, log_formatter
+from dashboard.utils import log_formatter
 
 
 class HomeView(LoginRequiredMixin, TemplateView):
