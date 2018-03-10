@@ -4,12 +4,14 @@ import pygogo
 import sys
 
 from prometheus_client import Histogram
+from pygogo.formatters import StructuredFormatter, BASIC_FORMAT
 
 TWO_CYCLE = "two_cycle"
 
 IS_INTERFACE = "is_interface"
+log_formatter = StructuredFormatter(BASIC_FORMAT)
 
-logger = pygogo.Gogo(__name__, low_formatter=pygogo.formatters.structured_formatter).get_logger()
+logger = pygogo.Gogo(__name__, low_formatter=log_formatter).get_logger()
 method_execution_time_histogram = Histogram('qdb_method_execution_time_seconds', 'Time taken to execute the method',
                                             ['method'])
 

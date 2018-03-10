@@ -15,7 +15,7 @@ from dashboard.forms import FileUploadForm, MappingUploadForm, Dhis2ImportForm
 from dashboard.helpers import F3, F2, F1, sort_cycle
 from dashboard.models import Score, LocationToPartnerMapping, FacilityTest
 from dashboard.tasks import import_data_from_dhis2, run_manual_import
-from dashboard.utils import timeit
+from dashboard.utils import timeit, log_formatter
 
 
 class HomeView(LoginRequiredMixin, TemplateView):
@@ -51,7 +51,7 @@ class AboutHowUsed(TemplateView):
     template_name = "about_used.html"
 
 
-logger = pygogo.Gogo(__name__, low_formatter=pygogo.formatters.structured_formatter).get_logger()
+logger = pygogo.Gogo(__name__, low_formatter=log_formatter).get_logger()
 
 
 class Dhis2ImportView(LoginRequiredMixin, StaffuserRequiredMixin, FormView):

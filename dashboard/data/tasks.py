@@ -1,6 +1,7 @@
 import pydash
 import pygogo
 from django.contrib.admin.models import LogEntry, CHANGE
+from pygogo.formatters import BASIC_FORMAT, StructuredFormatter
 
 from dashboard.checks.legacy.check import facility_has_single_order
 from dashboard.data.data_import import ExcelDataImport
@@ -8,9 +9,9 @@ from dashboard.data.html_data_import import HtmlDataImport
 from dashboard.helpers import get_prev_cycle, F1, F2, F3, DEFAULT, YES, WEB, NO
 from dashboard.models import Consumption, AdultPatientsRecord, PAEDPatientsRecord, MultipleOrderFacility, DashboardUser, \
     Cycle, Score
-from dashboard.utils import timeit
+from dashboard.utils import timeit, log_formatter
 
-logger = pygogo.Gogo(__name__, low_formatter=pygogo.formatters.structured_formatter).get_logger()
+logger = pygogo.Gogo(__name__, low_formatter=log_formatter).get_logger()
 
 
 @timeit

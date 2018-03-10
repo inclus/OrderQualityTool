@@ -7,7 +7,9 @@ from dashboard.data.html_data_import import TR, TD
 from dashboard.helpers import HTML_PARSER
 from dynamic_preferences.registries import global_preferences_registry
 
-logger = pygogo.Gogo(__name__, low_formatter=pygogo.formatters.structured_formatter).get_logger()
+from dashboard.utils import log_formatter
+
+logger = pygogo.Gogo(__name__, low_formatter=log_formatter).get_logger()
 
 
 def get_html_table(html_doc, report_id):
