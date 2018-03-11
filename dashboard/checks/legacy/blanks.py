@@ -40,7 +40,7 @@ class BlanksQualityCheck(QCheck):
         result = NOT_REPORTING
 
         values = values_for_records(self.fields, data.c_records)
-        number_of_consumption_record_blanks = len(pydash.select(
+        number_of_consumption_record_blanks = len(pydash.filter_(
             values, lambda v: v is None))
         if data.c_count == 0 and data.a_count == 0 and data.p_count == 0:
             return result

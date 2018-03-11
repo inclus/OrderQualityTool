@@ -33,7 +33,7 @@ class TestDHIS2FacilityAsLocation(TestCase):
         }
         loc = Location.migrate_from_dict({"name": "01 Commando HC II", "District": "Otuke District"})
         location = dhis2_facility_as_location({"01 Commando HC II": "PT"}, {
-            loc: loc})(data)
+            loc: loc}, {})(data)
         self.assertEqual(location.facility, "01 Commando HC II")
         self.assertEqual(location.district, "Otuke District")
         self.assertEqual(location.status, "Reporting")
@@ -44,6 +44,6 @@ class TestGetAllLocations(TestCase):
     @responses.activate
     @fake_orgunit_response()
     def test_should_parse_json_response(self):
-        locations = get_all_locations({}, {})
+        locations = get_all_locations({}, {}, {})
         self.assertEqual(len(locations), 30)
         self.assertEqual(locations[0].warehouse, "MAUL")

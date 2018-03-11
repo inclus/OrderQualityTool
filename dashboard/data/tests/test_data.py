@@ -138,7 +138,7 @@ class DataTestCase(TestCase):
         self.assertEqual(len(AdultPatientsRecord.objects.filter(cycle=test_cycle)), 0)
         self.assertEqual(len(PAEDPatientsRecord.objects.filter(cycle=test_cycle)), 0)
         self.assertEqual(len(Consumption.objects.filter(cycle=test_cycle)), 25)
-        self.assertEqual(len(MultipleOrderFacility.objects.filter(cycle=test_cycle)), 0)
+        self.assertEqual(len(MultipleOrderFacility.objects.filter(cycle=test_cycle)), 1)
         entries = LogEntry.objects.all()
         self.assertEqual(len(entries), 1)
 

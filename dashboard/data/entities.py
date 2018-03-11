@@ -188,7 +188,8 @@ class HtmlDataImportRecord(object):
         return as_number(self.data.get(TABLE_COLUMN_RECEIVED))
 
     def get_consumption(self):
-        return as_number(self.data.get(TABLE_COLUMN_ART_CONSUMPTION)) + as_number(self.data.get(TABLE_COLUMN_PMTCT_CONSUMPTION))
+        return as_number(self.data.get(TABLE_COLUMN_ART_CONSUMPTION)) + as_number(
+            self.data.get(TABLE_COLUMN_PMTCT_CONSUMPTION))
 
     def get_loses_adjustments(self):
         return as_number(self.data.get(TABLE_COLUMN_LOSES_ADJUSTMENTS))
@@ -231,6 +232,14 @@ class HtmlDataImportRecord(object):
             status="reporting",
             warehouse=self.warehouse
         )
+
+    def get_regimen_location(self):
+        if self.report_type == CONSUMPTION_REPORT:
+            formulation = self.data.get("REGIMEN")
+            return RegimenLocationCombination(location=self.location, formulation=formulation)
+        else:
+            formulation = self.data.get(TABLE_COLUMN_REGIMEN)
+            rl = RegimenLocationCombination(location=self.location, formulation=formulation)
 
     def build_patient_record(self):
         formulation = self.data.get(TABLE_COLUMN_REGIMEN)

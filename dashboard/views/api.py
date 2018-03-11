@@ -61,7 +61,7 @@ def aggregate_scores(user, test, cycles, formulation, keys, count_values, filter
             result[keys[NOT_REPORTING]] = 0
         return result
 
-    return pydash.collect(cycles, agg)
+    return pydash.map_(cycles, agg)
 
 
 class BestPerformingDistrictsView(APIView):

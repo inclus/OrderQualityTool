@@ -20,16 +20,25 @@ TR_ROTATED = "tr_rotated"
 @timeit
 def extract_locations_and_import_records(report_outputs, partner_mapping):
     records = get_all_records(report_outputs, partner_mapping)
-    locations_that_are_reporting = get_locations(records)
-    locations = get_all_locations(partner_mapping, locations_that_are_reporting)
+    locations_that_are_reporting = extract_locations_from_records(records)
+    locations_reporting_multiple_times = locations_reporting_multiple(records)
+    locations = get_all_locations(partner_mapping, locations_that_are_reporting, locations_reporting_multiple_times)
     return locations, records
 
 
 @timeit
-def get_locations(records):
+def extract_locations_from_records(records):
     grouped_by_location = pydash.group_by(records, lambda item: item.location)
     locations = list(grouped_by_location.keys())
     return dict((loc, loc) for loc in locations)
+
+
+@timeit
+def locations_reporting_multiple(records):
+    locations = list(
+        pydash.py_(records).group_by(lambda item: item.get_regimen_location()).pick_by(
+            lambda v, k: len(v) > 1).keys().reject(lambda x: x is None).value())
+    return dict((loc.location, loc.location) for loc in locations)
 
 
 @timeit

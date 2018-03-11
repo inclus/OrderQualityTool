@@ -207,8 +207,8 @@ class UserDefinedFacilityTracedCheck(UserDefinedFacilityCheck):
             if "name" in sample_tracer:
                 combination_name = sample_tracer.get("name")
 
-            return py_(group.model.tracing_formulations).filter(
-                {"name": combination_name}).first().value().get('formulations')
+            return py_(group.model.tracing_formulations).find(
+                {"name": combination_name}).value().get('formulations')
 
         return maybe(py_(group.model.tracing_formulations).first().value()).or_else(lambda: {}).get('formulations')
 

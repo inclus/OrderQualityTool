@@ -50,23 +50,29 @@ class DHIS2APIClient(object):
         return org_units
 
 
-def dhis2_facility_as_location(partner_mapping, locations_that_are_reporting):
+def dhis2_facility_as_location(partner_mapping, locations_that_are_reporting, locations_reporting_multiple_times):
     def f(facility_dict):
         name = facility_dict.get("name", "")
         new_location = Location(facility=name,
-                                district=py_(facility_dict.get("ancestors", [])).filter(
-                                    {"level": 3}).first().value().get(
+                                district=py_(facility_dict.get("ancestors", [])).find(
+                                    {"level": 3}).value().get(
                                     "name"), partner=partner_mapping.get(name, "Unknown"),
                                 warehouse=facility_dict.get("warehouse"), )
         reference_location = locations_that_are_reporting.get(new_location, None)
+        location_has_multiple = locations_reporting_multiple_times.get(new_location, None)
         if reference_location:
-            return attr.evolve(new_location, status="Reporting")
+            new_location = attr.evolve(new_location, status="Reporting")
         else:
-            return attr.evolve(new_location, status="Not Reporting")
+            new_location = attr.evolve(new_location, status="Not Reporting")
+        if location_has_multiple:
+            new_location = attr.evolve(new_location, multiple="multiple orders")
+        return new_location
 
     return f
 
 
-def get_all_locations(partner_mapping, locations_that_are_reporting):
+def get_all_locations(partner_mapping, locations_that_are_reporting, locations_reporting_multiple_times):
     all_facilities = DHIS2APIClient().get_locations()
-    return list(map(dhis2_facility_as_location(partner_mapping, locations_that_are_reporting), all_facilities))
+    return list(map(
+        dhis2_facility_as_location(partner_mapping, locations_that_are_reporting, locations_reporting_multiple_times),
+        all_facilities))

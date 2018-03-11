@@ -11,7 +11,7 @@ query_map = {F1: F1_QUERY, F2: F2_QUERY, F3: F3_QUERY}
 
 
 def get_combination(combinations, name):
-    return pydash.select(combinations, lambda x: x[NAME] == name)[0]
+    return pydash.filter_(combinations, lambda x: x[NAME] == name)[0]
 
 
 def get_int(value):

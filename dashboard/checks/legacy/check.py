@@ -88,9 +88,9 @@ def get_consumption_records(data, formulation_name):
 
 
 def get_patient_records(data, combinations, is_adult=True):
-    lower_case_combinations = pydash.collect(combinations, lambda x: x.lower())
+    lower_case_combinations = pydash.map_(combinations, lambda x: x.lower())
     records = data.a_records if is_adult else data.p_records
-    return pydash.chain(records).select(
+    return pydash.chain(records).filter_(
         lambda x: x.formulation.strip().lower() in lower_case_combinations
     ).value()
 
@@ -102,4 +102,4 @@ def filter_consumption_records(data, formulation_names):
                 return True
         return False
 
-    return pydash.select(data.c_records, filter_func)
+    return pydash.filter_(data.c_records, filter_func)

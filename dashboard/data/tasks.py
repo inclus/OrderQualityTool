@@ -1,7 +1,6 @@
 import pydash
 import pygogo
 from django.contrib.admin.models import LogEntry, CHANGE
-from pygogo.formatters import BASIC_FORMAT, StructuredFormatter
 
 from dashboard.checks.legacy.check import facility_has_single_order
 from dashboard.data.data_import import ExcelDataImport
@@ -72,7 +71,7 @@ def build_mof(report):
 @timeit
 def persist_multiple_order_records(report):
     facilities_with_multiple_orders = pydash.reject(report.locs, lambda f: facility_has_single_order(f))
-    all = pydash.collect(facilities_with_multiple_orders, build_mof(report))
+    all = pydash.map_(facilities_with_multiple_orders, build_mof(report))
     MultipleOrderFacility.objects.filter(cycle=report.cycle).delete()
     MultipleOrderFacility.objects.bulk_create(all)
 
