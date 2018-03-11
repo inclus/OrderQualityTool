@@ -50,7 +50,6 @@ class PreviewLocationsViewTestCase(WebTest):
         )))
 
 
-
 class PreviewViewTestCase(WebTest):
     url = "/api/tests/preview"
 
@@ -63,7 +62,7 @@ class PreviewViewTestCase(WebTest):
 
     def test_that_the_factors_are_considered(self):
         gen_paed_record()
-        params = DefinitionFactory().sampled().model('Paed').factors(form_b=2, form_a=5).get()
+        params = DefinitionFactory().sampled().are_equal().model('Paed').factors(form_b=2, form_a=5).get()
         response = self.app.post_json(self.url, user="testuser", params=params, expect_errors=True)
         json_response = loads(response.content.decode('utf8'))
         self.assertEqual(200, response.status_code)
@@ -82,7 +81,7 @@ class PreviewViewTestCase(WebTest):
 
     def test_result_with_paed_records(self):
         gen_paed_record()
-        params = DefinitionFactory().sampled().model('Paed').get()
+        params = DefinitionFactory().sampled().are_equal().model('Paed').get()
         response = self.app.post_json(self.url, user="testuser", params=params, expect_errors=True)
         json_response = loads(response.content.decode('utf8'))
         self.assertEqual(200, response.status_code)
@@ -101,7 +100,7 @@ class PreviewViewTestCase(WebTest):
 
     def test_result_with_adult_records(self):
         gen_adult_record()
-        params = DefinitionFactory().sampled().get()
+        params = DefinitionFactory().sampled().are_equal().get()
         response = self.app.post_json(self.url, user="testuser", params=params, expect_errors=True)
         json_response = loads(response.content.decode('utf8'))
         self.assertEqual(200, response.status_code)
@@ -120,7 +119,7 @@ class PreviewViewTestCase(WebTest):
 
     def test_result_with_consumption_records(self):
         gen_consumption_record(opening_balance=10, closing_balance=20)
-        params = DefinitionFactory().sampled().fields("opening_balance", "closing_balance").model(
+        params = DefinitionFactory().sampled().are_equal().fields("opening_balance", "closing_balance").model(
             'Consumption').factors(
             form_a=10).get()
         response = self.app.post_json(self.url, user="testuser", params=params, expect_errors=True)
@@ -145,7 +144,7 @@ class PreviewViewTestCase(WebTest):
         params = DefinitionFactory().traced(tracer={"name": "trace1", "formulations": ["form_tra", "form_trb"]}).model(
             'Consumption').tracing_formulations("form_tra",
                                                 "form_trb").fields(
-            "opening_balance", "closing_balance").get()
+            "opening_balance", "closing_balance").are_equal().get()
         response = self.app.post_json(self.url, user="testuser", params=params, expect_errors=True)
         json_response = loads(response.content.decode('utf8'))
 
@@ -286,6 +285,7 @@ class PreviewViewTestCase(WebTest):
             tracer={"name": "trace1", "formulations": ["form_tra", "form_trb"]})
         definition_builder.model('Paed').model_overrides({"trace1": {"id": "Adult", "formulations": ["form_tra"]}})
         definition_builder.tracing_formulations("form_tra", "form_trb")
+        definition_builder.are_equal()
         definition = definition_builder.get()
         response = self.app.post_json(self.url, user="testuser", params=definition, expect_errors=True)
         json_response = loads(response.content.decode('utf8'))

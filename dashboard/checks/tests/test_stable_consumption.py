@@ -5,7 +5,7 @@ from dashboard.checks.builder import stable_consumption_check
 from dashboard.checks.check import get_check_from_dict
 from dashboard.checks.legacy.cycles import StableConsumptionCheck
 from dashboard.data.entities import LocationData, C_RECORDS, FORMULATION, F1_QUERY, COMBINED_CONSUMPTION, F2_QUERY, YES, \
-    NO, Location
+    NO, Location, NOT_REPORTING
 from dashboard.models import Consumption
 
 passes = {
@@ -16,6 +16,17 @@ passes = {
             {FORMULATION: F2_QUERY, COMBINED_CONSUMPTION: 50},
         ]
     }),
+    "Previous": LocationData.migrate_from_dict({
+        'status': 'reporting',
+        C_RECORDS: [
+            {FORMULATION: F1_QUERY, COMBINED_CONSUMPTION: 40},
+            {FORMULATION: F2_QUERY, COMBINED_CONSUMPTION: 40},
+        ]
+    })
+}
+
+not_reporting = {
+    "Current": LocationData.migrate_from_dict({}),
     "Previous": LocationData.migrate_from_dict({
         'status': 'reporting',
         C_RECORDS: [
@@ -89,6 +100,7 @@ class StableConsumptionCheckTestCase(TestCase):
 
     @parameterized.expand([
         ("YES", passes, f1_combination, YES),
+        ("NOT_REPORTING", not_reporting, f1_combination, NOT_REPORTING),
         ("YES", passes, f2_combination, YES),
         ("has zero", f1_current_consumption_zero, f1_combination, NO),
         ("NO", f1_consumption_falls_by_50, f1_combination, YES),

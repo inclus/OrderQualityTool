@@ -2,8 +2,33 @@ import pydash
 from pydash import py_
 from pymaybe import maybe
 
+from dashboard.checks.utils import as_float_or_1
+
 
 class Comparison(object):
+    def get_result(self, group_results, definition):
+        operator_constant = definition.operator_constant
+        operator_constant = as_float_or_1(operator_constant)
+
+        if self.groups_have_adequate_data(group_results):
+            group1_aggregate = group_results[0].aggregate
+            group2_aggregate = maybe(group_results)[1].aggregate.or_else(None)
+
+            comparison_result = self.as_result(group1_aggregate, group2_aggregate, operator_constant)
+            result_text = self.text(group1_aggregate, group2_aggregate, operator_constant)
+            return comparison_result, result_text
+        return "NOT_REPORTING", None
+
+    def groups_have_adequate_data(self, groups):
+        valid_groups = py_(groups).reject(lambda x: x is None).value()
+        is_two_cycle = "Previous" in py_(valid_groups).map(lambda group_result: group_result.group.cycle.id).value()
+        if is_two_cycle:
+            return py_(valid_groups).every(lambda group_result: len(group_result.factored_records) > 0).value()
+        number_of_records = py_(valid_groups).map(
+            lambda group_result: group_result.factored_records).flatten().size().value()
+        has_adequate_data = number_of_records > 0
+        return has_adequate_data
+
     def as_result(self, group1, group2, constant=100.0):
         result = self.compare(group1, group2, constant)
         return "YES" if result else "NO"
@@ -123,6 +148,13 @@ class NoBlanksComparison(Comparison):
 
 
 class AtLeastNOfTotal(Comparison):
+    def groups_have_adequate_data(self, groups):
+        one_group_has_all_blank = py_(groups).reject(lambda x: x is None).some(
+            lambda gr: gr.all_values_blank()).value()
+        if one_group_has_all_blank:
+            return False
+        return super(AtLeastNOfTotal, self).groups_have_adequate_data(groups)
+
     def compare(self, group1, group2, constant=100.0):
         old_value = maybe(group1).or_else(0)
         new_value = maybe(group2).or_else(0)
@@ -140,15 +172,6 @@ class AtLeastNOfTotal(Comparison):
             return "second value is zero so the check fails"
         template = "%s is %s than %s%% of %s"
         return template % (group1, "more" if result else "less", constant, total)
-
-
-def as_float_or_1(value):
-    try:
-        return float(value)
-    except ValueError as e:
-        return 1
-    except TypeError as e:
-        return 1
 
 
 available_comparisons = {

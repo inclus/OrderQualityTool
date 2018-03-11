@@ -6,18 +6,11 @@ from pydash import py_, pick
 from pymaybe import maybe
 
 from dashboard.checks.aggregations import available_aggregations
-from dashboard.checks.comparisons import as_float_or_1, available_comparisons
-from dashboard.checks.entities import Definition
+from dashboard.checks.comparisons import available_comparisons
+from dashboard.checks.utils import as_float_or_1, as_number
+from dashboard.checks.entities import Definition, GroupResult, DataRecord
 from dashboard.helpers import get_prev_cycle, DEFAULT, YES, NO, N_A
 from dashboard.utils import timeit
-
-def as_number(value):
-    if not value:
-        return False, None
-    try:
-        return True, float(value)
-    except ValueError as e:
-        return False, None
 
 
 def factor_values_by_formulation(formulations, factors):
@@ -39,12 +32,10 @@ def factor_values_by_formulation(formulations, factors):
     return _p
 
 
-def as_values(fields):
+def as_data_records(fields):
     def _map(item):
         values = pick(attr.asdict(item), fields).values()
-        output = [item.formulation]
-        output.extend(values)
-        return output
+        return DataRecord(formulation=item.formulation, fields=fields, values=values)
 
     return _map
 
@@ -60,8 +51,8 @@ def current(cycle):
 cycle_lookups = {"Previous": previous, "Currrent": previous}
 
 
-def get_factored_values(formulations, factors, values):
-    return py_(values).map(factor_values_by_formulation(formulations, factors)).value()
+def get_factored_records(factors, records):
+    return py_(records).map(lambda val: val.factor(factors)).value()
 
 
 CLASS_BASED = "ClassBased"
@@ -77,28 +68,14 @@ class DynamicCheckMixin(object):
     def aggregate_values(self, group, values):
         aggregation = available_aggregations.get(group.aggregation.id)
         if aggregation:
-            all_values = py_(values).map(lambda x: x[1:]).flatten_deep().value()
+            all_values = py_(values).map(lambda x: x.values).flatten_deep().value()
             return aggregation(all_values)
         return None
 
     def compare_results(self, groups):
-        values = py_(groups).reject(lambda x: x is None).map('factored_values').map(skip_formulation).flatten().reject(
-            lambda x: x is None).value()
-        value_count = len(values)
-        if self.definition.operator and value_count > 0:
-            comparison_class = available_comparisons.get(self.definition.operator.id)
-            comparator = comparison_class()
-            operator_constant = self.definition.operator_constant
-
-            operator_constant = as_float_or_1(operator_constant)
-            gs = py_(groups).reject(lambda x: x is None).value()
-            if comparator and gs:
-                group1_result = groups[0].get('result')
-                group2_result = maybe(groups)[1].or_else({}).get('result')
-                comparison_result = comparator.as_result(group1_result, group2_result, constant=operator_constant)
-                result_text = comparator.text(group1_result, group2_result, operator_constant)
-                return comparison_result, result_text
-        return "NOT_REPORTING", None
+        comparison_class = available_comparisons.get(self.definition.operator.id)
+        comparator = comparison_class()
+        return comparator.get_result(groups, self.definition)
 
 
 class DBBasedCheckPreview(DynamicCheckMixin):
@@ -111,12 +88,12 @@ class DBBasedCheckPreview(DynamicCheckMixin):
             sample_cycle = self.definition.sample.get('cycle')
         if sample_tracer is None:
             sample_tracer = self.definition.sample.get('tracer')
-        groups = []
+        results = []
         for group in self.definition.groups:
             values_for_group = self._group_values_from_db(group, sample_cycle, sample_location, sample_tracer)
-            groups.append(values_for_group)
-        data = {'groups': groups}
-        comparison_result, comparison_text = self.compare_results(groups)
+            results.append(values_for_group)
+        data = {'groups': [r.as_dict() for r in results]}
+        comparison_result, comparison_text = self.compare_results(results)
         data['result'] = {self.get_result_key(sample_tracer): comparison_result}
         data['resultText'] = comparison_text
         return data
@@ -130,24 +107,18 @@ class DBBasedCheckPreview(DynamicCheckMixin):
             if model_id:
                 model = group.model.as_model(model_id)
         if model:
-            values = model.objects.filter(
+            db_records = model.objects.filter(
                 name=sample_location['name'],
                 cycle=parse_cycle(cycle, group),
                 district=sample_location['district'],
                 formulation__in=self.get_formulations(group, sample_tracer)
             ).values_list(
                 'formulation', *group.selected_fields)
+            records = [DataRecord(formulation=r[0], fields=group.selected_fields, values=r[1:]) for r in db_records]
 
-            factored_values = get_factored_values(group.selected_formulations, group.factors, values)
-            return {
-                "name": group.name,
-                "aggregation": group.aggregation.name,
-                "values": values,
-                "headers": group.selected_fields,
-                "has_factors": group.has_factors,
-                "factored_values": factored_values,
-                "result": self.aggregate_values(group, factored_values)
-            }
+            factored_values = get_factored_records(group.factors, records)
+            return GroupResult(group=group, values=records, factored_records=factored_values,
+                               aggregate=self.aggregate_values(group, factored_values))
 
     @timeit
     def get_locations_and_cycles(self):
@@ -190,27 +161,13 @@ class UserDefinedFacilityCheck(DBBasedCheckPreview):
 
         if records:
             formulations = self.get_formulations(group, combination)
-            values = self.get_values_from_records(records, formulations, group.selected_fields)
-            factored_values = get_factored_values(formulations, group.factors, values)
-            return {
-                "name": group.name,
-                "aggregation": group.aggregation.name,
-                "values": values,
-                "headers": group.selected_fields,
-                "has_factors": group.has_factors,
-                "factored_values": factored_values,
-                "cycle": group.cycle.id,
-                "result": self.aggregate_values(group, factored_values)
-            }
-        return {
-            "name": group.name,
-            "aggregation": maybe(group.aggregation).name.or_else(None),
-            "values": [],
-            "headers": group.selected_fields,
-            "has_factors": group.has_factors,
-            "factored_values": [],
-            "result": None
-        }
+            data_records = self.get_values_from_records(records, formulations, group.selected_fields)
+            factored_records = get_factored_records(group.factors, data_records)
+            return GroupResult(group=group, values=data_records, factored_records=factored_records,
+                               aggregate=self.aggregate_values(group, factored_records))
+
+        return GroupResult(group=group, values=[], factored_records=[],
+                           aggregate=None)
 
     def get_records_from_data_source(self, data_source, group):
         records = group.model.get_records(data_source)
@@ -219,7 +176,7 @@ class UserDefinedFacilityCheck(DBBasedCheckPreview):
     def get_values_from_records(self, records, formulations, selected_fields):
         formulations = [f.lower() for f in formulations]
         return py_(records).reject(lambda x: x.formulation.lower() not in formulations).map(
-            as_values(selected_fields)).value()
+            as_data_records(selected_fields)).value()
 
 
 class UserDefinedFacilityTracedCheck(UserDefinedFacilityCheck):

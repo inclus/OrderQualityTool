@@ -1,7 +1,10 @@
 import json
 
 import attr
+import pydash
 from pydash import py_
+
+from dashboard.checks.utils import as_float_or_1, as_number
 
 
 @attr.s(cmp=True, frozen=True)
@@ -112,3 +115,64 @@ class Definition(object):
             return Definition.from_dict(json.loads(definition))
         except ValueError as e:
             return Definition.from_dict({})
+
+
+@attr.s(cmp=True, frozen=True)
+class GroupResult(object):
+    group = attr.ib()
+    values = attr.ib()
+    factored_records = attr.ib()
+    aggregate = attr.ib()
+
+    def all_values_blank(self):
+        return pydash.every(self.factored_records, lambda data_record: data_record.all_blank())
+
+    def some_values_blank(self):
+        return pydash.some(self.factored_records, lambda data_record: data_record.some_blank())
+
+    def as_dict(self):
+        return {
+            "name": self.group.name,
+            "aggregation": self.group.aggregation.name,
+            "values": [v.to_list() for v in self.values],
+            "headers": self.group.selected_fields,
+            "has_factors": self.group.has_factors,
+            "factored_values": [v.to_list() for v in self.factored_records],
+            "result": self.aggregate
+        }
+
+
+@attr.s(cmp=True, frozen=True)
+class DataRecord(object):
+    formulation = attr.ib()
+    values = attr.ib()
+    fields = attr.ib()
+
+    def to_list(self):
+        values = [self.formulation]
+        values.extend(self.values)
+        return values
+
+    def all_blank(self):
+        return pydash.every(self.values, lambda x: x is None)
+
+    def some_blank(self):
+        return pydash.some(self.values, lambda x: x is None)
+
+    @staticmethod
+    def from_list(data, fields=[]):
+        return DataRecord(formulation=data[0], values=data[1:], fields=fields)
+
+    def factor(self, factors=None):
+        if factors is None:
+            factors = {}
+
+        factor = as_float_or_1(factors.get(self.formulation, 1))
+        new_values = []
+        for value in self.values:
+            is_numerical, numerical_value = as_number(value)
+            if is_numerical:
+                new_values.append(numerical_value * factor)
+            else:
+                new_values.append(value)
+        return attr.evolve(self, values=new_values)

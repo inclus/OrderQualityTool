@@ -202,7 +202,7 @@ class DefinitionFactory(object):
             "new", "existing").model("Adult")
 
     def sampled(self, **kwargs):
-        return self.initial().sample(**kwargs)
+        return self.initial().sample(**kwargs).are_equal()
 
     def traced(self, **kwargs):
         return self.initial().type(FACILITY_TWO_GROUPS_WITH_SAMPLE).sample(

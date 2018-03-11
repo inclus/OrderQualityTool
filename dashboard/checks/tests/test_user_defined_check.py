@@ -2,7 +2,7 @@ from django.test import TestCase
 from nose_parameterized import parameterized
 
 from dashboard.checks.builder import DefinitionFactory, guideline_adherence_adult1l_check, no_negatives_check
-from dashboard.checks.entities import DefinitionGroup
+from dashboard.checks.entities import DefinitionGroup, DataRecord
 from dashboard.checks.legacy.adherence import GuidelineAdherenceCheckAdult1L
 from dashboard.checks.legacy.negatives import NegativeNumbersQualityCheck
 from dashboard.checks.check import UserDefinedFacilityCheck, get_check_from_dict
@@ -47,7 +47,7 @@ class UserDefinedCheckTestCase(TestCase):
         )
         output = check.get_values_from_records(test_location_data.c_records, group.selected_formulations,
                                                group.selected_fields)
-        self.assertEqual(output, [[F1_QUERY, 3]])
+        self.assertEqual(output, [DataRecord.from_list([F1_QUERY, 3], group.selected_fields)])
 
 
 insufficient_data = LocationData.migrate_from_dict({
@@ -99,8 +99,9 @@ class TestGuideLineAdherence(TestCase):
 
         new_check_result = new_check.for_each_facility(data, "DEFAULT")
         legacy_check_result = legacy_check.for_each_facility(data, legacy_check.combinations[0])
-        self.assertEqual(legacy_check_result, new_check_result)
+        self.assertEqual(legacy_check_result, expected_result)
         self.assertEqual(expected_result, new_check_result)
+        self.assertEqual(legacy_check_result, new_check_result)
 
 
 has_no_data = LocationData.migrate_from_dict({})
