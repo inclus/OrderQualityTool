@@ -57,7 +57,8 @@ class DefinitionFactory(object):
         def __init__(self, data):
             self.data = data
 
-        def add_group(self, name, aggregation, cycle, model, fields, formulations, factors=None, model_overrides=None):
+        def add_group(self, name, aggregation, cycle, model, fields, formulations, factors=None, model_overrides=None,
+                      thresholds=None):
             id = "id"
             group = {
                 NAME: name,
@@ -70,6 +71,10 @@ class DefinitionFactory(object):
             if factors:
                 group["has_factors"] = True
                 group["factors"] = factors
+
+            if thresholds:
+                group["has_thresholds"] = True
+                group["thresholds"] = thresholds
 
             if model_overrides is not None:
                 override_models_on_group(group, model_overrides)
@@ -285,7 +290,7 @@ def volume_tally_check():
                       })
     builder.add_group("G2", SUM, CURRENT_CYCLE, "Adult", ["new", "existing"], [],
                       model_overrides={F2: {"id": "Paed", "formulations": F2_PATIENT_QUERY},
-                       F3: {"id": "Paed", "formulations": F3_PATIENT_QUERY}})
+                                       F3: {"id": "Paed", "formulations": F3_PATIENT_QUERY}})
     builder.percentage_variance_is_less_than(30)
     return builder.get()
 
@@ -311,8 +316,9 @@ def open_closing_check():
 
 def stable_consumption_check():
     builder = DefinitionFactory().blank().type(FACILITY_TWO_GROUPS_WITH_SAMPLE)
-    builder.add_group("G1", SUM, CURRENT_CYCLE, CONSUMPTION_MODEL, ["consumption"], [])
-    builder.add_group("G2", SUM, PREVIOUS_CYCLE, CONSUMPTION_MODEL, ["consumption"], [])
+    thresholds = {F1: 20, F2: 10, F3: 10}
+    builder.add_group("G1", SUM, CURRENT_CYCLE, CONSUMPTION_MODEL, ["consumption"], [], thresholds=thresholds)
+    builder.add_group("G2", SUM, PREVIOUS_CYCLE, CONSUMPTION_MODEL, ["consumption"], [], thresholds=thresholds)
     builder.percentage_variance_is_less_than(50)
     return builder.get()
 

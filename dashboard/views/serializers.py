@@ -25,6 +25,8 @@ class GroupSerializer(serializers.Serializer):
     factors = serializers.DictField(required=False)
     sample_formulation_model_overridden = serializers.DictField(required=False)
     sample_formulation_model_overrides = serializers.DictField(required=False)
+    has_thresholds = serializers.BooleanField(required=False)
+    thresholds = serializers.DictField(required=False)
 
 
 class SampleSerializer(serializers.Serializer):

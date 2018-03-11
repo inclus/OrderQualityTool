@@ -27,7 +27,7 @@ class UserDefinedCheckTestCase(TestCase):
         definition_builder.aggregation("VALUE")
         definition_builder.has_no_negatives()
         check = UserDefinedFacilityCheck(definition_builder.getDef())
-        result = check.for_each_facility(has_no_negatives, "DEFAULT")
+        result = check.for_each_facility(has_no_negatives, {"name": "DEFAULT"})
         self.assertEquals(result, 'YES')
 
     def test__group_values_from_location_data(self):
@@ -97,7 +97,7 @@ class TestGuideLineAdherence(TestCase):
         new_check = get_check_from_dict(guideline_adherence_adult1l_check())
         legacy_check = GuidelineAdherenceCheckAdult1L()
 
-        new_check_result = new_check.for_each_facility(data, "DEFAULT")
+        new_check_result = new_check.for_each_facility(data, {"name": "DEFAULT"})
         legacy_check_result = legacy_check.for_each_facility(data, legacy_check.combinations[0])
         self.assertEqual(legacy_check_result, expected_result)
         self.assertEqual(expected_result, new_check_result)

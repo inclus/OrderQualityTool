@@ -101,6 +101,23 @@
                             <input class="factor-input" ng-model="definitionGroup.factors[value]"/>
                         </div>
                     </div>
+                    <div ng-show="definitionGroup.model.hasTrace">
+                        <div class="checkbox-row">
+                            <input ng-model="definitionGroup.has_thresholds" id="id_has_thresholds" name="has_thresholds"
+                                   type="checkbox"><label
+                                class="vCheckboxLabel" for="id_has_threshold">Include Thresholds</label>
+                        </div>
+                        <div ng-show="definitionGroup.has_thresholds">
+                            <h5>Thresholds</h5>
+                            <div class="factor-container"
+                                 ng-repeat="trace in definitionGroup.model.tracingFormulations">
+                                <span for="" class="factor-label">{{ trace.name }}</span>
+                                <strong class="factor-label">*</strong>
+                                <input class="factor-input" ng-model="definitionGroup.thresholds[trace.name]"/>
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
             </div>
         </div>

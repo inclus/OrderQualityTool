@@ -3,6 +3,7 @@ import json
 import attr
 import pydash
 from pydash import py_
+from pymaybe import maybe
 
 from dashboard.checks.utils import as_float_or_1, as_number
 
@@ -67,6 +68,8 @@ class DefinitionGroup(object):
     aggregation = attr.ib()
     has_factors = attr.ib()
     factors = attr.ib()
+    has_thresholds = attr.ib()
+    thresholds = attr.ib()
 
     @staticmethod
     def from_dict(data):
@@ -81,6 +84,8 @@ class DefinitionGroup(object):
             sample_formulation_model_overridden=data.get('sample_formulation_model_overridden', {}),
             has_factors=data.get('has_factors'),
             factors=data.get('factors'),
+            has_thresholds=data.get('has_thresholds'),
+            thresholds=data.get('thresholds'),
         )
 
     @property
@@ -123,6 +128,23 @@ class GroupResult(object):
     values = attr.ib()
     factored_records = attr.ib()
     aggregate = attr.ib()
+    tracer = attr.ib()
+
+    def is_above_threshold(self):
+        if self.has_thresholds():
+            threshold = self.get_threshold()
+            aggregate = self.aggregate
+
+            if aggregate > threshold:
+                return True
+        else:
+            return True
+
+    def has_thresholds(self):
+        return self.group.has_thresholds and maybe(self.group.thresholds).or_else({}).get(self.tracer, None)
+
+    def get_threshold(self):
+        return self.group.thresholds.get(self.tracer, None)
 
     def all_values_blank(self):
         return pydash.every(self.factored_records, lambda data_record: data_record.all_blank())

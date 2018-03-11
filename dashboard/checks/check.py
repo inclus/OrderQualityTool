@@ -34,7 +34,7 @@ def factor_values_by_formulation(formulations, factors):
 
 def as_data_records(fields):
     def _map(item):
-        values = [v for i,v in enumerate(pick(attr.asdict(item), fields).values())]
+        values = [v for i, v in enumerate(pick(attr.asdict(item), fields).values())]
         return DataRecord(formulation=item.formulation, fields=fields, values=values)
 
     return _map
@@ -118,6 +118,7 @@ class DBBasedCheckPreview(DynamicCheckMixin):
 
             factored_values = get_factored_records(group.factors, records)
             return GroupResult(group=group, values=records, factored_records=factored_values,
+                               tracer=maybe(sample_tracer).or_else({}).get("name", None),
                                aggregate=self.aggregate_values(group, factored_values))
 
     @timeit
@@ -164,9 +165,11 @@ class UserDefinedFacilityCheck(DBBasedCheckPreview):
             data_records = self.get_values_from_records(records, formulations, group.selected_fields)
             factored_records = get_factored_records(group.factors, data_records)
             return GroupResult(group=group, values=data_records, factored_records=factored_records,
+                               tracer=combination.get("name", None),
                                aggregate=self.aggregate_values(group, factored_records))
 
         return GroupResult(group=group, values=[], factored_records=[],
+                           tracer=combination.get("name", None),
                            aggregate=None)
 
     def get_records_from_data_source(self, data_source, group):

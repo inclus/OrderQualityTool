@@ -25,6 +25,23 @@ passes = {
     })
 }
 
+below_threshold = {
+    "Current": LocationData.migrate_from_dict({
+        'status': 'reporting',
+        C_RECORDS: [
+            {FORMULATION: F1_QUERY, COMBINED_CONSUMPTION: 5},
+            {FORMULATION: F2_QUERY, COMBINED_CONSUMPTION: 5},
+        ]
+    }),
+    "Previous": LocationData.migrate_from_dict({
+        'status': 'reporting',
+        C_RECORDS: [
+            {FORMULATION: F1_QUERY, COMBINED_CONSUMPTION: 4},
+            {FORMULATION: F2_QUERY, COMBINED_CONSUMPTION: 4},
+        ]
+    })
+}
+
 not_reporting = {
     "Current": LocationData.migrate_from_dict({}),
     "Previous": LocationData.migrate_from_dict({
@@ -101,6 +118,7 @@ class StableConsumptionCheckTestCase(TestCase):
     @parameterized.expand([
         ("YES", passes, f1_combination, YES),
         ("NOT_REPORTING", not_reporting, f1_combination, NOT_REPORTING),
+        ("below threshold", below_threshold, f1_combination, NOT_REPORTING),
         ("YES", passes, f2_combination, YES),
         ("has zero", f1_current_consumption_zero, f1_combination, NO),
         ("NO", f1_consumption_falls_by_50, f1_combination, YES),

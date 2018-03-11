@@ -22,11 +22,15 @@ class Comparison(object):
     def groups_have_adequate_data(self, groups):
         valid_groups = py_(groups).reject(lambda x: x is None).value()
         is_two_cycle = "Previous" in py_(valid_groups).map(lambda group_result: group_result.group.cycle.id).value()
-        if is_two_cycle:
-            return py_(valid_groups).every(lambda group_result: len(group_result.factored_records) > 0).value()
+        if is_two_cycle and not py_(valid_groups).every(
+                lambda group_result: len(group_result.factored_records) > 0).value():
+            return False
         number_of_records = py_(valid_groups).map(
             lambda group_result: group_result.factored_records).flatten().size().value()
         has_adequate_data = number_of_records > 0
+        if has_adequate_data:
+            return pydash.some(valid_groups, lambda x: x.is_above_threshold())
+
         return has_adequate_data
 
     def as_result(self, group1, group2, constant=100.0):
