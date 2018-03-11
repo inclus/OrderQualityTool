@@ -106,7 +106,7 @@ class StableConsumptionCheckTestCase(TestCase):
         f1_combination = legacy_check.combinations[0]
 
         new_check = get_check_from_dict(stable_consumption_check())
-        new_check_result = new_check.for_each_facility(scenario["Current"], f1_combination,
+        new_check_result = new_check.for_each_facility(scenario["Current"], f1_combination['name'],
                                                        scenario["Previous"])
         self.assertEqual(expected, new_check_result)
 
@@ -126,7 +126,7 @@ class StableConsumptionCheckTestCase(TestCase):
     def test_that_check_has_same_result_as_preview(self, name, scenario, combination, expected):
 
         new_check = get_check_from_dict(stable_consumption_check())
-        new_check_result = new_check.for_each_facility(scenario["Current"], f1_combination,
+        new_check_result = new_check.for_each_facility(scenario["Current"], combination['name'],
                                                        scenario["Previous"])
         self.assertEqual(expected, new_check_result)
         current_cycle = "Nov - Dec 2017"

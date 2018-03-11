@@ -165,11 +165,11 @@ class UserDefinedFacilityCheck(DBBasedCheckPreview):
             data_records = self.get_values_from_records(records, formulations, group.selected_fields)
             factored_records = get_factored_records(group.factors, data_records)
             return GroupResult(group=group, values=data_records, factored_records=factored_records,
-                               tracer=combination.get("name", None),
+                               tracer=combination,
                                aggregate=self.aggregate_values(group, factored_records))
 
         return GroupResult(group=group, values=[], factored_records=[],
-                           tracer=combination.get("name", None),
+                           tracer=combination,
                            aggregate=None)
 
     def get_records_from_data_source(self, data_source, group):
