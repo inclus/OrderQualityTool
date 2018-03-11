@@ -34,7 +34,7 @@ def factor_values_by_formulation(formulations, factors):
 
 def as_data_records(fields):
     def _map(item):
-        values = pick(attr.asdict(item), fields).values()
+        values = [v for i,v in enumerate(pick(attr.asdict(item), fields).values())]
         return DataRecord(formulation=item.formulation, fields=fields, values=values)
 
     return _map
