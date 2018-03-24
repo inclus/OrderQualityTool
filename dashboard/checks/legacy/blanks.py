@@ -23,8 +23,7 @@ class BlanksQualityCheck(QCheck):
     fields = [OPENING_BALANCE,
               QUANTITY_RECEIVED,
               COMBINED_CONSUMPTION,
-              LOSES_ADJUSTMENTS,
-              DAYS_OUT_OF_STOCK]
+              LOSES_ADJUSTMENTS]
 
     def get_preview_data(self, location, cycle, sample_tracer=None):
         db_records = Consumption.objects.filter(name=location.get('name'), district=location.get('district'),
