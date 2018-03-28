@@ -1,0 +1,33 @@
+stages:
+  - test
+  - package
+
+
+test python 2.7:
+  variables:
+  image: python:2.7
+  stage: test
+  script:
+    - pip install tox
+    - tox -e py27
+
+test python 3.6:
+  variables:
+  image: python:3.6
+  stage: test
+  script:
+    - pip install tox
+    - tox -e py36
+
+docker:
+  stage: package
+  dependencies: []
+  script:
+    - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN $CI_REGISTRY
+    - export DOCKER_REPO="${CI_REGISTRY_IMAGE}:${CI_PIPELINE_ID}" && echo $DOCKER_REPO
+    - docker build -t ${CI_REGISTRY_IMAGE}:${CI_PIPELINE_ID} .
+    - docker tag ${CI_REGISTRY_IMAGE}:${CI_PIPELINE_ID} ${CI_REGISTRY_IMAGE}:latest
+    - docker push ${CI_REGISTRY_IMAGE}:${CI_PIPELINE_ID}
+    - docker push ${CI_REGISTRY_IMAGE}:latest
+  tags:
+    - mjshell
