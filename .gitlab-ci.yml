@@ -3,7 +3,7 @@ stages:
   - package
 
 
-test python 2.7:
+python2_7:
   variables:
   image: python:2.7
   stage: test
@@ -11,7 +11,7 @@ test python 2.7:
     - pip install tox
     - tox -e py27
 
-test python 3.6:
+python3_6:
   variables:
   image: python:3.6
   stage: test
