@@ -39,14 +39,14 @@ angular.module("dashboard").controller("HomeController", ["$scope", "ReportServi
         $scope.$watch("startCycle", function(start) {
             if (start) {
                 var pos = _.findIndex($scope.cycles, function(item) {
-                    return item == start;
+                    return item === start;
                 });
                 $scope.endCycles = $scope.cycles.slice(0, pos + 1);
 
-                $scope.selectedCycle = start;
             }
 
         }, true);
+
 
         function downloadURL(url, name) {
             var link = document.createElement("a");
