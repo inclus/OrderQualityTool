@@ -3,6 +3,7 @@ import pygogo
 from django.contrib.admin.models import LogEntry, CHANGE
 
 from dashboard.checks.legacy.check import facility_has_single_order
+from dashboard.checks.tracer import Tracer
 from dashboard.data.data_import import ExcelDataImport
 from dashboard.data.html_data_import import HtmlDataImport
 from dashboard.helpers import get_prev_cycle, F1, F2, F3, DEFAULT, YES, WEB, NO
@@ -107,9 +108,9 @@ def get_report_for_other_cycle(report):
 def persist_scores(score_cache, cycle):
     list_of_score_obj = list()
     mapping = {
-        F1: {"pass": "f1_pass_count", "fail": "f1_fail_count"},
-        F2: {"pass": "f2_pass_count", "fail": "f2_fail_count"},
-        F3: {"pass": "f3_pass_count", "fail": "f3_fail_count"},
+        Tracer.F1().key: {"pass": "f1_pass_count", "fail": "f1_fail_count"},
+        Tracer.F2().key: {"pass": "f2_pass_count", "fail": "f2_fail_count"},
+        Tracer.F3().key: {"pass": "f3_pass_count", "fail": "f3_fail_count"},
         DEFAULT: {"pass": "default_pass_count", "fail": "default_fail_count"},
     }
     for location, scores in score_cache.items():

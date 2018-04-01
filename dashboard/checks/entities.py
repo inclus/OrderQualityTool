@@ -98,7 +98,6 @@ class DefinitionGroup(object):
         models = {'Adult': "patient_formulations", 'Paed': "patient_formulations",
                   'Consumption': "consumption_formulations"}
         key = models.get(self.model.id)
-        print(tracer)
         if tracer is not None and type(tracer) is Tracer:
             if tracer.key == "DEFAULT":
                 return self.selected_formulations

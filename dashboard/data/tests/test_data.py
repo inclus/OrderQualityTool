@@ -135,6 +135,8 @@ class DataTestCase(TestCase):
 
         calculate_scores_for_checks_in_cycle(report)
         self.assertEqual(len(Score.objects.filter(cycle=test_cycle)), 30)
+        self.assertEqual(Score.objects.filter(cycle=test_cycle)[0].data['NO BLANKS'], {u'DEFAULT': u'NOT_REPORTING'})
+        self.assertEqual(Score.objects.filter(cycle=test_cycle)[0].data['WAREHOUSE FULFILMENT'], {u'abc3tc-paed': u'NOT_REPORTING', u'efv200-paed': u'NOT_REPORTING', u'tdf3tcefv-adult': u'NOT_REPORTING'})
         self.assertEqual(len(AdultPatientsRecord.objects.filter(cycle=test_cycle)), 0)
         self.assertEqual(len(PAEDPatientsRecord.objects.filter(cycle=test_cycle)), 0)
         self.assertEqual(len(Consumption.objects.filter(cycle=test_cycle)), 25)

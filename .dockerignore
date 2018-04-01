@@ -1,6 +1,7 @@
 .tox/
 asset_files/
 tmp
+.tmp
 dashboard/static/vendor/
 .node_modules/
 data/
@@ -10,3 +11,7 @@ data/
 .ropeproject/
 .vscode/
 .idea/
+Dockerfile
+docker-compose.yml
+__pycache__/
+*.pyc

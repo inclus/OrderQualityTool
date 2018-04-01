@@ -146,7 +146,7 @@ class DBBasedCheckPreview(DynamicCheckMixin):
 class UserDefinedFacilityCheck(DBBasedCheckPreview):
 
     def get_combinations(self):
-        return [DEFAULT]
+        return [Tracer.Default()]
 
     def for_each_facility(self, facility_data, combination, other_facility_data=None):
         groups = []

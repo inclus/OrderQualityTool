@@ -1,6 +1,7 @@
 import pydash
 
 from dashboard.checks.legacy.check import values_for_records, QCheck, facility_not_reporting, multiple_orders_score
+from dashboard.checks.tracer import Tracer
 from dashboard.helpers import *
 from dashboard.models import MultipleOrderFacility, Score, Consumption
 
@@ -18,7 +19,7 @@ class BlanksQualityCheck(QCheck):
     combinations = [{NAME: DEFAULT}]
 
     def get_combinations(self):
-        return [DEFAULT]
+        return [Tracer.Default()]
 
     fields = [OPENING_BALANCE,
               QUANTITY_RECEIVED,
@@ -57,7 +58,7 @@ class IsReportingCheck(QCheck):
     combinations = [{NAME: DEFAULT}]
 
     def get_combinations(self):
-        return [DEFAULT]
+        return [Tracer.Default()]
 
     def for_each_facility(self, facility, combination, previous_cycle_data=None):
         return NO if facility_not_reporting(facility) else YES
@@ -76,7 +77,7 @@ class MultipleCheck(QCheck):
     combinations = [{NAME: DEFAULT}]
 
     def get_combinations(self):
-        return [DEFAULT]
+        return [Tracer.Default()]
 
     def for_each_facility(self, facility_data, combination, previous_cycle_data=None):
         return multiple_orders_score(facility_data.location)

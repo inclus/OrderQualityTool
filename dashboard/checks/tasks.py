@@ -1,5 +1,7 @@
 from collections import defaultdict
 
+import pygogo
+
 from dashboard.checks.entities import Definition
 from dashboard.checks.legacy.adherence import GuidelineAdherenceCheckAdult1L, GuidelineAdherenceCheckAdult2L, \
     GuidelineAdherenceCheckPaed1L
@@ -14,9 +16,10 @@ from dashboard.data.entities import enrich_location_data
 from dashboard.data.tasks import get_report_for_other_cycle
 from dashboard.helpers import NAME
 from dashboard.models import FacilityTest
-from dashboard.utils import timeit
+from dashboard.utils import timeit, log_formatter
 from raven.contrib.django.raven_compat.models import client
 
+logger = pygogo.Gogo(__name__, low_formatter=log_formatter).get_logger()
 
 @timeit
 def run_dynamic_checks(report):
@@ -32,10 +35,11 @@ def run_dynamic_checks(report):
                     facility_data = enrich_location_data(location, report)
                     other_facility_data = enrich_location_data(location, other_report)
                     for combination in check_to_run.get_combinations():
-                        scores[location][check_obj.name][combination] = check_to_run.for_each_facility(facility_data,
+                        scores[location][check_obj.name][combination.key] = check_to_run.for_each_facility(facility_data,
                                                                                                        combination,
                                                                                                        other_facility_data)
-        except Exception:
+        except Exception as e:
+            logger.info("error running tests", extra={"error": e.message, "check": check_obj.name})
             client.captureException()
     return scores
 
