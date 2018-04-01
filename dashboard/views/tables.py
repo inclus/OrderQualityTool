@@ -12,7 +12,7 @@ from dashboard.checks.builder import FACILITY_TWO_GROUPS_WITH_SAMPLE
 from dashboard.checks.check import get_check_from_dict
 from dashboard.checks.tracer import Tracer
 from dashboard.helpers import *
-from dashboard.models import Score, FacilityTest
+from dashboard.models import Score, FacilityTest, TracingFormulations
 
 
 class ScoresTableView(BaseDatatableView):
@@ -104,10 +104,15 @@ class ScoreDetailsView(View):
     def get_context_data(self, request, id, column):
         scores = {YES: "Pass", NO: "Fail", NOT_REPORTING: "N/A"}
         combination = request.GET.get('combination', DEFAULT)
+        combination_name = combination
+        if combination != DEFAULT:
+            tracers = TracingFormulations.objects.filter(slug=combination)
+            if len(tracers) > 0:
+                combination_name = tracers[0].name
         column = int(column)
         score = Score.objects.get(id=id)
         score_data = {'ip': score.ip, 'district': score.district, 'warehouse': score.warehouse, 'name': score.name,
-                      'cycle': score.cycle, 'combination': combination}
+                      'cycle': score.cycle, 'combination': combination_name}
         has_result = column > 3
         response_data = {'score': score_data, 'has_result': has_result}
         template_name = "check/base.html"
@@ -126,7 +131,7 @@ class ScoreDetailsView(View):
                            'has_combination': len(maybe(result).or_else([])) > 1}
             response_data['result'] = result_data
         response_data['detail'] = {'id': id, 'column': column, 'test': score.name}
-        return response_data, template_name, score, combination
+        return response_data, template_name, score, combination_name
 
     def get_test_by_column(self, column):
         return maybe(FacilityTest.objects.get(order=column - 3)).or_else(None)
