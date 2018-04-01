@@ -1,4 +1,6 @@
 from dashboard.checks.entities import Definition
+from dashboard.checks.tracer import Tracer
+from dashboard.models import TracingFormulations
 
 OPERATOR = "operator"
 
@@ -6,19 +8,8 @@ SUM = "SUM"
 
 VALUE = "VALUE"
 
-F3_PATIENT_QUERY = ["ABC/3TC/EFV", "AZT/3TC/EFV"]
-
-F2_PATIENT_QUERY = ["ABC/3TC/LPV/r", "ABC/3TC/EFV", "ABC/3TC/NVP"]
-F3 = "EFV200 (Paed)"
-F2 = "ABC/3TC (Paed)"
-F1 = "TDF/3TC/EFV (Adult)"
-F1_PATIENT_QUERY = ["TDF/3TC/EFV (PMTCT)", "TDF/3TC/EFV (ADULT)"]
-F1_QUERY = ["Tenofovir/Lamivudine/Efavirenz (TDF/3TC/EFV) 300mg/300mg/600mg[Pack 30]"]
-F3_QUERY = ["Efavirenz (EFV) 200mg [Pack 90]"]
-F2_QUERY = ["Abacavir/Lamivudine (ABC/3TC) 60mg/30mg [Pack 60]"]
 CONSUMPTION_MODEL = "Consumption"
 FORMULATIONS = "formulations"
-TRACING_FORMULATIONS = "tracingFormulations"
 NAME = "name"
 FACILITY_TWO_GROUPS = "FacilityTwoGroups"
 CURRENT_CYCLE = "Current"
@@ -30,16 +21,8 @@ def build_model(name, check_type):
     model = {"id": ("%s" % name), NAME: ("%s Records" % name)}
     if check_type and check_type["id"] == FACILITY_TWO_GROUPS_WITH_SAMPLE:
         model["hasTrace"] = True
-        if name.lower() in ["paed", "adult"]:
-            model[TRACING_FORMULATIONS] = [
-                {NAME: F1, FORMULATIONS: F1_PATIENT_QUERY},
-                {NAME: F2, FORMULATIONS: F2_PATIENT_QUERY},
-                {NAME: F3, FORMULATIONS: F3_PATIENT_QUERY}, ]
-        if name.lower() in [CONSUMPTION_MODEL.lower()]:
-            model[TRACING_FORMULATIONS] = [
-                {NAME: F1, FORMULATIONS: F1_QUERY},
-                {NAME: F2, FORMULATIONS: F2_QUERY},
-                {NAME: F3, FORMULATIONS: F3_QUERY}, ]
+        model["tracingFormulations"] = [tracing_formulation.as_dict_obj() for tracing_formulation in
+                                        TracingFormulations.objects.all()]
     return model
 
 
@@ -171,9 +154,11 @@ class DefinitionFactory(object):
             self.data["sample"] = sample
             return self
 
-        def tracing_formulations(self, *formulations):
+        def tracing_formulations(self, key, *formulations):
             def f(group):
-                group['model']['tracingFormulations'] = [{FORMULATIONS: formulations, NAME: "trace1"}]
+                patient_formulations = 'patient_formulations'
+                group['model']['tracingFormulations'] = [
+                    {key: formulations, NAME: "trace1", "slug": "trace1"}]
                 return group
 
             return self.on_group(f)
@@ -288,9 +273,13 @@ def volume_tally_check():
                           "Abacavir/Lamivudine (ABC/3TC) 60mg/30mg [Pack 60]": 1 / 4.6,
                           "Efavirenz (EFV) 200mg [Pack 90]": 1,
                       })
+    f2 = Tracer.F2()
+    f3 = Tracer.F3()
     builder.add_group("G2", SUM, CURRENT_CYCLE, "Adult", ["new", "existing"], [],
-                      model_overrides={F2: {"id": "Paed", "formulations": F2_PATIENT_QUERY},
-                                       F3: {"id": "Paed", "formulations": F3_PATIENT_QUERY}})
+                      model_overrides={
+                          f2.key: {"id": "Paed", "formulations": f2.patient_formulations},
+                          f3.key: {"id": "Paed", "formulations": f3.patient_formulations}
+                      })
     builder.percentage_variance_is_less_than(30)
     return builder.get()
 
@@ -316,7 +305,7 @@ def open_closing_check():
 
 def stable_consumption_check():
     builder = DefinitionFactory().blank().type(FACILITY_TWO_GROUPS_WITH_SAMPLE)
-    thresholds = {F1: 20, F2: 10, F3: 10}
+    thresholds = {Tracer.F1().key: 20, Tracer.F2().key: 10, Tracer.F3().key: 10}
     builder.add_group("G1", SUM, CURRENT_CYCLE, CONSUMPTION_MODEL, ["consumption"], [], thresholds=thresholds)
     builder.add_group("G2", SUM, PREVIOUS_CYCLE, CONSUMPTION_MODEL, ["consumption"], [], thresholds=thresholds)
     builder.percentage_variance_is_less_than(50)

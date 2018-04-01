@@ -204,7 +204,7 @@ class GetTestsAPIView(APIView):
                                                                                                            'name',
                                                                                                            'order',
                                                                                                            'definition')
-        regimens = TracingFormulations.objects.filter(model="Consumption").values('name')
+        regimens = TracingFormulations.objects.values('name','slug')
         featured = pydash.py_(featured_tests).map(prepare_for_ui(regimens)).value()
         other = pydash.py_(other_tests).map(prepare_for_ui(regimens)).value()
         return Response({'featured': featured, 'other': other})

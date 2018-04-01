@@ -32,7 +32,7 @@
                 ng-show="ctrl.selectedTest.sampled"
                 ng-model="ctrl.selectedRegimen"
                 class="form-control select-drop"
-                ng-options="regimen.name for regimen in ctrl.selectedTest.regimens">
+                ng-options="regimen.slug as regimen.name for regimen in ctrl.selectedTest.regimens">
         </select>
     </div>
     <div ng-class="{'col-md-9': ctrl.featuredTests.indexOf(ctrl.selectedTest) == -1, 'col-md-12': ctrl.featuredTests.indexOf(ctrl.selectedTest) > -1}">

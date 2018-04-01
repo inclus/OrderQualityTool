@@ -21,7 +21,7 @@ class TestCombinations(TestCase):
     def test_get_combinations(self):
         new_check = get_check_from_dict(volume_tally_check())
         combinations = new_check.get_combinations()
-        self.assertListEqual(['TDF/3TC/EFV (Adult)', 'ABC/3TC (Paed)', 'EFV200 (Paed)'], combinations)
+        self.assertListEqual(['tdf3tcefv-adult', 'abc3tc-paed', 'efv200-paed'], [tr.key for tr in combinations])
         f1_formulations = new_check.get_formulations(new_check.definition.groups[0], combinations[0])
         f2_formulations = new_check.get_formulations(new_check.definition.groups[0], combinations[1])
         f3_formulations = new_check.get_formulations(new_check.definition.groups[0], combinations[2])

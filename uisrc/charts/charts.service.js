@@ -4,15 +4,15 @@ var chartService = ["$http", "$q",
             return response.data;
         };
         var getDataForTest = function (test, params) {
-            return $http.get("/api/test/" + test, {
+            return $http.get("/api/test/" + test+"/", {
                 params: params
             }).then(handleResponse);
         };
         var getMetrics = function (params) {
-            return $http.get("/api/test/metrics", {params: params}).then(handleResponse);
+            return $http.get("/api/test/metrics/", {params: params}).then(handleResponse);
         };
         var getTests = function () {
-            return $http.get("/api/test/list").then(handleResponse);
+            return $http.get("/api/test/list/").then(handleResponse);
         };
 
         var buildOptions = function (test, district, ip, warehouse, startCycle, endCycle, regimen) {

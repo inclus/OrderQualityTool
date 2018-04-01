@@ -2,29 +2,29 @@ import pydash
 
 from dashboard.checks.legacy.check import values_for_records, as_float, QCheck, facility_not_reporting, \
     get_consumption_records, get_patient_records
+from dashboard.checks.tracer import Tracer
 from dashboard.helpers import *
+from dashboard.models import TracingFormulations
 
 THRESHOLD = "threshold"
+SLUG = "slug"
 
 
 class OrdersOverTimeCheck(QCheck):
-    count = 0
-    two_cycle = True
-    test = DIFFERENT_ORDERS_OVER_TIME
-    combinations = [
-        {NAME: F1, CONSUMPTION_QUERY: F1_QUERY},
-        {NAME: F2, CONSUMPTION_QUERY: F2_QUERY},
-        {NAME: F3, CONSUMPTION_QUERY: F3_QUERY}
-    ]
-    fields = [OPENING_BALANCE, COMBINED_CONSUMPTION, DAYS_OUT_OF_STOCK]
+    def __init__(self):
+        self.count = 0
+        self.two_cycle = True
+        self.test = DIFFERENT_ORDERS_OVER_TIME
+        self.combinations = Tracer.from_db()
+        self.fields = [OPENING_BALANCE, COMBINED_CONSUMPTION, DAYS_OUT_OF_STOCK]
 
-    def for_each_facility(self, data, combination, previous_cycle_data=None):
+    def for_each_facility(self, data, tracer, previous_cycle_data=None):
         fields = self.fields
 
-        prev_records = get_consumption_records(previous_cycle_data, combination[CONSUMPTION_QUERY])
+        prev_records = get_consumption_records(previous_cycle_data, tracer.consumption_formulations)
         prev_values = values_for_records(fields, prev_records)
 
-        current_records = get_consumption_records(data, combination[CONSUMPTION_QUERY])
+        current_records = get_consumption_records(data, tracer.consumption_formulations)
         current_values = values_for_records(fields, current_records)
         all_values = prev_values + current_values
         all_zero = pydash.every(all_values, lambda x: x == 0)
@@ -41,19 +41,17 @@ class OrdersOverTimeCheck(QCheck):
 
 
 class BalancesMatchCheck(QCheck):
-    two_cycle = True
-    test = CLOSING_BALANCE_MATCHES_OPENING_BALANCE
-    combinations = [
-        {NAME: F1, CONSUMPTION_QUERY: F1_QUERY},
-        {NAME: F2, CONSUMPTION_QUERY: F2_QUERY},
-        {NAME: F3, CONSUMPTION_QUERY: F3_QUERY}
-    ]
+    def __init__(self):
+        self.count = 0
+        self.two_cycle = True
+        self.test = CLOSING_BALANCE_MATCHES_OPENING_BALANCE
+        self.combinations = Tracer.from_db()
 
-    def for_each_facility(self, data, combination, previous_cycle_data=None):
+    def for_each_facility(self, data, tracer, previous_cycle_data=None):
         result = NOT_REPORTING
         prev_records = get_consumption_records(previous_cycle_data,
-                                               combination[CONSUMPTION_QUERY])
-        current_records = get_consumption_records(data, combination[CONSUMPTION_QUERY])
+                                               tracer.consumption_formulations)
+        current_records = get_consumption_records(data, tracer.consumption_formulations)
         closing_balance_values = values_for_records([CLOSING_BALANCE], prev_records)
         opening_balance_values = values_for_records([OPENING_BALANCE], current_records)
 
@@ -73,19 +71,20 @@ class BalancesMatchCheck(QCheck):
 
 
 class StableConsumptionCheck(QCheck):
-    two_cycle = True
-    test = STABLE_CONSUMPTION
-    fields = [COMBINED_CONSUMPTION]
-    combinations = [
-        {NAME: F1, CONSUMPTION_QUERY: F1_QUERY, THRESHOLD: 20},
-        {NAME: F2, CONSUMPTION_QUERY: F2_QUERY, THRESHOLD: 10},
-        {NAME: F3, CONSUMPTION_QUERY: F3_QUERY, THRESHOLD: 10}
-    ]
+    def __init__(self):
+        self.two_cycle = True
+        self.test = STABLE_CONSUMPTION
+        self.fields = [COMBINED_CONSUMPTION]
+        self.combinations = [
+            Tracer.F1().with_data({THRESHOLD: 20}),
+            Tracer.F2().with_data({THRESHOLD: 10}),
+            Tracer.F3().with_data({THRESHOLD: 10}),
+        ]
 
-    def for_each_facility(self, data, combination, previous_cycle_data=None):
-        prev_records = get_consumption_records(previous_cycle_data, combination[CONSUMPTION_QUERY])
-        current_records = get_consumption_records(data, combination[CONSUMPTION_QUERY])
-        threshold = combination[THRESHOLD]
+    def for_each_facility(self, data, tracer, previous_cycle_data=None):
+        prev_records = get_consumption_records(previous_cycle_data, tracer.consumption_formulations)
+        current_records = get_consumption_records(data, tracer.consumption_formulations)
+        threshold = tracer.extras[THRESHOLD]
         number_of_consumption_records_prev_cycle = len(prev_records)
         number_of_consumption_records_current_cycle = len(current_records)
         fields = self.fields
@@ -110,17 +109,15 @@ class StableConsumptionCheck(QCheck):
 
 
 class WarehouseFulfillmentCheck(QCheck):
-    two_cycle = True
-    test = WAREHOUSE_FULFILMENT
-    combinations = [
-        {NAME: F1, CONSUMPTION_QUERY: F1_QUERY},
-        {NAME: F2, CONSUMPTION_QUERY: F2_QUERY},
-        {NAME: F3, CONSUMPTION_QUERY: F3_QUERY}
-    ]
+    def __init__(self):
+        self.count = 0
+        self.two_cycle = True
+        self.test = WAREHOUSE_FULFILMENT
+        self.combinations = Tracer.from_db()
 
-    def for_each_facility(self, data, combination, previous_cycle_data=None):
-        prev_records = get_consumption_records(previous_cycle_data, combination[CONSUMPTION_QUERY])
-        current_records = get_consumption_records(data, combination[CONSUMPTION_QUERY])
+    def for_each_facility(self, data, tracer, previous_cycle_data=None):
+        prev_records = get_consumption_records(previous_cycle_data, tracer.consumption_formulations)
+        current_records = get_consumption_records(data, tracer.consumption_formulations)
         count_prev = len(prev_records)
         count_current = len(current_records)
         prev_values = values_for_records([PACKS_ORDERED, ], prev_records)
@@ -142,20 +139,21 @@ class WarehouseFulfillmentCheck(QCheck):
 
 
 class StablePatientVolumesCheck(StableConsumptionCheck):
-    two_cycle = True
-    test = STABLE_PATIENT_VOLUMES
-    combinations = [
-        {NAME: F1, PATIENT_QUERY: F1_PATIENT_QUERY, ADULT: True, THRESHOLD: 10},
-        {NAME: F2, PATIENT_QUERY: ["ABC/3TC/EFV", "ABC/3TC/NVP"], ADULT: False, THRESHOLD: 5},
-        {NAME: F3, PATIENT_QUERY: ["ABC/3TC/EFV", "AZT/3TC/EFV"], ADULT: False, THRESHOLD: 5}
-    ]
-    fields = [NEW, EXISTING]
+    def __init__(self):
+        self.two_cycle = True
+        self.test = STABLE_PATIENT_VOLUMES
+        self.fields = [NEW, EXISTING]
+        self.combinations = [
+            Tracer.F1().with_data({ADULT: True, THRESHOLD: 10}),
+            Tracer.F2().with_data({ADULT: False, THRESHOLD: 5}),
+            Tracer.F3().with_data({ADULT: False, THRESHOLD: 5}),
+        ]
 
-    def for_each_facility(self, data, combination, previous_cycle_data=None):
-        is_adult = combination[ADULT]
+    def for_each_facility(self, data, tracer, previous_cycle_data=None):
+        is_adult = tracer.extras[ADULT]
         prev_records = get_patient_records(previous_cycle_data,
-                                           combination[PATIENT_QUERY], is_adult)
-        current_records = get_patient_records(data, combination[PATIENT_QUERY], is_adult)
+                                           tracer.patient_formulations, is_adult)
+        current_records = get_patient_records(data, tracer.patient_formulations, is_adult)
 
         data_is_sufficient = len(prev_records) > 0 and len(current_records) > 0
 
@@ -165,7 +163,7 @@ class StablePatientVolumesCheck(StableConsumptionCheck):
         current_population = self.calculate_sum(current_records)
         prev_population = self.calculate_sum(prev_records)
 
-        threshold = combination[THRESHOLD]
+        threshold = tracer.extras[THRESHOLD]
 
         include_record = (current_population > threshold or prev_population > threshold)
         result = NOT_REPORTING

@@ -4,9 +4,13 @@ from nose_parameterized import parameterized
 from dashboard.checks.builder import volume_tally_check
 from dashboard.checks.legacy.volumetally import VolumeTallyCheck
 from dashboard.checks.check import get_check_from_dict
+from dashboard.checks.tracer import Tracer
 from dashboard.data.entities import LocationData
 from dashboard.helpers import *
 
+F2_PATIENT_QUERY = ["ABC/3TC/LPV/r", "ABC/3TC/EFV", "ABC/3TC/NVP"]
+
+F1_PATIENT_QUERY = ["TDF/3TC/EFV (PMTCT)", "TDF/3TC/EFV (ADULT)"]
 both_zero = LocationData.migrate_from_dict({
     'status': 'reporting',
     A_RECORDS: [
@@ -105,7 +109,7 @@ class VolumeTallyQualityCheckTestCase(TestCase):
     ])
     def test_f1(self, name, data, expected):
         new_check = get_check_from_dict(volume_tally_check())
-        new_check_result = new_check.for_each_facility(data, {"name": "TDF/3TC/EFV (Adult)"})
+        new_check_result = new_check.for_each_facility(data, Tracer.F1())
         self.assertEqual(expected, new_check_result)
         legacy_check = VolumeTallyCheck()
         legacy_check_result = legacy_check.for_each_facility(data, legacy_check.combinations[0])
@@ -119,7 +123,7 @@ class VolumeTallyQualityCheckTestCase(TestCase):
     ])
     def test_f2(self, name, data, expected):
         new_check = get_check_from_dict(volume_tally_check())
-        new_check_result = new_check.for_each_facility(data, {"name": F2, "formulations": F2_PATIENT_QUERY})
+        new_check_result = new_check.for_each_facility(data, Tracer.F2())
         self.assertEqual(expected, new_check_result)
         legacy_check = VolumeTallyCheck()
         legacy_check_result = legacy_check.for_each_facility(data, legacy_check.combinations[1])

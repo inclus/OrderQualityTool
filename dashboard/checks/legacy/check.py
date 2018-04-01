@@ -52,8 +52,8 @@ class QCheck:
         raise NotImplementedError(self.test)
 
     def get_result_key(self, sample_tracer):
-        if sample_tracer and "name" in sample_tracer:
-            return sample_tracer.get("name")
+        if sample_tracer:
+            return sample_tracer.key
         return "DEFAULT"
 
 
@@ -81,17 +81,18 @@ def get_records_from_collection(collection, facility_name):
     return records
 
 
-def get_consumption_records(data, formulation_name):
-    return pydash.chain(data.c_records).reject(
-        lambda x: formulation_name.strip().lower() not in x.formulation.lower()
+def get_consumption_records(data, names):
+    lower_case_names = pydash.map_(names, lambda x: x.lower())
+    return pydash.chain(data.c_records).filter_(
+        lambda x: x.formulation.strip().lower() in lower_case_names
     ).value()
 
 
-def get_patient_records(data, combinations, is_adult=True):
-    lower_case_combinations = pydash.map_(combinations, lambda x: x.lower())
+def get_patient_records(data, names, is_adult=True):
+    lower_case_names = pydash.map_(names, lambda x: x.lower())
     records = data.a_records if is_adult else data.p_records
     return pydash.chain(records).filter_(
-        lambda x: x.formulation.strip().lower() in lower_case_combinations
+        lambda x: x.formulation.strip().lower() in lower_case_names
     ).value()
 
 

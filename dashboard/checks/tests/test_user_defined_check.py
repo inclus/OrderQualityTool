@@ -6,7 +6,7 @@ from dashboard.checks.entities import DefinitionGroup, DataRecord
 from dashboard.checks.legacy.adherence import GuidelineAdherenceCheckAdult1L
 from dashboard.checks.legacy.negatives import NegativeNumbersQualityCheck
 from dashboard.checks.check import UserDefinedFacilityCheck, get_check_from_dict
-from dashboard.data.entities import F1_PATIENT_QUERY
+from dashboard.checks.tracer import Tracer
 from dashboard.data.entities import LocationData
 from dashboard.helpers import A_RECORDS, NEW, EXISTING, \
     COMBINED_CONSUMPTION, ESTIMATED_NUMBER_OF_NEW_ART_PATIENTS, ESTIMATED_NUMBER_OF_NEW_PREGNANT_WOMEN, F1, \
@@ -27,7 +27,7 @@ class UserDefinedCheckTestCase(TestCase):
         definition_builder.aggregation("VALUE")
         definition_builder.has_no_negatives()
         check = UserDefinedFacilityCheck(definition_builder.getDef())
-        result = check.for_each_facility(has_no_negatives, {"name": "DEFAULT"})
+        result = check.for_each_facility(has_no_negatives, Tracer.Default())
         self.assertEquals(result, 'YES')
 
     def test__group_values_from_location_data(self):
@@ -48,7 +48,7 @@ class UserDefinedCheckTestCase(TestCase):
         output = check.get_values_from_records(test_location_data.c_records, group.selected_formulations,
                                                group.selected_fields)
         self.assertEqual(output, [DataRecord.from_list([F1_QUERY, 3], group.selected_fields)])
-
+F1_PATIENT_QUERY = ["TDF/3TC/EFV (PMTCT)", "TDF/3TC/EFV (ADULT)"]
 
 insufficient_data = LocationData.migrate_from_dict({
     'status': 'reporting',
@@ -97,7 +97,7 @@ class TestGuideLineAdherence(TestCase):
         new_check = get_check_from_dict(guideline_adherence_adult1l_check())
         legacy_check = GuidelineAdherenceCheckAdult1L()
 
-        new_check_result = new_check.for_each_facility(data, {"name": "DEFAULT"})
+        new_check_result = new_check.for_each_facility(data, Tracer.Default())
         legacy_check_result = legacy_check.for_each_facility(data, legacy_check.combinations[0])
         self.assertEqual(legacy_check_result, expected_result)
         self.assertEqual(expected_result, new_check_result)
@@ -135,7 +135,7 @@ class NegativeCheckTestCase(TestCase):
         new_check = get_check_from_dict(no_negatives_check())
         legacy_check = NegativeNumbersQualityCheck()
 
-        new_check_result = new_check.for_each_facility(data, {"name": F1, "formulations": F1_QUERY})
+        new_check_result = new_check.for_each_facility(data, Tracer.F1())
         legacy_check_result = legacy_check.for_each_facility(data, legacy_check.combinations[0])
         self.assertEqual(legacy_check_result, new_check_result)
         self.assertEqual(expected, new_check_result)

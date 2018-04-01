@@ -4,6 +4,7 @@ from nose_parameterized import parameterized
 from dashboard.checks.builder import stable_consumption_check
 from dashboard.checks.check import get_check_from_dict
 from dashboard.checks.legacy.cycles import StableConsumptionCheck
+from dashboard.checks.tracer import Tracer
 from dashboard.data.entities import LocationData, C_RECORDS, FORMULATION, F1_QUERY, COMBINED_CONSUMPTION, F2_QUERY, YES, \
     NO, Location, NOT_REPORTING
 from dashboard.models import Consumption
@@ -83,9 +84,6 @@ f1_consumption_falls_by_50 = {
     })
 }
 
-f1_combination = StableConsumptionCheck().combinations[0]
-f2_combination = StableConsumptionCheck().combinations[1]
-
 
 def create_consumption_record(location, formulation, cycle, **fields):
     Consumption.objects.create(
@@ -106,7 +104,7 @@ class StableConsumptionCheckTestCase(TestCase):
         f1_combination = legacy_check.combinations[0]
 
         new_check = get_check_from_dict(stable_consumption_check())
-        new_check_result = new_check.for_each_facility(scenario["Current"], f1_combination['name'],
+        new_check_result = new_check.for_each_facility(scenario["Current"], Tracer.F1(),
                                                        scenario["Previous"])
         self.assertEqual(expected, new_check_result)
 
@@ -116,17 +114,20 @@ class StableConsumptionCheckTestCase(TestCase):
         self.assertEqual(legacy_check_result, new_check_result)
 
     @parameterized.expand([
-        ("YES", passes, f1_combination, YES),
-        ("NOT_REPORTING", not_reporting, f1_combination, NOT_REPORTING),
-        ("below threshold", below_threshold, f1_combination, NOT_REPORTING),
-        ("YES", passes, f2_combination, YES),
-        ("has zero", f1_current_consumption_zero, f1_combination, NO),
-        ("NO", f1_consumption_falls_by_50, f1_combination, YES),
+        ("YES", passes, "f1", YES),
+        ("NOT_REPORTING", not_reporting, "f1", NOT_REPORTING),
+        ("below threshold", below_threshold, "f1", NOT_REPORTING),
+        ("YES", passes, "f2", YES),
+        ("has zero", f1_current_consumption_zero, "f1", NO),
+        ("NO", f1_consumption_falls_by_50, "f1", YES),
     ])
     def test_that_check_has_same_result_as_preview(self, name, scenario, combination, expected):
-
+        f1_combination = StableConsumptionCheck().combinations[0]
+        f2_combination = StableConsumptionCheck().combinations[1]
+        combinations = {"f1": f1_combination, "f2": f2_combination}
+        combination = combinations[combination]
         new_check = get_check_from_dict(stable_consumption_check())
-        new_check_result = new_check.for_each_facility(scenario["Current"], combination['name'],
+        new_check_result = new_check.for_each_facility(scenario["Current"], Tracer.F1(),
                                                        scenario["Previous"])
         self.assertEqual(expected, new_check_result)
         current_cycle = "Nov - Dec 2017"
@@ -140,4 +141,4 @@ class StableConsumptionCheckTestCase(TestCase):
 
         data = new_check.get_preview_data({"name": location.facility, "district": location.district}, current_cycle,
                                           combination)
-        self.assertEqual(data["result"][combination["name"]], expected)
+        self.assertEqual(data["result"][combination.key], expected)

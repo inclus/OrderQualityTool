@@ -1,41 +1,42 @@
 import pydash
 
 from dashboard.checks.legacy.check import values_for_records, QCheck, filter_consumption_records
+from dashboard.checks.tracer import Tracer
 from dashboard.helpers import *
 
 
 class NNRTIADULTSCheck(QCheck):
-    test = NNRTI_ADULTS
+    def __init__(self):
+        self.test = NNRTI_ADULTS
+        self.combinations = [Tracer.Default().with_data({
 
-    combinations = [{
-        NAME: DEFAULT,
-        DF2: [
-            "Efavirenz (EFV) 600mg [Pack 30]",
-            "Nevirapine (NVP) 200mg [Pack 60]",
-            "Atazanavir/Ritonavir (ATV/r) 300mg/100mg [Pack 30]",
-            "Lopinavir/Ritonavir (LPV/r) 200mg/50mg [Pack 120]",
-            "Dolutegravir (DTG) 50mg"
-        ],
-        DF1: [
-            "Zidovudine/Lamivudine (AZT/3TC) 300mg/150mg [Pack 60]",
-            "Tenofovir/Lamivudine (TDF/3TC) 300mg/300mg [Pack 30]",
-            "Abacavir/Lamivudine (ABC/3TC) 600mg/300mg [Pack 30]"
-        ],
-        FIELDS: [
-            COMBINED_CONSUMPTION
-        ],
-        RATIO: 2.0,
-        SHOW_CONVERSION: True
-    }]
-    count = 0
+            DF2: [
+                "Efavirenz (EFV) 600mg [Pack 30]",
+                "Nevirapine (NVP) 200mg [Pack 60]",
+                "Atazanavir/Ritonavir (ATV/r) 300mg/100mg [Pack 30]",
+                "Lopinavir/Ritonavir (LPV/r) 200mg/50mg [Pack 120]",
+                "Dolutegravir (DTG) 50mg"
+            ],
+            DF1: [
+                "Zidovudine/Lamivudine (AZT/3TC) 300mg/150mg [Pack 60]",
+                "Tenofovir/Lamivudine (TDF/3TC) 300mg/300mg [Pack 30]",
+                "Abacavir/Lamivudine (ABC/3TC) 600mg/300mg [Pack 30]"
+            ],
+            FIELDS: [
+                COMBINED_CONSUMPTION
+            ],
+            RATIO: 2.0,
+            SHOW_CONVERSION: True
+        })]
+        self.count = 0
 
-    def for_each_facility(self, data, combination, previous_cycle_data=None):
-        df1_records = filter_consumption_records(data, combination[DF1])
-        df2_records = filter_consumption_records(data, combination[DF2])
+    def for_each_facility(self, data, tracer, previous_cycle_data=None):
+        df1_records = filter_consumption_records(data, tracer.extras[DF1])
+        df2_records = filter_consumption_records(data, tracer.extras[DF2])
         df1_count = len(df1_records)
         df2_count = len(df2_records)
-        df1_values = values_for_records(combination.get(FIELDS, []), df1_records)
-        df2_values = values_for_records(combination.get(FIELDS, []), df2_records)
+        df1_values = values_for_records(tracer.extras.get(FIELDS, []), df1_records)
+        df2_values = values_for_records(tracer.extras.get(FIELDS, []), df2_records)
         all_df1_fields_are_blank = pydash.every(df1_values, lambda x: x is None) and len(df1_values) > 0
         all_df2_fields_are_blank = pydash.every(df2_values, lambda x: x is None) and len(df2_values) > 0
         sum_df1 = pydash.chain(df1_values).reject(lambda x: x is None).map(float).sum().value()
@@ -53,37 +54,37 @@ class NNRTIADULTSCheck(QCheck):
 
 
 class NNRTIPAEDCheck(NNRTIADULTSCheck):
-    test = NNRTI_PAED
-    combinations = [{
-        NAME: DEFAULT,
+    def __init__(self):
 
-        DF2: [
-            "Nevirapine (NVP) 50mg [Pack 60]",
-            "Lopinavir/Ritonavir (LPV/r) 80mg/20ml oral susp [Bottle 60ml]",
-            "Lopinavir/Ritonavir (LPV/r) 100mg/25mg",
-        ],
-        DF1: [
-            "Abacavir/Lamivudine (ABC/3TC) 60mg/30mg [Pack 60]",
-            "Zidovudine/Lamivudine (AZT/3TC) 60mg/30mg [Pack 60]"
-        ],
-        OTHER: ["Efavirenz (EFV) 200mg [Pack 90]"],
-        FIELDS: [
-            COMBINED_CONSUMPTION
-        ],
-        RATIO: 4.6,
-        SHOW_CONVERSION: True
-    }]
+        self.test = NNRTI_PAED
+        self.combinations = [Tracer.Default().with_data({
+            DF2: [
+                "Nevirapine (NVP) 50mg [Pack 60]",
+                "Lopinavir/Ritonavir (LPV/r) 80mg/20ml oral susp [Bottle 60ml]",
+                "Lopinavir/Ritonavir (LPV/r) 100mg/25mg",
+            ],
+            DF1: [
+                "Abacavir/Lamivudine (ABC/3TC) 60mg/30mg [Pack 60]",
+                "Zidovudine/Lamivudine (AZT/3TC) 60mg/30mg [Pack 60]"
+            ],
+            OTHER: ["Efavirenz (EFV) 200mg [Pack 90]"],
+            FIELDS: [
+                COMBINED_CONSUMPTION
+            ],
+            RATIO: 4.6,
+            SHOW_CONVERSION: True
+        })]
 
-    def for_each_facility(self, data, combination, other_cycle_data={}):
-        ratio = combination.get(RATIO)
-        df1_records = filter_consumption_records(data, combination[DF1])
-        df2_records = filter_consumption_records(data, combination[DF2])
-        other_records = filter_consumption_records(data, combination.get(OTHER, []))
+    def for_each_facility(self, data, tracer, other_cycle_data={}):
+        ratio = tracer.extras.get(RATIO)
+        df1_records = filter_consumption_records(data, tracer.extras[DF1])
+        df2_records = filter_consumption_records(data, tracer.extras[DF2])
+        other_records = filter_consumption_records(data, tracer.extras.get(OTHER, []))
         df1_count = len(df1_records)
         df2_count = len(df2_records) + len(other_records)
-        df1_values = values_for_records(combination[FIELDS], df1_records)
-        df2_values = values_for_records(combination[FIELDS], df2_records)
-        other_values = values_for_records(combination[FIELDS], other_records)
+        df1_values = values_for_records(tracer.extras[FIELDS], df1_records)
+        df2_values = values_for_records(tracer.extras[FIELDS], df2_records)
+        other_values = values_for_records(tracer.extras[FIELDS], other_records)
         sum_df1 = pydash.chain(df1_values).reject(lambda x: x is None).map(float).sum().value()
         sum_df2 = pydash.chain(df2_values).reject(lambda x: x is None).map(float).sum().value()
         other_sum = pydash.chain(other_values).reject(lambda x: x is None).map(float).sum().value()
@@ -106,5 +107,3 @@ class NNRTIPAEDCheck(NNRTIADULTSCheck):
             result = NO
 
         return result
-
-

@@ -26,15 +26,12 @@ class PreviewLocationsView(APIView):
             return Response(data=serializer.errors, status=400)
 
 
-class ConsumptionTracingFormulationView(APIView):
-    model = "Consumption"
+class TracingFormulationView(APIView):
 
     def get(self, request):
         from dashboard.models import TracingFormulations
-        tracers = [{"name": tracer.name, "formulations": tracer.formulations} for tracer in
-                   TracingFormulations.objects.filter(model=self.model)]
+        tracers = [
+            {"name": tracer.name, "slug": tracer.slug, "consumption_formulations": tracer.consumption_formulations,
+             "patient_formulations": tracer.patient_formulations} for tracer in
+            TracingFormulations.objects.all()]
         return Response(data=tracers)
-
-
-class PatientTracingFormulationView(ConsumptionTracingFormulationView):
-    model = "Patients"

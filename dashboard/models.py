@@ -4,6 +4,7 @@ import logging
 from custom_user.models import AbstractEmailUser
 from django.db import models
 from django.db.models import CharField
+from django_extensions.db.fields import AutoSlugField
 from jsonfield import JSONField
 from ordered_model.models import OrderedModel
 from picklefield import PickledObjectField
@@ -203,11 +204,32 @@ class FacilityTest(OrderedModel):
 
 class TracingFormulations(models.Model):
     name = models.CharField(max_length=255)
-    model = models.CharField(max_length=255)
-    formulations = JSONField()
+    consumption_formulations = JSONField()
+    patient_formulations = JSONField()
+    slug = AutoSlugField(populate_from=['name'.encode('utf-8')])
+
+    def as_dict_obj(self):
+        return {
+            "name": self.name,
+            "slug": self.slug,
+            "patient_formulations": self.patient_formulations,
+            "consumption_formulations": self.consumption_formulations
+        }
 
     class Meta:
         verbose_name_plural = "Tracing Formulations"
 
     def __unicode__(self):
-        return u'%s %s' % (self.name, self.model)
+        return u'%s' % (self.name)
+
+    @staticmethod
+    def get_abc_paed():
+        return TracingFormulations.objects.get(slug="abc3tc-paed")
+
+    @staticmethod
+    def get_tdf_adult():
+        return TracingFormulations.objects.get(slug="tdf3tcefv-adult")
+
+    @staticmethod
+    def get_efv_paed():
+        return TracingFormulations.objects.get(slug="efv200-paed")

@@ -45,7 +45,6 @@ urlpatterns = [
     url(r'^api/import/dhis2$', dashboard.views.api.NewImportView.as_view(), name='dhis2-import'),
     url(r'^api/tests/preview$', dashboard.views.definition.PreviewDefinitionView.as_view(), name='preview-definition'),
     url(r'^api/tests/preview/locations$', dashboard.views.definition.PreviewLocationsView.as_view(), name='preview-locations'),
-    url(r'^api/tests/tracing/consumption$', dashboard.views.definition.ConsumptionTracingFormulationView.as_view(), name='tracing-consumption'),
-    url(r'^api/tests/tracing/patients', dashboard.views.definition.PatientTracingFormulationView.as_view(), name='tracing-patients'),
+    url(r'^api/tests/tracingformulations', dashboard.views.definition.TracingFormulationView.as_view(), name='tracing-consumption'),
     url(r'^api/test/metrics', dashboard.views.api.ReportMetrics.as_view(), name='metrics'),
 ]

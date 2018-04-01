@@ -1,6 +1,7 @@
 import pydash
 
 from dashboard.checks.legacy.check import values_for_records, QCheck, facility_not_reporting, filter_consumption_records
+from dashboard.checks.tracer import Tracer
 from dashboard.helpers import *
 
 
@@ -8,8 +9,7 @@ class GuidelineAdherenceCheckAdult1L(QCheck):
     def __init__(self):
         QCheck.__init__(self)
         self.test = GUIDELINE_ADHERENCE_ADULT_1L
-        self.combinations = [{
-            NAME: DEFAULT,
+        self.combinations = [Tracer.Default().with_data({
             DF2: [
                 "AZT/3TC",
                 "ABC/3TC",
@@ -19,16 +19,16 @@ class GuidelineAdherenceCheckAdult1L(QCheck):
             ],
             RATIO: 0.80,
             FIELDS: [ESTIMATED_NUMBER_OF_NEW_ART_PATIENTS, ESTIMATED_NUMBER_OF_NEW_PREGNANT_WOMEN]
-        }]
+        })]
 
-    def for_each_facility(self, data, combination, previous_cycle_data=None):
-        ratio = combination[RATIO]
-        df1_records = filter_consumption_records(data, combination[DF1])
-        df2_records = filter_consumption_records(data, combination[DF2])
+    def for_each_facility(self, data, tracer, previous_cycle_data=None):
+        ratio = tracer.extras[RATIO]
+        df1_records = filter_consumption_records(data, tracer.extras[DF1])
+        df2_records = filter_consumption_records(data, tracer.extras[DF2])
         df1_count = len(df1_records)
         df2_count = len(df2_records)
-        df1_values = values_for_records(combination[FIELDS], df1_records)
-        df2_values = values_for_records(combination[FIELDS], df2_records)
+        df1_values = values_for_records(tracer.extras[FIELDS], df1_records)
+        df2_values = values_for_records(tracer.extras[FIELDS], df2_records)
         sum_df1 = pydash.chain(df1_values).reject(lambda x: x is None).sum().value()
         sum_df2 = pydash.chain(df2_values).reject(lambda x: x is None).sum().value()
         all_df1_fields_are_blank = pydash.every(df1_values, lambda x: x is None)

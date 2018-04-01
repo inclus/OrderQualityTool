@@ -131,6 +131,13 @@ class FacilityTestAdmin(OrderedModelAdmin):
     list_display = ('name', 'move_up_down_links', 'order')
 
 
+class TracingFormulationAdmin(ModelAdmin):
+    search_fields = ('name', 'model')
+    list_display = ('name',
+                    'slug',
+                    )
+
+
 admin_site = QdbSite()
 admin_site.register(Group, GroupAdmin)
 admin_site.register(DashboardUser, EmailUserAdmin)
@@ -143,5 +150,5 @@ admin_site.register(MultipleOrderFacility)
 admin_site.register(GlobalPreferenceModel, GlobalPreferenceAdmin)
 admin_site.register(Dhis2StandardReport)
 admin_site.register(FacilityTest, FacilityTestAdmin)
-admin_site.register(TracingFormulations)
+admin_site.register(TracingFormulations, TracingFormulationAdmin)
 admin_site.register(LogEntry, LogEntryAdmin)

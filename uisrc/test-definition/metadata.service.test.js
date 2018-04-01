@@ -68,8 +68,7 @@ describe('metadataService', function () {
             httpBackend.whenGET("/api/fields/patients").respond({
                 values: ["new", "existing"]
             });
-            httpBackend.whenGET("api/tests/tracing/consumption").respond({});
-            httpBackend.whenGET("api/tests/tracing/patients").respond({});
+            httpBackend.whenGET("/api/tests/tracingformulations").respond({});
             serivce_under_test.getAllFields().then(function (data) {
                 expect(data.formulationsConsumption).toEqual(["consump_a", "consump_b"]);
                 expect(data.formulationsPaed).toEqual(["paed_a", "paed_b"]);

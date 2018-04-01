@@ -5,6 +5,8 @@ from dashboard.checks.legacy.cycles import StablePatientVolumesCheck
 from dashboard.data.entities import LocationData
 from dashboard.helpers import *
 
+F1_PATIENT_QUERY = ["TDF/3TC/EFV (PMTCT)", "TDF/3TC/EFV (ADULT)"]
+
 initial = LocationData.migrate_from_dict({
     A_RECORDS: [
         {FORMULATION: F1_PATIENT_QUERY[0], NEW: 10, EXISTING: 10},

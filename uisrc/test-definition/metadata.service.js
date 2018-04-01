@@ -35,8 +35,8 @@ module.exports = ["$http", "$q", function ($http, $q) {
         return $http.get("/api/formulations/" + extra).then(parseDjangoResponse);
     };
 
-    self.getTracingFormulations = function (model) {
-        return $http.get("/api/tests/tracing/" + model).then(parseTracingResponse);
+    self.getTracingFormulations = function () {
+        return $http.get("/api/tests/tracingformulations").then(parseTracingResponse);
     };
 
     self.getAllFields = function () {
@@ -48,8 +48,7 @@ module.exports = ["$http", "$q", function ($http, $q) {
                 self.getFormulations("adult"),
                 self.getFormulations("paed"),
                 self.getFormulations("consumption"),
-                self.getTracingFormulations("patients"),
-                self.getTracingFormulations("consumption")
+                self.getTracingFormulations()
             ]).then(
             function (data) {
                 var output = {};
@@ -59,9 +58,7 @@ module.exports = ["$http", "$q", function ($http, $q) {
                 output.formulationsAdult = data[2];
                 output.formulationsPaed = data[3];
                 output.formulationsConsumption = data[4];
-                output.tracingAdult = data[5];
-                output.tracingPaed = data[5];
-                output.tracingConsumption = data[6];
+                output.tracingFormulations = data[5];
                 return output;
             });
     };

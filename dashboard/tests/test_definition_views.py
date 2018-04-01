@@ -141,8 +141,8 @@ class PreviewViewTestCase(WebTest):
 
     def test_two_facility_with_tracing_type(self):
         gen_consumption_record(formulation="form_tra", opening_balance=10, closing_balance=20)
-        params = DefinitionFactory().traced(tracer={"name": "trace1", "formulations": ["form_tra", "form_trb"]}).model(
-            'Consumption').tracing_formulations("form_tra",
+        params = DefinitionFactory().traced(tracer={"slug": "trace1", "formulations": ["form_tra", "form_trb"]}).model(
+            'Consumption').tracing_formulations("consumption_formulations", "form_tra",
                                                 "form_trb").fields(
             "opening_balance", "closing_balance").are_equal().get()
         response = self.app.post_json(self.url, user="testuser", params=params, expect_errors=True)
@@ -282,9 +282,9 @@ class PreviewViewTestCase(WebTest):
         gen_paed_record(formulation="form_trb")
         gen_adult_record(formulation="form_tra", new=300, existing=300)
         definition_builder = DefinitionFactory().traced(
-            tracer={"name": "trace1", "formulations": ["form_tra", "form_trb"]})
+            tracer={"slug": "trace1", "patient_formulations": ["form_tra", "form_trb"]})
         definition_builder.model('Paed').model_overrides({"trace1": {"id": "Adult", "formulations": ["form_tra"]}})
-        definition_builder.tracing_formulations("form_tra", "form_trb")
+        definition_builder.tracing_formulations("patient_formulations", "form_tra", "form_trb")
         definition_builder.are_equal()
         definition = definition_builder.get()
         response = self.app.post_json(self.url, user="testuser", params=definition, expect_errors=True)

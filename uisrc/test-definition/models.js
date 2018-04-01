@@ -12,13 +12,6 @@ ModelHelper = {
             return metaData[key];
         }
         return [];
-    },
-    getTracingFormulations: function (id, metaData) {
-        var key = "tracing" + id;
-        if (metaData && key in metaData) {
-            return metaData[key];
-        }
-        return [];
     }
 };
 
@@ -38,7 +31,7 @@ var newTracingModel = function (id, name, metaData, typeId, allowOverride, overr
     allowOverride = allowOverride || false;
     var model = newModel(id, name, metaData, typeId);
     model.hasTrace = true;
-    model.tracingFormulations = ModelHelper.getTracingFormulations(id, metaData);
+    model.tracingFormulations = metaData.tracingFormulations;
     model.allowOverride = allowOverride;
     model.overrideOptions = overrideOptions;
     return model;

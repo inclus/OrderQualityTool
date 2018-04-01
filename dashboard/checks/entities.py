@@ -5,6 +5,7 @@ import pydash
 from pydash import py_
 from pymaybe import maybe
 
+from dashboard.checks.tracer import Tracer
 from dashboard.checks.utils import as_float_or_1, as_number
 
 
@@ -93,6 +94,20 @@ class DefinitionGroup(object):
         return len(py_(self.sample_formulation_model_overrides.values()).map(
             lambda x: dict(x).get("formulations", [])).flatten().value()) > 0
 
+    def get_formulations(self, tracer):
+        models = {'Adult': "patient_formulations", 'Paed': "patient_formulations",
+                  'Consumption': "consumption_formulations"}
+        key = models.get(self.model.id)
+        print(tracer)
+        if tracer is not None and type(tracer) is Tracer:
+            if tracer.key == "DEFAULT":
+                return self.selected_formulations
+
+            return py_(self.model.tracing_formulations).find(
+                {"slug": tracer.key}).value().get(key)
+        else:
+            return self.selected_formulations
+
 
 @attr.s(cmp=True, frozen=True)
 class Definition(object):
@@ -141,10 +156,10 @@ class GroupResult(object):
             return True
 
     def has_thresholds(self):
-        return self.group.has_thresholds and maybe(self.group.thresholds).or_else({}).get(self.tracer, None)
+        return self.group.has_thresholds and maybe(self.group.thresholds).or_else({}).get(self.tracer.key, None)
 
     def get_threshold(self):
-        return self.group.thresholds.get(self.tracer, None)
+        return self.group.thresholds.get(self.tracer.key, None)
 
     def all_values_blank(self):
         return pydash.every(self.factored_records, lambda data_record: data_record.all_blank())

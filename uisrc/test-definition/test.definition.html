@@ -67,17 +67,19 @@
                             <h4>{{ trace.name }}</h4>
                             <div class="tracing-formulation-container">
                                 <div class="tracing-formulation-name">
-                                    <p ng-repeat="formulation in trace.formulations">
-                                        {{ formulation }}</p>
+                                    <p ng-repeat="formulation in trace.patient_formulations"
+                                       ng-show="definitionGroup.model.id === 'Adult' || definitionGroup.model.id === 'Paed'">{{ formulation }}</p>
+                                    <p ng-repeat="formulation in trace.consumption_formulations"
+                                       ng-show="definitionGroup.model.id === 'Consumption'">{{ formulation }}</p>
                                 </div>
                                 <div class="tracing-formulation-overrides"
                                      ng-show="definitionGroup.model.allowOverride">
                                     <input type="checkbox"
-                                           ng-model="definitionGroup.sample_formulation_model_overridden[trace.name]">
+                                           ng-model="definitionGroup.sample_formulation_model_overridden[trace.slug]">
                                     <label class="tracing-formulation-overrides-label">Override Model</label>
-                                    <select ng-model="definitionGroup.sample_formulation_model_overrides[trace.name]"
-                                            ng-options="option.id for option in [{'id': 'Paed', 'formulations': trace.formulations},{'id': 'Adult', 'formulations': trace.formulations},] track by option.id"
-                                            ng-show="definitionGroup.sample_formulation_model_overridden[trace.name]">
+                                    <select ng-model="definitionGroup.sample_formulation_model_overrides[trace.slug]"
+                                            ng-options="option.id for option in [{'id': 'Paed', 'formulations': trace.patient_formulations},{'id': 'Adult', 'formulations': trace.patient_formulations},] track by option.id"
+                                            ng-show="definitionGroup.sample_formulation_model_overridden[trace.slug]">
                                     </select>
 
                                 </div>
@@ -103,7 +105,8 @@
                     </div>
                     <div ng-show="definitionGroup.model.hasTrace">
                         <div class="checkbox-row">
-                            <input ng-model="definitionGroup.has_thresholds" id="id_has_thresholds" name="has_thresholds"
+                            <input ng-model="definitionGroup.has_thresholds" id="id_has_thresholds"
+                                   name="has_thresholds"
                                    type="checkbox"><label
                                 class="vCheckboxLabel" for="id_has_threshold">Include Thresholds</label>
                         </div>
@@ -113,7 +116,7 @@
                                  ng-repeat="trace in definitionGroup.model.tracingFormulations">
                                 <span for="" class="factor-label">{{ trace.name }}</span>
                                 <strong class="factor-label">*</strong>
-                                <input class="factor-input" ng-model="definitionGroup.thresholds[trace.name]"/>
+                                <input class="factor-input" ng-model="definitionGroup.thresholds[trace.slug]"/>
                             </div>
                         </div>
                     </div>

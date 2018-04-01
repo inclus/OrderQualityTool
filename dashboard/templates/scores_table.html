@@ -34,7 +34,7 @@
             </select>
             <select name="formulation" id="formulation_select" class="filter">
                 {% for formulation in formulations %}
-                    <option value="{{ formulation }}">{{ formulation }}</option>
+                    <option value="{{ formulation.slug }}">{{ formulation }}</option>
                 {% endfor %}
             </select>
         </div>

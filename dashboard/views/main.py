@@ -13,7 +13,7 @@ from openpyxl.writer.excel import save_virtual_workbook
 from dashboard.data.partner_mapping import load_file
 from dashboard.forms import FileUploadForm, MappingUploadForm, Dhis2ImportForm
 from dashboard.helpers import F3, F2, F1, sort_cycle
-from dashboard.models import Score, LocationToPartnerMapping, FacilityTest
+from dashboard.models import Score, LocationToPartnerMapping, FacilityTest, TracingFormulations
 from dashboard.tasks import import_data_from_dhis2, run_manual_import
 from dashboard.utils import log_formatter
 
@@ -165,5 +165,5 @@ class ReportsView(LoginRequiredMixin, TemplateView):
         context['warehouses'] = warehouses
         context['cycles'] = cycles
         context['checks'] = checks
-        context['formulations'] = [F1, F2, F3]
+        context['formulations'] = TracingFormulations.objects.all()
         return context

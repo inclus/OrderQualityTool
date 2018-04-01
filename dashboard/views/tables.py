@@ -10,6 +10,7 @@ from pydash import py_
 
 from dashboard.checks.builder import FACILITY_TWO_GROUPS_WITH_SAMPLE
 from dashboard.checks.check import get_check_from_dict
+from dashboard.checks.tracer import Tracer
 from dashboard.helpers import *
 from dashboard.models import Score, FacilityTest
 
@@ -114,7 +115,7 @@ class ScoreDetailsView(View):
             check_obj = self.get_test_by_column(column)
             check = get_check_from_dict(json.loads(check_obj.definition))
             response_data['data'] = check.get_preview_data({'name': score.name, "district": score.district},
-                                                           score.cycle, {"name": combination})
+                                                           score.cycle, Tracer(key=combination))
             if score.data and type(score.data) is dict:
                 result = score.data.get(check_obj.name)
             else:

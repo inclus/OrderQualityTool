@@ -4,14 +4,14 @@ var chartsController = ["$scope", "chartsService", function ($scope, chartsServi
         ctrl.selectedTest = test;
         var regimen = null;
         if (ctrl.selectedRegimen) {
-            regimen = ctrl.selectedRegimen.name;
+            regimen = ctrl.selectedRegimen;
         }
         chartsService.buildOptions(test, ctrl.selectedDistrict, ctrl.selectedIp, ctrl.selectedWarehouse, ctrl.startCycle, ctrl.endCycle, regimen).then(function (options) {
             ctrl.options = options;
         });
 
         if (test.sampled) {
-            ctrl.selectedRegimen = test.regimens[0];
+            ctrl.selectedRegimen = test.regimens[0].slug;
         } else {
             ctrl.selectedRegimen = null;
         }
@@ -26,11 +26,8 @@ var chartsController = ["$scope", "chartsService", function ($scope, chartsServi
     $scope.$watchGroup(
         ["ctrl.selectedDistrict",
             "ctrl.selectedIp",
-            "ctrl.selectedWarehouse",
-            "ctrl.startCycle",
-            "ctrl.endCycle",
-            "ctrl.selectedRegimen"], function (newValues) {
-            if (newValues[0] && newValues[1] && newValues[2])
+            "ctrl.selectedWarehouse"], function (newValues) {
+            if (newValues[0] && newValues[1] && newValues[2]) {
                 chartsService.getMetrics({
                     district: newValues[0].district,
                     ip: newValues[1].ip,
@@ -40,6 +37,16 @@ var chartsController = ["$scope", "chartsService", function ($scope, chartsServi
                         test.metric = metrics[test.name];
                     });
                 });
+            }
+        });
+
+    $scope.$watchGroup(
+        ["ctrl.selectedDistrict",
+            "ctrl.selectedIp",
+            "ctrl.selectedWarehouse",
+            "ctrl.startCycle",
+            "ctrl.endCycle",
+            "ctrl.selectedRegimen"], function (newValues) {
             if (ctrl.selectedTest) {
                 chartsService.buildOptions(
                     ctrl.selectedTest,
@@ -48,7 +55,7 @@ var chartsController = ["$scope", "chartsService", function ($scope, chartsServi
                     ctrl.selectedWarehouse,
                     ctrl.startCycle,
                     ctrl.endCycle,
-                    ctrl.selectedRegimen.name).then(function (options) {
+                    ctrl.selectedRegimen).then(function (options) {
                     ctrl.options = options;
                 });
             }

@@ -182,11 +182,7 @@ PASS = 'PASS'
 FAIL_COUNT = "fail_count"
 PASS_COUNT = "pass_count"
 
-F3_PATIENT_QUERY = ["ABC/3TC/EFV", "AZT/3TC/EFV"]
 
-F2_PATIENT_QUERY = ["ABC/3TC/LPV/r", "ABC/3TC/EFV", "ABC/3TC/NVP"]
-
-F1_PATIENT_QUERY = ["TDF/3TC/EFV (PMTCT)", "TDF/3TC/EFV (ADULT)"]
 
 
 def get_prev_cycle(cycle):
