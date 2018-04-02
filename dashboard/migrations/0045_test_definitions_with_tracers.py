@@ -13,7 +13,64 @@ from dashboard.checks.builder import class_based_check, guideline_adherence_adul
 
 
 def create_default_tests(apps, schema_editor):
-    pass
+    default_tests = [
+        {
+            "name": "GUIDELINE ADHERENCE (Adult 1L)",
+            "definition": guideline_adherence_adult1l_check()
+
+        }, {
+            "name": "GUIDELINE ADHERENCE (Adult 2L)",
+            "definition": guideline_adherence_adult2l_check()
+
+        }, {
+            "name": "GUIDELINE ADHERENCE (Paediatric 1L)",
+            "definition": guideline_paed1l_check()
+        },
+        {
+            "name": "NO BLANKS",
+            "definition": class_based_check("dashboard.checks.legacy.blanks.BlanksQualityCheck")
+        },
+        {
+            "name": "NO NEGATIVES",
+            "definition": no_negatives_check()
+        },
+        {
+            "name": "VOLUME TALLY",
+            "definition": volume_tally_check()
+        }, {
+            "name": "NON-REPEATING",
+            "definition": non_repeating_check()
+        }, {
+            "name": "OPENING = CLOSING",
+            "definition": open_closing_check()
+        }, {
+            "name": "STABLE CONSUMPTION",
+            "definition": stable_consumption_check()
+        }, {
+            "name": "WAREHOUSE FULFILMENT",
+            "definition": warehouse_fulfillment_check()
+        }, {
+            "name": "NRTI vs. INSTI/NNRTI/PI patient volumes (ADULT)",
+            "definition": nnrti_adult()
+        }, {
+            "name": "NRTI vs. INSTI/NNRTI/PI patient volumes (PAED)",
+            "definition": nnrti_paed()
+        },
+        {
+            "name": "MULTIPLE ORDERS",
+            "definition": class_based_check("dashboard.checks.legacy.blanks.MultipleCheck")
+        },
+        {
+            "name": "Facility Reporting",
+            "definition": class_based_check("dashboard.checks.legacy.blanks.IsReportingCheck")
+
+        },
+
+    ]
+
+    model = apps.get_registered_model("dashboard", "FacilityTest")
+    for test in default_tests:
+        model.objects.filter(name=test.get("name")).update(definition=json.dumps(test.get("definition")))
 
 
 def reverse(apps, schema_editor):
