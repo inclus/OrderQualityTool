@@ -14,8 +14,12 @@ var testDefinitionController = ["$scope", "metadataService", "previewService", f
     };
 
     ctrl.getFormulationsForFactors = function (group) {
+        var key = "patient_formulations";
+        if (group.model.id === "Consumption"){
+            key = "consumption_formulations";
+        }
         if (group.model.hasTrace) {
-            return _.chain(group.model.tracingFormulations).map("formulations").flatten().value();
+            return _.chain(group.model.tracingFormulations).map(key).flatten().value();
         } else {
             return group.selected_formulations;
         }
