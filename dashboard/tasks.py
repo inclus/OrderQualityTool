@@ -1,6 +1,7 @@
 import base64
 import re
 
+import pygogo
 from celery import shared_task
 from io import BytesIO
 
@@ -11,9 +12,11 @@ from dashboard.data.data_import import DataImport, ExcelDataImport
 from dashboard.data.html_data_import import HtmlDataImport
 from dashboard.data.tasks import persist_consumption, persist_adult_records, persist_paed_records, \
     persist_multiple_order_records, add_log_entry, persist_scores
-from dashboard.utils import timeit
+from dashboard.utils import timeit, log_formatter
 from dashboard.medist.tasks import fetch_reports
 from dashboard.models import Cycle, Dhis2StandardReport, LocationToPartnerMapping
+
+logger = pygogo.Gogo(__name__, low_formatter=log_formatter).get_logger()
 
 
 @timeit
@@ -35,7 +38,11 @@ def update_checks(ids):
         try:
             data_import = DataImport(None, cycle.title).build_form_db(cycle)
             calculate_scores_for_checks_in_cycle(data_import)
-        except Exception:
+        except Exception as e:
+            logger.error("error",
+                         extra={
+                             "exception": e.message,
+                             "cycle": cycle.title})
             client.captureException()
 
 
