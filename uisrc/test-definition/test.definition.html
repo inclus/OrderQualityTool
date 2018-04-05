@@ -19,6 +19,13 @@
         <div class="row-vertical group-container" ng-repeat="definitionGroup in ctrl.definition.groups">
             <div class="row with-space-between">
                 <input ng-model="definitionGroup.name" type="text">
+                <div class="group-control">
+                <div class="object-tools" ng-if="ctrl.definition.groups.length > 1">
+                    <a href="#" ng-click="ctrl.deleteGroup(definitionGroup)">
+                        Remove {{ definitionGroup.name }}
+                    </a>
+                </div>
+            </div>
             </div>
             <div class="group">
                 <div class="group-control">
@@ -103,20 +110,29 @@
                             <input class="factor-input" ng-model="definitionGroup.factors[value]"/>
                         </div>
                     </div>
-                    <div ng-show="definitionGroup.model.hasTrace">
+                    <div>
                         <div class="checkbox-row">
                             <input ng-model="definitionGroup.has_thresholds" id="id_has_thresholds"
                                    name="has_thresholds"
                                    type="checkbox"><label
                                 class="vCheckboxLabel" for="id_has_threshold">Include Thresholds</label>
                         </div>
-                        <div ng-show="definitionGroup.has_thresholds">
+                        <div ng-show="definitionGroup.has_thresholds && definitionGroup.model.hasTrace">
                             <h5>Thresholds</h5>
                             <div class="factor-container"
                                  ng-repeat="trace in definitionGroup.model.tracingFormulations">
                                 <span for="" class="factor-label">{{ trace.name }}</span>
-                                <strong class="factor-label">*</strong>
+                                <strong class="factor-label">>=</strong>
                                 <input class="factor-input" ng-model="definitionGroup.thresholds[trace.slug]"/>
+                            </div>
+                        </div>
+
+                        <div ng-show="definitionGroup.has_thresholds && !definitionGroup.model.hasTrace">
+                            <h5>Thresholds</h5>
+                            <div class="factor-container">
+                                <span for="" class="factor-label">{{ definitionGroup.name }}</span>
+                                <strong class="factor-label">>=</strong>
+                                <input class="factor-input" ng-model="definitionGroup.thresholds['DEFAULT']"/>
                             </div>
                         </div>
                     </div>

@@ -15,7 +15,7 @@ var testDefinitionController = ["$scope", "metadataService", "previewService", f
 
     ctrl.getFormulationsForFactors = function (group) {
         var key = "patient_formulations";
-        if (group.model.id === "Consumption"){
+        if (group.model.id === "Consumption") {
             key = "consumption_formulations";
         }
         if (group.model.hasTrace) {
@@ -58,6 +58,15 @@ var testDefinitionController = ["$scope", "metadataService", "previewService", f
         });
     };
 
+    ctrl.deleteGroup = function (group) {
+        var result = confirm("Are you sure you want to remove the group ?");
+        if (result === true) {
+            var item_index = ctrl.definition.groups.indexOf(group);
+            ctrl.definition.groups = ctrl.definition.groups.filter(function (item) {
+                return item !== group;
+            });
+        }
+    };
     init();
 
     return ctrl;
