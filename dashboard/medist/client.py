@@ -6,10 +6,10 @@ from pydash import py_
 from requests.auth import HTTPBasicAuth
 
 from dashboard.data.entities import Location
-from dashboard.utils import log_formatter
+from dashboard.utils import log_formatter, should_log_time
 
 logger = pygogo.Gogo(__name__, low_formatter=log_formatter).get_logger()
-
+logger.setLevel("INFO" if should_log_time() else "ERROR")
 
 def parse_warehouse(warehouse):
     return "".join([word[0] for word in warehouse.split(" ")])

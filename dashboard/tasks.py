@@ -13,11 +13,12 @@ from dashboard.data.data_import import DataImport, ExcelDataImport
 from dashboard.data.html_data_import import HtmlDataImport
 from dashboard.data.tasks import persist_consumption, persist_adult_records, persist_paed_records, \
     persist_multiple_order_records, add_log_entry, persist_scores
-from dashboard.utils import timeit, log_formatter
+from dashboard.utils import timeit, log_formatter, should_log_time
 from dashboard.medist.tasks import fetch_reports
 from dashboard.models import Cycle, Dhis2StandardReport, LocationToPartnerMapping, DashboardUser
 
 logger = pygogo.Gogo(__name__, low_formatter=log_formatter).get_logger()
+logger.setLevel("INFO" if should_log_time() else "ERROR")
 
 
 @timeit

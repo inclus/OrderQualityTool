@@ -29,7 +29,7 @@ class Comparison(object):
             lambda group_result: group_result.factored_records).flatten().size().value()
         has_adequate_data = number_of_records > 0
         if has_adequate_data:
-            return pydash.some(valid_groups, lambda x: x.is_above_threshold())
+            return pydash.every(valid_groups, lambda x: x.is_above_threshold())
 
         return has_adequate_data
 
@@ -156,6 +156,8 @@ class AtLeastNOfTotal(Comparison):
         one_group_has_all_blank = py_(groups).reject(lambda x: x is None).some(
             lambda gr: gr.all_values_blank()).value()
         if one_group_has_all_blank:
+            return True
+        if len(groups) > 1 and groups[1].aggregate == 0:
             return False
         return super(AtLeastNOfTotal, self).groups_have_adequate_data(groups)
 

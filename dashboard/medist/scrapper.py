@@ -7,10 +7,10 @@ from dashboard.data.html_data_import import TR, TD
 from dashboard.helpers import HTML_PARSER
 from dynamic_preferences.registries import global_preferences_registry
 
-from dashboard.utils import log_formatter
+from dashboard.utils import log_formatter, should_log_time
 
 logger = pygogo.Gogo(__name__, low_formatter=log_formatter).get_logger()
-
+logger.setLevel("INFO" if should_log_time() else "ERROR")
 
 def get_html_table(html_doc, report_id):
     soup = BeautifulSoup(html_doc, HTML_PARSER)

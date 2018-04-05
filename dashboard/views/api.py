@@ -21,7 +21,7 @@ from dashboard.models import Score, WAREHOUSE, DISTRICT, MultipleOrderFacility, 
     AdultPatientsRecord, PAEDPatientsRecord, FacilityTest, TracingFormulations
 from dashboard.serializers import ScoreSerializer, NewImportSerializer
 from dashboard.tasks import import_data_from_dhis2
-from dashboard.utils import log_formatter
+from dashboard.utils import log_formatter, should_log_time
 
 
 def aggregate_scores(user, test, cycles, formulation, keys, count_values, filters):
@@ -281,7 +281,7 @@ class AdminAccessView(APIView):
 
 
 logger = pygogo.Gogo(__name__, low_formatter=log_formatter).get_logger()
-
+logger.setLevel("INFO" if should_log_time() else "ERROR")
 
 class NewImportView(APIView):
     def post(self, request):

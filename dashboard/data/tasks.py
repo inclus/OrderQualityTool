@@ -9,10 +9,10 @@ from dashboard.data.html_data_import import HtmlDataImport
 from dashboard.helpers import get_prev_cycle, F1, F2, F3, DEFAULT, YES, WEB, NO
 from dashboard.models import Consumption, AdultPatientsRecord, PAEDPatientsRecord, MultipleOrderFacility, DashboardUser, \
     Cycle, Score
-from dashboard.utils import timeit, log_formatter
+from dashboard.utils import timeit, log_formatter, should_log_time
 
 logger = pygogo.Gogo(__name__, low_formatter=log_formatter).get_logger()
-
+logger.setLevel("INFO" if should_log_time() else "ERROR")
 
 @timeit
 def persist_consumption(report):

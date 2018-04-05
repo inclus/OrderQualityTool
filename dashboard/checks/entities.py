@@ -149,7 +149,7 @@ class GroupResult(object):
             threshold = self.get_threshold()
             aggregate = self.aggregate
 
-            if aggregate > threshold:
+            if aggregate >= threshold:
                 return True
         else:
             return True

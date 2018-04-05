@@ -92,7 +92,7 @@ class StableConsumptionCheck(QCheck):
         current_consumption = pydash.chain(current_values).reject(lambda x: x is None).sum().value()
         prev_values = values_for_records(fields, prev_records)
         prev_consumption = pydash.chain(prev_values).reject(lambda x: x is None).sum().value()
-        include_record = current_consumption > threshold or prev_consumption > threshold
+        include_record = current_consumption > threshold and prev_consumption > threshold
         result = NOT_REPORTING
         if number_of_consumption_records_prev_cycle == 0 or number_of_consumption_records_current_cycle == 0:
             return NOT_REPORTING

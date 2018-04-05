@@ -99,7 +99,7 @@ def create_consumption_record(location, formulation, cycle, **fields):
 class StableConsumptionCheckTestCase(TestCase):
     @parameterized.expand([
         ("YES", passes, YES),
-        ("has zero", f1_current_consumption_zero, NO),
+        ("has zero", f1_current_consumption_zero, NOT_REPORTING),
         ("NO", f1_consumption_falls_by_50, YES),
     ])
     def test_that_legacy_gets_same_result_as_new(self, name, scenario, expected):
@@ -121,7 +121,7 @@ class StableConsumptionCheckTestCase(TestCase):
         ("NOT_REPORTING", not_reporting, "f1", NOT_REPORTING),
         ("below threshold", below_threshold, "f1", NOT_REPORTING),
         ("YES", passes, "f2", YES),
-        ("has zero", f1_current_consumption_zero, "f1", NO),
+        ("has zero", f1_current_consumption_zero, "f1", NOT_REPORTING),
         ("NO", f1_consumption_falls_by_50, "f1", YES),
     ])
     def test_that_check_has_same_result_as_preview(self, name, scenario, combination, expected):

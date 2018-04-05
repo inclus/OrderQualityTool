@@ -3,10 +3,10 @@ import pygogo
 from dashboard.data.entities import ReportOutput
 from dashboard.medist.client import DHIS2APIClient
 from dashboard.medist.scrapper import DHIS2Scrapper
-from dashboard.utils import log_formatter
+from dashboard.utils import log_formatter, should_log_time
 
 logger = pygogo.Gogo(__name__, low_formatter=log_formatter).get_logger()
-
+logger.setLevel("INFO" if should_log_time() else "ERROR")
 
 def fetch_reports(reports, periods):
     scrapper = DHIS2Scrapper()
