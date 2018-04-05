@@ -34,6 +34,7 @@ def calculate_scores_for_checks_in_cycle(data_import):
 @shared_task
 def update_checks(ids):
     data = Cycle.objects.filter(id__in=ids).all()
+    logger.info("update checks for ids", extra={"ids": ids})
     for cycle in data:
         try:
             data_import = DataImport(None, cycle.title).build_form_db(cycle)

@@ -26,7 +26,7 @@ from dashboard.utils import log_formatter
 
 def aggregate_scores(user, test, cycles, formulation, keys, count_values, filters):
     scores_filter = {}
-    if user:
+    if user and hasattr(user, "access_level") and hasattr(user, "access_area"):
         access_level = user.access_level
         access_area = user.access_area
         if access_level and access_area:
@@ -204,7 +204,7 @@ class GetTestsAPIView(APIView):
                                                                                                            'name',
                                                                                                            'order',
                                                                                                            'definition')
-        regimens = TracingFormulations.objects.values('name','slug')
+        regimens = TracingFormulations.objects.values('name', 'slug')
         featured = pydash.py_(featured_tests).map(prepare_for_ui(regimens)).value()
         other = pydash.py_(other_tests).map(prepare_for_ui(regimens)).value()
         return Response({'featured': featured, 'other': other})

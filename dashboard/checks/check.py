@@ -220,10 +220,10 @@ class UserDefinedSingleGroupFacilityCheck(UserDefinedFacilityCheck):
             operator_constant = as_float_or_1(operator_constant)
 
             if comparator:
-                group1_result = groups[0].get('result')
+                group1_result = groups[0].aggregate
                 group2_result = None
                 comparison_result = comparator.compare(group1_result, group2_result, constant=operator_constant)
-                result_text = comparator.text(group1_result, group2_result, operator_constant, comparison_result)
+                result_text = comparator.text(group1_result, group2_result, operator_constant)
                 result = YES if comparison_result else NO
                 return result, result_text
         return N_A, None

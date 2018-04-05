@@ -13,5 +13,4 @@ def as_number(value):
     try:
         return True, float(value)
     except ValueError as e:
-        print(e, "--")
         return False, None

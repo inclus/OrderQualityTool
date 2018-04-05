@@ -2,6 +2,9 @@ from dashboard.checks.entities import Definition
 from dashboard.checks.tracer import Tracer
 from dashboard.models import TracingFormulations
 
+ADULT_MODEL = "Adult"
+PAED_MODEL = "Paed"
+
 OPERATOR = "operator"
 
 SUM = "SUM"
@@ -12,6 +15,7 @@ CONSUMPTION_MODEL = "Consumption"
 FORMULATIONS = "formulations"
 NAME = "name"
 FACILITY_TWO_GROUPS = "FacilityTwoGroups"
+FACILITY_ONE_GROUP = "FacilityOneGroup"
 CURRENT_CYCLE = "Current"
 PREVIOUS_CYCLE = "Previous"
 FACILITY_TWO_GROUPS_WITH_SAMPLE = "FacilityTwoGroupsAndTracingFormulation"
@@ -115,8 +119,10 @@ class DefinitionFactory(object):
         def getDef(self):
             return Definition.from_dict(self.data)
 
-        def type(self, id):
+        def type(self, id, name=None):
             self.data["type"] = {"id": id}
+            if name is not None:
+                self.data["type"]["name"] = name
             return self
 
         def factors(self, **factors):
@@ -203,7 +209,7 @@ class DefinitionFactory(object):
             "type": "ClassBased",
             "pythonClass": class_name
         }
-        return self.Builder({}).type("ClassBased").python_class(class_name)
+        return self.Builder({}).type("ClassBased", "Class Based Facility Check").python_class(class_name)
 
 
 def class_based_check(class_name):
@@ -212,36 +218,40 @@ def class_based_check(class_name):
 
 def guideline_adherence_adult1l_check():
     builder = DefinitionFactory().blank().type(FACILITY_TWO_GROUPS)
-    builder.add_group("G1", SUM, CURRENT_CYCLE, CONSUMPTION_MODEL,
-                      ["estimated_number_of_new_patients", "estimated_number_of_new_pregnant_women"],
-                      ["Tenofovir/Lamivudine/Efavirenz (TDF/3TC/EFV) 300mg/300mg/600mg[Pack 30]",
-                       "Tenofovir/Lamivudine (TDF/3TC) 300mg/300mg [Pack 30]"])
-    builder.add_group("G2", SUM, CURRENT_CYCLE, CONSUMPTION_MODEL,
-                      ["estimated_number_of_new_patients", "estimated_number_of_new_pregnant_women"],
-                      ["AZT/3TC/NVP 300/150/200mg", "AZT/3TC 300/150mg"])
-    builder.at_least_of_total(80)
+    builder.add_group("G1", SUM, CURRENT_CYCLE, ADULT_MODEL,
+                      ["new"],
+                      ["TDF/3TC/EFV (PMTCT)", "TDF/3TC/EFV (ADULT)"])
+    builder.add_group("G2", SUM, CURRENT_CYCLE, ADULT_MODEL,
+                      ["new"],
+                      ["ABC/3TC/AZT (ADULT)", "ABC/3TC/AZT (PMTCT)", 'ABC/3TC/EFV (ADULT)', 'ABC/3TC/EFV (PMTCT)',
+                       'ABC/3TC/NVP (ADULT)', 'ABC/3TC/NVP (PMTCT)', 'AZT/3TC/EFV (ADULT)', 'AZT/3TC/EFV (PMTCT)',
+                       'AZT/3TC/NVP (ADULT)', 'AZT/3TC/NVP (PMTCT)', 'TDF/3TC/AZT (ADULT)', 'TDF/3TC/AZT (PMTCT)',
+                       'TDF/3TC/EFV (ADULT)', 'TDF/3TC/EFV (PMTCT)'])
+    builder.at_least_of_total(90)
 
     return builder.get()
 
 
 def guideline_adherence_adult2l_check():
     builder = DefinitionFactory().blank().type(FACILITY_TWO_GROUPS)
-    builder.add_group("G1", SUM, CURRENT_CYCLE, CONSUMPTION_MODEL, ["estimated_number_of_new_patients"],
-                      ["Atazanavir/Ritonavir (ATV/r) 300mg/100mg [Pack 30]"])
-    builder.add_group("G2", SUM, CURRENT_CYCLE, CONSUMPTION_MODEL, ["estimated_number_of_new_patients"],
-                      ["Lopinavir/Ritonavir (LPV/r) 200mg/50mg [Pack 120]"])
-    builder.at_least_of_total(73)
+    builder.add_group("G1", SUM, CURRENT_CYCLE, ADULT_MODEL, ["new"],
+                      ["ABC/3TC/ATV/r (ADULT)", "ABC/3TC/ATV/r (PMTCT)", "AZT/3TC/ATV/r (ADULT)",
+                       "AZT/3TC/ATV/r (PMTCT)", "TDF/3TC/ATV/r (ADULT)", "TDF/3TC/ATV/r (PMTCT)"])
+    builder.add_group("G2", SUM, CURRENT_CYCLE, ADULT_MODEL, ["new"],
+                      ["ABC/3TC/LPV/r (ADULT)", "ABC/3TC/LPV/r (PMTCT)", "AZT/3TC/LPV/r (ADULT)",
+                       "AZT/3TC/LPV/r (PMTCT)", "TDF/3TC/LPV/r (ADULT)", "TDF/3TC/LPV/r (PMTCT)"])
+    builder.at_least_of_total(80)
 
     return builder.get()
 
 
 def guideline_paed1l_check():
     builder = DefinitionFactory().blank().type(FACILITY_TWO_GROUPS)
-    builder.add_group("G1", SUM, CURRENT_CYCLE, CONSUMPTION_MODEL, ["estimated_number_of_new_patients"],
-                      ["Abacavir/Lamivudine (ABC/3TC) 60mg/30mg [Pack 60]"])
-    builder.add_group("G2", SUM, CURRENT_CYCLE, CONSUMPTION_MODEL, ["estimated_number_of_new_patients"],
-                      ["Zidovudine/Lamivudine/Nevirapine (AZT/3TC/NVP) 60mg/30mg/50mg [Pack 60]",
-                       "Zidovudine/Lamivudine (AZT/3TC) 60mg/30mg [Pack 60]"])
+    builder.add_group("G1", SUM, CURRENT_CYCLE, PAED_MODEL, ["new"],
+                      ["ABC/3TC/EFV", "ABC/3TC/NVP", "ABC/3TC/LPV/r"])
+    builder.add_group("G2", SUM, CURRENT_CYCLE, PAED_MODEL, ["new"],
+                      ["AZT/3TC/ABC",
+                       "AZT/3TC/EFV", "AZT/3TC/LPV/r", "AZT/3TC/NVP"])
     builder.at_least_of_total(80)
 
     return builder.get()
@@ -250,24 +260,26 @@ def guideline_paed1l_check():
 def no_negatives_check():
     builder = DefinitionFactory().blank().type(FACILITY_TWO_GROUPS_WITH_SAMPLE)
     builder.add_group("G1", VALUE, CURRENT_CYCLE, CONSUMPTION_MODEL,
-                      ["opening_balance", "consumption", "closing_balance", "estimated_number_of_new_patients"],
+                      ["opening_balance", "consumption", "closing_balance", "estimated_number_of_new_patients",
+                       "quantity_received"],
                       [])
     builder.has_no_negatives()
     return builder.get()
 
 
 def no_blanks_check():
-    builder = DefinitionFactory().blank().type(FACILITY_TWO_GROUPS_WITH_SAMPLE)
+    builder = DefinitionFactory().blank().type(FACILITY_ONE_GROUP)
     builder.add_group("G1", VALUE, CURRENT_CYCLE, CONSUMPTION_MODEL,
-                      ["opening_balance", "consumption", "closing_balance", "estimated_number_of_new_patients"],
-                      [])
+                      ["opening_balance", "consumption", "loses_adjustments", "closing_balance", "quantity_received"],
+                      ["Tenofovir/Lamivudine/Efavirenz (TDF/3TC/EFV) 300mg/300mg/600mg[Pack 30]",
+                       "Abacavir/Lamivudine (ABC/3TC) 60mg/30mg [Pack 60]", "Efavirenz (EFV) 200mg [Pack 90]"])
     builder.has_no_blanks()
     return builder.get()
 
 
 def volume_tally_check():
     builder = DefinitionFactory().blank().type(FACILITY_TWO_GROUPS_WITH_SAMPLE)
-    builder.add_group("G1", SUM, CURRENT_CYCLE, CONSUMPTION_MODEL, ["consumption"], [],
+    builder.add_group("Patients in Current Cycle", SUM, CURRENT_CYCLE, CONSUMPTION_MODEL, ["consumption"], [],
                       factors={
                           "Tenofovir/Lamivudine/Efavirenz (TDF/3TC/EFV) 300mg/300mg/600mg[Pack 30]": 0.5,
                           "Abacavir/Lamivudine (ABC/3TC) 60mg/30mg [Pack 60]": 1 / 4.6,
@@ -312,6 +324,15 @@ def stable_consumption_check():
     return builder.get()
 
 
+def stable_patients_check():
+    builder = DefinitionFactory().blank().type(FACILITY_TWO_GROUPS_WITH_SAMPLE)
+    thresholds = {Tracer.F1().key: 20, Tracer.F2().key: 10, Tracer.F3().key: 10}
+    builder.add_group("G1", SUM, CURRENT_CYCLE, ADULT_MODEL, ["existing", "new"], [], thresholds=thresholds)
+    builder.add_group("G2", SUM, PREVIOUS_CYCLE, ADULT_MODEL, ["existing", "new"], [], thresholds=thresholds)
+    builder.percentage_variance_is_less_than(50)
+    return builder.get()
+
+
 def warehouse_fulfillment_check():
     builder = DefinitionFactory().blank().type(FACILITY_TWO_GROUPS_WITH_SAMPLE)
     builder.add_group("G1", VALUE, CURRENT_CYCLE, CONSUMPTION_MODEL, ["quantity_received"], [])
@@ -321,42 +342,48 @@ def warehouse_fulfillment_check():
 
 
 def nnrti_paed():
-    builder = DefinitionFactory().blank().type(FACILITY_TWO_GROUPS_WITH_SAMPLE)
+    builder = DefinitionFactory().blank().type(FACILITY_TWO_GROUPS)
     builder.add_group("G1", SUM, CURRENT_CYCLE, CONSUMPTION_MODEL, ["consumption"], [
         "Abacavir/Lamivudine (ABC/3TC) 60mg/30mg [Pack 60]",
-        "Zidovudine/Lamivudine (AZT/3TC) 60mg/30mg [Pack 60]",
-        "Efavirenz (EFV) 200mg [Pack 90]"
+        "Zidovudine/Lamivudine (AZT/3TC) 60mg/30mg [Pack 60]"
     ], factors={
-        "Efavirenz (EFV) 200mg [Pack 90]": 1,
-        "Abacavir/Lamivudine (ABC/3TC) 60mg/30mg [Pack 60]": 4.6,
-        "Zidovudine/Lamivudine (AZT/3TC) 60mg/30mg [Pack 60]": 4.6,
+        "Zidovudine/Lamivudine (AZT/3TC) 60mg/30mg [Pack 60]": "0.25",
+        "Abacavir/Lamivudine (ABC/3TC) 60mg/30mg [Pack 60]": "0.5",
     })
     builder.add_group("G2", SUM, CURRENT_CYCLE, CONSUMPTION_MODEL, ["consumption"], [
-        "Nevirapine (NVP) 50mg [Pack 60]",
-        "Lopinavir/Ritonavir (LPV/r) 80mg/20ml oral susp [Bottle 60ml]",
+        "Efavirenz (EFV) 200mg [Pack 90]",
         "Lopinavir/Ritonavir (LPV/r) 100mg/25mg",
-    ])
+        "Nevirapine (NVP) 50mg [Pack 60]",
+        "Lopinavir/Ritonavir (LPV/r) 40mg/10mg Pellets [Pack of 120]",
+    ], factors={'Efavirenz (EFV) 200mg [Pack 90]': '0.5',
+                'Lopinavir/Ritonavir (LPV/r) 100mg/25mg': '0.5',
+                'Lopinavir/Ritonavir (LPV/r) 40mg/10mg Pellets [Pack of 120]': '0.25',
+                'Nevirapine (NVP) 50mg [Pack 60]': '0.5',
+                'consumption': 1})
     builder.percentage_variance_is_less_than(30)
     return builder.get()
 
 
 def nnrti_adult():
-    builder = DefinitionFactory().blank().type(FACILITY_TWO_GROUPS_WITH_SAMPLE)
+    builder = DefinitionFactory().blank().type(FACILITY_TWO_GROUPS)
     builder.add_group("G1", SUM, CURRENT_CYCLE, CONSUMPTION_MODEL, ["consumption"], [
-        "Zidovudine/Lamivudine (AZT/3TC) 300mg/150mg [Pack 60]",
+        "Abacavir/Lamivudine (ABC/3TC) 600mg/300mg [Pack 30]",
         "Tenofovir/Lamivudine (TDF/3TC) 300mg/300mg [Pack 30]",
-        "Abacavir/Lamivudine (ABC/3TC) 600mg/300mg [Pack 30]"
+        "Zidovudine/Lamivudine (AZT/3TC) 300mg/150mg [Pack 60]",
     ], factors={
-        "Zidovudine/Lamivudine (AZT/3TC) 300mg/150mg [Pack 60]": 2,
-        "Tenofovir/Lamivudine (TDF/3TC) 300mg/300mg [Pack 30]": 2,
-        "Abacavir/Lamivudine (ABC/3TC) 600mg/300mg [Pack 30]": 2,
+        "Zidovudine/Lamivudine (AZT/3TC) 300mg/150mg [Pack 60]": '0.5',
+        "Tenofovir/Lamivudine (TDF/3TC) 300mg/300mg [Pack 30]": '0.5',
+        "Abacavir/Lamivudine (ABC/3TC) 600mg/300mg [Pack 30]": '0.5',
     })
     builder.add_group("G2", SUM, CURRENT_CYCLE, CONSUMPTION_MODEL, ["consumption"], [
-        "Efavirenz (EFV) 600mg [Pack 30]",
-        "Nevirapine (NVP) 200mg [Pack 60]",
         "Atazanavir/Ritonavir (ATV/r) 300mg/100mg [Pack 30]",
+        "Efavirenz (EFV) 600mg [Pack 30]",
         "Lopinavir/Ritonavir (LPV/r) 200mg/50mg [Pack 120]",
-        "Dolutegravir (DTG) 50mg"
-    ])
+        "Nevirapine (NVP) 200mg [Pack 60]",
+    ], factors={'Atazanavir/Ritonavir (ATV/r) 300mg/100mg [Pack 30]': '0.5',
+                'Efavirenz (EFV) 600mg [Pack 30]': '0.5',
+                'Lopinavir/Ritonavir (LPV/r) 200mg/50mg [Pack 120]': '0.5',
+                'Nevirapine (NVP) 200mg [Pack 60]': '0.5',
+                'consumption': 1})
     builder.percentage_variance_is_less_than(30)
     return builder.get()

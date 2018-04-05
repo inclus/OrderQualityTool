@@ -1,13 +1,16 @@
+from collections import defaultdict
+
 from django.test import TestCase
 from nose_parameterized import parameterized
 
-from dashboard.checks.builder import stable_consumption_check
+from dashboard.checks.builder import stable_consumption_check, stable_patients_check
 from dashboard.checks.check import get_check_from_dict
 from dashboard.checks.legacy.cycles import StableConsumptionCheck
+from dashboard.checks.tasks import run_facility_test
 from dashboard.checks.tracer import Tracer
 from dashboard.data.entities import LocationData, C_RECORDS, FORMULATION, F1_QUERY, COMBINED_CONSUMPTION, F2_QUERY, YES, \
     NO, Location, NOT_REPORTING
-from dashboard.models import Consumption
+from dashboard.models import Consumption, FacilityTest
 
 passes = {
     "Current": LocationData.migrate_from_dict({
@@ -142,3 +145,34 @@ class StableConsumptionCheckTestCase(TestCase):
         data = new_check.get_preview_data({"name": location.facility, "district": location.district}, current_cycle,
                                           combination)
         self.assertEqual(data["result"][combination.key], expected)
+
+
+class FakeImport(object):
+
+    def __init__(self, locs, cs, ads, pds):
+        self.locs = locs
+        self.cs = cs
+        self.ads = ads
+        self.pds = pds
+
+
+class StablePatients(TestCase):
+    def test_check_runs(self):
+        scores = defaultdict(lambda: defaultdict(dict))
+        test_location = Location(facility=u'St. Michael Kanyike HC III', district=u'Mpigi District', partner='Unknown',
+                                 warehouse=u'MAUL', multiple='not', status='Not Reporting')
+        locations = [test_location]
+        consumption_records = {test_location: []}
+        adult_records = {test_location: []}
+        paed_records = {test_location: []}
+        fake_import = FakeImport(locations, consumption_records, adult_records, paed_records)
+        run_facility_test(FacilityTest.objects.get(slug="stable-patients"), fake_import, fake_import, scores)
+        self.assertEqual(scores[test_location]['STABLE PATIENTS'],
+                         {u'abc3tc-paed': 'NOT_REPORTING', u'efv200-paed': 'NOT_REPORTING',
+                          u'tdf3tcefv-adult': 'NOT_REPORTING'})
+
+    def test_check_has_correct_combinations(self):
+        new_check = get_check_from_dict(stable_patients_check())
+        combinations = new_check.get_combinations()
+        self.assertEqual(len(combinations), 3)
+        self.assertEqual([tracer.key for tracer in combinations], [u'tdf3tcefv-adult', u'abc3tc-paed', u'efv200-paed'])

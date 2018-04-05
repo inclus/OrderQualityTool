@@ -191,6 +191,7 @@ class FacilityTest(OrderedModel):
     description = models.TextField()
     short_description = models.TextField()
     featured = models.BooleanField(default=False)
+    slug = AutoSlugField(populate_from=['name'.encode('utf-8')])
 
     class Meta(OrderedModel.Meta):
         verbose_name_plural = "Facility Tests"
