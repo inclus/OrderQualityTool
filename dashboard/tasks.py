@@ -5,6 +5,7 @@ import pygogo
 from celery import shared_task
 from io import BytesIO
 
+from django.contrib.admin.models import CHANGE, LogEntry
 from raven.contrib.django.models import client
 
 from dashboard.checks.tasks import run_dynamic_checks
@@ -14,7 +15,7 @@ from dashboard.data.tasks import persist_consumption, persist_adult_records, per
     persist_multiple_order_records, add_log_entry, persist_scores
 from dashboard.utils import timeit, log_formatter
 from dashboard.medist.tasks import fetch_reports
-from dashboard.models import Cycle, Dhis2StandardReport, LocationToPartnerMapping
+from dashboard.models import Cycle, Dhis2StandardReport, LocationToPartnerMapping, DashboardUser
 
 logger = pygogo.Gogo(__name__, low_formatter=log_formatter).get_logger()
 
@@ -39,12 +40,22 @@ def update_checks(ids):
         try:
             data_import = DataImport(None, cycle.title).build_form_db(cycle)
             calculate_scores_for_checks_in_cycle(data_import)
+            make_log_entry(cycle)
         except Exception as e:
             logger.error("error",
                          extra={
                              "exception": e.message,
                              "cycle": cycle.title})
             client.captureException()
+
+
+def make_log_entry(cycle):
+    user, created = DashboardUser.objects.get_or_create(email='background_worker@service', is_active=False)
+    LogEntry.objects.create(
+        user_id=user.id,
+        action_flag=CHANGE,
+        change_message="Updated Scores for cycle %s" % cycle.title,
+    )
 
 
 def to_mon(first_month_match):
