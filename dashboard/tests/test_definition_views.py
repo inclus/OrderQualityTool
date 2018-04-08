@@ -3,7 +3,8 @@ from json import loads
 from django.test import TestCase
 from django_webtest import WebTest
 
-from dashboard.checks.builder import DefinitionFactory
+from dashboard.checks.builder import DefinitionFactory, stable_patients_check
+from dashboard.checks.tracer import Tracer
 from dashboard.tests.test_helpers import gen_adult_record, gen_paed_record, gen_consumption_record
 from hamcrest import *
 
@@ -21,6 +22,32 @@ class DefinitionSerializerTestCase(TestCase):
 
 
 class PreviewLocationsViewTestCase(WebTest):
+    def test_that_locations_for_traced_checks_shows_up(self):
+        definition = stable_patients_check()
+        url = "/api/tests/preview/locations"
+        formulations = Tracer.F1().patient_formulations
+        gen_adult_record(formulation=formulations[0])
+        gen_adult_record(name="loc2", formulation=formulations[1])
+        response = self.app.post_json(url, user="testuser", params=definition)
+        json_response = response.content.decode('utf8')
+        self.assertEqual(200, response.status_code)
+        locations = loads(json_response).get('locations', [])
+        self.assertEqual(2, len(locations))
+        assert_that(locations, has_item(has_entries(
+            {
+                "name": equal_to("loc1"),
+                "district": equal_to("dis1"),
+                "cycles": equal_to(["cycle1"])
+            }
+        )))
+        assert_that(locations, has_item(has_entries(
+            {
+                "name": equal_to("loc2"),
+                "district": equal_to("dis1"),
+                "cycles": equal_to(["cycle1"])
+            }
+        )))
+
     def test_that_only_locations_with_data_show_up(self):
         url = "/api/tests/preview/locations"
         gen_adult_record()

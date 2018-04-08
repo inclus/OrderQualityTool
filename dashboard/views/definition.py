@@ -1,7 +1,7 @@
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from dashboard.views.serializers import DefinitionSerializer, DefinitionSampleSerializer
+from dashboard.views.serializers import DefinitionSampleSerializer, DefinitionSerializer
 
 
 class PreviewDefinitionView(APIView):

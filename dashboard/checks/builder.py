@@ -225,8 +225,7 @@ def guideline_adherence_adult1l_check():
                       ["new"],
                       ["ABC/3TC/AZT (ADULT)", "ABC/3TC/AZT (PMTCT)", 'ABC/3TC/EFV (ADULT)', 'ABC/3TC/EFV (PMTCT)',
                        'ABC/3TC/NVP (ADULT)', 'ABC/3TC/NVP (PMTCT)', 'AZT/3TC/EFV (ADULT)', 'AZT/3TC/EFV (PMTCT)',
-                       'AZT/3TC/NVP (ADULT)', 'AZT/3TC/NVP (PMTCT)', 'TDF/3TC/AZT (ADULT)', 'TDF/3TC/AZT (PMTCT)',
-                       'TDF/3TC/EFV (ADULT)', 'TDF/3TC/EFV (PMTCT)'])
+                       'AZT/3TC/NVP (ADULT)', 'AZT/3TC/NVP (PMTCT)', 'TDF/3TC/AZT (ADULT)', 'TDF/3TC/AZT (PMTCT)'])
     builder.at_least_of_total(90)
 
     return builder.get()
@@ -268,11 +267,10 @@ def no_negatives_check():
 
 
 def no_blanks_check():
-    builder = DefinitionFactory().blank().type(FACILITY_ONE_GROUP)
+    builder = DefinitionFactory().blank().type(FACILITY_TWO_GROUPS_WITH_SAMPLE)
     builder.add_group("G1", VALUE, CURRENT_CYCLE, CONSUMPTION_MODEL,
-                      ["opening_balance", "consumption", "loses_adjustments", "closing_balance", "quantity_received"],
-                      ["Tenofovir/Lamivudine/Efavirenz (TDF/3TC/EFV) 300mg/300mg/600mg[Pack 30]",
-                       "Abacavir/Lamivudine (ABC/3TC) 60mg/30mg [Pack 60]", "Efavirenz (EFV) 200mg [Pack 90]"])
+                      ["opening_balance", "closing_balance", "loses_adjustments", "quantity_received", "consumption"],
+                      [])
     builder.has_no_blanks()
     return builder.get()
 

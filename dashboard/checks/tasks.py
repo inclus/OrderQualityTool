@@ -28,11 +28,7 @@ def run_dynamic_checks(report):
     other_report = get_report_for_other_cycle(report)
     facility_tests = FacilityTest.objects.all()
     for check_obj in facility_tests:
-        # try:
         run_facility_test(check_obj, report, other_report, scores)
-    # except Exception as e:
-    #     logger.info("error running tests", extra={"error": e.message, "check": check_obj.name})
-    #     client.captureException()
     return scores
 
 
@@ -48,35 +44,3 @@ def run_facility_test(check_obj, report, other_report, scores):
                     facility_data,
                     combination,
                     other_facility_data)
-
-
-@timeit
-def run_checks(report):
-    scores = defaultdict(lambda: defaultdict(dict))
-    other_report = get_report_for_other_cycle(report)
-    checks = [
-        BlanksQualityCheck(),
-        NegativeNumbersQualityCheck(),
-        VolumeTallyCheck(),
-        MultipleCheck(),
-        IsReportingCheck(),
-        GuidelineAdherenceCheckAdult1L(),
-        GuidelineAdherenceCheckAdult2L(),
-        GuidelineAdherenceCheckPaed1L(),
-        NNRTIADULTSCheck(),
-        NNRTIPAEDCheck(),
-        BalancesMatchCheck(),
-        OrdersOverTimeCheck(),
-        StableConsumptionCheck(),
-        WarehouseFulfillmentCheck(),
-        StablePatientVolumesCheck()
-    ]
-    for location in report.locs:
-        facility_data = enrich_location_data(location, report)
-        other_facility_data = enrich_location_data(location, other_report)
-        for check in checks:
-            for combination in check.combinations:
-                scores[location][check.test][combination[NAME]] = check.for_each_facility(facility_data,
-                                                                                          combination,
-                                                                                          other_facility_data)
-    return scores

@@ -3,34 +3,16 @@ from collections import defaultdict
 
 import attr
 from pydash import py_, pick
-from pymaybe import maybe
 
 from dashboard.checks.aggregations import available_aggregations
+from dashboard.checks.builder import FACILITY_TWO_GROUPS_WITH_SAMPLE
 from dashboard.checks.comparisons import available_comparisons
-from dashboard.checks.tracer import Tracer
-from dashboard.checks.utils import as_float_or_1, as_number
 from dashboard.checks.entities import Definition, GroupResult, DataRecord
-from dashboard.helpers import get_prev_cycle, DEFAULT, YES, NO, N_A
+from dashboard.checks.legacy.check import facility_not_reporting
+from dashboard.checks.tracer import Tracer
+from dashboard.checks.utils import as_float_or_1
+from dashboard.helpers import get_prev_cycle, YES, NO, N_A
 from dashboard.utils import timeit
-
-
-def factor_values_by_formulation(formulations, factors):
-    if not factors:
-        factors = {}
-
-    def _p(values):
-        values = list(values)
-        formulation_name = values[0]
-        factor = as_float_or_1(factors.get(formulation_name, 1))
-        for index, value in enumerate(values):
-            if index != 0:
-                is_numerical, numerical_value = as_number(value)
-                if numerical_value:
-                    values[index] = numerical_value * factor
-
-        return values
-
-    return _p
 
 
 def as_data_records(fields):
@@ -129,13 +111,24 @@ class DBBasedCheckPreview(DynamicCheckMixin):
             model = group.model.as_model()
             if model:
                 field_filters = build_field_filters(group.selected_fields)
-                base_queryset = model.objects.filter(formulation__in=self.get_formulations(group),
+                formulations = self.get_preview_formulations(group)
+
+                base_queryset = model.objects.filter(formulation__in=formulations,
                                                      **field_filters)
                 raw_locations.extend(
                     base_queryset.order_by('name').values(
                         'name', 'district', 'cycle').distinct())
         locations = py_(raw_locations).uniq().group_by('name').map(as_loc).sort_by("name").value()
         return {"locations": locations}
+
+    def get_preview_formulations(self, group):
+        if self.definition.type.get("id") == FACILITY_TWO_GROUPS_WITH_SAMPLE:
+            models = {'Adult': "patient_formulations", 'Paed': "patient_formulations",
+                      'Consumption': "consumption_formulations"}
+            key = models.get(group.model.id)
+            return py_(group.model.tracing_formulations).map(lambda x: x.get(key)).flatten().value()
+        else:
+            return group.selected_formulations
 
     def get_result_key(self, sample_tracer):
         if sample_tracer:
@@ -154,6 +147,8 @@ class UserDefinedFacilityCheck(DBBasedCheckPreview):
             values_for_group = self._group_values_from_location_data(group, facility_data, other_facility_data,
                                                                      combination)
             groups.append(values_for_group)
+        if facility_not_reporting(facility_data):
+            return "NOT_REPORTING"
         comparison_result, _ = self.compare_results(groups)
         return comparison_result
 

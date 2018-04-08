@@ -78,20 +78,6 @@ class PercentageVarianceLessThanComparison(Comparison):
         return template % (group1, group2, "less" if result else "more", constant)
 
 
-class WithinComparison(Comparison):
-    def compare(self, group1, group2, constant=100.0):
-        group2 = maybe(group2).or_else(0)
-        difference = abs(group2 - group1)
-        margin = (constant / 100.0) * group1
-        return difference < margin
-
-    def text(self, group1, group2, constant):
-        result = self.compare(group1, group2, constant)
-        template = "%d and %d differ by %s than %s"
-        group2 = maybe(group2).or_else(0)
-        return template % (group1, group2, "less" if result else "more", constant)
-
-
 class EqualComparison(Comparison):
 
     def as_result(self, group1, group2, constant=100.0):
@@ -140,13 +126,18 @@ class NoNegativesComparison(Comparison):
         return template % ("none" if result else "some", values)
 
 
+def get_all_values_from_non_empty_groups(group1, group2):
+    return py_([group1, group2]).filter(lambda x: x is not None).flatten_deep()
+
+
 class NoBlanksComparison(Comparison):
+
     def compare(self, group1, group2, constant=100.0):
-        return py_([group1, group2]).flatten_deep().every(lambda x: x is not None).value()
+        return get_all_values_from_non_empty_groups(group1, group2).every(lambda x: x is not None).value()
 
     def text(self, group1, group2, constant):
         result = self.compare(group1, group2, constant)
-        values = py_([group1, group2]).flatten_deep().value()
+        values = get_all_values_from_non_empty_groups(group1, group2).value()
         template = "%s of the values %s are blank"
         return template % ("none" if result else "some", values)
 
@@ -186,6 +177,5 @@ available_comparisons = {
     "AreNotEqual": NotEqualComparison,
     "NoNegatives": NoNegativesComparison,
     "NoBlanks": NoBlanksComparison,
-    "Within": WithinComparison,
     "AtLeastNOfTotal": AtLeastNOfTotal,
 }

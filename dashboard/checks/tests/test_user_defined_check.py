@@ -19,7 +19,8 @@ class UserDefinedCheckTestCase(TestCase):
         has_no_negatives = LocationData.migrate_from_dict({
             C_RECORDS: [
                 {OPENING_BALANCE: 3, FORMULATION: F1_QUERY}
-            ]
+            ],
+            'status': 'reporting',
         })
         definition_builder = DefinitionFactory().initial().formulations(F1_QUERY)
         definition_builder.fields("opening_balance", "closing_balance")
@@ -48,6 +49,8 @@ class UserDefinedCheckTestCase(TestCase):
         output = check.get_values_from_records(test_location_data.c_records, group.selected_formulations,
                                                group.selected_fields)
         self.assertEqual(output, [DataRecord.from_list([F1_QUERY, 3], group.selected_fields)])
+
+
 F1_PATIENT_QUERY = ["TDF/3TC/EFV (PMTCT)", "TDF/3TC/EFV (ADULT)"]
 
 insufficient_data = LocationData.migrate_from_dict({
@@ -106,18 +109,21 @@ class TestGuideLineAdherence(TestCase):
 
 has_no_data = LocationData.migrate_from_dict({})
 has_no_negatives = LocationData.migrate_from_dict({
+    'status': 'reporting',
     C_RECORDS: [
         {OPENING_BALANCE: 3, FORMULATION: F1_QUERY}
     ]
 })
 
 has_blanks = LocationData.migrate_from_dict({
+    'status': 'reporting',
     C_RECORDS: [
         {OPENING_BALANCE: None, FORMULATION: F1_QUERY}
     ]
 })
 
 has_negatives = LocationData.migrate_from_dict({
+    'status': 'reporting',
     C_RECORDS: [
         {OPENING_BALANCE: -3, FORMULATION: F1_QUERY}
     ]

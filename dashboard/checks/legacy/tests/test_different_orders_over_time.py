@@ -9,20 +9,24 @@ from dashboard.data.entities import LocationData
 from dashboard.helpers import C_RECORDS, FORMULATION, F1_QUERY, OPENING_BALANCE, COMBINED_CONSUMPTION, YES, \
     NOT_REPORTING, NO, DAYS_OUT_OF_STOCK, F1
 
-
 one_zero = LocationData.migrate_from_dict(
-    {C_RECORDS: [{FORMULATION: F1_QUERY, OPENING_BALANCE: 12, DAYS_OUT_OF_STOCK: 0, COMBINED_CONSUMPTION: 4}]})
+    {C_RECORDS: [{FORMULATION: F1_QUERY, OPENING_BALANCE: 12, DAYS_OUT_OF_STOCK: 0, COMBINED_CONSUMPTION: 4}],
+     'status': 'reporting'})
 
 other_formulation = LocationData.migrate_from_dict(
-    {C_RECORDS: [{FORMULATION: "the", OPENING_BALANCE: 12, DAYS_OUT_OF_STOCK: 3, COMBINED_CONSUMPTION: 4}]})
+    {C_RECORDS: [{FORMULATION: "the", OPENING_BALANCE: 12, DAYS_OUT_OF_STOCK: 3, COMBINED_CONSUMPTION: 4}],
+     'status': 'reporting'})
 
 all_zeros = LocationData.migrate_from_dict(
-    {C_RECORDS: [{FORMULATION: F1_QUERY, OPENING_BALANCE: 0, DAYS_OUT_OF_STOCK: 0, COMBINED_CONSUMPTION: 0}]})
+    {C_RECORDS: [{FORMULATION: F1_QUERY, OPENING_BALANCE: 0, DAYS_OUT_OF_STOCK: 0, COMBINED_CONSUMPTION: 0}],
+     'status': 'reporting'})
 all_blanks = LocationData.migrate_from_dict(
-    {C_RECORDS: [{FORMULATION: F1_QUERY, OPENING_BALANCE: None, DAYS_OUT_OF_STOCK: None, COMBINED_CONSUMPTION: None}]})
+    {C_RECORDS: [{FORMULATION: F1_QUERY, OPENING_BALANCE: None, DAYS_OUT_OF_STOCK: None, COMBINED_CONSUMPTION: None}],
+     'status': 'reporting'})
 
 base = LocationData.migrate_from_dict(
-    {C_RECORDS: [{FORMULATION: F1_QUERY, OPENING_BALANCE: 12, DAYS_OUT_OF_STOCK: 3, COMBINED_CONSUMPTION: 4}]})
+    {C_RECORDS: [{FORMULATION: F1_QUERY, OPENING_BALANCE: 12, DAYS_OUT_OF_STOCK: 3, COMBINED_CONSUMPTION: 4}],
+     'status': 'reporting'})
 
 
 class TestDIFFERENTORDERSOVERTIMECheck(TestCase):

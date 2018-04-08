@@ -6,7 +6,7 @@ def sum_aggregation(values):
 
 
 def avg_aggregation(values):
-    return py_(values).reject(lambda x: x is None).avg().value()
+    return py_(values).reject(lambda x: x is None).mean().value()
 
 
 def values_aggregation(values):
