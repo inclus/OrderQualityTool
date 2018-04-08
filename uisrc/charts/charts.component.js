@@ -2,6 +2,11 @@ var chartsController = ["$scope", "chartsService", function ($scope, chartsServi
     var ctrl = this;
     ctrl.select = function (test) {
         ctrl.selectedTest = test;
+        if (test.sampled) {
+            ctrl.selectedRegimen = test.regimens[0].slug;
+        } else {
+            ctrl.selectedRegimen = null;
+        }
         var regimen = null;
         if (ctrl.selectedRegimen) {
             regimen = ctrl.selectedRegimen;
@@ -9,13 +14,6 @@ var chartsController = ["$scope", "chartsService", function ($scope, chartsServi
         chartsService.buildOptions(test, ctrl.selectedDistrict, ctrl.selectedIp, ctrl.selectedWarehouse, ctrl.startCycle, ctrl.endCycle, regimen).then(function (options) {
             ctrl.options = options;
         });
-
-        if (test.sampled) {
-            ctrl.selectedRegimen = test.regimens[0].slug;
-        } else {
-            ctrl.selectedRegimen = null;
-        }
-
     };
     chartsService.getTests().then(function (data) {
         ctrl.featuredTests = data.featured;
