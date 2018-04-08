@@ -324,9 +324,15 @@ def stable_consumption_check():
 
 def stable_patients_check():
     builder = DefinitionFactory().blank().type(FACILITY_TWO_GROUPS_WITH_SAMPLE)
-    thresholds = {Tracer.F1().key: 20, Tracer.F2().key: 10, Tracer.F3().key: 10}
-    builder.add_group("G1", SUM, CURRENT_CYCLE, ADULT_MODEL, ["existing", "new"], [], thresholds=thresholds)
-    builder.add_group("G2", SUM, PREVIOUS_CYCLE, ADULT_MODEL, ["existing", "new"], [], thresholds=thresholds)
+    f2 = Tracer.F2()
+    f3 = Tracer.F3()
+    thresholds = {Tracer.F1().key: "20", f2.key: "10", f3.key: "10"}
+    model_overrides = {f2.key: {"id": "Paed", "formulations": f2.patient_formulations},
+                       f3.key: {"id": "Paed", "formulations": f3.patient_formulations}}
+    builder.add_group("G1", SUM, CURRENT_CYCLE, ADULT_MODEL, ["existing", "new"], [], thresholds=thresholds,
+                      model_overrides=model_overrides)
+    builder.add_group("G2", SUM, PREVIOUS_CYCLE, ADULT_MODEL, ["existing", "new"], [], thresholds=thresholds,
+                      model_overrides=model_overrides)
     builder.percentage_variance_is_less_than(50)
     return builder.get()
 

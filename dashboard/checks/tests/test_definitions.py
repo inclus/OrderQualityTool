@@ -19,6 +19,7 @@ class FacilityTestDefinitions(TestCase):
     def test_definitions_match(self, name, check):
         test_obj = FacilityTest.objects.get(name=check['fields']['name'])
         generated_definition = json.loads(test_obj.definition)
+        print("---"*10, check['fields']['name'])
         customised_definition = json.loads(check['fields']['definition'])
         ignore_list = {
             'type.calculations',
@@ -39,10 +40,6 @@ class FacilityTestDefinitions(TestCase):
             ('groups', 1, 'model', 'fields'),
             ('groups', 0, 'model', 'selectId'),
             ('groups', 1, 'model', 'selectId'),
-            ('groups', 0, 'sample_formulation_model_overrides'),
-            ('groups', 1, 'sample_formulation_model_overrides'),
-            ('groups', 0, 'sample_formulation_model_overridden'),
-            ('groups', 1, 'sample_formulation_model_overridden'),
             ('groups', 0, 'cycles'),
             ('groups', 1, 'cycles'),
             ('groups', 0, 'aggregation'),
@@ -52,7 +49,7 @@ class FacilityTestDefinitions(TestCase):
                            ignore=ignore_list))
         pp = pprint.PrettyPrinter(indent=4)
         pp.pprint(output)
-        self.assertLess(len(output), 4)
+        self.assertLess(len(output), 3)
 
     @parameterized.expand(scenarios)
     def test_descriptions_match(self, name, check):
