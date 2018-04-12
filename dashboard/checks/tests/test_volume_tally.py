@@ -1,5 +1,5 @@
 from django.test import TestCase
-from nose_parameterized import parameterized
+from parameterized import parameterized
 
 from dashboard.checks.builder import volume_tally_check
 from dashboard.checks.legacy.volumetally import VolumeTallyCheck

@@ -4,7 +4,7 @@ import pprint
 
 from dictdiffer import diff
 from django.test import TestCase
-from nose_parameterized import parameterized
+from parameterized import parameterized
 
 from dashboard.models import FacilityTest
 

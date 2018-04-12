@@ -1,5 +1,5 @@
 from django.test import TestCase
-from nose_parameterized import parameterized
+from parameterized import parameterized
 
 from dashboard.checks.builder import DefinitionFactory, guideline_adherence_adult1l_check, no_negatives_check
 from dashboard.checks.entities import DefinitionGroup, DataRecord

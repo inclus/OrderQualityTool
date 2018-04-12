@@ -24,6 +24,7 @@ class ScoreSerializer(ModelSerializer):
 
     class Meta:
         model = Score
+        fields = '__all__'
 
 
 class NewImportSerializer(serializers.Serializer):

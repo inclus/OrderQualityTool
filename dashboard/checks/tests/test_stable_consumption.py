@@ -1,7 +1,7 @@
 from collections import defaultdict
 
 from django.test import TestCase
-from nose_parameterized import parameterized
+from parameterized import parameterized
 
 from dashboard.checks.builder import stable_consumption_check, stable_patients_check
 from dashboard.checks.check import get_check_from_dict

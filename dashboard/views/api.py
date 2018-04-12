@@ -2,6 +2,7 @@ import csv
 import json
 from functools import cmp_to_key
 
+import django_filters
 import pydash
 import pygogo
 from braces.views import LoginRequiredMixin
@@ -10,14 +11,13 @@ from django.db.models import Count, Sum
 from django.db.models.expressions import F
 from django.forms import model_to_dict
 from django.http import HttpResponse
-from rest_framework import filters
 from rest_framework.generics import ListAPIView
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from dashboard.checks.builder import FACILITY_TWO_GROUPS_WITH_SAMPLE
 from dashboard.helpers import *
-from dashboard.models import Score, WAREHOUSE, DISTRICT, MultipleOrderFacility, Cycle, MOH_CENTRAL, Consumption, \
+from dashboard.models import Score, WAREHOUSE, DISTRICT, Cycle, MOH_CENTRAL, Consumption, \
     AdultPatientsRecord, PAEDPatientsRecord, FacilityTest, TracingFormulations
 from dashboard.serializers import ScoreSerializer, NewImportSerializer
 from dashboard.tasks import import_data_from_dhis2
@@ -247,7 +247,7 @@ class FilterValuesView(APIView):
 class FacilityTestCycleScoresListView(ListAPIView):
     queryset = Score.objects.all()
     serializer_class = ScoreSerializer
-    filter_backends = (filters.DjangoFilterBackend,)
+    filter_backends = (django_filters.rest_framework.DjangoFilterBackend,)
     filter_fields = ('cycle', 'name', 'ip', 'warehouse', 'district')
 
 
@@ -282,6 +282,7 @@ class AdminAccessView(APIView):
 
 logger = pygogo.Gogo(__name__, low_formatter=log_formatter).get_logger()
 logger.setLevel("INFO" if should_log_time() else "ERROR")
+
 
 class NewImportView(APIView):
     def post(self, request):

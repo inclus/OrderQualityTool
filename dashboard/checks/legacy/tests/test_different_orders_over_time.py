@@ -1,5 +1,5 @@
 from django.test import TestCase
-from nose_parameterized import parameterized
+from parameterized import parameterized
 
 from dashboard.checks.builder import non_repeating_check
 from dashboard.checks.legacy.cycles import OrdersOverTimeCheck

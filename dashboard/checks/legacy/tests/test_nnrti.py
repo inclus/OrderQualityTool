@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from nose_parameterized import parameterized
+from parameterized import parameterized
 
 from dashboard.checks.legacy.nn import NNRTIADULTSCheck, NNRTIPAEDCheck
 from dashboard.data.entities import LocationData

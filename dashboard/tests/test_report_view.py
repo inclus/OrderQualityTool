@@ -3,7 +3,7 @@ import random
 from django.core.urlresolvers import reverse
 from django_webtest import WebTest
 from model_mommy import mommy
-from nose_parameterized import parameterized
+from parameterized import parameterized
 
 from dashboard.models import Score, DashboardUser
 

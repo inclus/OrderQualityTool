@@ -65,7 +65,7 @@ class ExcelDataImport(DataImport):
         return "ExcelDataImport %s" % self.cycle
 
     def get_workbook(self):
-        return load_workbook(self.raw_data, read_only=True, use_iterators=True)
+        return load_workbook(self.raw_data, read_only=True)
 
     def load(self, partner_mapping=None):
         self.workbook = self.get_workbook()
@@ -77,10 +77,10 @@ class ExcelDataImport(DataImport):
         return self
 
     def paed_patients(self, cache):
-        paed_patients_sheet = self.workbook.get_sheet_by_name(PATIENTS_PAED_SHEET)
+        paed_patients_sheet = self.workbook[PATIENTS_PAED_SHEET]
         records = defaultdict(list)
-        for row in paed_patients_sheet.iter_rows(
-                        'A%s:M%s' % (paed_patients_sheet.min_row + 1, paed_patients_sheet.max_row)):
+        for row in paed_patients_sheet[
+                        'A%s:M%s' % (paed_patients_sheet.min_row + 1, paed_patients_sheet.max_row)]:
             facility_key = get_real_facility_name(row[1].value, row[8].value)
             location = cache.get(facility_key, None)
             if facility_key and location:
@@ -95,10 +95,10 @@ class ExcelDataImport(DataImport):
         return records
 
     def adult_patients(self, cache):
-        adult_patients_sheet = self.workbook.get_sheet_by_name(PATIENTS_ADULT_SHEET)
+        adult_patients_sheet = self.workbook[PATIENTS_ADULT_SHEET]
         records = defaultdict(list)
-        for row in adult_patients_sheet.iter_rows(
-                        'A%s:M%s' % (adult_patients_sheet.min_row + 1, adult_patients_sheet.max_row)):
+        for row in adult_patients_sheet[
+                        'A%s:M%s' % (adult_patients_sheet.min_row + 1, adult_patients_sheet.max_row)]:
             facility_key = get_real_facility_name(row[1].value, row[8].value)
             location = cache.get(facility_key, None)
             if facility_key and location:
@@ -113,9 +113,9 @@ class ExcelDataImport(DataImport):
         return records
 
     def locations(self):
-        location_sheet = self.workbook.get_sheet_by_name(LOCATION)
+        location_sheet = self.workbook[LOCATION]
         facility_data = []
-        for row in location_sheet.iter_rows('B%s:J%s' % (location_sheet.min_row + 3, location_sheet.max_row)):
+        for row in location_sheet['B%s:J%s' % (location_sheet.min_row + 3, location_sheet.max_row)]:
             if row[0].value:
                 data = dict()
                 data[SCORES] = defaultdict(dict)
@@ -130,9 +130,9 @@ class ExcelDataImport(DataImport):
         return facility_data
 
     def consumption_records(self, cache):
-        consumption_sheet = self.workbook.get_sheet_by_name(CONSUMPTION_SHEET)
+        consumption_sheet = self.workbook[CONSUMPTION_SHEET]
         records = defaultdict(list)
-        for row in consumption_sheet.iter_rows('A%s:X%s' % (consumption_sheet.min_row + 1, consumption_sheet.max_row)):
+        for row in consumption_sheet['A%s:X%s' % (consumption_sheet.min_row + 1, consumption_sheet.max_row)]:
             facility_key = get_real_facility_name(row[1].value, row[17].value)
             location = cache.get(facility_key, None)
             if facility_key and location:

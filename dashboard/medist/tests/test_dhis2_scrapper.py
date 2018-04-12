@@ -1,6 +1,6 @@
 from django.test import TestCase
 from mock import patch, mock
-from nose_parameterized import parameterized
+from parameterized import parameterized
 
 from dashboard.medist.scrapper import DHIS2Scrapper, get_html_table
 

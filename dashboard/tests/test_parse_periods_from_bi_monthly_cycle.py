@@ -1,5 +1,5 @@
 from django.test import TestCase
-from nose_parameterized import parameterized
+from parameterized import parameterized
 
 from dashboard.tasks import parse_periods_from_bi_monthly_cycle
 
