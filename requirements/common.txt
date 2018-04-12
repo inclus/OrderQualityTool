@@ -42,3 +42,4 @@ pathlib2==2.3.0
 contextlib2==0.5.5
 django-extensions==2.0.6
 dictdiffer
+future==0.16.0
