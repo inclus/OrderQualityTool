@@ -41,22 +41,12 @@ def update_checks(ids):
         try:
             data_import = DataImport(None, cycle.title).build_form_db(cycle)
             calculate_scores_for_checks_in_cycle(data_import)
-            make_log_entry(cycle)
         except Exception as e:
             logger.error("error",
                          extra={
                              "exception": e.message,
                              "cycle": cycle.title})
             client.captureException()
-
-
-def make_log_entry(cycle):
-    user, created = DashboardUser.objects.get_or_create(email='background_worker@service', is_active=False)
-    LogEntry.objects.create(
-        user_id=user.id,
-        action_flag=CHANGE,
-        change_message="Updated Scores for cycle %s" % cycle.title,
-    )
 
 
 def to_mon(first_month_match):
