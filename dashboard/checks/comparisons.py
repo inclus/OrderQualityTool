@@ -148,7 +148,8 @@ class AtLeastNOfTotal(Comparison):
             lambda gr: gr.all_values_blank()).value()
         if one_group_has_all_blank:
             return True
-        if len(groups) > 1 and groups[1].aggregate == 0:
+        denominator = groups[1].aggregate + groups[0].aggregate
+        if len(groups) > 1 and denominator == 0:
             return False
         return super(AtLeastNOfTotal, self).groups_have_adequate_data(groups)
 
