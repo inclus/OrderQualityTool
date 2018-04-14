@@ -156,7 +156,7 @@ class AtLeastNOfTotal(Comparison):
     def compare(self, group1, group2, constant=100.0):
         old_value = maybe(group1).or_else(0)
         new_value = maybe(group2).or_else(0)
-        if new_value == 0:
+        if (new_value + old_value) == 0:
             return False
         total = new_value + old_value
         adjusted_total = (constant / 100.0) * total
@@ -166,8 +166,8 @@ class AtLeastNOfTotal(Comparison):
         result = self.compare(group1, group2, constant)
         new_value = maybe(group2).or_else(0)
         total = maybe(group1).or_else(0) + new_value
-        if new_value == 0:
-            return "second value is zero so the check fails"
+        if  total == 0:
+            return "denominator value is zero so the check fails"
         template = "%s is %s than %s%% of %s"
         return template % (group1, "more" if result else "less", constant, total)
 

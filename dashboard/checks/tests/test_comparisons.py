@@ -5,25 +5,6 @@ from dashboard.checks.comparisons import calculate_percentage_variance, Percenta
 from dashboard.checks.entities import GroupResult, DefinitionGroup, GroupModel, DefinitionOption, DataRecord
 from dashboard.checks.tracer import Tracer
 
-
-class TestPercentageVarianceLessThanComparison(TestCase):
-    def test_differ_by_less_than_50(self):
-        self.assertFalse(PercentageVarianceLessThanComparison().compare(100, 201, 50))
-        self.assertFalse(PercentageVarianceLessThanComparison().compare(-11.5, None, 50))
-        self.assertFalse(PercentageVarianceLessThanComparison().compare(201, 100, 50))
-        self.assertTrue(PercentageVarianceLessThanComparison().compare(200, 100, 50))
-        self.assertTrue(PercentageVarianceLessThanComparison().compare(30, 60, 50))
-
-    def test_dont_differ_by_less_than_50(self):
-        self.assertTrue(PercentageVarianceLessThanComparison().compare(10, 14, 50))
-        self.assertAlmostEqual(calculate_percentage_variance(10, 14.0), 400.0 / 14)
-        self.assertFalse(PercentageVarianceLessThanComparison().compare(0, 3, 50))
-        self.assertEquals(calculate_percentage_variance(3, 0), 100)
-        self.assertFalse(PercentageVarianceLessThanComparison().compare(3, 0, 50))
-        self.assertTrue(PercentageVarianceLessThanComparison().compare(14, 9, 50))
-        self.assertTrue(PercentageVarianceLessThanComparison().compare(10, 10, 50))
-
-
 current_cycle = DefinitionOption(id='Current', name='Current Cycle')
 previous_cycle = DefinitionOption(id='Previous', name='Previous Cycle')
 sum_comparison = DefinitionOption(id='SUM', name='SUM')
@@ -101,13 +82,13 @@ class TestThresholds(TestCase):
 class TestAtLeastNOfTotalComparison(TestCase):
     def test_comparison(self):
         self.assertTrue(AtLeastNOfTotal().compare(200, 100, 50))
-        self.assertFalse(AtLeastNOfTotal().compare(4183, None, 50))
-        self.assertEqual(AtLeastNOfTotal().text(200, None, 50), "second value is zero so the check fails")
+        self.assertTrue(AtLeastNOfTotal().compare(4183, None, 50))
+        self.assertEqual(AtLeastNOfTotal().text(200, None, 50), "200 is more than 50% of 200")
         self.assertEqual(AtLeastNOfTotal().text(200, 100, 50), "200 is more than 50% of 300")
         self.assertTrue(AtLeastNOfTotal().compare(10, 14, 10))
         self.assertTrue(AtLeastNOfTotal().compare(14, 9, 50))
         self.assertFalse(AtLeastNOfTotal().compare(10, 60, 50))
-        self.assertFalse(AtLeastNOfTotal().compare(5, 0, 90))
+        self.assertTrue(AtLeastNOfTotal().compare(5, 0, 90))
         self.assertEqual(AtLeastNOfTotal().text(10, 60, 50), "10 is less than 50% of 70")
 
     def test_groups_have_sufficient_data_if_the_aggregate_second_group_is_greater_than_zero(self):
@@ -196,3 +177,21 @@ class TestAtLeastNOfTotalComparison(TestCase):
             tracer=tracer)
 
         self.assertTrue(AtLeastNOfTotal().groups_have_adequate_data([result1, result2]))
+
+
+class TestPercentageVarianceLessThanComparison(TestCase):
+    def test_differ_by_less_than_50(self):
+        self.assertFalse(PercentageVarianceLessThanComparison().compare(100, 201, 50))
+        self.assertFalse(PercentageVarianceLessThanComparison().compare(-11.5, None, 50))
+        self.assertFalse(PercentageVarianceLessThanComparison().compare(201, 100, 50))
+        self.assertTrue(PercentageVarianceLessThanComparison().compare(200, 100, 50))
+        self.assertTrue(PercentageVarianceLessThanComparison().compare(30, 60, 50))
+
+    def test_dont_differ_by_less_than_50(self):
+        self.assertTrue(PercentageVarianceLessThanComparison().compare(10, 14, 50))
+        self.assertAlmostEqual(calculate_percentage_variance(10, 14.0), 400.0 / 14)
+        self.assertFalse(PercentageVarianceLessThanComparison().compare(0, 3, 50))
+        self.assertEquals(calculate_percentage_variance(3, 0), 100)
+        self.assertFalse(PercentageVarianceLessThanComparison().compare(3, 0, 50))
+        self.assertTrue(PercentageVarianceLessThanComparison().compare(14, 9, 50))
+        self.assertTrue(PercentageVarianceLessThanComparison().compare(10, 10, 50))
