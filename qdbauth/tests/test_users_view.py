@@ -57,5 +57,5 @@ class UserAddViewTestCase(WebTest, SuperUserAuthMixin):
         form['password2'] = "secret"
         form['access_level'] = "IP"
         response = form.submit()
-        self.assertEquals(response.status_code, 302)
-        self.assertEquals(DashboardUser.objects.count(), 3)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(DashboardUser.objects.count(), 3)
