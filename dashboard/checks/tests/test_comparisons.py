@@ -1,7 +1,7 @@
 from django.test import TestCase
 
 from dashboard.checks.comparisons import calculate_percentage_variance, PercentageVarianceLessThanComparison, \
-    AtLeastNOfTotal, Comparison
+    AtLeastNOfTotal, Comparison, PercentageVarianceLessThanComparisonForNNRTI
 from dashboard.checks.entities import GroupResult, DefinitionGroup, GroupModel, DefinitionOption, DataRecord
 from dashboard.checks.tracer import Tracer
 
@@ -195,3 +195,32 @@ class TestPercentageVarianceLessThanComparison(TestCase):
         self.assertFalse(PercentageVarianceLessThanComparison().compare(3, 0, 50))
         self.assertTrue(PercentageVarianceLessThanComparison().compare(14, 9, 50))
         self.assertTrue(PercentageVarianceLessThanComparison().compare(10, 10, 50))
+
+    def test_groups_have_sufficient_data_if_the_aggregate_for_group2_is_zero(self):
+        group1 = DefinitionGroup(name='G1', model=None, cycle=current_cycle, selected_fields=['consumption'],
+                                 selected_formulations=[], sample_formulation_model_overridden={},
+                                 sample_formulation_model_overrides={}, aggregation=sum_comparison, has_factors=None,
+                                 factors=None,
+                                 has_thresholds=False,
+                                 thresholds={u'abc3tc-paed': 10, u'efv200-paed': 10, u'tdf3tcefv-adult': 30})
+        group2 = DefinitionGroup(name='G2', model=None, cycle=previous_cycle,
+                                 selected_fields=['consumption'], selected_formulations=[],
+                                 sample_formulation_model_overridden={}, sample_formulation_model_overrides={},
+                                 aggregation=sum_comparison, has_factors=None, factors=None, has_thresholds=False,
+                                 thresholds={u'abc3tc-paed': 10, u'efv200-paed': 10, u'tdf3tcefv-adult': 20})
+        result1 = GroupResult(
+            group=group1,
+            values=None,
+            factored_records=[r1],
+            aggregate=50.0,
+            tracer=tracer
+        )
+
+        result2 = GroupResult(
+            group=group2,
+            values=None,
+            factored_records=[r2],
+            aggregate=0.0,
+            tracer=tracer)
+
+        self.assertFalse(PercentageVarianceLessThanComparisonForNNRTI().groups_have_adequate_data([result1, result2]))

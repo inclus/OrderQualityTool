@@ -78,6 +78,14 @@ class PercentageVarianceLessThanComparison(Comparison):
         return template % (group1, group2, "less" if result else "more", constant)
 
 
+class PercentageVarianceLessThanComparisonForNNRTI(PercentageVarianceLessThanComparison):
+    def groups_have_adequate_data(self, groups):
+        denominator = groups[1].aggregate
+        if len(groups) > 1 and denominator == 0:
+            return False
+        return super(PercentageVarianceLessThanComparison, self).groups_have_adequate_data(groups)
+
+
 class EqualComparison(Comparison):
 
     def as_result(self, group1, group2, constant=100.0):
@@ -166,7 +174,7 @@ class AtLeastNOfTotal(Comparison):
         result = self.compare(group1, group2, constant)
         new_value = maybe(group2).or_else(0)
         total = maybe(group1).or_else(0) + new_value
-        if  total == 0:
+        if total == 0:
             return "denominator value is zero so the check fails"
         template = "%s is %s than %s%% of %s"
         return template % (group1, "more" if result else "less", constant, total)
@@ -174,6 +182,7 @@ class AtLeastNOfTotal(Comparison):
 
 available_comparisons = {
     "LessThan": PercentageVarianceLessThanComparison,
+    "NNRTILessThan": PercentageVarianceLessThanComparisonForNNRTI,
     "AreEqual": EqualComparison,
     "AreNotEqual": NotEqualComparison,
     "NoNegatives": NoNegativesComparison,

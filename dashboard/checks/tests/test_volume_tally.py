@@ -99,13 +99,13 @@ no_data = LocationData.migrate_from_dict({})
 
 class VolumeTallyQualityCheckTestCase(TestCase):
     @parameterized.expand([
-        # ("no data", no_data, NOT_REPORTING),
-        # ("both zero", both_zero, YES),
+        ("no data", no_data, NOT_REPORTING),
+        ("both zero", both_zero, YES),
         ("patients blank", patients_blank, NO),
-        # ("consumption blank", consumption_blank, NO),
-        # ("patients zero", patients_zero, NO),
-        # ("0.7", above_30_percent, NO),
-        # ("one", below_30_percent, YES),
+        ("consumption blank", consumption_blank, NO),
+        ("patients zero", patients_zero, NO),
+        ("0.7", above_30_percent, NO),
+        ("one", below_30_percent, YES),
     ])
     def test_f1(self, name, data, expected):
         new_check = get_check_from_dict(volume_tally_check())
@@ -114,18 +114,18 @@ class VolumeTallyQualityCheckTestCase(TestCase):
         legacy_check = VolumeTallyCheck()
         legacy_check_result = legacy_check.for_each_facility(data, legacy_check.combinations[0])
         self.assertEqual(expected, legacy_check_result)
-        # self.assertEqual(legacy_check_result, new_check_result)
+        self.assertEqual(legacy_check_result, new_check_result)
 
-    # @parameterized.expand([
-    #     ("no data", no_data, NOT_REPORTING),
-    #     ("both zero", both_zero, YES),
-    #     ("below_30_percent", below_30_percent, YES),
-    # ])
-    # def test_f2(self, name, data, expected):
-    #     new_check = get_check_from_dict(volume_tally_check())
-    #     new_check_result = new_check.for_each_facility(data, Tracer.F2())
-    #     self.assertEqual(expected, new_check_result)
-    #     legacy_check = VolumeTallyCheck()
-    #     legacy_check_result = legacy_check.for_each_facility(data, legacy_check.combinations[1])
-    #     self.assertEqual(expected, legacy_check_result)
-    #     self.assertEqual(legacy_check_result, new_check_result)
+    @parameterized.expand([
+        ("no data", no_data, NOT_REPORTING),
+        ("both zero", both_zero, YES),
+        ("below_30_percent", below_30_percent, YES),
+    ])
+    def test_f2(self, name, data, expected):
+        new_check = get_check_from_dict(volume_tally_check())
+        new_check_result = new_check.for_each_facility(data, Tracer.F2())
+        self.assertEqual(expected, new_check_result)
+        legacy_check = VolumeTallyCheck()
+        legacy_check_result = legacy_check.for_each_facility(data, legacy_check.combinations[1])
+        self.assertEqual(expected, legacy_check_result)
+        self.assertEqual(legacy_check_result, new_check_result)

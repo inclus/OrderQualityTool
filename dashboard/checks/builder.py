@@ -147,7 +147,12 @@ class DefinitionFactory(object):
             return self
 
         def percentage_variance_is_less_than(self, ratio=1):
-            self.data[OPERATOR] = {"id": "LessThan", NAME: "Percentage Variance is less than"}
+            self.data[OPERATOR] = {"id": "LessThan", NAME: "Percentage Variance is less than N%"}
+            self.data["operatorConstant"] = ratio
+            return self
+
+        def nnrti_percentage_variance_is_less_than(self, ratio=1):
+            self.data[OPERATOR] = {"id": "NNRTILessThan", NAME: "FOR NNRTI Percentage Variance is less than N%"}
             self.data["operatorConstant"] = ratio
             return self
 
@@ -364,7 +369,7 @@ def nnrti_paed():
                 'Lopinavir/Ritonavir (LPV/r) 40mg/10mg Pellets [Pack of 120]': '0.25',
                 'Nevirapine (NVP) 50mg [Pack 60]': '0.5',
                 'consumption': 1})
-    builder.percentage_variance_is_less_than(30)
+    builder.nnrti_percentage_variance_is_less_than(30)
     return builder.get()
 
 
@@ -389,5 +394,5 @@ def nnrti_adult():
                 'Lopinavir/Ritonavir (LPV/r) 200mg/50mg [Pack 120]': '0.5',
                 'Nevirapine (NVP) 200mg [Pack 60]': '0.5',
                 'consumption': 1})
-    builder.percentage_variance_is_less_than(30)
+    builder.nnrti_percentage_variance_is_less_than(30)
     return builder.get()
