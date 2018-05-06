@@ -206,9 +206,9 @@ class TableCSVExportView(View):
         return mapping.get(value, value)
 
     def get(self, request):
-        formulation = request.GET.get('formulation', F1)
+        formulation = request.GET.get('formulation', Tracer.F1().key)
         cycle = request.GET.get('cycle', None)
-        columns = ScoresTableView.columns
+        columns = [test[0] for test in FacilityTest.objects.values_list("name")]
         response = HttpResponse(content_type='text/csv')
         response['Content-Disposition'] = 'attachment; filename="facilitytable-%s-%s.csv"' % (cycle, formulation)
         writer = csv.writer(response)
@@ -220,7 +220,7 @@ class TableCSVExportView(View):
         for score in Score.objects.filter(**filter).order_by('name'):
             row = []
             for c in columns:
-                value = getattr(score, c)
+                value = score.data.get(c)
                 if type(value) is dict:
                     if DEFAULT in value:
                         row.append(self.parse_value(value.get(DEFAULT)))

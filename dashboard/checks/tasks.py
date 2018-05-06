@@ -2,22 +2,12 @@ from collections import defaultdict
 
 import pygogo
 
-from dashboard.checks.entities import Definition
-from dashboard.checks.legacy.adherence import GuidelineAdherenceCheckAdult1L, GuidelineAdherenceCheckAdult2L, \
-    GuidelineAdherenceCheckPaed1L
-from dashboard.checks.legacy.blanks import BlanksQualityCheck, MultipleCheck, IsReportingCheck
-from dashboard.checks.legacy.volumetally import VolumeTallyCheck
-from dashboard.checks.legacy.cycles import BalancesMatchCheck, OrdersOverTimeCheck, StableConsumptionCheck, \
-    WarehouseFulfillmentCheck, StablePatientVolumesCheck
-from dashboard.checks.legacy.negatives import NegativeNumbersQualityCheck
-from dashboard.checks.legacy.nn import NNRTIADULTSCheck, NNRTIPAEDCheck
 from dashboard.checks.check import get_check
+from dashboard.checks.entities import Definition
 from dashboard.data.entities import enrich_location_data
 from dashboard.data.tasks import get_report_for_other_cycle
-from dashboard.helpers import NAME
 from dashboard.models import FacilityTest
 from dashboard.utils import timeit, log_formatter
-from raven.contrib.django.raven_compat.models import client
 
 logger = pygogo.Gogo(__name__, low_formatter=log_formatter).get_logger()
 
