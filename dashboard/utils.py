@@ -17,7 +17,7 @@ method_execution_time_histogram = Histogram('qdb_method_execution_time_seconds',
 
 
 def should_log_time():
-    return 'test' not in sys.argv
+    return 'test' not in sys.argv and 'jenkins' not in sys.argv
 
 
 def timeit(method):
