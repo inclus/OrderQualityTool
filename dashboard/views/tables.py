@@ -208,18 +208,19 @@ class TableCSVExportView(View):
     def get(self, request):
         formulation = request.GET.get('formulation', Tracer.F1().key)
         cycle = request.GET.get('cycle', None)
-        columns = [test[0] for test in FacilityTest.objects.values_list("name")]
+        test_names = [test[0] for test in FacilityTest.objects.values_list("name")]
         response = HttpResponse(content_type='text/csv')
         response['Content-Disposition'] = 'attachment; filename="facilitytable-%s-%s.csv"' % (cycle, formulation)
         writer = csv.writer(response)
-        writer.writerow(columns)
+        columns = ["Facility", "District", "Warehouse", "IP"]
+        writer.writerow(columns + test_names)
         filter = {'cycle': cycle}
         if self.request.user:
             if self.request.user.access_level and self.request.user.access_area:
                 filter[self.request.user.access_level.lower()] = self.request.user.access_area
         for score in Score.objects.filter(**filter).order_by('name'):
-            row = []
-            for c in columns:
+            row = [score.name, score.district, score.warehouse, score.ip]
+            for c in test_names:
                 value = score.data.get(c)
                 if type(value) is dict:
                     if DEFAULT in value:
