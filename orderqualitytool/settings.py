@@ -25,7 +25,8 @@ INSTALLED_APPS = (
     'analytical',
     'django.contrib.sites',
     'custom_user',
-    'ordered_model'
+    'ordered_model',
+    'ckeditor',
 )
 
 MIDDLEWARE_CLASSES = (

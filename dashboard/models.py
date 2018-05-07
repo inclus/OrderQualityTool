@@ -1,6 +1,7 @@
 import json
 import logging
 
+from ckeditor.fields import RichTextField
 from custom_user.models import AbstractEmailUser
 from django.db import models
 from django.db.models import CharField
@@ -188,7 +189,7 @@ class FacilityTest(OrderedModel):
     created = models.DateTimeField(auto_now_add=True, editable=False)
     last_updated = models.DateTimeField(auto_now=True, editable=False)
     definition = TestDefinitionField()
-    description = models.TextField()
+    description = RichTextField()
     short_description = models.TextField()
     featured = models.BooleanField(default=False)
     slug = AutoSlugField(populate_from=['name'.encode('utf-8')])
