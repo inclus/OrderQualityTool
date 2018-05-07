@@ -1,10 +1,10 @@
-def as_float_or_1(value):
+def as_float_or_1(value, default=1):
     try:
         return float(value)
     except ValueError as e:
-        return 1
+        return default
     except TypeError as e:
-        return 1
+        return default
 
 
 def as_number(value):

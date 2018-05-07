@@ -148,9 +148,8 @@ class GroupResult(object):
         if self.has_thresholds():
             threshold = self.get_threshold()
             aggregate = self.aggregate
-
-            if aggregate >= threshold:
-                return True
+            print(aggregate, threshold)
+            return aggregate >= threshold
         else:
             return True
 
@@ -158,7 +157,8 @@ class GroupResult(object):
         return self.group.has_thresholds and maybe(self.group.thresholds).or_else({}).get(self.tracer.key, None)
 
     def get_threshold(self):
-        return self.group.thresholds.get(self.tracer.key, None)
+        raw_value = self.group.thresholds.get(self.tracer.key, None)
+        return as_float_or_1(raw_value, 0) if raw_value else raw_value
 
     def all_values_blank(self):
         return pydash.every(self.factored_records, lambda data_record: data_record.all_blank())

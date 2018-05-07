@@ -29,7 +29,8 @@ class Comparison(object):
             lambda group_result: group_result.factored_records).flatten().size().value()
         has_adequate_data = number_of_records > 0
         if has_adequate_data:
-            return pydash.every(valid_groups, lambda x: x.is_above_threshold())
+            resu = pydash.every(valid_groups, lambda x: x.is_above_threshold())
+            return resu
 
         return has_adequate_data
 
