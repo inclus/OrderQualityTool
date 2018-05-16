@@ -8,24 +8,19 @@ import jsonfield.fields
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('dashboard', '0041_auto_20180324_0706'),
-    ]
+    dependencies = [("dashboard", "0041_auto_20180324_0706")]
 
     operations = [
-        migrations.RemoveField(
-            model_name='tracingformulations',
-            name='formulations',
-        ),
+        migrations.RemoveField(model_name="tracingformulations", name="formulations"),
         migrations.AddField(
-            model_name='tracingformulations',
-            name='consumption_formulations',
+            model_name="tracingformulations",
+            name="consumption_formulations",
             field=jsonfield.fields.JSONField(default=[]),
             preserve_default=False,
         ),
         migrations.AddField(
-            model_name='tracingformulations',
-            name='patient_formulations',
+            model_name="tracingformulations",
+            name="patient_formulations",
             field=jsonfield.fields.JSONField(default=[]),
             preserve_default=False,
         ),

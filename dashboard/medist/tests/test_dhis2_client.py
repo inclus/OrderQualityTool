@@ -7,33 +7,27 @@ from dashboard.medist.tests.test_helpers import fake_orgunit_response
 
 
 class TestDHIS2FacilityAsLocation(TestCase):
+
     def test_dhis2_facility_as_location(self):
         data = {
             "level": 5,
             "name": "01 Commando HC II",
             "id": "Ugl9pT2K5B0",
             "ancestors": [
-                {
-                    "name": "MOH - Uganda",
-                    "level": 1
-                },
-                {
-                    "name": "Northern Region",
-                    "level": 2
-                },
-                {
-                    "name": "Otuke District",
-                    "level": 3
-                },
-                {
-                    "name": "Okwang Subcounty",
-                    "level": 4
-                }
-            ]
+                {"name": "MOH - Uganda", "level": 1},
+                {"name": "Northern Region", "level": 2},
+                {"name": "Otuke District", "level": 3},
+                {"name": "Okwang Subcounty", "level": 4},
+            ],
         }
-        loc = Location.migrate_from_dict({"name": "01 Commando HC II", "District": "Otuke District"})
-        location = dhis2_facility_as_location({"01 Commando HC II": "PT"}, {
-            loc: loc}, {})(data)
+        loc = Location.migrate_from_dict(
+            {"name": "01 Commando HC II", "District": "Otuke District"}
+        )
+        location = dhis2_facility_as_location(
+            {"01 Commando HC II": "PT"}, {loc: loc}, {}
+        )(
+            data
+        )
         self.assertEqual(location.facility, "01 Commando HC II")
         self.assertEqual(location.district, "Otuke District")
         self.assertEqual(location.status, "Reporting")
@@ -41,6 +35,7 @@ class TestDHIS2FacilityAsLocation(TestCase):
 
 
 class TestGetAllLocations(TestCase):
+
     @responses.activate
     @fake_orgunit_response()
     def test_should_parse_json_response(self):

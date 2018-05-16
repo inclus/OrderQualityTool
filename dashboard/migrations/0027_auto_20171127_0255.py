@@ -7,19 +7,16 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('dashboard', '0026_facilitytest'),
-    ]
+    dependencies = [("dashboard", "0026_facilitytest")]
 
     operations = [
         migrations.AlterModelOptions(
-            name='facilitytest',
-            options={'verbose_name_plural': 'Facility Tests'},
+            name="facilitytest", options={"verbose_name_plural": "Facility Tests"}
         ),
         migrations.AddField(
-            model_name='facilitytest',
-            name='short_description',
-            field=models.TextField(default='short description here'),
+            model_name="facilitytest",
+            name="short_description",
+            field=models.TextField(default="short description here"),
             preserve_default=False,
         ),
     ]

@@ -18,7 +18,7 @@ class NewUserForm(EmailUserCreationForm):
 
     class Meta:
         model = get_user_model()
-        fields = ('email', 'is_superuser', 'access_level', 'access_area')
+        fields = ("email", "is_superuser", "access_level", "access_area")
 
 
 class EditUserForm(ModelForm):
@@ -26,7 +26,7 @@ class EditUserForm(ModelForm):
 
     class Meta:
         model = get_user_model()
-        fields = ('email', 'is_superuser', 'access_level', 'access_area')
+        fields = ("email", "is_superuser", "access_level", "access_area")
 
     def __init__(self, *args, **kwargs):
         super(EditUserForm, self).__init__(*args, **kwargs)
@@ -42,7 +42,7 @@ class UserAddView(LoginRequiredMixin, SuperuserRequiredMixin, FormView):
 
     def get_context_data(self, **kwargs):
         data = super(UserAddView, self).get_context_data(**kwargs)
-        data['page_header'] = "Create User"
+        data["page_header"] = "Create User"
         return data
 
     def get_success_url(self):
@@ -59,11 +59,11 @@ class UserEditView(LoginRequiredMixin, SuperuserRequiredMixin, FormView):
 
     def get_context_data(self, **kwargs):
         data = super(UserEditView, self).get_context_data(**kwargs)
-        data['page_header'] = "Edit User"
+        data["page_header"] = "Edit User"
         return data
 
     def get_form(self, form_class=None):
-        user = get_user_model().objects.get(pk=(self.kwargs.get('pk')))
+        user = get_user_model().objects.get(pk=(self.kwargs.get("pk")))
         return self.form_class(instance=user, **self.get_form_kwargs())
 
     def get_success_url(self):
@@ -80,11 +80,11 @@ class ChangePasswordView(LoginRequiredMixin, SuperuserRequiredMixin, FormView):
 
     def get_context_data(self, **kwargs):
         data = super(ChangePasswordView, self).get_context_data(**kwargs)
-        data['page_header'] = "Change Password"
+        data["page_header"] = "Change Password"
         return data
 
     def get_form(self, form_class=None):
-        user = get_user_model().objects.get(pk=(self.kwargs.get('pk')))
+        user = get_user_model().objects.get(pk=(self.kwargs.get("pk")))
         return self.form_class(user, **self.get_form_kwargs())
 
     def get_success_url(self):

@@ -7,14 +7,12 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('dashboard', '0013_auto_20171026_0535'),
-    ]
+    dependencies = [("dashboard", "0013_auto_20171026_0535")]
 
     operations = [
         migrations.AddField(
-            model_name='consumption',
-            name='days_out_of_stock',
+            model_name="consumption",
+            name="days_out_of_stock",
             field=models.FloatField(blank=True, null=True),
-        ),
+        )
     ]

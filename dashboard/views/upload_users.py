@@ -22,15 +22,15 @@ def emailIsValid(email):
 class UserImportView(LoginRequiredMixin, SuperuserRequiredMixin, FormView):
     template_name = "import.html"
     form_class = UserUploadForm
-    success_url = '/'
+    success_url = "/"
 
     def get_context_data(self, **kwargs):
         context = super(UserImportView, self).get_context_data(**kwargs)
-        context['title'] = "Upload Users"
+        context["title"] = "Upload Users"
         return context
 
     def form_valid(self, form):
-        import_file = StringIO(form.cleaned_data['import_file'].read().decode())
+        import_file = StringIO(form.cleaned_data["import_file"].read().decode())
         reader = csv.reader(import_file)
         for row in reader:
             email, password, role, access_area, superuser = row

@@ -17,8 +17,18 @@ from rest_framework.views import APIView
 
 from dashboard.checks.builder import FACILITY_TWO_GROUPS_WITH_SAMPLE
 from dashboard.helpers import *
-from dashboard.models import Score, WAREHOUSE, DISTRICT, Cycle, MOH_CENTRAL, Consumption, \
-    AdultPatientsRecord, PAEDPatientsRecord, FacilityTest, TracingFormulations
+from dashboard.models import (
+    Score,
+    WAREHOUSE,
+    DISTRICT,
+    Cycle,
+    MOH_CENTRAL,
+    Consumption,
+    AdultPatientsRecord,
+    PAEDPatientsRecord,
+    FacilityTest,
+    TracingFormulations,
+)
 from dashboard.serializers import ScoreSerializer, NewImportSerializer
 from dashboard.tasks import import_data_from_dhis2
 from dashboard.utils import log_formatter, should_log_time
@@ -37,12 +47,14 @@ def aggregate_scores(user, test, cycles, formulation, keys, count_values, filter
     grouped_objects = pydash.group_by(score_objects, lambda x: x["cycle"])
 
     def get_count_key(value):
-        value_as_dict = json.loads(value.get('data'))
-        return value_as_dict.get(test, {}).get(formulation, None) if type(value_as_dict) is dict else None
+        value_as_dict = json.loads(value.get("data"))
+        return value_as_dict.get(test, {}).get(formulation, None) if type(
+            value_as_dict
+        ) is dict else None
 
     def agg(value):
         values = grouped_objects.get(value, [])
-        result = {'cycle': value}
+        result = {"cycle": value}
         total = len(values)
         yes_count_value = count_values[YES]
         no_count_value = count_values[NO]
@@ -66,7 +78,7 @@ def aggregate_scores(user, test, cycles, formulation, keys, count_values, filter
 
 class BestPerformingDistrictsView(APIView):
     reverse = True
-    acc = 'best'
+    acc = "best"
 
     def get(self, request):
         results = self.get_data(request)
@@ -74,15 +86,20 @@ class BestPerformingDistrictsView(APIView):
 
     def get_data(self, request):
         filters = {}
-        levels = {'district': 'district', 'ip': 'ip', 'warehouse': 'warehouse', 'facility': 'name'}
-        formulation = request.GET.get('formulation', F1)
-        level = request.GET.get('level', 'district').lower()
-        name = levels.get(level, 'district')
-        most_recent_cycle = get_most_recent_cycle(Cycle, 'title')
-        cycle = request.GET.get('cycle', most_recent_cycle)
+        levels = {
+            "district": "district",
+            "ip": "ip",
+            "warehouse": "warehouse",
+            "facility": "name",
+        }
+        formulation = request.GET.get("formulation", F1)
+        level = request.GET.get("level", "district").lower()
+        name = levels.get(level, "district")
+        most_recent_cycle = get_most_recent_cycle(Cycle, "title")
+        cycle = request.GET.get("cycle", most_recent_cycle)
 
         if cycle:
-            filters['cycle'] = cycle
+            filters["cycle"] = cycle
 
         mapping = {
             F1: {"pass": "f1_pass_count", "fail": "f1_fail_count"},
@@ -91,48 +108,51 @@ class BestPerformingDistrictsView(APIView):
         }
 
         fm = mapping.get(formulation, mapping.get(F1))
-        data = Score.objects.filter(**filters).values(name, 'cycle').annotate(count=Count('pk'),
-                                                                              best=Sum(F(fm['pass']) + F(
-                                                                                  'default_pass_count')),
-                                                                              worst=Sum(F(fm['fail']) + F(
-                                                                                  'default_fail_count')))
+        data = Score.objects.filter(**filters).values(name, "cycle").annotate(
+            count=Count("pk"),
+            best=Sum(F(fm["pass"]) + F("default_pass_count")),
+            worst=Sum(F(fm["fail"]) + F("default_fail_count")),
+        )
 
         for item in data:
-            item['name'] = item[name]
-            item['rate'] = (float(item[self.acc]) / float(item['count']))
-        results = sorted(data, key=lambda x: (x['rate'], x[self.acc]), reverse=True)
+            item["name"] = item[name]
+            item["rate"] = (float(item[self.acc]) / float(item["count"]))
+        results = sorted(data, key=lambda x: (x["rate"], x[self.acc]), reverse=True)
         return results
 
 
 class WorstPerformingDistrictsView(BestPerformingDistrictsView):
     reverse = False
-    acc = 'worst'
+    acc = "worst"
 
 
 class BestPerformingDistrictsCSVView(BestPerformingDistrictsView):
-    file_name = 'best'
-    title = 'Average Number of Passes'
+    file_name = "best"
+    title = "Average Number of Passes"
 
     def get(self, request):
-        response = HttpResponse(content_type='text/csv')
-        level = request.GET.get('level', 'district').lower()
-        response['Content-Disposition'] = 'attachment; filename="%s-%s.csv"' % (self.file_name, level)
+        response = HttpResponse(content_type="text/csv")
+        level = request.GET.get("level", "district").lower()
+        response["Content-Disposition"] = 'attachment; filename="%s-%s.csv"' % (
+            self.file_name, level
+        )
         writer = csv.writer(response)
         writer.writerow([level, self.title])
         results = self.get_data(request)
         for n in results:
-            writer.writerow([n['name'], n['rate']])
+            writer.writerow([n["name"], n["rate"]])
         return response
 
 
 class WorstPerformingDistrictsCSVView(BestPerformingDistrictsCSVView):
-    file_name = 'worst'
+    file_name = "worst"
     reverse = False
-    acc = 'worst'
-    title = 'Average Number of Fails'
+    acc = "worst"
+    title = "Average Number of Fails"
 
 
 class CyclesView(APIView):
+
     def get(self, request):
         most_recent_cycle = get_most_recent_cycle()
         if most_recent_cycle:
@@ -143,7 +163,7 @@ class CyclesView(APIView):
         return Response({"values": [], "most_recent_cycle": most_recent_cycle})
 
 
-def get_most_recent_cycle(model=Score, field='cycle'):
+def get_most_recent_cycle(model=Score, field="cycle"):
     records = [cycle[field] for cycle in model.objects.values(field).distinct()]
     sorted_cyles = sorted(records, key=cmp_to_key(sort_cycle), reverse=True)
     if len(sorted_cyles) > 0:
@@ -152,15 +172,24 @@ def get_most_recent_cycle(model=Score, field='cycle'):
 
 
 class ReportMetrics(APIView):
+
     def get(self, request):
         output = {}
         facility_filters = build_filters(self.request)
         most_recent_cycle = get_most_recent_cycle()
-        featured_tests = FacilityTest.objects.filter(featured=True).order_by('order')[:2]
+        featured_tests = FacilityTest.objects.filter(featured=True).order_by("order")[
+            :2
+        ]
         for test in featured_tests:
-            scores = aggregate_scores(self.request.user, test.name, [most_recent_cycle], DEFAULT,
-                                      {YES: YES, NO: NO, NOT_REPORTING: NOT_REPORTING},
-                                      {YES: YES, NO: NO, NOT_REPORTING: NOT_REPORTING}, facility_filters)
+            scores = aggregate_scores(
+                self.request.user,
+                test.name,
+                [most_recent_cycle],
+                DEFAULT,
+                {YES: YES, NO: NO, NOT_REPORTING: NOT_REPORTING},
+                {YES: YES, NO: NO, NOT_REPORTING: NOT_REPORTING},
+                facility_filters,
+            )
 
             rate = "{0:.1f}".format(scores[0][YES]) if len(scores) > 0 else ""
             output[test.name] = rate
@@ -185,10 +214,13 @@ def build_filters(request):
 
 
 def prepare_for_ui(regimens):
+
     def for_each_item(item):
         new_item = {"name": item["name"], "id": item["id"]}
         definition = json.loads(maybe(item)["definition"].or_else("{}"))
-        new_item["sampled"] = maybe(definition)['type']['id'].or_else("") == FACILITY_TWO_GROUPS_WITH_SAMPLE
+        new_item["sampled"] = maybe(definition)["type"]["id"].or_else(
+            ""
+        ) == FACILITY_TWO_GROUPS_WITH_SAMPLE
         new_item["regimens"] = regimens
         return new_item
 
@@ -196,24 +228,40 @@ def prepare_for_ui(regimens):
 
 
 class GetTestsAPIView(APIView):
+
     def get(self, request):
-        featured_tests = FacilityTest.objects.filter(featured=True).order_by('order').values('id', 'name', 'order',
-                                                                                             'definition')[:2]
-        ids_for_featured_tests = [item['id'] for item in featured_tests]
-        other_tests = FacilityTest.objects.exclude(id__in=ids_for_featured_tests).order_by('order').values('id',
-                                                                                                           'name',
-                                                                                                           'order',
-                                                                                                           'definition')
-        regimens = TracingFormulations.objects.values('name', 'slug')
+        featured_tests = FacilityTest.objects.filter(featured=True).order_by(
+            "order"
+        ).values(
+            "id", "name", "order", "definition"
+        )[
+            :2
+        ]
+        ids_for_featured_tests = [item["id"] for item in featured_tests]
+        other_tests = FacilityTest.objects.exclude(
+            id__in=ids_for_featured_tests
+        ).order_by(
+            "order"
+        ).values(
+            "id", "name", "order", "definition"
+        )
+        regimens = TracingFormulations.objects.values("name", "slug")
         featured = pydash.py_(featured_tests).map(prepare_for_ui(regimens)).value()
         other = pydash.py_(other_tests).map(prepare_for_ui(regimens)).value()
-        return Response({'featured': featured, 'other': other})
+        return Response({"featured": featured, "other": other})
 
 
 class ScoresAPIView(APIView):
-    def generate_data(self, test, start, end, formulation=DEFAULT,
-                      keys={YES: YES, NO: NO, NOT_REPORTING: NOT_REPORTING},
-                      count_values={YES: YES, NO: NO, NOT_REPORTING: NOT_REPORTING}):
+
+    def generate_data(
+        self,
+        test,
+        start,
+        end,
+        formulation=DEFAULT,
+        keys={YES: YES, NO: NO, NOT_REPORTING: NOT_REPORTING},
+        count_values={YES: YES, NO: NO, NOT_REPORTING: NOT_REPORTING},
+    ):
         filters = build_filters(self.request)
         if formulation is None:
             formulation = DEFAULT
@@ -221,62 +269,79 @@ class ScoresAPIView(APIView):
         if start and end:
             start_index = cycles.index(start)
             end_index = cycles.index(end)
-            cycles_included = cycles[start_index: end_index + 1]
+            cycles_included = cycles[start_index:end_index + 1]
             cycles = cycles_included
-        results = aggregate_scores(self.request.user, test, cycles, formulation, keys, count_values, filters)
-        return Response({'values': results})
+        results = aggregate_scores(
+            self.request.user, test, cycles, formulation, keys, count_values, filters
+        )
+        return Response({"values": results})
 
     def get(self, request, id):
-        start = request.GET.get('start', None)
-        end = request.GET.get('end', None)
-        regimen = request.GET.get('regimen', None)
-        keys = {YES: 'yes', NO: 'no', NOT_REPORTING: 'not_reporting'}
+        start = request.GET.get("start", None)
+        end = request.GET.get("end", None)
+        regimen = request.GET.get("regimen", None)
+        keys = {YES: "yes", NO: "no", NOT_REPORTING: "not_reporting"}
         test = FacilityTest.objects.get(id=id)
         return self.generate_data(test.name, start, end, regimen, keys)
 
 
 class FilterValuesView(APIView):
+
     def get(self, request):
-        ips = Score.objects.values('ip').order_by('ip').distinct()
-        warehouses = Score.objects.values('warehouse').order_by('warehouse').distinct()
-        districts = Score.objects.values('district').order_by('district').distinct()
-        cycles = Score.objects.values('cycle').distinct()
-        return Response({"ips": ips, "warehouses": warehouses, "districts": districts, "cycles": cycles})
+        ips = Score.objects.values("ip").order_by("ip").distinct()
+        warehouses = Score.objects.values("warehouse").order_by("warehouse").distinct()
+        districts = Score.objects.values("district").order_by("district").distinct()
+        cycles = Score.objects.values("cycle").distinct()
+        return Response(
+            {
+                "ips": ips,
+                "warehouses": warehouses,
+                "districts": districts,
+                "cycles": cycles,
+            }
+        )
 
 
 class FacilityTestCycleScoresListView(ListAPIView):
     queryset = Score.objects.all()
     serializer_class = ScoreSerializer
     filter_backends = (django_filters.rest_framework.DjangoFilterBackend,)
-    filter_fields = ('cycle', 'name', 'ip', 'warehouse', 'district')
+    filter_fields = ("cycle", "name", "ip", "warehouse", "district")
 
 
 class RankingsAccessView(LoginRequiredMixin, APIView):
+
     def get(self, request):
-        levels = ['District', 'Warehouse', 'IP', 'Facility']
+        levels = ["District", "Warehouse", "IP", "Facility"]
         if request.user.access_level == "IP":
-            levels = ['District', 'Warehouse', 'Facility']
+            levels = ["District", "Warehouse", "Facility"]
         if request.user.access_level == WAREHOUSE:
-            levels = ['District', 'IP', 'Facility']
+            levels = ["District", "IP", "Facility"]
         if request.user.access_level == DISTRICT:
-            levels = ['IP', 'Warehouse', 'Facility']
+            levels = ["IP", "Warehouse", "Facility"]
         return Response({"values": levels})
 
 
 class AccessAreasView(APIView):
+
     def get(self, request):
-        level = request.GET.get('level', None)
-        access_levels = ['district', 'warehouse', 'ip', 'facility']
+        level = request.GET.get("level", None)
+        access_levels = ["district", "warehouse", "ip", "facility"]
         access_areas = []
         if level and level.lower() in access_levels:
-            access_areas = pydash.reject(Score.objects.values_list(level, flat=True).distinct(), lambda x: len(x) < 1)
+            access_areas = pydash.reject(
+                Score.objects.values_list(level, flat=True).distinct(),
+                lambda x: len(x) < 1,
+            )
         return Response(access_areas)
 
 
 class AdminAccessView(APIView):
+
     def get(self, request):
         is_admin = type(request.user) != AnonymousUser and (
-                request.user.access_level == MOH_CENTRAL or request.user.is_superuser)
+            request.user.access_level == MOH_CENTRAL or request.user.is_superuser
+        )
         return Response({"is_admin": is_admin})
 
 
@@ -285,41 +350,65 @@ logger.setLevel("INFO" if should_log_time() else "ERROR")
 
 
 class NewImportView(APIView):
+
     def post(self, request):
         serializer = NewImportSerializer(data=request.data)
         if serializer.is_valid():
-            logger.info("launching task",
-                        extra={"task_name": "import_data_from_dhis2", "period": serializer.data["period"]})
-            import_data_from_dhis2.apply_async(args=[serializer.data["period"]], priority=2)
+            logger.info(
+                "launching task",
+                extra={
+                    "task_name": "import_data_from_dhis2",
+                    "period": serializer.data["period"],
+                },
+            )
+            import_data_from_dhis2.apply_async(
+                args=[serializer.data["period"]], priority=2
+            )
             return Response({"ok": True})
         return Response({"ok": False})
 
 
 class ListAdultFormulations(APIView):
+
     def get(self, request):
         all_values = []
-        distinct_values_from_adult = AdultPatientsRecord.objects.order_by().values_list('formulation').distinct()
+        distinct_values_from_adult = AdultPatientsRecord.objects.order_by().values_list(
+            "formulation"
+        ).distinct()
         all_values.extend(distinct_values_from_adult)
-        return Response({"values": pydash.chain(all_values).flatten().uniq().sort().value()})
+        return Response(
+            {"values": pydash.chain(all_values).flatten().uniq().sort().value()}
+        )
 
 
 class ListPaedFormulations(APIView):
+
     def get(self, request):
         all_values = []
-        distinct_values_from_paed = PAEDPatientsRecord.objects.order_by().values_list('formulation').distinct()
+        distinct_values_from_paed = PAEDPatientsRecord.objects.order_by().values_list(
+            "formulation"
+        ).distinct()
         all_values.extend(distinct_values_from_paed)
-        return Response({"values": pydash.chain(all_values).flatten().uniq().sort().value()})
+        return Response(
+            {"values": pydash.chain(all_values).flatten().uniq().sort().value()}
+        )
 
 
 class ListConsumptionFormulations(APIView):
+
     def get(self, request):
         all_values = []
-        distinct_values_from_consumption = Consumption.objects.order_by().values_list('formulation').distinct()
+        distinct_values_from_consumption = Consumption.objects.order_by().values_list(
+            "formulation"
+        ).distinct()
         all_values.extend(distinct_values_from_consumption)
-        return Response({"values": pydash.chain(all_values).flatten().uniq().sort().value()})
+        return Response(
+            {"values": pydash.chain(all_values).flatten().uniq().sort().value()}
+        )
 
 
 class ListPatientFields(APIView):
+
     def get(self, request):
         all_fields = []
         fields_from_adult = model_to_dict(AdultPatientsRecord()).keys()
@@ -327,15 +416,36 @@ class ListPatientFields(APIView):
         all_fields.extend(fields_from_adult)
         all_fields.extend(fields_from_paed)
         return Response(
-            {"values": pydash.chain(all_fields).without(
-                "id", "ip", "formulation", "warehouse", "notes", "name", "district",
-                "cycle").uniq().sort().value()})
+            {
+                "values": pydash.chain(all_fields).without(
+                    "id",
+                    "ip",
+                    "formulation",
+                    "warehouse",
+                    "notes",
+                    "name",
+                    "district",
+                    "cycle",
+                ).uniq().sort().value()
+            }
+        )
 
 
 class ListConsumptionFields(APIView):
+
     def get(self, request):
         fields = model_to_dict(Consumption()).keys()
         return Response(
-            {"values": pydash.chain(fields).without(
-                "id", "ip", "formulation", "warehouse", "notes", "name", "district",
-                "cycle").uniq().sort().value()})
+            {
+                "values": pydash.chain(fields).without(
+                    "id",
+                    "ip",
+                    "formulation",
+                    "warehouse",
+                    "notes",
+                    "name",
+                    "district",
+                    "cycle",
+                ).uniq().sort().value()
+            }
+        )

@@ -7,19 +7,13 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('dashboard', '0002_auto_20160107_1849'),
-    ]
+    dependencies = [("dashboard", "0002_auto_20160107_1849")]
 
     operations = [
         migrations.AlterField(
-            model_name='score',
-            name='fail_count',
-            field=models.IntegerField(default=0),
+            model_name="score", name="fail_count", field=models.IntegerField(default=0)
         ),
         migrations.AlterField(
-            model_name='score',
-            name='pass_count',
-            field=models.IntegerField(default=0),
+            model_name="score", name="pass_count", field=models.IntegerField(default=0)
         ),
     ]

@@ -18,14 +18,16 @@ default_tests = [
 
 This is done by testing if the volume of estimated new ART patients on Adult TDF-based formulations (i.e. TDF/3TC/EFV 300/300/600mg and TDF/3TC 300/300mg) represent at least 80% of the total of those on TDF-based and AZT-based formulations (Adult AZT-based formulations are AZT/3TC/NVP 300/150/200mg and AZT/3TC 300/150mg)""",
         "test_type": "FACILITY_ONLY",
-    }, {
+    },
+    {
         "name": "GUIDELINE ADHERENCE (Adult 2L)",
         "short_description": "GUIDELINE ADHERENCE (Adult 2L): Estimated new patients on ATV/r-based formulations are 73%+ of total?",
         "description": """Tests is the facility is adhering to national guidelines for Adult 2nd Line therapy
 
 This is done by testing if the volume of estimated new ART patients on Adult ATV/r-based formulations (i.e. ATV/r 300/100mg) represent at least 73% of the total of those on ATV/r-based and LPV/r-based formulations (Adult LPV/r-based formulations are LPV/r 200/50mg)""",
         "test_type": "FACILITY_ONLY",
-    }, {
+    },
+    {
         "name": "GUIDELINE ADHERENCE (Paediatric 1L)",
         "short_description": "GUIDELINE ADHERENCE (Paediatric 1L): Estimated new patients on ABC-based formulations are 80%+ of total?",
         "description": """Tests is the facility is adhering to national guidelines for Paediatric 1st Line therapy
@@ -66,21 +68,24 @@ Tests if the facility has reported corresponding Consumption volumes and Patient
 
 3) For Sample Formulation 3, Paediatric EFV: Compares bimonthly Consumption volumes of formulation Efavirenz (EFV) 200mg [Pack 90] (converted into an estimated Patients figure by dividing by 1.0) with Patient Numbers for regimens ABC/3TC/EFV (PAED) and AZT/3TC/EFV (PAED)""",
         "test_type": "FACILITY_AND_SAMPLE_FORMULATION",
-    }, {
+    },
+    {
         "name": "NON-REPEATING",
         "short_description": "NON-REPEATING: Order changes in consecutive cycles?",
         "description": """This test is carried out for the system's three Sample Formulations: 1) Adult TDF/3TC/EFV (300/300/600mg), 2) Paediatric ABC/3TC (60/30mg), and 3) Paediatric EFV(200mg)
 
 Tests if the facility has submitted the same order in consecutive cycles. This is done by comparing certain key datapoints (Opening Balance, ART Consumption, Closing Balance and Estimated New ART Patients) from a given cycle with the same datapoints reported in the previous cycle""",
         "test_type": "FACILITY_AND_SAMPLE_FORMULATION",
-    }, {
+    },
+    {
         "name": "OPENING = CLOSING",
         "short_description": "OPENING = CLOSING: Opening  balance = Closing balance from previous cycle?",
         "description": """This test is carried out for the system's three Sample Formulations: 1) Adult TDF/3TC/EFV (300/300/600mg), 2) Paediatric ABC/3TC (60/30mg), and 3) Paediatric EFV(200mg)
 
 Tests if the "Opening Balance" reported by the facility in one cycle is the same as the "Closing Balance" result of the previous cycle""",
         "test_type": "FACILITY_AND_SAMPLE_FORMULATION",
-    }, {
+    },
+    {
         "name": "STABLE CONSUMPTION",
         "short_description": "STABLE CONSUMPTION: Consumption changes by less than 50% vs. previous cycle?",
         "description": """This test is carried out for the system's three Sample Formulations: 1) Adult TDF/3TC/EFV (300/300/600mg), 2) Paediatric ABC/3TC (60/30mg), and 3) Paediatric EFV(200mg)
@@ -93,7 +98,8 @@ Tests if the facility's total Consumption volume (i.e. ART Consumption + PMTCT C
 
 3) For Sample Formulation 3, Paediatric EFV: Total consumption in either cycle must be at least 10 packs""",
         "test_type": "FACILITY_AND_SAMPLE_FORMULATION",
-    }, {
+    },
+    {
         "name": "WAREHOUSE FULFILMENT",
         "short_description": "WAREHOUSE FULFILMENT: Volume delivered = volume ordered in previous cycle?",
         "description": """This test is carried out for the system's three Sample Formulations: 1) Adult TDF/3TC/EFV (300/300/600mg), 2) Paediatric ABC/3TC (60/30mg), and 3) Paediatric EFV(200mg)
@@ -101,7 +107,8 @@ Tests if the facility's total Consumption volume (i.e. ART Consumption + PMTCT C
 Tests if the "Quantity Received" reported by the facility in one cycle is the same as the "Packs Ordered" result of the previous cycle.
 This test can therefore reflect more than just the facility's ability to input correct figures as per what has been delivered. It also tests warehouse ability to correctly deliver what has been requested""",
         "test_type": "FACILITY_AND_SAMPLE_FORMULATION",
-    }, {
+    },
+    {
         "name": "NRTI vs. INSTI/NNRTI/PI patient volumes (ADULT)",
         "short_description": "NRTI vs. INSTI/NNRTI/PI patient volumes (ADULT): Differ by <30%?",
         "description": """Tests if the current patient numbers implied by facility's reported Adult NRTI consumption volumes are similar to those implied by the reported Adult NNRTI/PI consumption volumes
@@ -111,7 +118,8 @@ This is done by taking total consumption volumes (ART and PMTCT) for each of the
 NRTI formulations: TDF/3TC 300/300mg, AZT/3TC 300/150mg, ABC/3TC 600/300mg
 NNRTI/PI formulations: NVP 200mg, EFV 600mg, ATV/r 300/100mg, LPV/r 200/50mg""",
         "test_type": "FACILITY_ONLY",
-    }, {
+    },
+    {
         "name": "NRTI vs. INSTI/NNRTI/PI patient volumes (PAED)",
         "short_description": "NRTI vs. INSTI/NNRTI/PI patient volumes (PAED): Differ by <30%?",
         "description": """Tests if the current patient numbers implied by facility's reported Paediatric NRTI consumption volumes are similar to those implied by the reported Paediatric NNRTI/PI consumption volumes
@@ -122,7 +130,6 @@ NRTI formulations: AZT/3TC 60/30mg, ABC/3TC 60/30mg
 NNRTI/PI formulations: NVP 50mg, EFV 200mg, LPV/r 100/25mg, LPV/r 80/20mg""",
         "test_type": "FACILITY_ONLY",
     },
-
 ]
 
 
@@ -133,10 +140,6 @@ def create_default_tests(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
-    dependencies = [
-        ('dashboard', '0028_facilitytest_test_type'),
-    ]
+    dependencies = [("dashboard", "0028_facilitytest_test_type")]
 
-    operations = [
-        migrations.RunPython(create_default_tests),
-    ]
+    operations = [migrations.RunPython(create_default_tests)]

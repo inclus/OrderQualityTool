@@ -12,9 +12,12 @@ class Tracer(object):
 
     @staticmethod
     def from_tracing_formulation(formulation):
-        return Tracer(key=formulation.slug, consumption_formulations=formulation.consumption_formulations,
-                      patient_formulations=formulation.patient_formulations,
-                      extras=None)
+        return Tracer(
+            key=formulation.slug,
+            consumption_formulations=formulation.consumption_formulations,
+            patient_formulations=formulation.patient_formulations,
+            extras=None,
+        )
 
     def with_data(self, data):
         self.extras = data
@@ -23,8 +26,11 @@ class Tracer(object):
     @staticmethod
     def from_dict(data):
         if data and "slug" in data:
-            return Tracer(key=data.get("slug"), consumption_formulations=data.get("consumption_formulations"),
-                          patient_formulations=data.get("patient_formulations"))
+            return Tracer(
+                key=data.get("slug"),
+                consumption_formulations=data.get("consumption_formulations"),
+                patient_formulations=data.get("patient_formulations"),
+            )
 
     @staticmethod
     def from_db():
@@ -44,4 +50,9 @@ class Tracer(object):
 
     @staticmethod
     def Default():
-        return Tracer(key="DEFAULT", consumption_formulations=None, patient_formulations=None, extras=None)
+        return Tracer(
+            key="DEFAULT",
+            consumption_formulations=None,
+            patient_formulations=None,
+            extras=None,
+        )

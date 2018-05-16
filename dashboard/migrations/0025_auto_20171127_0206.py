@@ -7,33 +7,29 @@ from django.db import migrations
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('dashboard', '0024_auto_20171112_0404'),
-    ]
+    dependencies = [("dashboard", "0024_auto_20171112_0404")]
 
     operations = [
         migrations.AlterModelOptions(
-            name='adultpatientsrecord',
-            options={'verbose_name_plural': 'Adult Patient Records'},
+            name="adultpatientsrecord",
+            options={"verbose_name_plural": "Adult Patient Records"},
         ),
         migrations.AlterModelOptions(
-            name='consumption',
-            options={'verbose_name_plural': 'Consumption Records'},
+            name="consumption", options={"verbose_name_plural": "Consumption Records"}
         ),
         migrations.AlterModelOptions(
-            name='dashboarduser',
-            options={'verbose_name_plural': 'Users'},
+            name="dashboarduser", options={"verbose_name_plural": "Users"}
         ),
         migrations.AlterModelOptions(
-            name='dhis2standardreport',
-            options={'verbose_name_plural': 'DHIS2 Standard Reports'},
+            name="dhis2standardreport",
+            options={"verbose_name_plural": "DHIS2 Standard Reports"},
         ),
         migrations.AlterModelOptions(
-            name='multipleorderfacility',
-            options={'verbose_name_plural': 'Facilities with Multiple Orders'},
+            name="multipleorderfacility",
+            options={"verbose_name_plural": "Facilities with Multiple Orders"},
         ),
         migrations.AlterModelOptions(
-            name='paedpatientsrecord',
-            options={'verbose_name_plural': 'Paed Patient Records'},
+            name="paedpatientsrecord",
+            options={"verbose_name_plural": "Paed Patient Records"},
         ),
     ]

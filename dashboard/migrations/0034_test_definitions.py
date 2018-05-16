@@ -14,10 +14,6 @@ def reverse(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
-    dependencies = [
-        ('dashboard', '0033_auto_20171211_0155'),
-    ]
+    dependencies = [("dashboard", "0033_auto_20171211_0155")]
 
-    operations = [
-        migrations.RunPython(create_default_tests, reverse),
-    ]
+    operations = [migrations.RunPython(create_default_tests, reverse)]

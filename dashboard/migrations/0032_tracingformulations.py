@@ -8,21 +8,25 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('dashboard', '0031_remove_facilitytest_test_type'),
-    ]
+    dependencies = [("dashboard", "0031_remove_facilitytest_test_type")]
 
     operations = [
         migrations.CreateModel(
-            name='TracingFormulations',
+            name="TracingFormulations",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=255)),
-                ('model', models.CharField(max_length=255)),
-                ('formulations', jsonfield.fields.JSONField()),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=255)),
+                ("model", models.CharField(max_length=255)),
+                ("formulations", jsonfield.fields.JSONField()),
             ],
-            options={
-                'verbose_name_plural': 'Tracing Formulations',
-            },
-        ),
+            options={"verbose_name_plural": "Tracing Formulations"},
+        )
     ]

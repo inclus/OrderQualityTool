@@ -7,14 +7,25 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('dashboard', '0017_dhis2standardreport'),
-    ]
+    dependencies = [("dashboard", "0017_dhis2standardreport")]
 
     operations = [
         migrations.AlterField(
-            model_name='dhis2standardreport',
-            name='report_type',
-            field=models.CharField(choices=[(b'Consumption Data Report', b'Consumption Data Report'), (b'Adult/PMTCT ART Patient Report', b'Adult/PMTCT ART Patient Report'), (b'Paediatric ART Patient Report', b'Paediatric ART Patient Report')], max_length=50),
-        ),
+            model_name="dhis2standardreport",
+            name="report_type",
+            field=models.CharField(
+                choices=[
+                    (b"Consumption Data Report", b"Consumption Data Report"),
+                    (
+                        b"Adult/PMTCT ART Patient Report",
+                        b"Adult/PMTCT ART Patient Report",
+                    ),
+                    (
+                        b"Paediatric ART Patient Report",
+                        b"Paediatric ART Patient Report",
+                    ),
+                ],
+                max_length=50,
+            ),
+        )
     ]

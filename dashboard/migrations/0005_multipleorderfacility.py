@@ -7,20 +7,26 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('dashboard', '0004_remove_consumption_facility_cycle'),
-    ]
+    dependencies = [("dashboard", "0004_remove_consumption_facility_cycle")]
 
     operations = [
         migrations.CreateModel(
-            name='MultipleOrderFacility',
+            name="MultipleOrderFacility",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(db_index=True, max_length=256)),
-                ('cycle', models.CharField(db_index=True, max_length=256)),
-                ('district', models.CharField(db_index=True, max_length=256)),
-                ('ip', models.CharField(db_index=True, max_length=256)),
-                ('warehouse', models.CharField(db_index=True, max_length=256)),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(db_index=True, max_length=256)),
+                ("cycle", models.CharField(db_index=True, max_length=256)),
+                ("district", models.CharField(db_index=True, max_length=256)),
+                ("ip", models.CharField(db_index=True, max_length=256)),
+                ("warehouse", models.CharField(db_index=True, max_length=256)),
             ],
-        ),
+        )
     ]

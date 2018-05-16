@@ -10,7 +10,7 @@ from dashboard.models import Score, FacilityTest
 
 
 class OrderFormFreeOfNegativesViewTestCase(WebTest):
-    url_name = 'test_scores_api'
+    url_name = "test_scores_api"
     test_id = 7
     formulation = F1
 
@@ -26,16 +26,29 @@ class OrderFormFreeOfNegativesViewTestCase(WebTest):
         url = reverse(self.url_name, kwargs={"id": self.test_id})
         start = "Mar - Apr %s" % year
         end = "Nov - Dec %s" % year
-        Score.objects.create(data={test: {self.formulation: YES}}, name="F4", cycle=start)
-        Score.objects.create(data={test: {self.formulation: NO}}, name="F5", cycle=start)
-        Score.objects.create(data={test: {self.formulation: NO}}, name="F6", cycle=start)
-        Score.objects.create(data={test: {self.formulation: NOT_REPORTING}}, name="F7", cycle=start)
-        Score.objects.create(data={test: {self.formulation: NOT_REPORTING}}, name="F8", cycle=start)
+        Score.objects.create(
+            data={test: {self.formulation: YES}}, name="F4", cycle=start
+        )
+        Score.objects.create(
+            data={test: {self.formulation: NO}}, name="F5", cycle=start
+        )
+        Score.objects.create(
+            data={test: {self.formulation: NO}}, name="F6", cycle=start
+        )
+        Score.objects.create(
+            data={test: {self.formulation: NOT_REPORTING}}, name="F7", cycle=start
+        )
+        Score.objects.create(
+            data={test: {self.formulation: NOT_REPORTING}}, name="F8", cycle=start
+        )
         response = self.app.get(self.get_url(end, start, url), user="testuser")
         self.assertEqual(200, response.status_code)
-        json_content = response.content.decode('utf8')
+        json_content = response.content.decode("utf8")
         data = json.loads(json_content)
-        self.assertEquals(data['values'][0], {u'cycle': u'Mar - Apr 2015', u'no': 40, u'not_reporting': 40, u'yes': 20})
+        self.assertEquals(
+            data["values"][0],
+            {u"cycle": u"Mar - Apr 2015", u"no": 40, u"not_reporting": 40, u"yes": 20},
+        )
 
 
 class OrderFormFreeOfGapsViewTestCase(OrderFormFreeOfNegativesViewTestCase):

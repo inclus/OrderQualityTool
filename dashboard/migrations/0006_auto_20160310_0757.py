@@ -7,49 +7,43 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('dashboard', '0005_multipleorderfacility'),
-    ]
+    dependencies = [("dashboard", "0005_multipleorderfacility")]
 
     operations = [
         migrations.RenameField(
-            model_name='score',
-            old_name='fail_count',
-            new_name='default_fail_count',
+            model_name="score", old_name="fail_count", new_name="default_fail_count"
         ),
         migrations.RenameField(
-            model_name='score',
-            old_name='pass_count',
-            new_name='default_pass_count',
+            model_name="score", old_name="pass_count", new_name="default_pass_count"
         ),
         migrations.AddField(
-            model_name='score',
-            name='f1_fail_count',
+            model_name="score",
+            name="f1_fail_count",
             field=models.IntegerField(default=0),
         ),
         migrations.AddField(
-            model_name='score',
-            name='f1_pass_count',
+            model_name="score",
+            name="f1_pass_count",
             field=models.IntegerField(default=0),
         ),
         migrations.AddField(
-            model_name='score',
-            name='f2_fail_count',
+            model_name="score",
+            name="f2_fail_count",
             field=models.IntegerField(default=0),
         ),
         migrations.AddField(
-            model_name='score',
-            name='f2_pass_count',
+            model_name="score",
+            name="f2_pass_count",
             field=models.IntegerField(default=0),
         ),
         migrations.AddField(
-            model_name='score',
-            name='f3_fail_count',
+            model_name="score",
+            name="f3_fail_count",
             field=models.IntegerField(default=0),
         ),
         migrations.AddField(
-            model_name='score',
-            name='f3_pass_count',
+            model_name="score",
+            name="f3_pass_count",
             field=models.IntegerField(default=0),
         ),
     ]

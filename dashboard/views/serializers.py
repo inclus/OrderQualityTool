@@ -10,7 +10,9 @@ class OptionField(serializers.Serializer):
 
 
 class GroupModelField(OptionField):
-    tracingFormulations = serializers.ListField(child=serializers.DictField(), required=False)
+    tracingFormulations = serializers.ListField(
+        child=serializers.DictField(), required=False
+    )
     allowOverride = serializers.BooleanField(required=False)
 
 

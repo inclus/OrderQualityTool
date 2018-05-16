@@ -8,14 +8,14 @@ import django_extensions.db.fields
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('dashboard', '0039_auto_20180220_0427'),
-    ]
+    dependencies = [("dashboard", "0039_auto_20180220_0427")]
 
     operations = [
         migrations.AddField(
-            model_name='tracingformulations',
-            name='slug',
-            field=django_extensions.db.fields.AutoSlugField(blank=True, editable=False, populate_from=u'name'),
-        ),
+            model_name="tracingformulations",
+            name="slug",
+            field=django_extensions.db.fields.AutoSlugField(
+                blank=True, editable=False, populate_from=u"name"
+            ),
+        )
     ]

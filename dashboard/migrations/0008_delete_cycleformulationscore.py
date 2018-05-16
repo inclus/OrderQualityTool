@@ -7,12 +7,6 @@ from django.db import migrations
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('dashboard', '0007_dashboarduser_access_area'),
-    ]
+    dependencies = [("dashboard", "0007_dashboarduser_access_area")]
 
-    operations = [
-        migrations.DeleteModel(
-            name='CycleFormulationScore',
-        ),
-    ]
+    operations = [migrations.DeleteModel(name="CycleFormulationScore")]

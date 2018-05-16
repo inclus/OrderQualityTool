@@ -13,7 +13,12 @@ from openpyxl.writer.excel import save_virtual_workbook
 from dashboard.data.partner_mapping import load_file
 from dashboard.forms import FileUploadForm, MappingUploadForm, Dhis2ImportForm
 from dashboard.helpers import F3, F2, F1, sort_cycle
-from dashboard.models import Score, LocationToPartnerMapping, FacilityTest, TracingFormulations
+from dashboard.models import (
+    Score,
+    LocationToPartnerMapping,
+    FacilityTest,
+    TracingFormulations,
+)
 from dashboard.tasks import import_data_from_dhis2, run_manual_import
 from dashboard.utils import log_formatter, should_log_time
 
@@ -35,7 +40,7 @@ class AboutTestPageView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super(AboutTestPageView, self).get_context_data(**kwargs)
-        context['tests'] = FacilityTest.objects.all()
+        context["tests"] = FacilityTest.objects.all()
         return context
 
 
@@ -54,20 +59,23 @@ class AboutHowUsed(TemplateView):
 logger = pygogo.Gogo(__name__, low_formatter=log_formatter).get_logger()
 logger.setLevel("INFO" if should_log_time() else "ERROR")
 
+
 class Dhis2ImportView(LoginRequiredMixin, StaffuserRequiredMixin, FormView):
     template_name = "import_dhis2.html"
     form_class = Dhis2ImportForm
-    success_url = '/'
+    success_url = "/"
 
     def get_context_data(self, **kwargs):
         context = super(Dhis2ImportView, self).get_context_data(**kwargs)
-        context['title'] = "Import Data For Cycle from DHIS2"
+        context["title"] = "Import Data For Cycle from DHIS2"
         return context
 
     def form_valid(self, form):
-        cycles = form.cleaned_data['cycle']
-        logger.info("launching task",
-                    extra={"task_name": "import_data_from_dhis2", "periods": cycles})
+        cycles = form.cleaned_data["cycle"]
+        logger.info(
+            "launching task",
+            extra={"task_name": "import_data_from_dhis2", "periods": cycles},
+        )
         for cycle in cycles:
             import_data_from_dhis2.apply_async(args=[cycle], priority=2)
         LogEntry.objects.create(
@@ -75,7 +83,11 @@ class Dhis2ImportView(LoginRequiredMixin, StaffuserRequiredMixin, FormView):
             action_flag=CHANGE,
             change_message="Started Import for cycle %s from dhis2" % (cycles),
         )
-        messages.add_message(self.request, messages.INFO, 'Successfully started import for cycles %s' % (cycles))
+        messages.add_message(
+            self.request,
+            messages.INFO,
+            "Successfully started import for cycles %s" % (cycles),
+        )
         return super(Dhis2ImportView, self).form_valid(form)
 
 
@@ -86,44 +98,50 @@ def serialize_upload_file(import_file):
 class DataImportView(LoginRequiredMixin, StaffuserRequiredMixin, FormView):
     template_name = "import.html"
     form_class = FileUploadForm
-    success_url = '/'
+    success_url = "/"
 
     def get_context_data(self, **kwargs):
         context = super(DataImportView, self).get_context_data(**kwargs)
-        context['title'] = "Import Data For Cycle"
+        context["title"] = "Import Data For Cycle"
         return context
 
     def form_valid(self, form):
-        import_file = form.cleaned_data['import_file']
-        cycle = form.cleaned_data['cycle']
-        run_manual_import.apply_async(args=[cycle, serialize_upload_file(import_file)], priority=1)
-        messages.add_message(self.request, messages.INFO, 'Successfully started import for cycle %s' % cycle)
+        import_file = form.cleaned_data["import_file"]
+        cycle = form.cleaned_data["cycle"]
+        run_manual_import.apply_async(
+            args=[cycle, serialize_upload_file(import_file)], priority=1
+        )
+        messages.add_message(
+            self.request,
+            messages.INFO,
+            "Successfully started import for cycle %s" % cycle,
+        )
         return super(DataImportView, self).form_valid(form)
 
 
 class PartnerMappingImportPage(LoginRequiredMixin, StaffuserRequiredMixin, FormView):
     template_name = "partner-mapping.html"
     form_class = MappingUploadForm
-    success_url = '/import/mapping'
+    success_url = "/import/mapping"
 
     def get_context_data(self, **kwargs):
         context = super(PartnerMappingImportPage, self).get_context_data(**kwargs)
-        context['title'] = "Update the Partner to Facility Mapping"
+        context["title"] = "Update the Partner to Facility Mapping"
         return context
 
     def form_valid(self, form):
-        import_file = form.cleaned_data['import_file']
+        import_file = form.cleaned_data["import_file"]
         mapping = load_file(import_file)
         LocationToPartnerMapping.objects.all().delete()
         LocationToPartnerMapping.objects.create(mapping=mapping)
-        messages.add_message(self.request, messages.INFO, 'Successfully updated the partner mapping')
+        messages.add_message(
+            self.request, messages.INFO, "Successfully updated the partner mapping"
+        )
         return super(PartnerMappingImportPage, self).form_valid(form)
 
 
 def download_mapping(request):
-    excel_data = [
-        ['Name', 'IP']
-    ]
+    excel_data = [["Name", "IP"]]
 
     for location, partner in LocationToPartnerMapping.get_mapping().items():
         excel_data.append([location, partner])
@@ -133,14 +151,16 @@ def download_mapping(request):
     for line in excel_data:
         ws.append(line)
 
-    response = HttpResponse(save_virtual_workbook(wb),
-                            content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
-    response['Content-Disposition'] = 'attachment; filename=partner_mapping.xlsx'
+    response = HttpResponse(
+        save_virtual_workbook(wb),
+        content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    )
+    response["Content-Disposition"] = "attachment; filename=partner_mapping.xlsx"
 
     return response
 
 
-DEFAULT = 'DEFAULT'
+DEFAULT = "DEFAULT"
 
 
 class ReportsView(LoginRequiredMixin, TemplateView):
@@ -154,16 +174,16 @@ class ReportsView(LoginRequiredMixin, TemplateView):
         if access_level and access_area:
             qs_filter[access_level.lower()] = access_area
         qs = Score.objects.filter(**qs_filter)
-        ips = qs.values('ip').order_by('ip').distinct()
-        warehouses = qs.values('warehouse').order_by('warehouse').distinct()
+        ips = qs.values("ip").order_by("ip").distinct()
+        warehouses = qs.values("warehouse").order_by("warehouse").distinct()
         checks = FacilityTest.objects.all()
-        districts = qs.values('district').order_by('district').distinct()
-        raw_cycles = [c[0] for c in qs.values_list('cycle').distinct()]
+        districts = qs.values("district").order_by("district").distinct()
+        raw_cycles = [c[0] for c in qs.values_list("cycle").distinct()]
         cycles = sorted(raw_cycles, key=cmp_to_key(sort_cycle), reverse=True)
-        context['districts'] = districts
-        context['ips'] = ips
-        context['warehouses'] = warehouses
-        context['cycles'] = cycles
-        context['checks'] = checks
-        context['formulations'] = TracingFormulations.objects.all()
+        context["districts"] = districts
+        context["ips"] = ips
+        context["warehouses"] = warehouses
+        context["cycles"] = cycles
+        context["checks"] = checks
+        context["formulations"] = TracingFormulations.objects.all()
         return context

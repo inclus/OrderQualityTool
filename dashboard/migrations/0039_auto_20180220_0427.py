@@ -6,10 +6,20 @@ import json
 
 from django.db import migrations
 
-from dashboard.checks.builder import class_based_check, guideline_adherence_adult1l_check, \
-    guideline_adherence_adult2l_check, guideline_paed1l_check, no_negatives_check, volume_tally_check, \
-    non_repeating_check, open_closing_check, stable_consumption_check, nnrti_paed, warehouse_fulfillment_check, \
-    nnrti_adult
+from dashboard.checks.builder import (
+    class_based_check,
+    guideline_adherence_adult1l_check,
+    guideline_adherence_adult2l_check,
+    guideline_paed1l_check,
+    no_negatives_check,
+    volume_tally_check,
+    non_repeating_check,
+    open_closing_check,
+    stable_consumption_check,
+    nnrti_paed,
+    warehouse_fulfillment_check,
+    nnrti_adult,
+)
 
 
 def create_default_tests(apps, schema_editor):
@@ -21,10 +31,6 @@ def reverse(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
-    dependencies = [
-        ('dashboard', '0038_featured_tests'),
-    ]
+    dependencies = [("dashboard", "0038_featured_tests")]
 
-    operations = [
-        migrations.RunPython(create_default_tests, reverse),
-    ]
+    operations = [migrations.RunPython(create_default_tests, reverse)]

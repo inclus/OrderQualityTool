@@ -14,7 +14,7 @@ def create_default_tests(apps, schema_editor):
         {
             "name": "NRTI vs. INSTI/NNRTI/PI Patient Volumes (PAED)",
             "slug": "nrti-vs-insti-nnrti-pi-patient-volumes-paed",
-            "definition": nnrti_paed()
+            "definition": nnrti_paed(),
         },
         {
             "name": "STABLE PATIENTS",
@@ -31,7 +31,9 @@ def create_default_tests(apps, schema_editor):
         query_set = model.objects.filter(slug=test.get("slug"))
         if len(query_set) > 0:
             print("updating ", test.get("slug"))
-            query_set.update(name=test.get("name"), definition=json.dumps(test.get("definition")))
+            query_set.update(
+                name=test.get("name"), definition=json.dumps(test.get("definition"))
+            )
         else:
             print("adding ", test.get("slug"))
             model.objects.create(
@@ -39,7 +41,8 @@ def create_default_tests(apps, schema_editor):
                 definition=json.dumps(test.get("definition")),
                 description=test.get("description"),
                 short_description=test.get("short_description"),
-                order=test.get("order"))
+                order=test.get("order"),
+            )
 
 
 def reverse(apps, schema_editor):
@@ -47,10 +50,6 @@ def reverse(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
-    dependencies = [
-        ('dashboard', '0047_facilitytest_slug'),
-    ]
+    dependencies = [("dashboard", "0047_facilitytest_slug")]
 
-    operations = [
-        migrations.RunPython(create_default_tests, reverse),
-    ]
+    operations = [migrations.RunPython(create_default_tests, reverse)]

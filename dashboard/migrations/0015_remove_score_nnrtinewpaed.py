@@ -7,13 +7,6 @@ from django.db import migrations
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('dashboard', '0014_consumption_days_out_of_stock'),
-    ]
+    dependencies = [("dashboard", "0014_consumption_days_out_of_stock")]
 
-    operations = [
-        migrations.RemoveField(
-            model_name='score',
-            name='nnrtiNewPaed',
-        ),
-    ]
+    operations = [migrations.RemoveField(model_name="score", name="nnrtiNewPaed")]

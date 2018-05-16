@@ -8,6 +8,7 @@ from dashboard.utils import log_formatter, should_log_time
 logger = pygogo.Gogo(__name__, low_formatter=log_formatter).get_logger()
 logger.setLevel("INFO" if should_log_time() else "ERROR")
 
+
 def fetch_reports(reports, periods):
     scrapper = DHIS2Scrapper()
     results = []
@@ -19,7 +20,9 @@ def fetch_reports(reports, periods):
                 if report_id:
                     report_html = scrapper.get_standard_report(report_id, period, unit)
                     if report_html:
-                        results.append(ReportOutput(output=str(report_html), report=report))
+                        results.append(
+                            ReportOutput(output=str(report_html), report=report)
+                        )
                 else:
                     logger.info("Report has no id", extra=report)
     return results

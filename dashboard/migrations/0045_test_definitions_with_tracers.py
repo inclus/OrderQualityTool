@@ -6,10 +6,21 @@ import json
 
 from django.db import migrations
 
-from dashboard.checks.builder import class_based_check, guideline_adherence_adult1l_check, \
-    guideline_adherence_adult2l_check, guideline_paed1l_check, no_negatives_check, volume_tally_check, \
-    non_repeating_check, open_closing_check, stable_consumption_check, nnrti_paed, warehouse_fulfillment_check, \
-    nnrti_adult, no_blanks_check
+from dashboard.checks.builder import (
+    class_based_check,
+    guideline_adherence_adult1l_check,
+    guideline_adherence_adult2l_check,
+    guideline_paed1l_check,
+    no_negatives_check,
+    volume_tally_check,
+    non_repeating_check,
+    open_closing_check,
+    stable_consumption_check,
+    nnrti_paed,
+    warehouse_fulfillment_check,
+    nnrti_adult,
+    no_blanks_check,
+)
 
 
 def create_default_tests(apps, schema_editor):
@@ -19,14 +30,14 @@ def create_default_tests(apps, schema_editor):
             "definition": guideline_adherence_adult1l_check(),
             "description": "Tests if the facility is adhering to national guidelines for Adult 1st Line therapy.\r\n\r\nThis is done by testing if the volume of new ART patients on Adult TDF/3TC/EFV 300/300/600mg formulation represent at least 90% of the total of those on Adult 1L  formulations (all currently available Adult 1L regimens)",
             "short_description": "GUIDELINE ADHERENCE (Adult 1L): New patients on TDF/3TC/EFV 300/300/600mg formulation is 90%+ of total new patients in period?",
-
-        }, {
+        },
+        {
             "name": "GUIDELINE ADHERENCE (Adult 2L)",
             "definition": guideline_adherence_adult2l_check(),
             "description": "Tests if the facility is adhering to national guidelines for Adult 2nd Line therapy\r\n\r\nThis is done by testing if the volume of new ART patients on Adult ATV/r-based formulations (i.e. ATV/r 300/100mg) represent at least 80% of the total of those on ATV/r-based and LPV/r-based formulations (Adult LPV/r-based formulations are LPV/r 200/50mg)",
             "short_description": "GUIDELINE ADHERENCE (Adult 2L): New patients on ATV/r-based formulations are 80%+ of total new patients for the period?",
-
-        }, {
+        },
+        {
             "name": "GUIDELINE ADHERENCE (Paediatric 1L)",
             "definition": guideline_paed1l_check(),
             "description": "Tests if the facility is adhering to national guidelines for Paediatric 1st Line therapy\r\n\r\nThis is done by testing if the volume of new Paediatric ART patients on Paediatric ABC-based formulations (i.e. ABC/3TC 120/60mg) represent at least 80% of the total of those on ABC-based and AZT-based formulations (Paediatric AZT-based formulations including AZT/3TC 60/30mg)",
@@ -47,34 +58,40 @@ def create_default_tests(apps, schema_editor):
         {
             "name": "VOLUME TALLY",
             "definition": volume_tally_check(),
-            "description": "This test is carried out for the system's three Sample Formulations: 1) Adult TDF/3TC/EFV (300/300/600mg), 2) Paediatric ABC/3TC (120/60mg), and 3) Paediatric EFV(200mg)\r\n\r\nTests if the facility has reported corresponding Consumption volumes and Patient numbers that \"make sense\", i.e. are within 30% of each other. The specific datapoints compared are:\r\n\r\n1) For Sample Formulation 1, Adult TDF/3TC/EFV: Compares bimonthly Consumption volumes of formulation Tenofovir/Lamivudine/Efavirenz (TDF/3TC/EFV) 300mg/300mg/600mg[Pack 30] (converted into an estimated Patients figure by dividing by 2.0) with Patient Numbers for regimens TDF/3TC/EFV (ADULT) and TDF/3TC/EFV (PMTCT)\r\n\r\n2) For Sample Formulation 2, Paediatric ABC/3TC: Compares bimonthly Consumption volumes of formulation Abacavir/Lamivudine (ABC/3TC) 120mg/60mg [Pack 60] (converted into an estimated Patients figure by dividing by 4.6) with Patient Numbers for regimens ABC/3TC/EFV (PAED), ABC/3TC/NVP (PAED) and ABC/3TC/LPV/r (PAED)\r\n\r\n3) For Sample Formulation 3, Paediatric EFV: Compares bimonthly Consumption volumes of formulation Efavirenz (EFV) 200mg [Pack 90] (converted into an estimated Patients figure by dividing by 1.0) with Patient Numbers for regimens ABC/3TC/EFV (PAED) and AZT/3TC/EFV (PAED)",
+            "description": 'This test is carried out for the system\'s three Sample Formulations: 1) Adult TDF/3TC/EFV (300/300/600mg), 2) Paediatric ABC/3TC (120/60mg), and 3) Paediatric EFV(200mg)\r\n\r\nTests if the facility has reported corresponding Consumption volumes and Patient numbers that "make sense", i.e. are within 30% of each other. The specific datapoints compared are:\r\n\r\n1) For Sample Formulation 1, Adult TDF/3TC/EFV: Compares bimonthly Consumption volumes of formulation Tenofovir/Lamivudine/Efavirenz (TDF/3TC/EFV) 300mg/300mg/600mg[Pack 30] (converted into an estimated Patients figure by dividing by 2.0) with Patient Numbers for regimens TDF/3TC/EFV (ADULT) and TDF/3TC/EFV (PMTCT)\r\n\r\n2) For Sample Formulation 2, Paediatric ABC/3TC: Compares bimonthly Consumption volumes of formulation Abacavir/Lamivudine (ABC/3TC) 120mg/60mg [Pack 60] (converted into an estimated Patients figure by dividing by 4.6) with Patient Numbers for regimens ABC/3TC/EFV (PAED), ABC/3TC/NVP (PAED) and ABC/3TC/LPV/r (PAED)\r\n\r\n3) For Sample Formulation 3, Paediatric EFV: Compares bimonthly Consumption volumes of formulation Efavirenz (EFV) 200mg [Pack 90] (converted into an estimated Patients figure by dividing by 1.0) with Patient Numbers for regimens ABC/3TC/EFV (PAED) and AZT/3TC/EFV (PAED)',
             "short_description": "VOLUME TALLY: Consumption and patient volumes within 30%?",
-        }, {
+        },
+        {
             "name": "NON-REPEATING",
             "definition": non_repeating_check(),
             "description": "This test is carried out for the system's three Sample Formulations: 1) Adult TDF/3TC/EFV (300/300/600mg), 2) Paediatric ABC/3TC (120/60mg), and 3) Paediatric EFV(200mg)\r\n\r\nTests if the facility has submitted the same order in consecutive cycles. This is done by comparing certain key datapoints (Opening Balance, ART Consumption, Days Out of Stock) from a given cycle with the same datapoints reported in the previous cycle",
             "short_description": "NON-REPEATING: Order changes in consecutive cycles?",
-        }, {
+        },
+        {
             "name": "OPENING = CLOSING",
             "definition": open_closing_check(),
-            "description": "This test is carried out for the system's three Sample Formulations: 1) Adult TDF/3TC/EFV (300/300/600mg), 2) Paediatric ABC/3TC (120/60mg), and 3) Paediatric EFV(200mg)\r\n\r\nTests if the \"Opening Balance\" reported by the facility in one cycle is the same as the \"Closing Balance\" result of the previous cycle",
+            "description": 'This test is carried out for the system\'s three Sample Formulations: 1) Adult TDF/3TC/EFV (300/300/600mg), 2) Paediatric ABC/3TC (120/60mg), and 3) Paediatric EFV(200mg)\r\n\r\nTests if the "Opening Balance" reported by the facility in one cycle is the same as the "Closing Balance" result of the previous cycle',
             "short_description": "OPENING = CLOSING: Opening  balance = Closing balance from previous cycle?",
-        }, {
+        },
+        {
             "name": "STABLE CONSUMPTION",
             "definition": stable_consumption_check(),
             "description": "This test is carried out for the system's three Sample Formulations: 1) Adult TDF/3TC/EFV (300/300/600mg), 2) Paediatric ABC/3TC (120/60mg), and 3) Paediatric EFV(200mg)\r\n\r\nTests if the facility's total Consumption volume (i.e. ART Consumption + PMTCT Consumption) in a given cycle is stable relative to that of the previous cycle, with stability defined as a change of less than 50%. This test is run for the system's three Sample Formulations but excludes facilities that are considered \"low volume\", according to the following rules:\r\n\r\n1) For Sample Formulation 1, Adult TDF/3TC/EFV: Total consumption in either cycle must be at least 20 packs\r\n\r\n2) For Sample Formulation 2, Paediatric ABC/3TC: Total consumption in either cycle must be at least 10 packs\r\n\r\n3) For Sample Formulation 3, Paediatric EFV: Total consumption in either cycle must be at least 10 packs\r\n\r\nTo note, in situations where there is a drastic shift in consumption for TDF/3TC/EFV it may be due to a stock-out and the facility has shifted to using TDF/3TC + EFV. This must be checked for manual to determine if this is the underlying reason for the drastic shift in consumption period to period for TDF/3TC/EFV.",
             "short_description": "STABLE CONSUMPTION: Consumption changes by less than 50% vs. previous cycle?",
-        }, {
+        },
+        {
             "name": "WAREHOUSE FULFILMENT",
             "definition": warehouse_fulfillment_check(),
-            "description": "This test is carried out for the system's three Sample Formulations: 1) Adult TDF/3TC/EFV (300/300/600mg), 2) Paediatric ABC/3TC (120/60mg), and 3) Paediatric EFV(200mg)\r\n\r\nTests if the \"Quantity Received\" reported by the facility in one cycle is the same as the \"Packs Ordered\" result of the previous cycle.\r\n\r\nThis test can therefore reflect more than just the facility's ability to input correct figures as per what has been delivered. It also tests warehouse ability to correctly deliver what has been requested",
+            "description": 'This test is carried out for the system\'s three Sample Formulations: 1) Adult TDF/3TC/EFV (300/300/600mg), 2) Paediatric ABC/3TC (120/60mg), and 3) Paediatric EFV(200mg)\r\n\r\nTests if the "Quantity Received" reported by the facility in one cycle is the same as the "Packs Ordered" result of the previous cycle.\r\n\r\nThis test can therefore reflect more than just the facility\'s ability to input correct figures as per what has been delivered. It also tests warehouse ability to correctly deliver what has been requested',
             "short_description": "WAREHOUSE FULFILMENT: Volume delivered = volume ordered in previous cycle?",
-        }, {
+        },
+        {
             "name": "NRTI vs. INSTI/NNRTI/PI patient volumes (ADULT)",
             "definition": nnrti_adult(),
             "description": "Tests if the current patient numbers implied by facility's reported Adult NRTI consumption volumes are similar to those implied by the reported Adult NNRTI/PI consumption volumes\r\n\r\nThis is done by taking total consumption volumes (ART and PMTCT) for each of the formulations below, converting to patient numbers (by dividing through by 2.0 for all formulations), summing the totals for both sets of formulations (NRTI and NNRTI/PI) separately, and finally testing if the two resulting figures are within 30% of each other.\r\n\r\nNRTI formulations: TDF/3TC 300/300mg, AZT/3TC 300/150mg, ABC/3TC 600/300mg\r\nNNRTI/PI formulations: NVP 200mg, EFV 600mg, ATV/r 300/100mg, LPV/r 200/50mg",
             "short_description": "NRTI vs. INSTI/NNRTI/PI patient volumes (ADULT): Differ by <30%?",
-        }, {
+        },
+        {
             "name": "NRTI vs. INSTI/NNRTI/PI patient volumes (PAED)",
             "description": "Tests if the current reported Paediatric NRTI patient volumes (implied using consumption volumes) are similar to the reported Paediatric NNRTI/PI patient volumes (implied using consumption volumes).\r\n\r\nThis is done by taking total consumption volumes (ART and PMTCT) for each of the formulations below, converting the consumption values into patient volumes, summing the totals for both sets of formulations (NRTI and NNRTI/PI) separately, and finally testing if the two resulting figures are within 30% of each other.\r\n\r\nNRTI formulations: AZT/3TC 60/30mg, ABC/3TC 120/60mg\r\nNNRTI/PI formulations: NVP 50mg, EFV 200mg, LPV/r 100/25mg, LPV/r 40/10mg",
             "short_description": "NRTI vs. INSTI/NNRTI/PI patient volumes (PAED): Differ by <30%?",
@@ -82,25 +99,29 @@ def create_default_tests(apps, schema_editor):
         },
         {
             "name": "MULTIPLE ORDERS",
-            "definition": class_based_check("dashboard.checks.legacy.blanks.MultipleCheck"),
+            "definition": class_based_check(
+                "dashboard.checks.legacy.blanks.MultipleCheck"
+            ),
             "description": "Reports facilities that have submitted more than one order during a given cycle",
             "short_description": "MULTIPLE ORDERS: Submitted more than one order?",
         },
         {
             "name": "Facility Reporting",
-            "definition": class_based_check("dashboard.checks.legacy.blanks.IsReportingCheck"),
+            "definition": class_based_check(
+                "dashboard.checks.legacy.blanks.IsReportingCheck"
+            ),
             "description": "Reports if the facility has submitted an order or not during a given cycle",
             "short_description": "Did the facility submit an order?",
-
         },
-
     ]
 
     model = apps.get_registered_model("dashboard", "FacilityTest")
     for test in default_tests:
-        model.objects.filter(name=test.get("name")).update(definition=json.dumps(test.get("definition")),
-                                                           description=test.get("description"),
-                                                           short_description=test.get("short_description"))
+        model.objects.filter(name=test.get("name")).update(
+            definition=json.dumps(test.get("definition")),
+            description=test.get("description"),
+            short_description=test.get("short_description"),
+        )
 
 
 def reverse(apps, schema_editor):
@@ -108,10 +129,6 @@ def reverse(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
-    dependencies = [
-        ('dashboard', '0044_cleanup_tracing_formulations'),
-    ]
+    dependencies = [("dashboard", "0044_cleanup_tracing_formulations")]
 
-    operations = [
-        migrations.RunPython(create_default_tests, reverse),
-    ]
+    operations = [migrations.RunPython(create_default_tests, reverse)]

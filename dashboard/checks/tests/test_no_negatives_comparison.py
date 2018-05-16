@@ -6,6 +6,7 @@ no_negatives_comparison = NoNegativesComparison().compare
 
 
 class TestNo_negatives_comparison(TestCase):
+
     def test_no_negatives_comparison_compares_lists(self):
         result = no_negatives_comparison([1, 2], [121, 12])
         self.assertTrue(result)

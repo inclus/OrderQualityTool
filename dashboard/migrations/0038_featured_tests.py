@@ -7,7 +7,11 @@ from django.db import migrations
 
 def create_default_tests(apps, schema_editor):
     model = apps.get_registered_model("dashboard", "FacilityTest")
-    model.objects.filter(name__in=["Facility Reporting", "GUIDELINE ADHERENCE (Adult 1L)"]).update(featured=True)
+    model.objects.filter(
+        name__in=["Facility Reporting", "GUIDELINE ADHERENCE (Adult 1L)"]
+    ).update(
+        featured=True
+    )
 
 
 def reverse(apps, schema_editor):
@@ -15,10 +19,6 @@ def reverse(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
-    dependencies = [
-        ('dashboard', '0037_auto_20180201_1935'),
-    ]
+    dependencies = [("dashboard", "0037_auto_20180201_1935")]
 
-    operations = [
-        migrations.RunPython(create_default_tests, reverse),
-    ]
+    operations = [migrations.RunPython(create_default_tests, reverse)]

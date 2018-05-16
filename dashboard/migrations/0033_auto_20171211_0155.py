@@ -28,12 +28,14 @@ F2_QUERY = ["Abacavir/Lamivudine (ABC/3TC) 60mg/30mg [Pack 60]"]
 
 def add_default_tracers(apps, schema_editor):
     model = apps.get_registered_model("dashboard", "TracingFormulations")
-    tracers = [{NAME: F1, FORMULATIONS: F1_PATIENT_QUERY, MODEL: PATIENTS},
-               {NAME: F2, FORMULATIONS: F2_PATIENT_QUERY, MODEL: PATIENTS},
-               {NAME: F3, FORMULATIONS: F3_PATIENT_QUERY, MODEL: PATIENTS},
-               {NAME: F1, FORMULATIONS: F1_QUERY, MODEL: CONSUMPTION},
-               {NAME: F2, FORMULATIONS: F2_QUERY, MODEL: CONSUMPTION},
-               {NAME: F3, FORMULATIONS: F3_QUERY, MODEL: CONSUMPTION}]
+    tracers = [
+        {NAME: F1, FORMULATIONS: F1_PATIENT_QUERY, MODEL: PATIENTS},
+        {NAME: F2, FORMULATIONS: F2_PATIENT_QUERY, MODEL: PATIENTS},
+        {NAME: F3, FORMULATIONS: F3_PATIENT_QUERY, MODEL: PATIENTS},
+        {NAME: F1, FORMULATIONS: F1_QUERY, MODEL: CONSUMPTION},
+        {NAME: F2, FORMULATIONS: F2_QUERY, MODEL: CONSUMPTION},
+        {NAME: F3, FORMULATIONS: F3_QUERY, MODEL: CONSUMPTION},
+    ]
     for tracer in tracers:
         model_obj, created = model.objects.get_or_create(**tracer)
         model_obj.save()
@@ -42,11 +44,8 @@ def add_default_tracers(apps, schema_editor):
 def reverse(apps, schema_editor):
     pass
 
-class Migration(migrations.Migration):
-    dependencies = [
-        ('dashboard', '0032_tracingformulations'),
-    ]
 
-    operations = [
-        migrations.RunPython(add_default_tracers, reverse),
-    ]
+class Migration(migrations.Migration):
+    dependencies = [("dashboard", "0032_tracingformulations")]
+
+    operations = [migrations.RunPython(add_default_tracers, reverse)]

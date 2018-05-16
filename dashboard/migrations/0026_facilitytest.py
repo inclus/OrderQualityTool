@@ -7,23 +7,27 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('dashboard', '0025_auto_20171127_0206'),
-    ]
+    dependencies = [("dashboard", "0025_auto_20171127_0206")]
 
     operations = [
         migrations.CreateModel(
-            name='FacilityTest',
+            name="FacilityTest",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=255)),
-                ('created', models.DateTimeField(auto_now_add=True)),
-                ('last_updated', models.DateTimeField(auto_now=True)),
-                ('definition', models.TextField()),
-                ('description', models.TextField()),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=255)),
+                ("created", models.DateTimeField(auto_now_add=True)),
+                ("last_updated", models.DateTimeField(auto_now=True)),
+                ("definition", models.TextField()),
+                ("description", models.TextField()),
             ],
-            options={
-                'verbose_name_plural': 'Facility Test',
-            },
-        ),
+            options={"verbose_name_plural": "Facility Test"},
+        )
     ]

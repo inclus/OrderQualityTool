@@ -6,10 +6,23 @@ from model_mommy import mommy
 
 from dashboard.checks.legacy.nn import NNRTIPAEDCheck, NNRTIADULTSCheck
 from dashboard.checks.tracer import Tracer
-from dashboard.helpers import DEFAULT, YES, DF1, DF2, PACKS_ORDERED, \
-    ESTIMATED_NUMBER_OF_NEW_PREGNANT_WOMEN, ESTIMATED_NUMBER_OF_NEW_ART_PATIENTS, \
-    QUANTITY_REQUIRED_FOR_CURRENT_PATIENTS, MONTHS_OF_STOCK_ON_HAND, CLOSING_BALANCE, LOSES_ADJUSTMENTS, \
-    COMBINED_CONSUMPTION, QUANTITY_RECEIVED, OPENING_BALANCE, F1_QUERY
+from dashboard.helpers import (
+    DEFAULT,
+    YES,
+    DF1,
+    DF2,
+    PACKS_ORDERED,
+    ESTIMATED_NUMBER_OF_NEW_PREGNANT_WOMEN,
+    ESTIMATED_NUMBER_OF_NEW_ART_PATIENTS,
+    QUANTITY_REQUIRED_FOR_CURRENT_PATIENTS,
+    MONTHS_OF_STOCK_ON_HAND,
+    CLOSING_BALANCE,
+    LOSES_ADJUSTMENTS,
+    COMBINED_CONSUMPTION,
+    QUANTITY_RECEIVED,
+    OPENING_BALANCE,
+    F1_QUERY,
+)
 from dashboard.models import Score, Consumption, AdultPatientsRecord, PAEDPatientsRecord
 
 F1_PATIENT_QUERY = ["TDF/3TC/EFV (PMTCT)", "TDF/3TC/EFV (ADULT)"]
@@ -26,7 +39,7 @@ def generate_values():
         LOSES_ADJUSTMENTS,
         COMBINED_CONSUMPTION,
         QUANTITY_RECEIVED,
-        OPENING_BALANCE
+        OPENING_BALANCE,
     ]
     data = {}
     for field in fields:
@@ -43,20 +56,52 @@ class ScoreDetailTestCase():
         ip = "I1"
         district = "D1"
         cycle = "Jan - Feb 2015"
-        score = Score.objects.create(name=name, warehouse=warehouse, ip=ip, district=district,
-                                     data={"REPORTING": {DEFAULT: YES}},
-                                     cycle=cycle)
+        score = Score.objects.create(
+            name=name,
+            warehouse=warehouse,
+            ip=ip,
+            district=district,
+            data={"REPORTING": {DEFAULT: YES}},
+            cycle=cycle,
+        )
         for q in F1_PATIENT_QUERY:
-            mommy.make(AdultPatientsRecord, name=name, warehouse=warehouse, ip=ip, district=district, cycle=cycle,
-                       formulation=q, new=random.randrange(0, 600), existing=random.randrange(0, 600))
-            mommy.make(PAEDPatientsRecord, name=name, warehouse=warehouse, ip=ip, district=district, cycle=cycle,
-                       formulation=q, new=random.randrange(0, 600), existing=random.randrange(0, 600))
+            mommy.make(
+                AdultPatientsRecord,
+                name=name,
+                warehouse=warehouse,
+                ip=ip,
+                district=district,
+                cycle=cycle,
+                formulation=q,
+                new=random.randrange(0, 600),
+                existing=random.randrange(0, 600),
+            )
+            mommy.make(
+                PAEDPatientsRecord,
+                name=name,
+                warehouse=warehouse,
+                ip=ip,
+                district=district,
+                cycle=cycle,
+                formulation=q,
+                new=random.randrange(0, 600),
+                existing=random.randrange(0, 600),
+            )
         for formulation in self.get_formulations():
             values = generate_values()
-            mommy.make(Consumption, name=name, warehouse=warehouse, ip=ip, district=district, cycle=cycle,
-                       formulation=formulation, **values)
-        url = reverse("scores-detail",
-                      kwargs={"id": score.id, "column": self.column}) + "?combination=" + Tracer.F1().key
+            mommy.make(
+                Consumption,
+                name=name,
+                warehouse=warehouse,
+                ip=ip,
+                district=district,
+                cycle=cycle,
+                formulation=formulation,
+                **values
+            )
+        url = reverse(
+            "scores-detail", kwargs={"id": score.id, "column": self.column}
+        ) + "?combination=" + Tracer.F1().key
         response = self.app.get(url)
         self.assertEqual(response.status_code, 200)
 
@@ -69,7 +114,9 @@ class NNRTICheckTestMixin(ScoreDetailTestCase):
 
     def get_formulations(self):
         check = NNRTIPAEDCheck()
-        formulations = check.combinations[0].extras[DF1] + check.combinations[0].extras[DF2]
+        formulations = check.combinations[0].extras[DF1] + check.combinations[0].extras[
+            DF2
+        ]
         return formulations
 
 

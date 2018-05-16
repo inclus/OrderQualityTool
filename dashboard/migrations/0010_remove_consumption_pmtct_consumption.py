@@ -7,13 +7,8 @@ from django.db import migrations
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('dashboard', '0009_auto_20160424_2109'),
-    ]
+    dependencies = [("dashboard", "0009_auto_20160424_2109")]
 
     operations = [
-        migrations.RemoveField(
-            model_name='consumption',
-            name='pmtct_consumption',
-        ),
+        migrations.RemoveField(model_name="consumption", name="pmtct_consumption")
     ]

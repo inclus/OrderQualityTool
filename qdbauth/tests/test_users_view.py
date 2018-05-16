@@ -5,6 +5,7 @@ from dashboard.models import DashboardUser
 
 
 class SuperUserAuthMixin():
+
     def test_should_require_login(self):
         response = self.app.get(self.get_url())
         self.assertEqual(response.status_code, 302)
@@ -41,21 +42,21 @@ class UserAddViewTestCase(WebTest, SuperUserAuthMixin):
         user = DashboardUser.objects.create_superuser("a@a.com", "secret")
         response = self.app.get(self.get_url(), user=user)
         form = response.form
-        form['email'] = "theuser@mail.com"
-        form['password1'] = "secret"
-        form['password2'] = ""
+        form["email"] = "theuser@mail.com"
+        form["password1"] = "secret"
+        form["password2"] = ""
         response = form.submit()
         self.assertTrue("form" in response.context)
-        self.assertFalse(response.context['form'].is_valid())
+        self.assertFalse(response.context["form"].is_valid())
 
     def test_should_create_user(self):
         user = DashboardUser.objects.create_superuser("a@a.com", "secret")
         response = self.app.get(self.get_url(), user=user)
         form = response.form
-        form['email'] = "theuser@mail.com"
-        form['password1'] = "secret"
-        form['password2'] = "secret"
-        form['access_level'] = "IP"
+        form["email"] = "theuser@mail.com"
+        form["password1"] = "secret"
+        form["password2"] = "secret"
+        form["access_level"] = "IP"
         response = form.submit()
         self.assertEqual(response.status_code, 302)
         self.assertEqual(DashboardUser.objects.count(), 3)

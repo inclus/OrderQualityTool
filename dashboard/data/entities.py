@@ -9,8 +9,8 @@ TABLE_COLUMN_QUANTITY_REQUIRED_FOR_CURRENT_PATIENTS = "QUANTITY REQUIRED FOR CUR
 TABLE_COLUMN_PACKS_ORDERED = "Packs Ordered"
 TABLE_COLUMN_MONTHS_OF_STOCK_ON_HAND = "MONTHS OF STOCK ON-HAND"
 TABLE_COLUMN_RECEIVED = "Quantity Recieved"
-EXISTING = 'existing'
-NEW = 'new'
+EXISTING = "existing"
+NEW = "new"
 TABLE_COLUMN_SUBCOUNTY = "Subcounty"
 TABLE_COLUMN_REGION = "Region"
 TABLE_COLUMN_FACILITY = "Facility"
@@ -76,7 +76,8 @@ class PatientRecord(Record):
             regimen_location=self.regimen_location,
             existing=as_number(record.existing) + as_number(self.existing),
             new=as_number(record.new) + as_number(self.new),
-            formulation=self.formulation)
+            formulation=self.formulation,
+        )
 
     @staticmethod
     def migrate_from_dict(data, location=None, regimen_location=None):
@@ -122,28 +123,55 @@ class ConsumptionRecord(Record):
             loses_adjustments=data.get(LOSES_ADJUSTMENTS),
             closing_balance=data.get(CLOSING_BALANCE),
             months_of_stock_on_hand=data.get(MONTHS_OF_STOCK_ON_HAND),
-            quantity_required_for_current_patients=data.get(QUANTITY_REQUIRED_FOR_CURRENT_PATIENTS),
-            estimated_number_of_new_patients=data.get(ESTIMATED_NUMBER_OF_NEW_ART_PATIENTS),
-            estimated_number_of_new_pregnant_women=data.get(ESTIMATED_NUMBER_OF_NEW_PREGNANT_WOMEN),
+            quantity_required_for_current_patients=data.get(
+                QUANTITY_REQUIRED_FOR_CURRENT_PATIENTS
+            ),
+            estimated_number_of_new_patients=data.get(
+                ESTIMATED_NUMBER_OF_NEW_ART_PATIENTS
+            ),
+            estimated_number_of_new_pregnant_women=data.get(
+                ESTIMATED_NUMBER_OF_NEW_PREGNANT_WOMEN
+            ),
             days_out_of_stock=data.get(DAYS_OUT_OF_STOCK),
             packs_ordered=data.get(PACKS_ORDERED),
         )
 
     def add(self, record):
-        opening_balance = as_number(self.opening_balance) + as_number(record.opening_balance)
-        quantity_received = as_number(self.quantity_received) + as_number(record.quantity_received)
+        opening_balance = as_number(self.opening_balance) + as_number(
+            record.opening_balance
+        )
+        quantity_received = as_number(self.quantity_received) + as_number(
+            record.quantity_received
+        )
         consumption = as_number(self.consumption) + as_number(record.consumption)
-        loses_adjustments = as_number(self.loses_adjustments) + as_number(record.loses_adjustments)
-        closing_balance = as_number(self.closing_balance) + as_number(record.closing_balance)
-        months_of_stock_on_hand = as_number(self.months_of_stock_on_hand) + as_number(record.months_of_stock_on_hand)
-        quantity_required_for_current_patients = as_number(self.quantity_required_for_current_patients) + as_number(
-            record.quantity_required_for_current_patients)
-        estimated_number_of_new_patients = as_number(self.estimated_number_of_new_patients) + as_number(
-            record.estimated_number_of_new_patients)
-        number_of_new_pregnant_women = as_number(self.estimated_number_of_new_pregnant_women) + as_number(
-            record.estimated_number_of_new_pregnant_women)
+        loses_adjustments = as_number(self.loses_adjustments) + as_number(
+            record.loses_adjustments
+        )
+        closing_balance = as_number(self.closing_balance) + as_number(
+            record.closing_balance
+        )
+        months_of_stock_on_hand = as_number(self.months_of_stock_on_hand) + as_number(
+            record.months_of_stock_on_hand
+        )
+        quantity_required_for_current_patients = as_number(
+            self.quantity_required_for_current_patients
+        ) + as_number(
+            record.quantity_required_for_current_patients
+        )
+        estimated_number_of_new_patients = as_number(
+            self.estimated_number_of_new_patients
+        ) + as_number(
+            record.estimated_number_of_new_patients
+        )
+        number_of_new_pregnant_women = as_number(
+            self.estimated_number_of_new_pregnant_women
+        ) + as_number(
+            record.estimated_number_of_new_pregnant_women
+        )
         packs_ordered = as_number(self.packs_ordered) + as_number(record.packs_ordered)
-        days_out_of_stock = as_number(self.days_out_of_stock) + as_number(record.days_out_of_stock)
+        days_out_of_stock = as_number(self.days_out_of_stock) + as_number(
+            record.days_out_of_stock
+        )
         return ConsumptionRecord(
             location=self.location,
             regimen_location=self.regimen_location,
@@ -189,7 +217,8 @@ class HtmlDataImportRecord(object):
 
     def get_consumption(self):
         return as_number(self.data.get(TABLE_COLUMN_ART_CONSUMPTION)) + as_number(
-            self.data.get(TABLE_COLUMN_PMTCT_CONSUMPTION))
+            self.data.get(TABLE_COLUMN_PMTCT_CONSUMPTION)
+        )
 
     def get_loses_adjustments(self):
         return as_number(self.data.get(TABLE_COLUMN_LOSES_ADJUSTMENTS))
@@ -201,7 +230,9 @@ class HtmlDataImportRecord(object):
         return as_number(self.data.get(TABLE_COLUMN_MONTHS_OF_STOCK_ON_HAND))
 
     def get_quantity_required_for_current_patients(self):
-        return as_number(self.data.get(TABLE_COLUMN_QUANTITY_REQUIRED_FOR_CURRENT_PATIENTS))
+        return as_number(
+            self.data.get(TABLE_COLUMN_QUANTITY_REQUIRED_FOR_CURRENT_PATIENTS)
+        )
 
     def get_number_of_new_art_patients(self):
         return as_number(self.data.get(TABLE_COLUMN_NEW_PATIENTS))
@@ -230,43 +261,51 @@ class HtmlDataImportRecord(object):
             district=district,
             partner=partner,
             status="reporting",
-            warehouse=self.warehouse
+            warehouse=self.warehouse,
         )
 
     def get_regimen_location(self):
         if self.report_type == CONSUMPTION_REPORT:
             formulation = self.data.get("REGIMEN")
-            return RegimenLocationCombination(location=self.location, formulation=formulation)
+            return RegimenLocationCombination(
+                location=self.location, formulation=formulation
+            )
         else:
             formulation = self.data.get(TABLE_COLUMN_REGIMEN)
-            rl = RegimenLocationCombination(location=self.location, formulation=formulation)
+            rl = RegimenLocationCombination(
+                location=self.location, formulation=formulation
+            )
 
     def build_patient_record(self):
         formulation = self.data.get(TABLE_COLUMN_REGIMEN)
         rl = RegimenLocationCombination(location=self.location, formulation=formulation)
-        return PatientRecord(location=self.location,
-                             regimen_location=rl,
-                             existing=as_number(self.data.get(TABLE_COLUMN_EXISTING)),
-                             new=as_number(self.data.get(TABLE_COLUMN_NEW)),
-                             formulation=formulation)
+        return PatientRecord(
+            location=self.location,
+            regimen_location=rl,
+            existing=as_number(self.data.get(TABLE_COLUMN_EXISTING)),
+            new=as_number(self.data.get(TABLE_COLUMN_NEW)),
+            formulation=formulation,
+        )
 
     def build_consumption_record(self):
         formulation = self.data.get("REGIMEN")
         rl = RegimenLocationCombination(location=self.location, formulation=formulation)
-        return ConsumptionRecord(location=self.location,
-                                 regimen_location=rl,
-                                 opening_balance=self.get_opening_balance(),
-                                 quantity_received=self.get_quantity_received(),
-                                 consumption=self.get_consumption(),
-                                 loses_adjustments=self.get_loses_adjustments(),
-                                 closing_balance=self.get_closing_balance(),
-                                 months_of_stock_on_hand=self.get_months_of_stock_on_hand(),
-                                 quantity_required_for_current_patients=self.get_quantity_required_for_current_patients(),
-                                 estimated_number_of_new_patients=self.get_number_of_new_art_patients(),
-                                 estimated_number_of_new_pregnant_women=self.get_number_of_new_pregnant_patients(),
-                                 packs_ordered=self.get_packs_ordered(),
-                                 days_out_of_stock=None,
-                                 formulation=formulation)
+        return ConsumptionRecord(
+            location=self.location,
+            regimen_location=rl,
+            opening_balance=self.get_opening_balance(),
+            quantity_received=self.get_quantity_received(),
+            consumption=self.get_consumption(),
+            loses_adjustments=self.get_loses_adjustments(),
+            closing_balance=self.get_closing_balance(),
+            months_of_stock_on_hand=self.get_months_of_stock_on_hand(),
+            quantity_required_for_current_patients=self.get_quantity_required_for_current_patients(),
+            estimated_number_of_new_patients=self.get_number_of_new_art_patients(),
+            estimated_number_of_new_pregnant_women=self.get_number_of_new_pregnant_patients(),
+            packs_ordered=self.get_packs_ordered(),
+            days_out_of_stock=None,
+            formulation=formulation,
+        )
 
 
 @attr.s
@@ -294,8 +333,9 @@ class ExcelDataImportRecord(object):
     def build_patient_record(self):
         formulation = self.data.get(FORMULATION)
         rl = RegimenLocationCombination(location=self.location, formulation=formulation)
-        return PatientRecord.migrate_from_dict(self.data, location=self.location,
-                                               regimen_location=rl)
+        return PatientRecord.migrate_from_dict(
+            self.data, location=self.location, regimen_location=rl
+        )
 
     def build_consumption_record(self):
         formulation = self.data.get(FORMULATION)
@@ -321,7 +361,9 @@ class LocationData(object):
 
     @staticmethod
     def migrate_from_dict(data):
-        c_records = list(map(ConsumptionRecord.migrate_from_dict, data.get(C_RECORDS, [])))
+        c_records = list(
+            map(ConsumptionRecord.migrate_from_dict, data.get(C_RECORDS, []))
+        )
         a_records = list(map(PatientRecord.migrate_from_dict, data.get(A_RECORDS, [])))
         p_records = list(map(PatientRecord.migrate_from_dict, data.get(P_RECORDS, [])))
         location = Location.migrate_from_dict(data)
@@ -335,7 +377,7 @@ class LocationData(object):
             p_records=p_records,
             c_count=c_count,
             a_count=a_count,
-            p_count=p_count
+            p_count=p_count,
         )
 
 
@@ -359,5 +401,5 @@ def enrich_location_data(location, report):
         p_count=len(p_records),
         c_records=c_records,
         p_records=p_records,
-        a_records=a_records
+        a_records=a_records,
     )

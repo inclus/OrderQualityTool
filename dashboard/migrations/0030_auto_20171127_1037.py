@@ -8,14 +8,12 @@ from django.db import migrations
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('dashboard', '0029_auto_20171127_0307'),
-    ]
+    dependencies = [("dashboard", "0029_auto_20171127_0307")]
 
     operations = [
         migrations.AlterField(
-            model_name='facilitytest',
-            name='definition',
+            model_name="facilitytest",
+            name="definition",
             field=dashboard.widget.TestDefinitionField(),
-        ),
+        )
     ]

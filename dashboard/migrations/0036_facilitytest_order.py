@@ -19,16 +19,14 @@ def reverse(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
-    dependencies = [
-        ('dashboard', '0035_auto_20180125_0716'),
-    ]
+    dependencies = [("dashboard", "0035_auto_20180125_0716")]
 
     operations = [
         migrations.AddField(
-            model_name='facilitytest',
-            name='order',
+            model_name="facilitytest",
+            name="order",
             field=models.PositiveIntegerField(db_index=True, default=1, editable=False),
             preserve_default=False,
         ),
-        migrations.RunPython(set_order, reverse)
+        migrations.RunPython(set_order, reverse),
     ]

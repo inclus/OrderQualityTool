@@ -7,14 +7,10 @@ from django.db import migrations
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('dashboard', '0015_remove_score_nnrtinewpaed'),
-    ]
+    dependencies = [("dashboard", "0015_remove_score_nnrtinewpaed")]
 
     operations = [
         migrations.RenameField(
-            model_name='score',
-            old_name='nnrtiCurrentPaed',
-            new_name='nnrtiPaed',
-        ),
+            model_name="score", old_name="nnrtiCurrentPaed", new_name="nnrtiPaed"
+        )
     ]

@@ -16,6 +16,7 @@ from dashboard.utils import timeit
 
 
 def as_data_records(fields):
+
     def _map(item):
         values = [v for i, v in enumerate(pick(attr.asdict(item), fields).values())]
         return DataRecord(formulation=item.formulation, fields=fields, values=values)
@@ -42,6 +43,7 @@ CLASS_BASED = "ClassBased"
 
 
 class DynamicCheckMixin(object):
+
     def __init__(self, definition):
         self.definition = definition
 
@@ -64,45 +66,59 @@ class DynamicCheckMixin(object):
 class DBBasedCheckPreview(DynamicCheckMixin):
 
     @timeit
-    def get_preview_data(self, sample_location=None, sample_cycle=None, sample_tracer=None):
+    def get_preview_data(
+        self, sample_location=None, sample_cycle=None, sample_tracer=None
+    ):
         if sample_location is None:
-            sample_location = self.definition.sample.get('location')
+            sample_location = self.definition.sample.get("location")
         if sample_cycle is None:
-            sample_cycle = self.definition.sample.get('cycle')
+            sample_cycle = self.definition.sample.get("cycle")
         if sample_tracer is None:
-            sample_tracer = Tracer.from_dict(self.definition.sample.get('tracer'))
+            sample_tracer = Tracer.from_dict(self.definition.sample.get("tracer"))
         results = []
         for group in self.definition.groups:
-            values_for_group = self._group_values_from_db(group, sample_cycle, sample_location, sample_tracer)
+            values_for_group = self._group_values_from_db(
+                group, sample_cycle, sample_location, sample_tracer
+            )
             results.append(values_for_group)
-        data = {'groups': [r.as_dict() for r in results]}
+        data = {"groups": [r.as_dict() for r in results]}
         comparison_result, comparison_text = self.compare_results(results)
-        data['result'] = {self.get_result_key(sample_tracer): comparison_result}
-        data['resultText'] = comparison_text
+        data["result"] = {self.get_result_key(sample_tracer): comparison_result}
+        data["resultText"] = comparison_text
         return data
 
     @timeit
     def _group_values_from_db(self, group, cycle, sample_location, tracer):
         model = group.model.as_model()
         if group.has_overrides:
-            model_id = group.sample_formulation_model_overrides.get(tracer.key, {}).get("id", None)
+            model_id = group.sample_formulation_model_overrides.get(tracer.key, {}).get(
+                "id", None
+            )
             if model_id:
                 model = group.model.as_model(model_id)
         if model:
             formulations = self.get_formulations(group, tracer)
             db_records = model.objects.filter(
-                name=sample_location['name'],
+                name=sample_location["name"],
                 cycle=parse_cycle(cycle, group),
-                district=sample_location['district'],
-                formulation__in=formulations
+                district=sample_location["district"],
+                formulation__in=formulations,
             ).values_list(
-                'formulation', *group.selected_fields)
-            records = [DataRecord(formulation=r[0], fields=group.selected_fields, values=r[1:]) for r in db_records]
+                "formulation", *group.selected_fields
+            )
+            records = [
+                DataRecord(formulation=r[0], fields=group.selected_fields, values=r[1:])
+                for r in db_records
+            ]
 
             factored_values = get_factored_records(group.factors, records)
-            return GroupResult(group=group, values=records, factored_records=factored_values,
-                               tracer=tracer,
-                               aggregate=self.aggregate_values(group, factored_values))
+            return GroupResult(
+                group=group,
+                values=records,
+                factored_records=factored_values,
+                tracer=tracer,
+                aggregate=self.aggregate_values(group, factored_values),
+            )
 
     @timeit
     def get_locations_and_cycles(self):
@@ -113,20 +129,30 @@ class DBBasedCheckPreview(DynamicCheckMixin):
                 field_filters = build_field_filters(group.selected_fields)
                 formulations = self.get_preview_formulations(group)
 
-                base_queryset = model.objects.filter(formulation__in=formulations,
-                                                     **field_filters)
+                base_queryset = model.objects.filter(
+                    formulation__in=formulations, **field_filters
+                )
                 raw_locations.extend(
-                    base_queryset.order_by('name').values(
-                        'name', 'district', 'cycle').distinct())
-        locations = py_(raw_locations).uniq().group_by('name').map(as_loc).sort_by("name").value()
+                    base_queryset.order_by("name").values(
+                        "name", "district", "cycle"
+                    ).distinct()
+                )
+        locations = py_(raw_locations).uniq().group_by("name").map(as_loc).sort_by(
+            "name"
+        ).value()
         return {"locations": locations}
 
     def get_preview_formulations(self, group):
         if self.definition.type.get("id") == FACILITY_TWO_GROUPS_WITH_SAMPLE:
-            models = {'Adult': "patient_formulations", 'Paed': "patient_formulations",
-                      'Consumption': "consumption_formulations"}
+            models = {
+                "Adult": "patient_formulations",
+                "Paed": "patient_formulations",
+                "Consumption": "consumption_formulations",
+            }
             key = models.get(group.model.id)
-            return py_(group.model.tracing_formulations).map(lambda x: x.get(key)).flatten().value()
+            return py_(group.model.tracing_formulations).map(
+                lambda x: x.get(key)
+            ).flatten().value()
         else:
             return group.selected_formulations
 
@@ -144,29 +170,38 @@ class UserDefinedFacilityCheck(DBBasedCheckPreview):
     def for_each_facility(self, facility_data, combination, other_facility_data=None):
         groups = []
         for group in self.definition.groups:
-            values_for_group = self._group_values_from_location_data(group, facility_data, other_facility_data,
-                                                                     combination)
+            values_for_group = self._group_values_from_location_data(
+                group, facility_data, other_facility_data, combination
+            )
             groups.append(values_for_group)
         if facility_not_reporting(facility_data):
             return "NOT_REPORTING"
         comparison_result, _ = self.compare_results(groups)
         return comparison_result
 
-    def _group_values_from_location_data(self, group, facility_data, other_facility_data, tracer):
+    def _group_values_from_location_data(
+        self, group, facility_data, other_facility_data, tracer
+    ):
         data_source = other_facility_data if group.cycle and group.cycle.id == "Previous" else facility_data
         records = self.get_records_from_data_source(data_source, group)
 
         if records:
             formulations = self.get_formulations(group, tracer)
-            data_records = self.get_values_from_records(records, formulations, group.selected_fields)
+            data_records = self.get_values_from_records(
+                records, formulations, group.selected_fields
+            )
             factored_records = get_factored_records(group.factors, data_records)
-            return GroupResult(group=group, values=data_records, factored_records=factored_records,
-                               tracer=tracer,
-                               aggregate=self.aggregate_values(group, factored_records))
+            return GroupResult(
+                group=group,
+                values=data_records,
+                factored_records=factored_records,
+                tracer=tracer,
+                aggregate=self.aggregate_values(group, factored_records),
+            )
 
-        return GroupResult(group=group, values=[], factored_records=[],
-                           tracer=tracer,
-                           aggregate=None)
+        return GroupResult(
+            group=group, values=[], factored_records=[], tracer=tracer, aggregate=None
+        )
 
     def get_records_from_data_source(self, data_source, group):
         records = group.model.get_records(data_source)
@@ -174,13 +209,20 @@ class UserDefinedFacilityCheck(DBBasedCheckPreview):
 
     def get_values_from_records(self, records, formulations, selected_fields):
         formulations = [f.lower() for f in formulations]
-        return py_(records).reject(lambda x: x.formulation.lower() not in formulations).map(
-            as_data_records(selected_fields)).value()
+        return py_(records).reject(
+            lambda x: x.formulation.lower() not in formulations
+        ).map(
+            as_data_records(selected_fields)
+        ).value()
 
 
 class UserDefinedFacilityTracedCheck(UserDefinedFacilityCheck):
+
     def get_combinations(self):
-        return [Tracer.from_dict(tr) for tr in self.definition.groups[0].model.tracing_formulations]
+        return [
+            Tracer.from_dict(tr)
+            for tr in self.definition.groups[0].model.tracing_formulations
+        ]
 
     def get_formulations(self, group, sample_tracer=None):
         return group.get_formulations(sample_tracer)
@@ -190,16 +232,23 @@ class UserDefinedFacilityTracedCheck(UserDefinedFacilityCheck):
         if group.has_overrides:
             formulations_to_add = defaultdict(set)
             formulations_to_override = []
-            for (sample, override_model) in group.sample_formulation_model_overrides.items():
-                cleaned_formulation_names = [name.lower() for name in override_model.get("formulations", [])]
+            for (
+                sample, override_model
+            ) in group.sample_formulation_model_overrides.items():
+                cleaned_formulation_names = [
+                    name.lower() for name in override_model.get("formulations", [])
+                ]
                 for name in cleaned_formulation_names:
-                    formulations_to_add[override_model.get('id')].add(name)
+                    formulations_to_add[override_model.get("id")].add(name)
                     formulations_to_override.append(name)
-            records = py_(records).reject(lambda x: x.formulation.lower() in formulations_to_override).value()
+            records = py_(records).reject(
+                lambda x: x.formulation.lower() in formulations_to_override
+            ).value()
             for (model, formulations) in formulations_to_add.items():
                 get_records = group.model.get_records(data_source, model)
                 records_for_override_model = py_(get_records).reject(
-                    lambda x: x.formulation.lower() not in formulations).value()
+                    lambda x: x.formulation.lower() not in formulations
+                ).value()
                 records.extend(records_for_override_model)
         return records
 
@@ -217,8 +266,12 @@ class UserDefinedSingleGroupFacilityCheck(UserDefinedFacilityCheck):
             if comparator:
                 group1_result = groups[0].aggregate
                 group2_result = None
-                comparison_result = comparator.compare(group1_result, group2_result, constant=operator_constant)
-                result_text = comparator.text(group1_result, group2_result, operator_constant)
+                comparison_result = comparator.compare(
+                    group1_result, group2_result, constant=operator_constant
+                )
+                result_text = comparator.text(
+                    group1_result, group2_result, operator_constant
+                )
                 result = YES if comparison_result else NO
                 return result, result_text
         return N_A, None
@@ -237,7 +290,7 @@ def get_check_from_dict(data):
 
 
 def get_check(definition):
-    check_type = definition.type.get('id')
+    check_type = definition.type.get("id")
     full_class_name = definition.python_class
     if check_type == CLASS_BASED and full_class_name:
         return get_check_by_class(full_class_name)
@@ -263,9 +316,9 @@ def build_field_filters(selected_fields):
 def as_loc(items):
     if len(items) > 0:
         return {
-            "name": items[0]['name'],
-            "district": items[0]['district'],
-            "cycles": [item['cycle'] for item in items]
+            "name": items[0]["name"],
+            "district": items[0]["district"],
+            "cycles": [item["cycle"] for item in items],
         }
     else:
         return None

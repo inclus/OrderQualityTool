@@ -8,15 +8,17 @@ from django.db import migrations
 
 def create_admin_user(apps, schema_editor):
     DashboardUser = apps.get_registered_model("dashboard", "DashboardUser")
-    user, created = DashboardUser.objects.get_or_create(email="admin@a.com", is_staff=True, is_superuser=True, password=make_password("admin"), access_level="MOH CENTRAL")
+    user, created = DashboardUser.objects.get_or_create(
+        email="admin@a.com",
+        is_staff=True,
+        is_superuser=True,
+        password=make_password("admin"),
+        access_level="MOH CENTRAL",
+    )
     user.save()
 
 
 class Migration(migrations.Migration):
-    dependencies = [
-        ('dashboard', '0008_delete_cycleformulationscore'),
-    ]
+    dependencies = [("dashboard", "0008_delete_cycleformulationscore")]
 
-    operations = [
-        migrations.RunPython(create_admin_user),
-    ]
+    operations = [migrations.RunPython(create_admin_user)]

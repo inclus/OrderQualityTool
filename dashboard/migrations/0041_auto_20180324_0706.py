@@ -19,10 +19,6 @@ def reverse(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
-    dependencies = [
-        ('dashboard', '0040_tracingformulations_slug'),
-    ]
+    dependencies = [("dashboard", "0040_tracingformulations_slug")]
 
-    operations = [
-        migrations.RunPython(update_slugs, reverse),
-    ]
+    operations = [migrations.RunPython(update_slugs, reverse)]

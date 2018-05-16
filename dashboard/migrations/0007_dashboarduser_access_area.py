@@ -7,14 +7,12 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('dashboard', '0006_auto_20160310_0757'),
-    ]
+    dependencies = [("dashboard", "0006_auto_20160310_0757")]
 
     operations = [
         migrations.AddField(
-            model_name='dashboarduser',
-            name='access_area',
+            model_name="dashboarduser",
+            name="access_area",
             field=models.CharField(blank=True, max_length=250, null=True),
-        ),
+        )
     ]

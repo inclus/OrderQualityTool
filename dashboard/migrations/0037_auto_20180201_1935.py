@@ -7,18 +7,16 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('dashboard', '0036_facilitytest_order'),
-    ]
+    dependencies = [("dashboard", "0036_facilitytest_order")]
 
     operations = [
         migrations.AlterModelOptions(
-            name='facilitytest',
-            options={'ordering': ('order',), 'verbose_name_plural': 'Facility Tests'},
+            name="facilitytest",
+            options={"ordering": ("order",), "verbose_name_plural": "Facility Tests"},
         ),
         migrations.AddField(
-            model_name='facilitytest',
-            name='featured',
+            model_name="facilitytest",
+            name="featured",
             field=models.BooleanField(default=False),
         ),
     ]

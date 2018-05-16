@@ -5,6 +5,7 @@ from dashboard.models import Score
 
 
 class FacilityScoreSerializer(ModelSerializer):
+
     class Meta:
         model = Score
 
@@ -24,7 +25,7 @@ class ScoreSerializer(ModelSerializer):
 
     class Meta:
         model = Score
-        fields = '__all__'
+        fields = "__all__"
 
 
 class NewImportSerializer(serializers.Serializer):

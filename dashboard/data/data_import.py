@@ -11,6 +11,7 @@ logger = logging.getLogger(__name__)
 
 
 class DataImport():
+
     def __init__(self, raw_data, cycle):
         self.raw_data = raw_data
         self.cycle = cycle
@@ -49,7 +50,7 @@ def get_value(row, i):
         value = real_value
         if "_" in str(value):
             value = real_value = value.replace("_", "-")
-        if value != "-" and value != '':
+        if value != "-" and value != "":
             return real_value
 
 
@@ -61,6 +62,7 @@ def build_cache_by_facility(locations):
 
 
 class ExcelDataImport(DataImport):
+
     def __str__(self):
         return "ExcelDataImport %s" % self.cycle
 
@@ -80,7 +82,8 @@ class ExcelDataImport(DataImport):
         paed_patients_sheet = self.workbook[PATIENTS_PAED_SHEET]
         records = defaultdict(list)
         for row in paed_patients_sheet[
-                        'A%s:M%s' % (paed_patients_sheet.min_row + 1, paed_patients_sheet.max_row)]:
+            "A%s:M%s" % (paed_patients_sheet.min_row + 1, paed_patients_sheet.max_row)
+        ]:
             facility_key = get_real_facility_name(row[1].value, row[8].value)
             location = cache.get(facility_key, None)
             if facility_key and location:
@@ -88,7 +91,9 @@ class ExcelDataImport(DataImport):
                 record_data[FORMULATION] = row[2].value
                 record_data[EXISTING] = get_value(row, 4)
                 record_data[NEW] = get_value(row, 5)
-                patient_record = ExcelDataImportRecord(data=record_data, location=location).build_patient_record()
+                patient_record = ExcelDataImportRecord(
+                    data=record_data, location=location
+                ).build_patient_record()
                 records[location].append(patient_record)
             else:
                 logger.debug("%s not found" % facility_key)
@@ -98,7 +103,8 @@ class ExcelDataImport(DataImport):
         adult_patients_sheet = self.workbook[PATIENTS_ADULT_SHEET]
         records = defaultdict(list)
         for row in adult_patients_sheet[
-                        'A%s:M%s' % (adult_patients_sheet.min_row + 1, adult_patients_sheet.max_row)]:
+            "A%s:M%s" % (adult_patients_sheet.min_row + 1, adult_patients_sheet.max_row)
+        ]:
             facility_key = get_real_facility_name(row[1].value, row[8].value)
             location = cache.get(facility_key, None)
             if facility_key and location:
@@ -106,7 +112,9 @@ class ExcelDataImport(DataImport):
                 record_data[FORMULATION] = row[2].value
                 record_data[EXISTING] = get_value(row, 4)
                 record_data[NEW] = get_value(row, 5)
-                patient_record = ExcelDataImportRecord(data=record_data, location=location).build_patient_record()
+                patient_record = ExcelDataImportRecord(
+                    data=record_data, location=location
+                ).build_patient_record()
                 records[location].append(patient_record)
             else:
                 logger.debug("%s not found" % facility_key)
@@ -115,7 +123,9 @@ class ExcelDataImport(DataImport):
     def locations(self):
         location_sheet = self.workbook[LOCATION]
         facility_data = []
-        for row in location_sheet['B%s:J%s' % (location_sheet.min_row + 3, location_sheet.max_row)]:
+        for row in location_sheet[
+            "B%s:J%s" % (location_sheet.min_row + 3, location_sheet.max_row)
+        ]:
             if row[0].value:
                 data = dict()
                 data[SCORES] = defaultdict(dict)
@@ -132,7 +142,9 @@ class ExcelDataImport(DataImport):
     def consumption_records(self, cache):
         consumption_sheet = self.workbook[CONSUMPTION_SHEET]
         records = defaultdict(list)
-        for row in consumption_sheet['A%s:X%s' % (consumption_sheet.min_row + 1, consumption_sheet.max_row)]:
+        for row in consumption_sheet[
+            "A%s:X%s" % (consumption_sheet.min_row + 1, consumption_sheet.max_row)
+        ]:
             facility_key = get_real_facility_name(row[1].value, row[17].value)
             location = cache.get(facility_key, None)
             if facility_key and location:
@@ -144,10 +156,18 @@ class ExcelDataImport(DataImport):
                 consumption_data[LOSES_ADJUSTMENTS] = get_value(row, 8)
                 consumption_data[CLOSING_BALANCE] = get_value(row, 9)
                 consumption_data[MONTHS_OF_STOCK_ON_HAND] = get_value(row, 10)
-                consumption_data[QUANTITY_REQUIRED_FOR_CURRENT_PATIENTS] = get_value(row, 11)
-                consumption_data[ESTIMATED_NUMBER_OF_NEW_ART_PATIENTS] = get_value(row, 12)
-                consumption_data[ESTIMATED_NUMBER_OF_NEW_PREGNANT_WOMEN] = get_value(row, 13)
+                consumption_data[QUANTITY_REQUIRED_FOR_CURRENT_PATIENTS] = get_value(
+                    row, 11
+                )
+                consumption_data[ESTIMATED_NUMBER_OF_NEW_ART_PATIENTS] = get_value(
+                    row, 12
+                )
+                consumption_data[ESTIMATED_NUMBER_OF_NEW_PREGNANT_WOMEN] = get_value(
+                    row, 13
+                )
                 consumption_data[PACKS_ORDERED] = get_value(row, 14)
-                record = ExcelDataImportRecord(data=consumption_data, location=location).build_consumption_record()
+                record = ExcelDataImportRecord(
+                    data=consumption_data, location=location
+                ).build_consumption_record()
                 records[location].append(record)
         return records

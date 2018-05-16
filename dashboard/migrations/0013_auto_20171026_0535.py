@@ -7,18 +7,11 @@ from django.db import migrations
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('dashboard', '0012_auto_20171023_0720'),
-    ]
+    dependencies = [("dashboard", "0012_auto_20171023_0720")]
 
     operations = [
         migrations.RenameField(
-            model_name='score',
-            old_name='nnrtiCurrentAdults',
-            new_name='nnrtiAdults',
+            model_name="score", old_name="nnrtiCurrentAdults", new_name="nnrtiAdults"
         ),
-        migrations.RemoveField(
-            model_name='score',
-            name='nnrtiNewAdults',
-        ),
+        migrations.RemoveField(model_name="score", name="nnrtiNewAdults"),
     ]

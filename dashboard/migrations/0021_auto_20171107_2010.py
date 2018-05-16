@@ -9,8 +9,14 @@ from dashboard.data import partner_mapping
 
 
 def create_default_mapping(apps, schema_editor):
-    path_to_fixture = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'data', 'tests', 'fixtures',
-                                   'partner_mapping.xlsx')
+    path_to_fixture = os.path.join(
+        os.path.dirname(os.path.abspath(__file__)),
+        "..",
+        "data",
+        "tests",
+        "fixtures",
+        "partner_mapping.xlsx",
+    )
     with open(path_to_fixture, "rb") as fixture_file:
         mapping = partner_mapping.load_file(fixture_file)
         model = apps.get_registered_model("dashboard", "LocationToPartnerMapping")
@@ -19,10 +25,6 @@ def create_default_mapping(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
-    dependencies = [
-        ('dashboard', '0020_locationtopartnermapping'),
-    ]
+    dependencies = [("dashboard", "0020_locationtopartnermapping")]
 
-    operations = [
-        migrations.RunPython(create_default_mapping),
-    ]
+    operations = [migrations.RunPython(create_default_mapping)]

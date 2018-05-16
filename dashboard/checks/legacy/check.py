@@ -5,6 +5,7 @@ from dashboard.helpers import NEW, EXISTING, NO, NOT_REPORTING, YES
 
 
 def reduce_to_values(records):
+
     def func(total, field):
         as_dicts = map(attr.asdict, records)
         total.extend(pydash.pluck(as_dicts, field))
@@ -26,7 +27,10 @@ def as_float(value):
 
 def get_consumption_totals(fields, records):
     return pydash.chain(values_for_records(fields, records)).reject(
-        lambda x: x is None).map(as_float).sum().value()
+        lambda x: x is None
+    ).map(
+        as_float
+    ).sum().value()
 
 
 def get_patient_total(records):
@@ -42,6 +46,7 @@ def has_all_blanks(records, fields):
 
 
 class QCheck:
+
     def __init__(self):
         pass
 
@@ -58,19 +63,19 @@ class QCheck:
 
 
 def facility_not_reporting(location_data):
-    return location_data.location.status.strip().lower() != 'reporting'
+    return location_data.location.status.strip().lower() != "reporting"
 
 
 def facility_has_single_order(facility):
-    not_multiple = facility.multiple.strip().lower() != 'multiple orders'
+    not_multiple = facility.multiple.strip().lower() != "multiple orders"
     return not_multiple
 
 
 def multiple_orders_score(facility):
     text_value = facility.multiple.strip().lower()
-    if 'multiple' in text_value:
+    if "multiple" in text_value:
         return NO
-    elif 'not' in text_value:
+    elif "not" in text_value:
         return NOT_REPORTING
     else:
         return YES
@@ -97,6 +102,7 @@ def get_patient_records(data, names, is_adult=True):
 
 
 def filter_consumption_records(data, formulation_names):
+
     def filter_func(x):
         for f in formulation_names:
             if f in x.formulation:

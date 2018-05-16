@@ -49,7 +49,9 @@ class CheckDataSource(object):
         row.append(name_row)
         row.append([""])
         headers = ["", "Facility", "District", "Warehouse", "IP", "Cycle"]
-        details = ["", score.name, score.district, score.warehouse, score.ip, score.cycle]
+        details = [
+            "", score.name, score.district, score.warehouse, score.ip, score.cycle
+        ]
         if self.show_formulation:
             headers.append("Formulation")
             details.append(combination)
@@ -72,7 +74,9 @@ def values_for_models(fields, models):
     return output
 
 
-def append_values_for_header(consumption, header_row, n, table_count, records_key='records', header_key='name'):
+def append_values_for_header(
+    consumption, header_row, n, table_count, records_key="records", header_key="name"
+):
     records = []
     records_count = 0
     if n < table_count:
@@ -108,11 +112,13 @@ def add_blank_row(row):
 def get_table_for_cycle(cycle, check, combination, score, fields):
     check_combination = get_combination(check.combinations, combination)
     formulation_query = check_combination.get(CONSUMPTION_QUERY)
-    consumption_records = Consumption.objects.filter(name=score.name, district=score.district, cycle=cycle,
-                                                     formulation__icontains=formulation_query)
-    tables = [
-        {"cycle": cycle}
-    ]
+    consumption_records = Consumption.objects.filter(
+        name=score.name,
+        district=score.district,
+        cycle=cycle,
+        formulation__icontains=formulation_query,
+    )
+    tables = [{"cycle": cycle}]
     rows = []
     for consumption in consumption_records:
         for field in fields:
@@ -127,11 +133,11 @@ def build_dynamic_header(header_row, n, no_tables, tables):
     table = []
     if n < no_tables:
         table = tables[n]
-        records = table.get('rows', [])
-        name = table.get('cycle')
+        records = table.get("rows", [])
+        name = table.get("cycle")
         header_row.append(name)
 
-        for header in table.get('headers'):
+        for header in table.get("headers"):
             header_row.append(header)
     return records, table
 
@@ -139,21 +145,21 @@ def build_dynamic_header(header_row, n, no_tables, tables):
 def append_values_for_headers(current_row, rows, table, line, has_sum=True):
     if line < len(rows):
         item = rows[line]
-        current_row.append(item.get('column'))
-        for header in table.get('headers'):
+        current_row.append(item.get("column"))
+        for header in table.get("headers"):
             current_row.append(item.get(header))
         if has_sum:
             current_row.append(item.get("sum"))
     else:
         current_row.append("")
-        for header in table.get('headers'):
+        for header in table.get("headers"):
             current_row.append("")
         if has_sum:
             current_row.append("")
 
 
 def append_total_row(table, totals, total_row):
-    for header in table.get('headers'):
+    for header in table.get("headers"):
         total_row.append(totals.get(header))
     total_row.append(totals.get("sum"))
 

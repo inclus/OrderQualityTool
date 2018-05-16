@@ -20,15 +20,15 @@ def reverse(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
-    dependencies = [
-        ('dashboard', '0046_auto_20180401_0845'),
-    ]
+    dependencies = [("dashboard", "0046_auto_20180401_0845")]
 
     operations = [
         migrations.AddField(
-            model_name='facilitytest',
-            name='slug',
-            field=django_extensions.db.fields.AutoSlugField(blank=True, editable=False, populate_from=[u'name']),
+            model_name="facilitytest",
+            name="slug",
+            field=django_extensions.db.fields.AutoSlugField(
+                blank=True, editable=False, populate_from=[u"name"]
+            ),
         ),
         migrations.RunPython(update_slugs, reverse),
     ]

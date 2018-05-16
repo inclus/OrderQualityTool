@@ -17,10 +17,7 @@ class DefinitionOption(object):
     @staticmethod
     def from_dict(data):
         if data:
-            return DefinitionOption(
-                id=data.get('id', ''),
-                name=data.get('name', ''),
-            )
+            return DefinitionOption(id=data.get("id", ""), name=data.get("name", ""))
 
 
 @attr.s(cmp=True, frozen=True)
@@ -31,14 +28,14 @@ class GroupModel(DefinitionOption):
     @staticmethod
     def from_dict(data):
         return GroupModel(
-            id=data.get('id', ''),
-            name=data.get('name', ''),
-            tracing_formulations=data.get('tracingFormulations', []),
-            has_trace=data.get('hasTrace', False),
+            id=data.get("id", ""),
+            name=data.get("name", ""),
+            tracing_formulations=data.get("tracingFormulations", []),
+            has_trace=data.get("hasTrace", False),
         )
 
     def get_records(self, location_data, id=None):
-        models = {'Adult': "a_records", 'Paed': "p_records", 'Consumption': "c_records"}
+        models = {"Adult": "a_records", "Paed": "p_records", "Consumption": "c_records"}
         if id is None:
             id = self.id
         if id in models:
@@ -47,8 +44,17 @@ class GroupModel(DefinitionOption):
             return []
 
     def as_model(self, model_id=None):
-        from dashboard.models import AdultPatientsRecord, PAEDPatientsRecord, Consumption
-        models = {'Adult': AdultPatientsRecord, 'Paed': PAEDPatientsRecord, 'Consumption': Consumption}
+        from dashboard.models import (
+            AdultPatientsRecord,
+            PAEDPatientsRecord,
+            Consumption,
+        )
+
+        models = {
+            "Adult": AdultPatientsRecord,
+            "Paed": PAEDPatientsRecord,
+            "Consumption": Consumption,
+        }
         if model_id is None:
             model_id = self.id
         if model_id in models:
@@ -75,35 +81,48 @@ class DefinitionGroup(object):
     @staticmethod
     def from_dict(data):
         return DefinitionGroup(
-            model=GroupModel.from_dict(data.get('model')),
-            name=data.get('name'),
-            cycle=DefinitionOption.from_dict(data.get('cycle')),
-            aggregation=DefinitionOption.from_dict(data.get('aggregation')),
-            selected_fields=data.get('selected_fields'),
-            selected_formulations=data.get('selected_formulations'),
-            sample_formulation_model_overrides=data.get('sample_formulation_model_overrides', {}),
-            sample_formulation_model_overridden=data.get('sample_formulation_model_overridden', {}),
-            has_factors=data.get('has_factors'),
-            factors=data.get('factors'),
-            has_thresholds=data.get('has_thresholds'),
-            thresholds=data.get('thresholds'),
+            model=GroupModel.from_dict(data.get("model")),
+            name=data.get("name"),
+            cycle=DefinitionOption.from_dict(data.get("cycle")),
+            aggregation=DefinitionOption.from_dict(data.get("aggregation")),
+            selected_fields=data.get("selected_fields"),
+            selected_formulations=data.get("selected_formulations"),
+            sample_formulation_model_overrides=data.get(
+                "sample_formulation_model_overrides", {}
+            ),
+            sample_formulation_model_overridden=data.get(
+                "sample_formulation_model_overridden", {}
+            ),
+            has_factors=data.get("has_factors"),
+            factors=data.get("factors"),
+            has_thresholds=data.get("has_thresholds"),
+            thresholds=data.get("thresholds"),
         )
 
     @property
     def has_overrides(self):
-        return len(py_(self.sample_formulation_model_overrides.values()).map(
-            lambda x: dict(x).get("formulations", [])).flatten().value()) > 0
+        return len(
+            py_(self.sample_formulation_model_overrides.values()).map(
+                lambda x: dict(x).get("formulations", [])
+            ).flatten().value()
+        ) > 0
 
     def get_formulations(self, tracer):
-        models = {'Adult': "patient_formulations", 'Paed': "patient_formulations",
-                  'Consumption': "consumption_formulations"}
+        models = {
+            "Adult": "patient_formulations",
+            "Paed": "patient_formulations",
+            "Consumption": "consumption_formulations",
+        }
         key = models.get(self.model.id)
         if tracer is not None and type(tracer) is Tracer:
             if tracer.key == "DEFAULT":
                 return self.selected_formulations
 
             return py_(self.model.tracing_formulations).find(
-                {"slug": tracer.key}).value().get(key)
+                {"slug": tracer.key}
+            ).value().get(
+                key
+            )
         else:
             return self.selected_formulations
 
@@ -120,12 +139,12 @@ class Definition(object):
     @staticmethod
     def from_dict(data):
         return Definition(
-            groups=py_(data.get('groups', [])).map(DefinitionGroup.from_dict).value(),
-            type=data.get('type'),
-            python_class=data.get('python_class'),
-            sample=data.get('sample'),
-            operator=DefinitionOption.from_dict(data.get('operator')),
-            operator_constant=data.get('operatorConstant'),
+            groups=py_(data.get("groups", [])).map(DefinitionGroup.from_dict).value(),
+            type=data.get("type"),
+            python_class=data.get("python_class"),
+            sample=data.get("sample"),
+            operator=DefinitionOption.from_dict(data.get("operator")),
+            operator_constant=data.get("operatorConstant"),
         )
 
     @staticmethod
@@ -154,17 +173,25 @@ class GroupResult(object):
             return True
 
     def has_thresholds(self):
-        return self.group.has_thresholds and maybe(self.group.thresholds).or_else({}).get(self.tracer.key, None)
+        return self.group.has_thresholds and maybe(self.group.thresholds).or_else(
+            {}
+        ).get(
+            self.tracer.key, None
+        )
 
     def get_threshold(self):
         raw_value = self.group.thresholds.get(self.tracer.key, None)
         return as_float_or_1(raw_value, 0) if raw_value else raw_value
 
     def all_values_blank(self):
-        return pydash.every(self.factored_records, lambda data_record: data_record.all_blank())
+        return pydash.every(
+            self.factored_records, lambda data_record: data_record.all_blank()
+        )
 
     def some_values_blank(self):
-        return pydash.some(self.factored_records, lambda data_record: data_record.some_blank())
+        return pydash.some(
+            self.factored_records, lambda data_record: data_record.some_blank()
+        )
 
     def as_dict(self):
         return {
@@ -174,7 +201,7 @@ class GroupResult(object):
             "headers": self.group.selected_fields,
             "has_factors": self.group.has_factors,
             "factored_values": [v.to_list() for v in self.factored_records],
-            "result": self.aggregate
+            "result": self.aggregate,
         }
 
 

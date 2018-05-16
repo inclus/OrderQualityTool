@@ -1,43 +1,87 @@
 from django.test import TestCase
 
-from dashboard.checks.comparisons import calculate_percentage_variance, PercentageVarianceLessThanComparison, \
-    AtLeastNOfTotal, Comparison, PercentageVarianceLessThanComparisonForNNRTI
-from dashboard.checks.entities import GroupResult, DefinitionGroup, GroupModel, DefinitionOption, DataRecord
+from dashboard.checks.comparisons import (
+    calculate_percentage_variance,
+    PercentageVarianceLessThanComparison,
+    AtLeastNOfTotal,
+    Comparison,
+    PercentageVarianceLessThanComparisonForNNRTI,
+)
+from dashboard.checks.entities import (
+    GroupResult,
+    DefinitionGroup,
+    GroupModel,
+    DefinitionOption,
+    DataRecord,
+)
 from dashboard.checks.tracer import Tracer
 
-current_cycle = DefinitionOption(id='Current', name='Current Cycle')
-previous_cycle = DefinitionOption(id='Previous', name='Previous Cycle')
-sum_comparison = DefinitionOption(id='SUM', name='SUM')
+current_cycle = DefinitionOption(id="Current", name="Current Cycle")
+previous_cycle = DefinitionOption(id="Previous", name="Previous Cycle")
+sum_comparison = DefinitionOption(id="SUM", name="SUM")
 r1 = DataRecord(
-    formulation='Tenofovir/Lamivudine/Efavirenz (TDF/3TC/EFV) 300mg/300mg/600mg[Pack 30]',
-    values=[50.0], fields=['consumption'])
+    formulation="Tenofovir/Lamivudine/Efavirenz (TDF/3TC/EFV) 300mg/300mg/600mg[Pack 30]",
+    values=[50.0],
+    fields=["consumption"],
+)
 r2 = DataRecord(
-    formulation='Tenofovir/Lamivudine/Efavirenz (TDF/3TC/EFV) 300mg/300mg/600mg[Pack 30]',
-    values=[0], fields=['consumption'])
-tracer = Tracer(key=u'tdf3tcefv-adult',
-                consumption_formulations=[u'Tenofovir/Lamivudine/Efavirenz (TDF/3TC/EFV) 300mg/300mg/600mg[Pack 30]'],
-                patient_formulations=[u'TDF/3TC/EFV (PMTCT)', u'TDF/3TC/EFV (ADULT)'], extras=None)
+    formulation="Tenofovir/Lamivudine/Efavirenz (TDF/3TC/EFV) 300mg/300mg/600mg[Pack 30]",
+    values=[0],
+    fields=["consumption"],
+)
+tracer = Tracer(
+    key=u"tdf3tcefv-adult",
+    consumption_formulations=[
+        u"Tenofovir/Lamivudine/Efavirenz (TDF/3TC/EFV) 300mg/300mg/600mg[Pack 30]"
+    ],
+    patient_formulations=[u"TDF/3TC/EFV (PMTCT)", u"TDF/3TC/EFV (ADULT)"],
+    extras=None,
+)
 
 
 class TestThresholds(TestCase):
-    def test_groups_have_insufficient_data_if_the_aggregate_is_below_the_threshold(self):
-        group1 = DefinitionGroup(name='G1', model=None, cycle=current_cycle, selected_fields=['consumption'],
-                                 selected_formulations=[], sample_formulation_model_overridden={},
-                                 sample_formulation_model_overrides={}, aggregation=sum_comparison, has_factors=None,
-                                 factors=None,
-                                 has_thresholds=True,
-                                 thresholds={u'abc3tc-paed': 10, u'efv200-paed': 10, u'tdf3tcefv-adult': 200})
-        group2 = DefinitionGroup(name='G2', model=None, cycle=previous_cycle,
-                                 selected_fields=['consumption'], selected_formulations=[],
-                                 sample_formulation_model_overridden={}, sample_formulation_model_overrides={},
-                                 aggregation=sum_comparison, has_factors=None, factors=None, has_thresholds=True,
-                                 thresholds={u'abc3tc-paed': 10, u'efv200-paed': 10, u'tdf3tcefv-adult': 200})
+
+    def test_groups_have_insufficient_data_if_the_aggregate_is_below_the_threshold(
+        self
+    ):
+        group1 = DefinitionGroup(
+            name="G1",
+            model=None,
+            cycle=current_cycle,
+            selected_fields=["consumption"],
+            selected_formulations=[],
+            sample_formulation_model_overridden={},
+            sample_formulation_model_overrides={},
+            aggregation=sum_comparison,
+            has_factors=None,
+            factors=None,
+            has_thresholds=True,
+            thresholds={
+                u"abc3tc-paed": 10, u"efv200-paed": 10, u"tdf3tcefv-adult": 200
+            },
+        )
+        group2 = DefinitionGroup(
+            name="G2",
+            model=None,
+            cycle=previous_cycle,
+            selected_fields=["consumption"],
+            selected_formulations=[],
+            sample_formulation_model_overridden={},
+            sample_formulation_model_overrides={},
+            aggregation=sum_comparison,
+            has_factors=None,
+            factors=None,
+            has_thresholds=True,
+            thresholds={
+                u"abc3tc-paed": 10, u"efv200-paed": 10, u"tdf3tcefv-adult": 200
+            },
+        )
         result1 = GroupResult(
             group=group1,
             values=None,
             factored_records=[r1],
             aggregate=50.0,
-            tracer=tracer
+            tracer=tracer,
         )
 
         result2 = GroupResult(
@@ -45,28 +89,46 @@ class TestThresholds(TestCase):
             values=None,
             factored_records=[r2],
             aggregate=40.0,
-            tracer=tracer)
+            tracer=tracer,
+        )
 
         self.assertFalse(Comparison().groups_have_adequate_data([result1, result2]))
 
     def test_groups_have_sufficient_data_if_the_aggregate_is_above_the_threshold(self):
-        group1 = DefinitionGroup(name='G1', model=None, cycle=current_cycle, selected_fields=['consumption'],
-                                 selected_formulations=[], sample_formulation_model_overridden={},
-                                 sample_formulation_model_overrides={}, aggregation=sum_comparison, has_factors=None,
-                                 factors=None,
-                                 has_thresholds=True,
-                                 thresholds={u'abc3tc-paed': 10, u'efv200-paed': 10, u'tdf3tcefv-adult': 30})
-        group2 = DefinitionGroup(name='G2', model=None, cycle=previous_cycle,
-                                 selected_fields=['consumption'], selected_formulations=[],
-                                 sample_formulation_model_overridden={}, sample_formulation_model_overrides={},
-                                 aggregation=sum_comparison, has_factors=None, factors=None, has_thresholds=True,
-                                 thresholds={u'abc3tc-paed': 10, u'efv200-paed': 10, u'tdf3tcefv-adult': 20})
+        group1 = DefinitionGroup(
+            name="G1",
+            model=None,
+            cycle=current_cycle,
+            selected_fields=["consumption"],
+            selected_formulations=[],
+            sample_formulation_model_overridden={},
+            sample_formulation_model_overrides={},
+            aggregation=sum_comparison,
+            has_factors=None,
+            factors=None,
+            has_thresholds=True,
+            thresholds={u"abc3tc-paed": 10, u"efv200-paed": 10, u"tdf3tcefv-adult": 30},
+        )
+        group2 = DefinitionGroup(
+            name="G2",
+            model=None,
+            cycle=previous_cycle,
+            selected_fields=["consumption"],
+            selected_formulations=[],
+            sample_formulation_model_overridden={},
+            sample_formulation_model_overrides={},
+            aggregation=sum_comparison,
+            has_factors=None,
+            factors=None,
+            has_thresholds=True,
+            thresholds={u"abc3tc-paed": 10, u"efv200-paed": 10, u"tdf3tcefv-adult": 20},
+        )
         result1 = GroupResult(
             group=group1,
             values=None,
             factored_records=[r1],
             aggregate=50.0,
-            tracer=tracer
+            tracer=tracer,
         )
 
         result2 = GroupResult(
@@ -74,41 +136,68 @@ class TestThresholds(TestCase):
             values=None,
             factored_records=[r2],
             aggregate=40.0,
-            tracer=tracer)
+            tracer=tracer,
+        )
 
         self.assertTrue(Comparison().groups_have_adequate_data([result1, result2]))
 
 
 class TestAtLeastNOfTotalComparison(TestCase):
+
     def test_comparison(self):
         self.assertTrue(AtLeastNOfTotal().compare(200, 100, 50))
         self.assertTrue(AtLeastNOfTotal().compare(4183, None, 50))
-        self.assertEqual(AtLeastNOfTotal().text(200, None, 50), "200 is more than 50% of 200")
-        self.assertEqual(AtLeastNOfTotal().text(200, 100, 50), "200 is more than 50% of 300")
+        self.assertEqual(
+            AtLeastNOfTotal().text(200, None, 50), "200 is more than 50% of 200"
+        )
+        self.assertEqual(
+            AtLeastNOfTotal().text(200, 100, 50), "200 is more than 50% of 300"
+        )
         self.assertTrue(AtLeastNOfTotal().compare(10, 14, 10))
         self.assertTrue(AtLeastNOfTotal().compare(14, 9, 50))
         self.assertFalse(AtLeastNOfTotal().compare(10, 60, 50))
         self.assertTrue(AtLeastNOfTotal().compare(5, 0, 90))
-        self.assertEqual(AtLeastNOfTotal().text(10, 60, 50), "10 is less than 50% of 70")
+        self.assertEqual(
+            AtLeastNOfTotal().text(10, 60, 50), "10 is less than 50% of 70"
+        )
 
-    def test_groups_have_sufficient_data_if_the_aggregate_second_group_is_greater_than_zero(self):
-        group1 = DefinitionGroup(name='G1', model=None, cycle=current_cycle, selected_fields=['consumption'],
-                                 selected_formulations=[], sample_formulation_model_overridden={},
-                                 sample_formulation_model_overrides={}, aggregation=sum_comparison, has_factors=None,
-                                 factors=None,
-                                 has_thresholds=False,
-                                 thresholds={u'abc3tc-paed': 10, u'efv200-paed': 10, u'tdf3tcefv-adult': 30})
-        group2 = DefinitionGroup(name='G2', model=None, cycle=previous_cycle,
-                                 selected_fields=['consumption'], selected_formulations=[],
-                                 sample_formulation_model_overridden={}, sample_formulation_model_overrides={},
-                                 aggregation=sum_comparison, has_factors=None, factors=None, has_thresholds=False,
-                                 thresholds={u'abc3tc-paed': 10, u'efv200-paed': 10, u'tdf3tcefv-adult': 20})
+    def test_groups_have_sufficient_data_if_the_aggregate_second_group_is_greater_than_zero(
+        self
+    ):
+        group1 = DefinitionGroup(
+            name="G1",
+            model=None,
+            cycle=current_cycle,
+            selected_fields=["consumption"],
+            selected_formulations=[],
+            sample_formulation_model_overridden={},
+            sample_formulation_model_overrides={},
+            aggregation=sum_comparison,
+            has_factors=None,
+            factors=None,
+            has_thresholds=False,
+            thresholds={u"abc3tc-paed": 10, u"efv200-paed": 10, u"tdf3tcefv-adult": 30},
+        )
+        group2 = DefinitionGroup(
+            name="G2",
+            model=None,
+            cycle=previous_cycle,
+            selected_fields=["consumption"],
+            selected_formulations=[],
+            sample_formulation_model_overridden={},
+            sample_formulation_model_overrides={},
+            aggregation=sum_comparison,
+            has_factors=None,
+            factors=None,
+            has_thresholds=False,
+            thresholds={u"abc3tc-paed": 10, u"efv200-paed": 10, u"tdf3tcefv-adult": 20},
+        )
         result1 = GroupResult(
             group=group1,
             values=None,
             factored_records=[r1],
             aggregate=50.0,
-            tracer=tracer
+            tracer=tracer,
         )
 
         result2 = GroupResult(
@@ -116,57 +205,85 @@ class TestAtLeastNOfTotalComparison(TestCase):
             values=None,
             factored_records=[r2],
             aggregate=40.0,
-            tracer=tracer)
+            tracer=tracer,
+        )
 
         self.assertTrue(AtLeastNOfTotal().groups_have_adequate_data([result1, result2]))
 
-    def test_groups_have_insufficient_data_if_the_sum_aggregate_second_group_is_zero(self):
-        group1 = DefinitionGroup(name='G1', model=None, cycle=current_cycle, selected_fields=['consumption'],
-                                 selected_formulations=[], sample_formulation_model_overridden={},
-                                 sample_formulation_model_overrides={}, aggregation=sum_comparison, has_factors=None,
-                                 factors=None,
-                                 has_thresholds=True,
-                                 thresholds={u'abc3tc-paed': 10, u'efv200-paed': 10, u'tdf3tcefv-adult': 20})
-        group2 = DefinitionGroup(name='G2', model=None, cycle=previous_cycle,
-                                 selected_fields=['consumption'], selected_formulations=[],
-                                 sample_formulation_model_overridden={}, sample_formulation_model_overrides={},
-                                 aggregation=sum_comparison, has_factors=None, factors=None, has_thresholds=True,
-                                 thresholds={u'abc3tc-paed': 10, u'efv200-paed': 10, u'tdf3tcefv-adult': 20})
+    def test_groups_have_insufficient_data_if_the_sum_aggregate_second_group_is_zero(
+        self
+    ):
+        group1 = DefinitionGroup(
+            name="G1",
+            model=None,
+            cycle=current_cycle,
+            selected_fields=["consumption"],
+            selected_formulations=[],
+            sample_formulation_model_overridden={},
+            sample_formulation_model_overrides={},
+            aggregation=sum_comparison,
+            has_factors=None,
+            factors=None,
+            has_thresholds=True,
+            thresholds={u"abc3tc-paed": 10, u"efv200-paed": 10, u"tdf3tcefv-adult": 20},
+        )
+        group2 = DefinitionGroup(
+            name="G2",
+            model=None,
+            cycle=previous_cycle,
+            selected_fields=["consumption"],
+            selected_formulations=[],
+            sample_formulation_model_overridden={},
+            sample_formulation_model_overrides={},
+            aggregation=sum_comparison,
+            has_factors=None,
+            factors=None,
+            has_thresholds=True,
+            thresholds={u"abc3tc-paed": 10, u"efv200-paed": 10, u"tdf3tcefv-adult": 20},
+        )
         result1 = GroupResult(
-            group=group1,
-            values=None,
-            factored_records=[r1],
-            aggregate=0.0,
-            tracer=None
+            group=group1, values=None, factored_records=[r1], aggregate=0.0, tracer=None
         )
 
         result2 = GroupResult(
-            group=group2,
-            values=None,
-            factored_records=[r2],
-            aggregate=0.0,
-            tracer=None)
+            group=group2, values=None, factored_records=[r2], aggregate=0.0, tracer=None
+        )
 
-        self.assertFalse(AtLeastNOfTotal().groups_have_adequate_data([result1, result2]))
+        self.assertFalse(
+            AtLeastNOfTotal().groups_have_adequate_data([result1, result2])
+        )
 
     def test_groups_have_sufficient_data_if_the_sum_of_the_aggregates_is_not_zero(self):
-        group1 = DefinitionGroup(name='G1', model=None, cycle=current_cycle, selected_fields=['consumption'],
-                                 selected_formulations=[], sample_formulation_model_overridden={},
-                                 sample_formulation_model_overrides={}, aggregation=sum_comparison, has_factors=None,
-                                 factors=None,
-                                 has_thresholds=True,
-                                 thresholds={u'abc3tc-paed': 0, u'efv200-paed': 0, u'tdf3tcefv-adult': 5})
-        group2 = DefinitionGroup(name='G2', model=None, cycle=previous_cycle,
-                                 selected_fields=['consumption'], selected_formulations=[],
-                                 sample_formulation_model_overridden={}, sample_formulation_model_overrides={},
-                                 aggregation=sum_comparison, has_factors=None, factors=None, has_thresholds=True,
-                                 thresholds={u'abc3tc-paed': 0, u'efv200-paed': 0, u'tdf3tcefv-adult': 0})
+        group1 = DefinitionGroup(
+            name="G1",
+            model=None,
+            cycle=current_cycle,
+            selected_fields=["consumption"],
+            selected_formulations=[],
+            sample_formulation_model_overridden={},
+            sample_formulation_model_overrides={},
+            aggregation=sum_comparison,
+            has_factors=None,
+            factors=None,
+            has_thresholds=True,
+            thresholds={u"abc3tc-paed": 0, u"efv200-paed": 0, u"tdf3tcefv-adult": 5},
+        )
+        group2 = DefinitionGroup(
+            name="G2",
+            model=None,
+            cycle=previous_cycle,
+            selected_fields=["consumption"],
+            selected_formulations=[],
+            sample_formulation_model_overridden={},
+            sample_formulation_model_overrides={},
+            aggregation=sum_comparison,
+            has_factors=None,
+            factors=None,
+            has_thresholds=True,
+            thresholds={u"abc3tc-paed": 0, u"efv200-paed": 0, u"tdf3tcefv-adult": 0},
+        )
         result1 = GroupResult(
-            group=group1,
-            values=None,
-            factored_records=[r1],
-            aggregate=5,
-            tracer=tracer
+            group=group1, values=None, factored_records=[r1], aggregate=5, tracer=tracer
         )
 
         result2 = GroupResult(
@@ -174,15 +291,19 @@ class TestAtLeastNOfTotalComparison(TestCase):
             values=None,
             factored_records=[r2],
             aggregate=0.0,
-            tracer=tracer)
+            tracer=tracer,
+        )
 
         self.assertTrue(AtLeastNOfTotal().groups_have_adequate_data([result1, result2]))
 
 
 class TestPercentageVarianceLessThanComparison(TestCase):
+
     def test_differ_by_less_than_50(self):
         self.assertFalse(PercentageVarianceLessThanComparison().compare(100, 201, 50))
-        self.assertFalse(PercentageVarianceLessThanComparison().compare(-11.5, None, 50))
+        self.assertFalse(
+            PercentageVarianceLessThanComparison().compare(-11.5, None, 50)
+        )
         self.assertFalse(PercentageVarianceLessThanComparison().compare(201, 100, 50))
         self.assertTrue(PercentageVarianceLessThanComparison().compare(200, 100, 50))
         self.assertTrue(PercentageVarianceLessThanComparison().compare(30, 60, 50))
@@ -197,23 +318,40 @@ class TestPercentageVarianceLessThanComparison(TestCase):
         self.assertTrue(PercentageVarianceLessThanComparison().compare(10, 10, 50))
 
     def test_groups_have_sufficient_data_if_the_aggregate_for_group2_is_zero(self):
-        group1 = DefinitionGroup(name='G1', model=None, cycle=current_cycle, selected_fields=['consumption'],
-                                 selected_formulations=[], sample_formulation_model_overridden={},
-                                 sample_formulation_model_overrides={}, aggregation=sum_comparison, has_factors=None,
-                                 factors=None,
-                                 has_thresholds=False,
-                                 thresholds={u'abc3tc-paed': 10, u'efv200-paed': 10, u'tdf3tcefv-adult': 30})
-        group2 = DefinitionGroup(name='G2', model=None, cycle=previous_cycle,
-                                 selected_fields=['consumption'], selected_formulations=[],
-                                 sample_formulation_model_overridden={}, sample_formulation_model_overrides={},
-                                 aggregation=sum_comparison, has_factors=None, factors=None, has_thresholds=False,
-                                 thresholds={u'abc3tc-paed': 10, u'efv200-paed': 10, u'tdf3tcefv-adult': 20})
+        group1 = DefinitionGroup(
+            name="G1",
+            model=None,
+            cycle=current_cycle,
+            selected_fields=["consumption"],
+            selected_formulations=[],
+            sample_formulation_model_overridden={},
+            sample_formulation_model_overrides={},
+            aggregation=sum_comparison,
+            has_factors=None,
+            factors=None,
+            has_thresholds=False,
+            thresholds={u"abc3tc-paed": 10, u"efv200-paed": 10, u"tdf3tcefv-adult": 30},
+        )
+        group2 = DefinitionGroup(
+            name="G2",
+            model=None,
+            cycle=previous_cycle,
+            selected_fields=["consumption"],
+            selected_formulations=[],
+            sample_formulation_model_overridden={},
+            sample_formulation_model_overrides={},
+            aggregation=sum_comparison,
+            has_factors=None,
+            factors=None,
+            has_thresholds=False,
+            thresholds={u"abc3tc-paed": 10, u"efv200-paed": 10, u"tdf3tcefv-adult": 20},
+        )
         result1 = GroupResult(
             group=group1,
             values=None,
             factored_records=[r1],
             aggregate=50.0,
-            tracer=tracer
+            tracer=tracer,
         )
 
         result2 = GroupResult(
@@ -221,6 +359,11 @@ class TestPercentageVarianceLessThanComparison(TestCase):
             values=None,
             factored_records=[r2],
             aggregate=0.0,
-            tracer=tracer)
+            tracer=tracer,
+        )
 
-        self.assertFalse(PercentageVarianceLessThanComparisonForNNRTI().groups_have_adequate_data([result1, result2]))
+        self.assertFalse(
+            PercentageVarianceLessThanComparisonForNNRTI().groups_have_adequate_data(
+                [result1, result2]
+            )
+        )

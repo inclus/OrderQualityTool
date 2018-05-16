@@ -30,8 +30,14 @@ class TracingFormulationView(APIView):
 
     def get(self, request):
         from dashboard.models import TracingFormulations
+
         tracers = [
-            {"name": tracer.name, "slug": tracer.slug, "consumption_formulations": tracer.consumption_formulations,
-             "patient_formulations": tracer.patient_formulations} for tracer in
-            TracingFormulations.objects.all()]
+            {
+                "name": tracer.name,
+                "slug": tracer.slug,
+                "consumption_formulations": tracer.consumption_formulations,
+                "patient_formulations": tracer.patient_formulations,
+            }
+            for tracer in TracingFormulations.objects.all()
+        ]
         return Response(data=tracers)

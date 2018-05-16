@@ -7,12 +7,20 @@ from dashboard.checks.tracer import Tracer
 from dashboard.data.data_import import ExcelDataImport
 from dashboard.data.html_data_import import HtmlDataImport
 from dashboard.helpers import get_prev_cycle, F1, F2, F3, DEFAULT, YES, WEB, NO
-from dashboard.models import Consumption, AdultPatientsRecord, PAEDPatientsRecord, MultipleOrderFacility, DashboardUser, \
-    Cycle, Score
+from dashboard.models import (
+    Consumption,
+    AdultPatientsRecord,
+    PAEDPatientsRecord,
+    MultipleOrderFacility,
+    DashboardUser,
+    Cycle,
+    Score,
+)
 from dashboard.utils import timeit, log_formatter, should_log_time
 
 logger = pygogo.Gogo(__name__, low_formatter=log_formatter).get_logger()
 logger.setLevel("INFO" if should_log_time() else "ERROR")
+
 
 @timeit
 def persist_consumption(report):
@@ -48,12 +56,16 @@ def persist_records(locs, model, collection, cycle):
                 **record_as_dict
             )
             adult_records.append(c)
-    logger.info("saving records", extra={"cycle": cycle, "model": model.__name__, "count": len(adult_records)})
+    logger.info(
+        "saving records",
+        extra={"cycle": cycle, "model": model.__name__, "count": len(adult_records)},
+    )
     model.objects.filter(cycle=cycle).delete()
     model.objects.bulk_create(adult_records)
 
 
 def build_mof(report):
+
     def func(location):
         facility_name = location.facility
         ip = location.partner
@@ -64,14 +76,17 @@ def build_mof(report):
             name=facility_name,
             ip=ip,
             district=district,
-            warehouse=warehouse)
+            warehouse=warehouse,
+        )
 
     return func
 
 
 @timeit
 def persist_multiple_order_records(report):
-    facilities_with_multiple_orders = pydash.reject(report.locs, lambda f: facility_has_single_order(f))
+    facilities_with_multiple_orders = pydash.reject(
+        report.locs, lambda f: facility_has_single_order(f)
+    )
     all = pydash.map_(facilities_with_multiple_orders, build_mof(report))
     MultipleOrderFacility.objects.filter(cycle=report.cycle).delete()
     MultipleOrderFacility.objects.bulk_create(all)
@@ -80,7 +95,9 @@ def persist_multiple_order_records(report):
 def add_log_entry(data_import):
     cycle = data_import.cycle
     source = ""
-    user, created = DashboardUser.objects.get_or_create(email='background_worker@service', is_active=False)
+    user, created = DashboardUser.objects.get_or_create(
+        email="background_worker@service", is_active=False
+    )
     if type(data_import) == HtmlDataImport:
         source = "from dhis2"
 
@@ -119,7 +136,9 @@ def persist_scores(score_cache, cycle):
             ip=location.partner,
             district=location.district,
             warehouse=location.warehouse,
-            cycle=cycle, data=scores)
+            cycle=cycle,
+            data=scores,
+        )
         for key, value in scores.items():
             for f, result in value.items():
                 formulation_mapping = mapping.get(f)

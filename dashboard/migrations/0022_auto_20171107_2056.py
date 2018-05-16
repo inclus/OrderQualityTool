@@ -7,14 +7,15 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('dashboard', '0021_auto_20171107_2010'),
-    ]
+    dependencies = [("dashboard", "0021_auto_20171107_2010")]
 
     operations = [
         migrations.AlterField(
-            model_name='dhis2standardreport',
-            name='partner',
-            field=models.CharField(choices=[(b'MAUL', b'MAUL'), (b'JMS', b'JMS'), (b'NMS', b'NMS')], max_length=50),
-        ),
+            model_name="dhis2standardreport",
+            name="partner",
+            field=models.CharField(
+                choices=[(b"MAUL", b"MAUL"), (b"JMS", b"JMS"), (b"NMS", b"NMS")],
+                max_length=50,
+            ),
+        )
     ]

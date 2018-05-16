@@ -6,6 +6,7 @@ from dashboard.checks.utils import as_float_or_1
 
 
 class Comparison(object):
+
     def get_result(self, group_results, definition):
         operator_constant = definition.operator_constant
         operator_constant = as_float_or_1(operator_constant)
@@ -14,19 +15,30 @@ class Comparison(object):
             group1_aggregate = group_results[0].aggregate
             group2_aggregate = maybe(group_results)[1].aggregate.or_else(None)
 
-            comparison_result = self.as_result(group1_aggregate, group2_aggregate, operator_constant)
-            result_text = self.text(group1_aggregate, group2_aggregate, operator_constant)
+            comparison_result = self.as_result(
+                group1_aggregate, group2_aggregate, operator_constant
+            )
+            result_text = self.text(
+                group1_aggregate, group2_aggregate, operator_constant
+            )
             return comparison_result, result_text
         return "NOT_REPORTING", None
 
     def groups_have_adequate_data(self, groups):
         valid_groups = py_(groups).reject(lambda x: x is None).value()
-        is_two_cycle = "Previous" in py_(valid_groups).map(lambda group_result: group_result.group.cycle.id).value()
-        if is_two_cycle and not py_(valid_groups).every(
-                lambda group_result: len(group_result.factored_records) > 0).value():
+        is_two_cycle = "Previous" in py_(valid_groups).map(
+            lambda group_result: group_result.group.cycle.id
+        ).value()
+        if (
+            is_two_cycle
+            and not py_(valid_groups).every(
+                lambda group_result: len(group_result.factored_records) > 0
+            ).value()
+        ):
             return False
         number_of_records = py_(valid_groups).map(
-            lambda group_result: group_result.factored_records).flatten().size().value()
+            lambda group_result: group_result.factored_records
+        ).flatten().size().value()
         has_adequate_data = number_of_records > 0
         if has_adequate_data:
             resu = pydash.every(valid_groups, lambda x: x.is_above_threshold())
@@ -79,12 +91,19 @@ class PercentageVarianceLessThanComparison(Comparison):
         return template % (group1, group2, "less" if result else "more", constant)
 
 
-class PercentageVarianceLessThanComparisonForNNRTI(PercentageVarianceLessThanComparison):
+class PercentageVarianceLessThanComparisonForNNRTI(
+    PercentageVarianceLessThanComparison
+):
+
     def groups_have_adequate_data(self, groups):
         denominator = groups[1].aggregate
         if len(groups) > 1 and denominator == 0:
             return False
-        return super(PercentageVarianceLessThanComparison, self).groups_have_adequate_data(groups)
+        return super(
+            PercentageVarianceLessThanComparison, self
+        ).groups_have_adequate_data(
+            groups
+        )
 
 
 class EqualComparison(Comparison):
@@ -125,12 +144,17 @@ class NotEqualComparison(EqualComparison):
 
 
 class NoNegativesComparison(Comparison):
+
     def compare(self, group1, group2, constant=100.0):
-        return py_([group1, group2]).flatten_deep().reject(lambda x: x is None).every(lambda x: x >= 0).value()
+        return py_([group1, group2]).flatten_deep().reject(lambda x: x is None).every(
+            lambda x: x >= 0
+        ).value()
 
     def text(self, group1, group2, constant):
         result = self.compare(group1, group2, constant)
-        values = py_([group1, group2]).flatten_deep().reject(lambda x: x is None).value()
+        values = py_([group1, group2]).flatten_deep().reject(
+            lambda x: x is None
+        ).value()
         template = "%s of the values %s are negative"
         return template % ("none" if result else "some", values)
 
@@ -142,7 +166,9 @@ def get_all_values_from_non_empty_groups(group1, group2):
 class NoBlanksComparison(Comparison):
 
     def compare(self, group1, group2, constant=100.0):
-        return get_all_values_from_non_empty_groups(group1, group2).every(lambda x: x is not None).value()
+        return get_all_values_from_non_empty_groups(group1, group2).every(
+            lambda x: x is not None
+        ).value()
 
     def text(self, group1, group2, constant):
         result = self.compare(group1, group2, constant)
@@ -152,9 +178,11 @@ class NoBlanksComparison(Comparison):
 
 
 class AtLeastNOfTotal(Comparison):
+
     def groups_have_adequate_data(self, groups):
         one_group_has_all_blank = py_(groups).reject(lambda x: x is None).some(
-            lambda gr: gr.all_values_blank()).value()
+            lambda gr: gr.all_values_blank()
+        ).value()
         if one_group_has_all_blank:
             return True
         denominator = groups[1].aggregate + groups[0].aggregate

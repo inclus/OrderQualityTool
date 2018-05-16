@@ -5,6 +5,7 @@ from openpyxl import load_workbook
 
 
 class FormattedKeyDict(collections.MutableMapping):
+
     def __init__(self, data=None, **kwargs):
         self._store = OrderedDict()
         if data is None:
@@ -20,7 +21,7 @@ class FormattedKeyDict(collections.MutableMapping):
         return self._store[self.format_key(key)][1]
 
     def format_key(self, key):
-        return ' '.join(key.lower().split())
+        return " ".join(key.lower().split())
 
     def __delitem__(self, key):
         del self._store[self.format_key(key)]
@@ -33,11 +34,7 @@ class FormattedKeyDict(collections.MutableMapping):
 
     def lower_items(self):
         """Like iteritems(), but with all lowercase keys."""
-        return (
-            (lowerkey, keyval[1])
-            for (lowerkey, keyval)
-            in self._store.items()
-        )
+        return ((lowerkey, keyval[1]) for (lowerkey, keyval) in self._store.items())
 
     def __eq__(self, other):
         if isinstance(other, collections.Mapping):
@@ -59,6 +56,6 @@ def load_file(mapping_file):
     workbook = load_workbook(mapping_file, read_only=True)
     only_sheet = workbook.active
     mapping = FormattedKeyDict()
-    for row in only_sheet['A%s:B%s' % (only_sheet.min_row + 1, only_sheet.max_row)]:
+    for row in only_sheet["A%s:B%s" % (only_sheet.min_row + 1, only_sheet.max_row)]:
         mapping[row[0].value] = row[1].value
     return mapping

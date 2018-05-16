@@ -8,79 +8,33 @@ import jsonfield.fields
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('dashboard', '0034_test_definitions'),
-    ]
+    dependencies = [("dashboard", "0034_test_definitions")]
 
     operations = [
+        migrations.RemoveField(model_name="score", name="MULTIPLE_ORDERS"),
+        migrations.RemoveField(model_name="score", name="OrderFormFreeOfGaps"),
+        migrations.RemoveField(model_name="score", name="REPORTING"),
+        migrations.RemoveField(model_name="score", name="WEB_BASED"),
         migrations.RemoveField(
-            model_name='score',
-            name='MULTIPLE_ORDERS',
+            model_name="score", name="closingBalanceMatchesOpeningBalance"
         ),
+        migrations.RemoveField(model_name="score", name="consumptionAndPatients"),
+        migrations.RemoveField(model_name="score", name="differentOrdersOverTime"),
+        migrations.RemoveField(model_name="score", name="guidelineAdherenceAdult1L"),
+        migrations.RemoveField(model_name="score", name="guidelineAdherenceAdult2L"),
+        migrations.RemoveField(model_name="score", name="guidelineAdherencePaed1L"),
+        migrations.RemoveField(model_name="score", name="nnrtiAdults"),
+        migrations.RemoveField(model_name="score", name="nnrtiPaed"),
         migrations.RemoveField(
-            model_name='score',
-            name='OrderFormFreeOfGaps',
+            model_name="score", name="orderFormFreeOfNegativeNumbers"
         ),
-        migrations.RemoveField(
-            model_name='score',
-            name='REPORTING',
-        ),
-        migrations.RemoveField(
-            model_name='score',
-            name='WEB_BASED',
-        ),
-        migrations.RemoveField(
-            model_name='score',
-            name='closingBalanceMatchesOpeningBalance',
-        ),
-        migrations.RemoveField(
-            model_name='score',
-            name='consumptionAndPatients',
-        ),
-        migrations.RemoveField(
-            model_name='score',
-            name='differentOrdersOverTime',
-        ),
-        migrations.RemoveField(
-            model_name='score',
-            name='guidelineAdherenceAdult1L',
-        ),
-        migrations.RemoveField(
-            model_name='score',
-            name='guidelineAdherenceAdult2L',
-        ),
-        migrations.RemoveField(
-            model_name='score',
-            name='guidelineAdherencePaed1L',
-        ),
-        migrations.RemoveField(
-            model_name='score',
-            name='nnrtiAdults',
-        ),
-        migrations.RemoveField(
-            model_name='score',
-            name='nnrtiPaed',
-        ),
-        migrations.RemoveField(
-            model_name='score',
-            name='orderFormFreeOfNegativeNumbers',
-        ),
-        migrations.RemoveField(
-            model_name='score',
-            name='stableConsumption',
-        ),
-        migrations.RemoveField(
-            model_name='score',
-            name='stablePatientVolumes',
-        ),
-        migrations.RemoveField(
-            model_name='score',
-            name='warehouseFulfilment',
-        ),
+        migrations.RemoveField(model_name="score", name="stableConsumption"),
+        migrations.RemoveField(model_name="score", name="stablePatientVolumes"),
+        migrations.RemoveField(model_name="score", name="warehouseFulfilment"),
         migrations.AddField(
-            model_name='score',
-            name='data',
-            field=jsonfield.fields.JSONField(default='{}'),
+            model_name="score",
+            name="data",
+            field=jsonfield.fields.JSONField(default="{}"),
             preserve_default=False,
         ),
     ]

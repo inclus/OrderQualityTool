@@ -10,13 +10,13 @@ from dashboard.widget import TestDefinitionField
 
 def validate_file_extension(valid_extensions=None):
     if valid_extensions is None:
-        valid_extensions = ['.xlsx', '.xls']
+        valid_extensions = [".xlsx", ".xls"]
 
     def validate(value):
         ext = os.path.splitext(value.name)[1]
 
         if ext not in valid_extensions:
-            raise ValidationError(u'Unsupported file extension.')
+            raise ValidationError(u"Unsupported file extension.")
 
     return validate
 
@@ -35,12 +35,13 @@ class MappingUploadForm(Form):
 
 
 class UserUploadForm(Form):
-    import_file = FileField(validators=[validate_file_extension(['.csv'])])
+    import_file = FileField(validators=[validate_file_extension([".csv"])])
 
 
 class TestDefinitionForm(ModelForm):
+
     class Meta:
         model = FacilityTest
-        fields = '__all__'
+        fields = "__all__"
 
-    add = TestDefinitionField('definition')
+    add = TestDefinitionField("definition")

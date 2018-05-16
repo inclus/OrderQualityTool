@@ -11,11 +11,22 @@ from raven.contrib.django.models import client
 from dashboard.checks.tasks import run_dynamic_checks
 from dashboard.data.data_import import DataImport, ExcelDataImport
 from dashboard.data.html_data_import import HtmlDataImport
-from dashboard.data.tasks import persist_consumption, persist_adult_records, persist_paed_records, \
-    persist_multiple_order_records, add_log_entry, persist_scores
+from dashboard.data.tasks import (
+    persist_consumption,
+    persist_adult_records,
+    persist_paed_records,
+    persist_multiple_order_records,
+    add_log_entry,
+    persist_scores,
+)
 from dashboard.utils import timeit, log_formatter, should_log_time
 from dashboard.medist.tasks import fetch_reports
-from dashboard.models import Cycle, Dhis2StandardReport, LocationToPartnerMapping, DashboardUser
+from dashboard.models import (
+    Cycle,
+    Dhis2StandardReport,
+    LocationToPartnerMapping,
+    DashboardUser,
+)
 
 logger = pygogo.Gogo(__name__, low_formatter=log_formatter).get_logger()
 logger.setLevel("INFO" if should_log_time() else "ERROR")
@@ -42,27 +53,24 @@ def update_checks(ids):
             data_import = DataImport(None, cycle.title).build_form_db(cycle)
             calculate_scores_for_checks_in_cycle(data_import)
         except Exception as e:
-            logger.error("error",
-                         extra={
-                             "exception": e.message,
-                             "cycle": cycle.title})
+            logger.error("error", extra={"exception": e.message, "cycle": cycle.title})
             client.captureException()
 
 
 def to_mon(first_month_match):
     months = {
-        'Jan': '01',
-        'Feb': '02',
-        'Mar': '03',
-        'Apr': '04',
-        'May': '05',
-        'Jun': '06',
-        'Jul': '07',
-        'Aug': '08',
-        'Sep': '09',
-        'Oct': '10',
-        'Nov': '11',
-        'Dec': '12',
+        "Jan": "01",
+        "Feb": "02",
+        "Mar": "03",
+        "Apr": "04",
+        "May": "05",
+        "Jun": "06",
+        "Jul": "07",
+        "Aug": "08",
+        "Sep": "09",
+        "Oct": "10",
+        "Nov": "11",
+        "Dec": "12",
     }
     return months.get(first_month_match, "")
 

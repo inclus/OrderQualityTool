@@ -7,15 +7,23 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('dashboard', '0027_auto_20171127_0255'),
-    ]
+    dependencies = [("dashboard", "0027_auto_20171127_0255")]
 
     operations = [
         migrations.AddField(
-            model_name='facilitytest',
-            name='test_type',
-            field=models.CharField(choices=[(b'FACILITY_ONLY', b'FACILITY_ONLY'), (b'FACILITY_AND_SAMPLE_FORMULATION', b'FACILITY_AND_SAMPLE_FORMULATION')], default='FACILITY_ONLY', max_length=255),
+            model_name="facilitytest",
+            name="test_type",
+            field=models.CharField(
+                choices=[
+                    (b"FACILITY_ONLY", b"FACILITY_ONLY"),
+                    (
+                        b"FACILITY_AND_SAMPLE_FORMULATION",
+                        b"FACILITY_AND_SAMPLE_FORMULATION",
+                    ),
+                ],
+                default="FACILITY_ONLY",
+                max_length=255,
+            ),
             preserve_default=False,
-        ),
+        )
     ]

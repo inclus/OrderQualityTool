@@ -29,9 +29,25 @@ F2_QUERY = ["Abacavir/Lamivudine (ABC/3TC) 60mg/30mg [Pack 60]"]
 def add_default_tracers(apps, schema_editor):
     model = apps.get_registered_model("dashboard", "TracingFormulations")
     tracers = [
-        {NAME: F1, PATIENT_FORMULATIONS: F1_PATIENT_QUERY, CONSUMPTION_FORMULATIONS: F1_QUERY, "slug": slugify(F1)},
-        {NAME: F2, PATIENT_FORMULATIONS: F2_PATIENT_QUERY, CONSUMPTION_FORMULATIONS: F2_QUERY, "slug": slugify(F2)},
-        {NAME: F3, PATIENT_FORMULATIONS: F3_PATIENT_QUERY, CONSUMPTION_FORMULATIONS: F3_QUERY, "slug": slugify(F3)}, ]
+        {
+            NAME: F1,
+            PATIENT_FORMULATIONS: F1_PATIENT_QUERY,
+            CONSUMPTION_FORMULATIONS: F1_QUERY,
+            "slug": slugify(F1),
+        },
+        {
+            NAME: F2,
+            PATIENT_FORMULATIONS: F2_PATIENT_QUERY,
+            CONSUMPTION_FORMULATIONS: F2_QUERY,
+            "slug": slugify(F2),
+        },
+        {
+            NAME: F3,
+            PATIENT_FORMULATIONS: F3_PATIENT_QUERY,
+            CONSUMPTION_FORMULATIONS: F3_QUERY,
+            "slug": slugify(F3),
+        },
+    ]
     model.objects.all().delete()
     for tracer in tracers:
         model_obj, created = model.objects.get_or_create(**tracer)
@@ -43,10 +59,6 @@ def reverse(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
-    dependencies = [
-        ('dashboard', '0043_remove_tracingformulations_model'),
-    ]
+    dependencies = [("dashboard", "0043_remove_tracingformulations_model")]
 
-    operations = [
-        migrations.RunPython(add_default_tracers, reverse),
-    ]
+    operations = [migrations.RunPython(add_default_tracers, reverse)]

@@ -38,7 +38,11 @@ class DashboardUser(AbstractEmailUser):
         choices=(
             (WAREHOUSE, WAREHOUSE),
             (DISTRICT, DISTRICT),
-            (IIP, IIP), (MOH_CENTRAL, MOH_CENTRAL)), max_length=50)
+            (IIP, IIP),
+            (MOH_CENTRAL, MOH_CENTRAL),
+        ),
+        max_length=50,
+    )
     access_area = CharField(max_length=250, null=True, blank=True)
 
     def get_full_name(self):
@@ -48,7 +52,7 @@ class DashboardUser(AbstractEmailUser):
         return self.email
 
     class Meta:
-        app_label = 'dashboard'
+        app_label = "dashboard"
         verbose_name_plural = "Users"
 
 
@@ -192,37 +196,37 @@ class FacilityTest(OrderedModel):
     description = RichTextField()
     short_description = models.TextField()
     featured = models.BooleanField(default=False)
-    slug = AutoSlugField(populate_from=['name'.encode('utf-8')])
+    slug = AutoSlugField(populate_from=["name".encode("utf-8")])
 
     class Meta(OrderedModel.Meta):
         verbose_name_plural = "Facility Tests"
 
     def __unicode__(self):
-        return u'%s' % self.name
+        return u"%s" % self.name
 
     def get_type(self):
-        return maybe(json.loads(self.definition))['type']['id'].or_else(None)
+        return maybe(json.loads(self.definition))["type"]["id"].or_else(None)
 
 
 class TracingFormulations(models.Model):
     name = models.CharField(max_length=255)
     consumption_formulations = JSONField()
     patient_formulations = JSONField()
-    slug = AutoSlugField(populate_from=['name'.encode('utf-8')])
+    slug = AutoSlugField(populate_from=["name".encode("utf-8")])
 
     def as_dict_obj(self):
         return {
             "name": self.name,
             "slug": self.slug,
             "patient_formulations": self.patient_formulations,
-            "consumption_formulations": self.consumption_formulations
+            "consumption_formulations": self.consumption_formulations,
         }
 
     class Meta:
         verbose_name_plural = "Tracing Formulations"
 
     def __unicode__(self):
-        return u'%s' % (self.name)
+        return u"%s" % (self.name)
 
     @staticmethod
     def get_abc_paed():

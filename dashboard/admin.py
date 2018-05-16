@@ -12,44 +12,58 @@ from logentry_admin.admin import LogEntryAdmin
 from ordered_model.admin import OrderedModelAdmin
 
 from dashboard.forms import TestDefinitionForm
-from dashboard.models import DashboardUser, Consumption, Cycle, AdultPatientsRecord, PAEDPatientsRecord, \
-    Score, MultipleOrderFacility, Dhis2StandardReport, FacilityTest, TracingFormulations
+from dashboard.models import (
+    DashboardUser,
+    Consumption,
+    Cycle,
+    AdultPatientsRecord,
+    PAEDPatientsRecord,
+    Score,
+    MultipleOrderFacility,
+    Dhis2StandardReport,
+    FacilityTest,
+    TracingFormulations,
+)
 from dashboard.tasks import update_checks
 
 
 class EmailUserAdmin(UserAdmin):
     fieldsets = (
-        (None, {'fields': ('email', 'password')}),
-        (_('Permissions'), {
-            'fields': ('is_active', 'is_staff', 'is_superuser',
-                       'groups', 'user_permissions')
-        }),
-        (_('Important dates'), {'fields': ('last_login', 'date_joined')}),
+        (None, {"fields": ("email", "password")}),
+        (
+            _("Permissions"),
+            {
+                "fields": (
+                    "is_active",
+                    "is_staff",
+                    "is_superuser",
+                    "groups",
+                    "user_permissions",
+                )
+            },
+        ),
+        (_("Important dates"), {"fields": ("last_login", "date_joined")}),
     )
-    add_fieldsets = ((
-                         None, {
-                             'classes': ('wide',),
-                             'fields': ('email', 'password1', 'password2')
-                         }
-                     ),
+    add_fieldsets = (
+        (None, {"classes": ("wide",), "fields": ("email", "password1", "password2")}),
     )
 
     form = EmailUserChangeForm
     add_form = EmailUserCreationForm
 
-    list_display = ('email', 'is_staff')
-    list_filter = ('is_staff', 'is_superuser', 'is_active', 'groups')
-    search_fields = ('email',)
-    ordering = ('email',)
-    filter_horizontal = ('groups', 'user_permissions',)
+    list_display = ("email", "is_staff")
+    list_filter = ("is_staff", "is_superuser", "is_active", "groups")
+    search_fields = ("email",)
+    ordering = ("email",)
+    filter_horizontal = ("groups", "user_permissions")
 
 
 class QdbSite(AdminSite):
-    site_title = ugettext_lazy('Order Quality admin')
+    site_title = ugettext_lazy("Order Quality admin")
 
-    site_header = ugettext_lazy('Order Quality administration')
+    site_header = ugettext_lazy("Order Quality administration")
 
-    index_title = ugettext_lazy('Order Quality administration')
+    index_title = ugettext_lazy("Order Quality administration")
 
 
 class MyModelAdmin(HierarchicalModelAdmin):
@@ -58,38 +72,32 @@ class MyModelAdmin(HierarchicalModelAdmin):
 
 class ConsumptionAdmin(ModelAdmin):
     list_display = (
-        'name',
-        'cycle',
-        'district',
-        'ip',
-        'warehouse',
-        'formulation',
-        'opening_balance',
-        'quantity_received',
-        'consumption',
-        'loses_adjustments',
-        'closing_balance',
-        'months_of_stock_on_hand',
-        'quantity_required_for_current_patients',
-        'estimated_number_of_new_patients',
-        'estimated_number_of_new_pregnant_women'
+        "name",
+        "cycle",
+        "district",
+        "ip",
+        "warehouse",
+        "formulation",
+        "opening_balance",
+        "quantity_received",
+        "consumption",
+        "loses_adjustments",
+        "closing_balance",
+        "months_of_stock_on_hand",
+        "quantity_required_for_current_patients",
+        "estimated_number_of_new_patients",
+        "estimated_number_of_new_pregnant_women",
     )
-    search_fields = ('name', 'cycle', 'district', 'ip')
-    list_filter = ('cycle', 'formulation')
+    search_fields = ("name", "cycle", "district", "ip")
+    list_filter = ("cycle", "formulation")
 
 
 class PatientAdmin(ModelAdmin):
-    search_fields = ('name', 'district')
-    list_filter = ('cycle', 'formulation', 'ip', 'warehouse')
-    list_display = ('name',
-                    'cycle',
-                    'district',
-                    'ip',
-                    'warehouse',
-                    'formulation',
-                    'existing',
-                    'new'
-                    )
+    search_fields = ("name", "district")
+    list_filter = ("cycle", "formulation", "ip", "warehouse")
+    list_display = (
+        "name", "cycle", "district", "ip", "warehouse", "formulation", "existing", "new"
+    )
 
 
 def run_tests(model_admin, request, queryset):
@@ -100,18 +108,19 @@ run_tests.short_description = "Run quality tests for these cycles"
 
 
 class ScoreAdmin(ModelAdmin):
-    search_fields = ('name', 'district')
-    list_display = ('name',
-                    'cycle',
-                    'district',
-                    'ip',
-                    'warehouse',
-                    'default_pass_count',
-                    'default_fail_count',
-                    'f1_pass_count',
-                    'f1_fail_count'
-                    )
-    list_filter = ('cycle',)
+    search_fields = ("name", "district")
+    list_display = (
+        "name",
+        "cycle",
+        "district",
+        "ip",
+        "warehouse",
+        "default_pass_count",
+        "default_fail_count",
+        "f1_pass_count",
+        "f1_fail_count",
+    )
+    list_filter = ("cycle",)
 
     def cycle(self, obj):
         return obj.facility_cycle.cycle
@@ -128,14 +137,12 @@ class CycleAdmin(ModelAdmin):
 
 
 class FacilityTestAdmin(OrderedModelAdmin):
-    list_display = ('name', 'move_up_down_links', 'order')
+    list_display = ("name", "move_up_down_links", "order")
 
 
 class TracingFormulationAdmin(ModelAdmin):
-    search_fields = ('name', 'model')
-    list_display = ('name',
-                    'slug',
-                    )
+    search_fields = ("name", "model")
+    list_display = ("name", "slug")
 
 
 admin_site = QdbSite()
