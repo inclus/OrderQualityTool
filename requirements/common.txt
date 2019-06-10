@@ -19,7 +19,7 @@ django-logentry-admin==1.0.3
 django-ordered-model==1.4.3
 django-password-reset==1.0
 django-picklefield==1.0.0
-django-prometheus==1.0.12
+django-prometheus==1.0.15
 django-simple-menu==1.2.1
 Django==1.11.21
 djangorestframework==3.8.2
