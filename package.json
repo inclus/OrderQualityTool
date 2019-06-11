@@ -20,7 +20,7 @@
   "homepage": "https://github.com/CHAIUganda/OrderQualityTool#readme",
   "devDependencies": {
     "angular-mocks": "1.5.11",
-    "compression-webpack-plugin": "^1.0.1",
+    "compression-webpack-plugin": "^1.1.12",
     "css-loader": "~0.28.7",
     "eslint": "^5.16.0",
     "eslint-loader": "^1.9.0",
