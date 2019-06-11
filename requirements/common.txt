@@ -2,7 +2,7 @@ arrow==0.12.1
 assertlib==0.3.2
 attrs==17.4.0
 beautifulsoup4==4.7.1
-celery==4.1.0
+celery==4.3.0
 contextlib2==0.5.5
 dictdiffer
 django-admirarchy==0.2.2
