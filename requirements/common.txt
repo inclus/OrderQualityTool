@@ -1,4 +1,4 @@
-arrow==0.12.1
+arrow==0.14.2
 assertlib==0.3.2
 attrs==17.4.0
 beautifulsoup4==4.7.1
