@@ -5,7 +5,7 @@ beautifulsoup4==4.7.1
 celery==4.3.0
 contextlib2==0.5.5
 dictdiffer
-django-admirarchy==0.2.2
+django-admirarchy==1.0.0
 django-analytical==2.4.0
 django-bootstrap3==9.1.0
 django-braces==1.12.0
