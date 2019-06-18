@@ -196,7 +196,7 @@ class FacilityTest(OrderedModel):
     description = RichTextField()
     short_description = models.TextField()
     featured = models.BooleanField(default=False)
-    slug = AutoSlugField(populate_from=["name".encode("utf-8")])
+    slug = AutoSlugField(populate_from=["name"])
 
     class Meta(OrderedModel.Meta):
         verbose_name_plural = "Facility Tests"
@@ -212,7 +212,7 @@ class TracingFormulations(models.Model):
     name = models.CharField(max_length=255)
     consumption_formulations = JSONField()
     patient_formulations = JSONField()
-    slug = AutoSlugField(populate_from=["name".encode("utf-8")])
+    slug = AutoSlugField(populate_from=["name"])
 
     def as_dict_obj(self):
         return {
