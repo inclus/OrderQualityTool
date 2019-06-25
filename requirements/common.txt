@@ -30,7 +30,7 @@ jsonfield==2.0.2
 markdown==2.6.11
 model_mommy
 openpyxl==2.6.2
-pathlib2==2.3.0
+pathlib2==2.3.4
 psycopg2==2.8.2
 pydash==4.7.5
 pygogo==0.12.0
