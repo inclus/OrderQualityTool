@@ -40,7 +40,7 @@
     "url-loader": "0.6.2",
     "webpack": "~3.12.0",
     "webpack-dev-server": "^2.9.4",
-    "write-file-webpack-plugin": "^4.2.0"
+    "write-file-webpack-plugin": "^4.5.0"
   },
   "dependencies": {
     "angular": "1.5.11",
