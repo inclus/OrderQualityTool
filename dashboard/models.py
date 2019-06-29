@@ -58,7 +58,7 @@ class DashboardUser(AbstractEmailUser):
 
 class Cycle(models.Model):
     title = models.CharField(max_length=256, db_index=True, unique=True)
-    state = PickledObjectField()
+    state = PickledObjectField(null=True)
 
     def __unicode__(self):
         return "%s" % (self.title)
@@ -177,7 +177,7 @@ class Dhis2StandardReport(models.Model):
 
 
 class LocationToPartnerMapping(models.Model):
-    mapping = PickledObjectField()
+    mapping = PickledObjectField(null=True)
 
     def update(self, mapping):
         self.objects.all().delete()
