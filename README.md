@@ -1,7 +1,7 @@
 # OrderQualityTool
 Order Quality Tool and Dashboard, to connect to DHIS2 data
 
-[![Build Status](https://travis-ci.org/CHAIUganda/OrderQualityTool.svg?branch=develop)](https://travis-ci.org/CHAIUganda/OrderQualityTool)
+[![CircleCI](https://circleci.com/gh/inclus/OrderQualityTool.svg?style=svg)](https://circleci.com/gh/inclus/OrderQualityTool)
 ## Developer Setup
 
 
