@@ -1,7 +1,7 @@
 version: 2
 
 jobs:
-  build-python:
+  build-py:
     docker:
       - image: themattrix/tox
     working_directory: ~/py
@@ -34,3 +34,9 @@ jobs:
             - node_modules
           key: js-dependencies-{{ checksum "package.json" }}
       - run: npm test
+workflows:
+  version: 2
+  test:
+    jobs:
+      - build-py
+      - build-js
