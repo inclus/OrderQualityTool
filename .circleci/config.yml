@@ -41,5 +41,5 @@ workflows:
     jobs:
       - build-py
       - build-js
-        requires:
+          requires:
             - build-py
