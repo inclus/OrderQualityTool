@@ -8,11 +8,11 @@ jobs:
     steps:
       - checkout
       - run: cat requirements/*.txt > all.txt
+      - run: cat all.txt
       - run: apt-get update && apt-get install libpq-dev -y
       - restore_cache:
           keys:
             - py-dependencies-{{ checksum "all.txt" }}
-            - py-dependencies-
       - run: tox
       - save_cache:
           paths:
@@ -28,7 +28,6 @@ jobs:
       - restore_cache:
           keys:
             - js-dependencies-{{ checksum "package.json" }}
-            - js-dependencies-
       - run: npm install
       - save_cache:
           paths:
