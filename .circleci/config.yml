@@ -1,0 +1,36 @@
+version: 2
+
+jobs:
+  build-python:
+    docker:
+      - image: themattrix/tox
+    working_directory: ~/py
+    steps:
+      - checkout
+      - run: cat requirements/*.txt all.txt
+      - restore_cache:
+          keys:
+            - py-dependencies-{{ checksum "all.txt" }}
+            - py-dependencies-
+      - run: tox
+      - save_cache:
+          paths:
+            - ".tox"
+            - ".eggs"
+          key: py-dependencies-{{ checksum "all.txt" }}
+  build-js:
+    docker:
+      - image: circleci/node:10.16
+    working_directory: ~/js
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - js-dependencies-{{ checksum "package.json" }}
+            - js-dependencies-
+      - run: npm install
+      - save_cache:
+          paths:
+            - node_modules
+          key: js-dependencies-{{ checksum "package.json" }}
+      - run: npm test
