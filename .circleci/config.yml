@@ -7,7 +7,7 @@ jobs:
     working_directory: ~/py
     steps:
       - checkout
-      - run: cat requirements/*.txt all.txt
+      - run: cat requirements/*.txt > all.txt
       - restore_cache:
           keys:
             - py-dependencies-{{ checksum "all.txt" }}
