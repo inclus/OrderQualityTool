@@ -38,7 +38,7 @@ pymaybe==0.1.6
 raven==6.10.0
 redis==2.10.6
 requests==2.22.0
-splinter==0.10.10
+splinter==0.11.0
 ujson==1.35
 uwsgi
 xlrd==1.2.0
