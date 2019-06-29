@@ -65,7 +65,7 @@
     "lodash": "^4.17.11",
     "multiple-select": "~1.2.1",
     "ng-dialog": "^1.4.0",
-    "ng-table": "^1.0.0",
+    "ng-table": "^3.0.1",
     "select2": "~4.0.1",
     "ui-select": "^0.19.8"
   }
