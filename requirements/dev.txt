@@ -2,7 +2,7 @@
 coverage==4.5.3
 django-jenkins
 django-nose
-django-webtest==1.9.6
+django-webtest==1.9.7
 mock
 nose-parameterized==0.6.0
 nose-timer
