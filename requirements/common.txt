@@ -29,7 +29,7 @@ future==0.17.1
 jsonfield==2.0.2
 markdown==3.1.1
 model_mommy
-openpyxl==2.6.2
+openpyxl==2.6.3
 pathlib2==2.3.4
 psycopg2==2.8.3
 pydash==4.7.5
