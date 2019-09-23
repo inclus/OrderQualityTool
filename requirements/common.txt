@@ -3,7 +3,7 @@ assertlib==0.3.2
 attrs==19.1.0
 beautifulsoup4==4.8.0
 celery==4.3.0
-contextlib2==0.5.5
+contextlib2==0.6.0
 dictdiffer
 django-admirarchy==1.0.0
 django-analytical==2.5.0
