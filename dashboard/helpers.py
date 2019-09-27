@@ -30,7 +30,7 @@ def format_range(start, end):
 
 def generate_cycles(start, end):
     if start.month % 2 == 0:
-        start = start.replace(months=-1)
+        start = start.shift(months=-1)
     return [
         format_range(s, e) for s, e in CustomArrow.span_range("month=2", start, end)
     ]
@@ -38,12 +38,12 @@ def generate_cycles(start, end):
 
 def generate_choices():
     return [
-        (s, s) for s in generate_cycles(now().replace(years=-2), now().replace(years=4))
+        (s, s) for s in generate_cycles(now().shift(years=-2), now().shift(years=4))
     ]
 
 
 def generate_past_choices(years=3):
-    return [(s, s) for s in generate_cycles(now().replace(years=-years), now())]
+    return [(s, s) for s in generate_cycles(now().shift(years=-years), now())]
 
 
 def to_date(text):
@@ -191,16 +191,16 @@ PASS_COUNT = "pass_count"
 
 def get_prev_cycle(cycle):
     current_cycle_date = to_date(cycle)
-    start_month = current_cycle_date.replace(months=-3)
-    end_month = current_cycle_date.replace(months=-2)
+    start_month = current_cycle_date.shift(months=-3)
+    end_month = current_cycle_date.shift(months=-2)
     prev_cycle = format_range(start_month, end_month)
     return prev_cycle
 
 
 def get_next_cycle(cycle):
     current_cycle_date = to_date(cycle)
-    start_month = current_cycle_date.replace(months=1)
-    end_month = current_cycle_date.replace(months=2)
+    start_month = current_cycle_date.shift(months=1)
+    end_month = current_cycle_date.shift(months=2)
     prev_cycle = format_range(start_month, end_month)
     return prev_cycle
 

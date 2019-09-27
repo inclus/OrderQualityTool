@@ -157,7 +157,7 @@ class CyclesView(APIView):
         most_recent_cycle = get_most_recent_cycle()
         if most_recent_cycle:
             month = to_date(most_recent_cycle)
-            cycles = generate_cycles(now().replace(years=-2), month)
+            cycles = generate_cycles(now().shift(years=-2), month)
             cycles.reverse()
             return Response({"values": cycles, "most_recent_cycle": most_recent_cycle})
         return Response({"values": [], "most_recent_cycle": most_recent_cycle})
@@ -265,7 +265,7 @@ class ScoresAPIView(APIView):
         filters = build_filters(self.request)
         if formulation is None:
             formulation = DEFAULT
-        cycles = generate_cycles(now().replace(years=-2), now())
+        cycles = generate_cycles(now().shift(years=-2), now())
         if start and end:
             start_index = cycles.index(start)
             end_index = cycles.index(end)
