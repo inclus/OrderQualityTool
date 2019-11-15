@@ -63,7 +63,7 @@
     "jquery": "1.12.4",
     "jsrender": "~1.0.5",
     "lodash": "^4.17.15",
-    "multiple-select": "~1.4.3",
+    "multiple-select": "~1.5.2",
     "ng-dialog": "^1.4.0",
     "ng-table": "^3.0.1",
     "select2": "~4.0.11",
