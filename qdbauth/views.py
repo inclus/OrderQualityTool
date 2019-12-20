@@ -2,7 +2,7 @@ from braces.views import LoginRequiredMixin, SuperuserRequiredMixin
 from custom_user.forms import EmailUserCreationForm
 from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import AdminPasswordChangeForm
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.forms import ModelForm, CharField, Select
 from django.http import HttpResponseRedirect
 from django.views.generic import ListView, FormView

@@ -2,7 +2,7 @@ import json
 import os
 from json import loads
 
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django_webtest import WebTest
 from mock import patch, ANY
 from pydash import py_

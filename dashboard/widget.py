@@ -1,7 +1,7 @@
 from django.db.models import Field
 from django.forms import Textarea
 from django.template import loader
-from django.utils import six
+import six
 from django.utils.encoding import (
     smart_text,
 )
