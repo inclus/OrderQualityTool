@@ -7,5 +7,5 @@ mock
 nose-parameterized==0.6.0
 nose-timer
 pyhamcrest
-responses==0.10.7
+responses==0.10.9
 safety==1.8.5
