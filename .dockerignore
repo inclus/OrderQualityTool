@@ -3,7 +3,7 @@ asset_files/
 tmp
 .tmp
 dashboard/static/vendor/
-.node_modules/
+node_modules/
 data/
 .git/
 .tox/
@@ -15,3 +15,10 @@ Dockerfile
 docker-compose.yml
 __pycache__/
 *.pyc
+coverage/
+**/__pycache__/
+*.py[cod]
+*$py.class
+**/*.pyc
+deploy_docs/
+dashboard/static/dist

@@ -33,6 +33,7 @@ jobs:
           paths:
             - node_modules
           key: js-dependencies-{{ checksum "package.json" }}
+      - run: npm run build
       - run: npm test
 workflows:
   version: 2

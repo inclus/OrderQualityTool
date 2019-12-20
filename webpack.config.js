@@ -19,6 +19,26 @@ if (isDevServer) {
 }
 
 module.exports = {
+  mode: 'production',
+   optimization: {
+      splitChunks: {
+        chunks: 'all',
+        maxInitialRequests: Infinity,
+        cacheGroups: {
+          vendor: {
+            test: /[\\/]node_modules[\\/]/,
+            name(module) {
+              // get the name. E.g. node_modules/packageName/not/this/part.js
+              // or node_modules/packageName
+              const packageName = module.context.match(/[\\/]node_modules[\\/](.*?)([\\/]|$)/)[1];
+  
+              // npm package names are URL-safe, but some servers don't like @ symbols
+              return `npm.${packageName.replace('@', '')}`;
+            },
+          },
+        },
+      }
+    },
     devtool: 'inline-source-map',
     entry: {
         app: entryFiles,
@@ -27,11 +47,12 @@ module.exports = {
   },
   output: {
     path: path.join(__dirname, "dashboard/static/dist"),
-    filename: "[name].bundle.js",
+    filename: "[name].[hash:8].bundle.js",
     publicPath: "/static/dist/"
   },
   module: {
-    loaders: [{
+   
+    rules: [{
       test: /\.less$/,
       loader: "style-loader!css-loader!less-loader"
     }, {
@@ -68,7 +89,8 @@ module.exports = {
     new webpack.HotModuleReplacementPlugin(),
     new webpack.NoEmitOnErrorsPlugin(),
     new CompressionPlugin(),
-    new WriteFilePlugin()
+    new WriteFilePlugin(),
+    new webpack.HashedModuleIdsPlugin(), 
   ],
   resolve: {
     alias: {

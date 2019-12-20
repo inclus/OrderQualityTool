@@ -38,7 +38,8 @@
     "less-loader": "5.0.0",
     "style-loader": "^0.23.1",
     "url-loader": "1.1.2",
-    "webpack": "~3.12.0",
+    "webpack": "v4.41.4",
+    "webpack-cli": "^3.3.10",
     "webpack-dev-server": "^2.11.5",
     "write-file-webpack-plugin": "^4.5.1"
   },
@@ -52,7 +53,7 @@
     "angular-selector": "^1.6.1",
     "angular-ui-router": "~1.0.23",
     "angular-ui-router-tabs": "~2.0.2",
-    "bootstrap": "4.4.1",
+    "bootstrap": "3.4.1",
     "checklist-model": "~1.0.0",
     "components-font-awesome": "~5.9.0",
     "datatables.net": "^1.10.20",
@@ -66,6 +67,7 @@
     "multiple-select": "~1.5.2",
     "ng-dialog": "^1.4.0",
     "ng-table": "^3.0.1",
+    "popper.js": "^1.16.0",
     "select2": "~4.0.12",
     "ui-select": "^0.19.8"
   }

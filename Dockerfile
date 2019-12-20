@@ -10,7 +10,7 @@ COPY webpack.config.js /usr/src/app/
 COPY uisrc /usr/src/app/uisrc/
 RUN npm run build
 
-FROM python:2.7-alpine
+FROM python:3.7-alpine
 RUN mkdir -p /usr/src/app
 WORKDIR /usr/src/app
 ENV PHANTOMJS_ARCHIVE="phantomjs.tar.gz"
