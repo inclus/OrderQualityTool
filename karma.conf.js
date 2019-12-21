@@ -22,7 +22,7 @@ module.exports = function (config) {
 
     webpack: {
       module: {
-        loaders: [{
+        rules: [{
           test: /\.less$/,
           loader: "style-loader!css-loader!less-loader"
         }, {
