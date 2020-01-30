@@ -42,4 +42,4 @@ splinter==0.13.0
 ujson==1.35
 uwsgi
 xlrd==1.2.0
-django-ckeditor==5.8.0
+django-ckeditor==5.9.0
