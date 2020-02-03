@@ -36,7 +36,7 @@ pydash==4.7.6
 pygogo==0.12.0
 pymaybe==0.1.6
 raven==6.10.0
-redis==3.3.11
+redis==3.4.1
 requests==2.22.0
 splinter==0.13.0
 ujson==1.35
