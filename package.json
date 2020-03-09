@@ -67,7 +67,7 @@
     "multiple-select": "~1.5.2",
     "ng-dialog": "^1.4.0",
     "ng-table": "^3.0.1",
-    "popper.js": "^1.16.0",
+    "popper.js": "^1.16.1",
     "select2": "~4.0.13",
     "ui-select": "^0.19.8"
   }
