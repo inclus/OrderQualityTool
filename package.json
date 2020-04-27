@@ -23,7 +23,7 @@
     "compression-webpack-plugin": "^3.1.0",
     "css-loader": "^3.4.2",
     "eslint": "^6.7.2",
-    "eslint-loader": "^3.0.3",
+    "eslint-loader": "^4.0.2",
     "file-loader": "5.0.2",
     "html-loader": "^0.5.5",
     "istanbul-instrumenter-loader": "^3.0.1",
