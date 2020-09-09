@@ -32,7 +32,7 @@
     "karma-coverage-istanbul-reporter": "^2.1.1",
     "karma-jasmine": "^3.1.1",
     "karma-phantomjs-launcher": "^1.0.4",
-    "karma-sourcemap-loader": "^0.3.7",
+    "karma-sourcemap-loader": "^0.3.8",
     "karma-webpack": "^4.0.2",
     "less": "^3.11.1",
     "less-loader": "6.1.1",
