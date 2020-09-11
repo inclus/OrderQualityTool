@@ -31,7 +31,7 @@ markdown==3.2.2
 model_mommy
 openpyxl==3.0.5
 pathlib2==2.3.5
-psycopg2==2.8.4
+psycopg2==2.8.6
 pydash==4.7.6
 pygogo==0.12.0
 pymaybe==0.1.6
